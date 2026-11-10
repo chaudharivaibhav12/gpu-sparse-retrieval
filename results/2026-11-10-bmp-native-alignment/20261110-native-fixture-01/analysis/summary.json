@@ -1,0 +1,25 @@
+{
+  "summary": {
+    "attempts": 96,
+    "crashes": 20,
+    "returned_score_errors": 0,
+    "successful_attempts_missing_above_cutoff": 50,
+    "oracle_queries_verified": 12,
+    "returned_rows_checked": 5120,
+    "canonical_top10_matches": 16
+  },
+  "interpretation": [
+    "Observed singleton query: original ID 1047 scores 7 in the independent oracle, while native BMP returns no rows with exit 0. Source search.rs:131-153 initializes current block, scores it only inside a loop over subsequent blocks, and omits final queued block.",
+    "Observed constant-score query k=10: all 193 passages score 1; native BMP panics at search.rs:131. Initial threshold equals every block bound; strict ub > threshold creates an empty queue followed by unwrap.",
+    "Observed constant-score query k=1000: 192 positive results returned; passage 1047 is absent. This reproduces final-block omission without score ties affecting result cardinality.",
+    "Observed empty query panics at query/mod.rs:50. Unknown-only query panics at search.rs:131. Source inspection shows unchecked unwraps on absent maxima or empty block queue.",
+    "Observed tie query k=10: all returned scores correct and no score-above-cutoff winner omitted in this minimal case; tied membership and order differ from original-numeric-ID canonical rule. Native heap strict score admission and equal-score comparator explain the policy difference."
+  ],
+  "limitations": [
+    "193 synthetic documents and 12 fixture queries; block sizes 8/32, raw/compressed bounds, k=10/1000, alpha=beta=1.0.",
+    "All oracle scores are at most 9120; u16 overflow and real-data external alignment remain untested.",
+    "Minimal source causes characterized; no corrected BMP variant was built. Native original binary/source unchanged."
+  ],
+  "qualification": "Native external BMP has no runtime adapter. Observations are uninstrumented correctness checks. No retrieval speed comparison.",
+  "next_action": "Create a separately labeled corrected variant and rerun this fixture, then common calibration data."
+}
