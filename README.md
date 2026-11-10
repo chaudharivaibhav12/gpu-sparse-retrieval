@@ -2,6 +2,10 @@
 
 C++17/CUDA research project for exact ranked passage retrieval over a pre-encoded SPLADE index. The proposed system uses block-score bounds to avoid unnecessary payload reads while preserving exact results under a fixed scoring representation.
 
+## Team experiments
+
+Start with [CONTRIBUTING.md](CONTRIBUTING.md). Every new experiment uses `exp/<owner>/<experiment-id>`, an `experiments/<experiment-id>/` folder and a fresh `results/<experiment-id>/<run-id>/` folder. The experiment folder links directly to its saved runs. Copy the template and fill the question, full settings, code paths and decision rules before execution.
+
 ## Repository layout
 
 | Directory | Contents |
@@ -9,8 +13,9 @@ C++17/CUDA research project for exact ranked passage retrieval over a pre-encode
 | `src/` | Independent CIFF importer, sequential scorer, offline pruning pilot and CUDA scoring controls |
 | `tests/` | Independent Python conversion, scoring and pruning fixtures |
 | `scripts/` | Pinned input acquisition, experiment drivers and result summarization |
-| `results/` | Small calibration outputs, input/build manifests and correctness evidence |
-| `docs/` | Research plan, implementation notes, current status, beginner guide and course materials |
+| `experiments/` | Experiment index, templates, code/config references, reviews and links to each run |
+| `results/` | Canonical per-experiment run folders plus preserved historical evidence |
+| `docs/` | Research plan, implementation notes, current status and beginner guide |
 | `papers/` | Reference PDFs supplied for the project |
 
 ## Current state
@@ -44,6 +49,10 @@ Bulk input/index files are reproducible from pinned metadata and excluded from G
 The scoring contract uses exact uint8 document impacts, the pinned BMP float32/ceil cap32 query transformation, uint64 accumulation, and score-descending/original-numeric-ID-ascending ties. These semantics do not establish equivalence to original model FP32 retrieval.
 
 ## Documentation
+
+- [Team contribution and experiment conventions](CONTRIBUTING.md)
+- [Experiment index](experiments/README.md)
+- [Saved results layout](results/README.md)
 
 - [Research plan](docs/research-plan.md)
 - [Current project status](docs/project-status.md)
