@@ -1,0 +1,60 @@
+{
+  "review_stage": "separate pre-execution orchestration and post-execution evidence review",
+  "algorithm_changes": false,
+  "parent_source_and_binary_equivalence_verified": true,
+  "source_commit": "069adb1378582174f42416fba969fe4539cfc879",
+  "binary_build_source_commit": "ee099d4d98835d88f19a12cef2328308e2ba5479",
+  "checks": [
+    "parent config loaded; only corpus/input and command allowance deltas declared",
+    "driver syntax check and manual path/timeout/gate/parent-delta review before execution",
+    "input hashes and source/patch/binary/lock equality before execution",
+    "byte-identical GSP and effective-query round trips",
+    "PISA bytes equal 100K parent",
+    "fresh gated CPU top-10 equal historical 1M bytes",
+    "both 25-query canonical comparisons",
+    "CRC/SHA-256 evidence archive and public artifact hashes"
+  ],
+  "result": {
+    "source_commit": "069adb1378582174f42416fba969fe4539cfc879",
+    "binary_build_source_commit": "ee099d4d98835d88f19a12cef2328308e2ba5479",
+    "documents": 1000000,
+    "queries_per_layout": 25,
+    "k": 10,
+    "block_size": 32,
+    "layouts": [
+      {
+        "compressed": false,
+        "exit_code": 0,
+        "queries": 25,
+        "mismatched_query_ids": [],
+        "unexpected_query_ids": [],
+        "stdout": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/real-b32-raw-search.stdout",
+        "recording_id": "OBSERVATION-85127399c223",
+        "index_sha256": "2a47def0141e18903e05bb7934618102f5048a881fce0fa250b843b19e1f0ba8",
+        "index_bytes": 1588159243
+      },
+      {
+        "compressed": true,
+        "exit_code": 0,
+        "queries": 25,
+        "mismatched_query_ids": [],
+        "unexpected_query_ids": [],
+        "stdout": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/real-b32-compressed-search.stdout",
+        "recording_id": "OBSERVATION-7a35242ac2f2",
+        "index_sha256": "14c33d7844b28f1ebecf7fd4fa3956710cb4e36aeb6ed7ac89285f28338c3838",
+        "index_bytes": 1114914705
+      }
+    ],
+    "roundtrip_byte_identical": true,
+    "prepared_weights_byte_identical": true,
+    "parent_100k_pisa_byte_identical": true,
+    "historical_cpu_top10_byte_identical": true,
+    "success": true,
+    "qualification": "Corrected external commands are uninstrumented observations; CPU reference is runtime-gated. Correctness scope only."
+  },
+  "limits": [
+    "First 25 calibration queries, k=10, block size 32 and this nested 1M subset.",
+    "External BMP commands remain uninstrumented observations; CPU reference is runtime-gated.",
+    "No held-out evaluation or repeated/interleaved timing comparison."
+  ]
+}
