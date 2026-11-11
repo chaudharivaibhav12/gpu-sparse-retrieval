@@ -1,0 +1,70 @@
+{
+  "parent_experiment": "2026-11-11-cuda-block-control",
+  "parent_source_commit": "89a896fd2e7eec5f0d5434cee89ca40555ccd047",
+  "base_main_commit": "37d306450ddf9c912fcea32e1c1a267b8ef086f8",
+  "block_sizes": [
+    16,
+    32
+  ],
+  "corpus_sizes": [
+    100000,
+    1000000
+  ],
+  "queries": "first 25 calibration queries in original order",
+  "k": 10,
+  "gpu_id": 0,
+  "seed_policy": "first 16 identity document blocks; distinct actual documents; kth seed score or zero when insufficient",
+  "bounds": "exact uint8 per-term per-block maxima, uint64 weighted sum",
+  "skip_rule": "skip only bounds strictly below seed threshold; retain equal bounds",
+  "schedule": "stable three-pass prefix compaction; seed blocks already scored and excluded from rescore",
+  "scorer": "same block_scores CSR scorer and hierarchical GPU merger as parent",
+  "skipped_score_policy": "zero the entire dense score buffer before every pruned query; skipped positive losers may have zero placeholder scores and must not be described as full-score matches",
+  "correctness": {
+    "fixtures": "regular sizes 0/1/17/255/256/257/1025/8193; depths 0/1/10/100/128; five independent queries; modes 0 and 1 at both block sizes",
+    "special_fixture": "prunable 1025 documents, k10: positive certified losers plus a tied winner in the final partial block with the smallest original ID",
+    "real_data": "100K/1M, 25 calibration queries, k10; modes 0 and 1 at B16/B32",
+    "checks": [
+      "every returned canonical ID/score",
+      "evaluated GPU document scores",
+      "every upper bound against CPU term-max sum and full-reference block maximum",
+      "stable survivor list and flags",
+      "threshold against actual distinct seed witnesses",
+      "every skipped document strictly below threshold and zeroed placeholder",
+      "wrong expected tie-pruning mark must be rejected before query compute"
+    ]
+  },
+  "timing": {
+    "only_after_all_correctness_passes": true,
+    "corpus": 1000000,
+    "block_sizes": [
+      16,
+      32
+    ],
+    "mode": 2,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "order": "alternates control/pruned by (round+query index)%2",
+    "cpu_affinity": "minimum allowed logical CPU, resolved and frozen on CIMS",
+    "primary_statistic": "geometric mean of query-wise pruned/control median query wall ratios",
+    "uncertainty": "10000 query-pair percentile bootstrap samples, seed 20261111, conditional 95% interval",
+    "boundary": "weight preparation/upload, score reset, seed scoring/selection, bounds, stable compaction, survivor-count transfer, survivor scoring, global merging and winner copy",
+    "excluded": "index/plane build/upload, runtime gate, CPU oracle, validation-only and diagnostic threshold transfers, file I/O and monitoring",
+    "cache": "repeated resident calibration workload; both paths in one process with pruning metadata resident",
+    "monitoring": "GPU clocks/power/memory/compute PIDs sampled; shared-node contention limits interpretation",
+    "stopping": "fixed rounds; no optional stopping/tuning; stop on any correctness failure; defer timing if selected GPU remains occupied for ten minutes"
+  },
+  "decision_rule": "A ratio below 1 with interval below 1 is promising within this calibration execution. Above 1 is negative. An interval crossing 1 is inconclusive. No held-out/general service inference.",
+  "declared_changes": [
+    "Add full-byte term-major block maxima plane, prefix seed policy, strict-bound filter, stable compaction and score-reset policy.",
+    "Add mode 0 matched unpruned, mode 1 pruned validation, mode 2 paired resident measurement.",
+    "Factor parent main behind a preprocessor guard; default parent executable is unchanged.",
+    "Add new runtime config/semantic fields and explicit not_checked for disabled in-process validation.",
+    "Pruned dense score placeholders are not actual document scores; verify only evaluated scores and independently certify skipped losers."
+  ],
+  "limitations": [
+    "No held-out access; no selective refinement yet; k>128 unsupported.",
+    "Full-byte maxima add substantial resident metadata; no peak-memory reduction is assumed.",
+    "Paired process holds metadata for both rows, so control peak memory cannot be inferred from paired allocation counts.",
+    "Correctness code and CUDA compilation still need CIMS execution; no new results exist yet."
+  ]
+}

@@ -21,6 +21,7 @@ struct GpuEvent {
     ~GpuEvent() { cudaEventDestroy(event); }
 };
 
+#ifndef GSP_BLOCK_SCORER_ONLY
 int main(int argc,char** argv) {
     try {
         require(argc==10,"Usage: cuda_device_topk INDEX QUERIES CSV TOP_TSV LIMIT K GPU VERIFY_SCORES BLOCK_SIZE");
@@ -85,3 +86,5 @@ int main(int argc,char** argv) {
         return 0;
     } catch (const exception& e) { cerr<<"ERROR: "<<e.what()<<'\n';return 1; }
 }
+
+#endif

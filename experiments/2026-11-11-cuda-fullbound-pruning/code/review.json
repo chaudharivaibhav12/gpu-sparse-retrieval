@@ -1,0 +1,42 @@
+{
+  "stage": "separate pre-execution source/analysis review; CUDA validation pending",
+  "reviewed": [
+    "The scorer body and GPU merger are reused; parent-main suppression is conditional and defaults preserve the parent executable.",
+    "Exact uint8 maxima and uint64 sums are conservative. Real distinct prefix seeds establish a lower threshold; equal upper bounds are retained.",
+    "Seed selection addresses the contiguous seed prefix. k0/N0 paths avoid null dereferences and empty launches.",
+    "Every pruned query zeroes all scores before seed/survivor scoring. Skipped positive losers are placeholders and are certified against the CPU reference, not falsely compared for full-score equality.",
+    "All scan threads reach both barriers each step; scan/group-prefix/scatter kernels provide global ordering; stable sorted block IDs are verified against CPU flags.",
+    "Seed blocks are excluded from survivor scoring; seed+survivor+skipped accounting covers all blocks.",
+    "Queried survivor count is copied before launching its exact CTA count; this four-byte synchronization cost is inside query timing.",
+    "Diagnostic threshold copy, CPU reference, flag/bound validation and output writes are outside the query boundary. Returned candidate validity and identity are checked even with CPU verification disabled.",
+    "All algorithm settings, memory sizes, seed capacity, mode/round counts, CPU affinity and semantic policies are reported before query compute.",
+    "Paired statistics are withheld unless every output, membership, iteration order and verification status passes."
+  ],
+  "local_checks": [
+    "Independent fixture generator syntax and generated 8193-document compaction-boundary cases passed.",
+    "Special fixture confirms an equal-bound tail winner with ID zero and positive low-score certified losers.",
+    "Analysis tests passed: known 2x ratio/bootstrap, duplicate samples, iteration drift, verification-status drift, block accounting and wrong score rejection."
+  ],
+  "alternatives": [
+    {
+      "option": "Choose seeds using the largest query bounds",
+      "reason_deferred": "Additional selection/gather policy would compound the first correctness test; record prefix-seed survivor/threshold behavior before tuning."
+    },
+    {
+      "option": "Atomic survivor compaction",
+      "reason_deferred": "Use a deterministic stable order to keep the matched pipeline auditable."
+    }
+  ],
+  "pending": [
+    "nvcc compilation and independently checked GPU fixtures",
+    "100K/1M canonical and skipped-block safety checks",
+    "deliberate runtime tie-policy rejection",
+    "only then fixed paired calibration timing"
+  ],
+  "limits": [
+    "No held-out access; no selective refinement yet; k>128 unsupported.",
+    "Full-byte maxima add substantial resident metadata; no peak-memory reduction is assumed.",
+    "Paired process holds metadata for both rows, so control peak memory cannot be inferred from paired allocation counts.",
+    "Correctness code and CUDA compilation still need CIMS execution; no new results exist yet."
+  ]
+}
