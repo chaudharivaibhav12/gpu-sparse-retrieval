@@ -1,5 +1,5 @@
 {
-  "stage": "separate pre-execution review; CIMS compile/regression validation pending",
+  "stage": "Second separate pre-execution review: runtime gate timeout parsing correction",
   "parent_experiment": "2026-11-10-bmp-1m-validation",
   "parent_result_commit": "1e4b1314691aae5c46e6eb211229d663d8c97a9c",
   "reviewed": [
@@ -24,18 +24,24 @@
     "overlay_apply": "PASS: git apply --check and exact reviewed-source bytes with core.autocrlf=false"
   },
   "pending": [
-    "Compile Rust with pinned Cargo.lock on CIMS.",
-    "Run eight expected Rust tests (five parent plus three context tests).",
-    "Rerun unchanged 96 CLI fixture cases and benchmark-specific fixture output checks.",
-    "Verify runtime-gate deliberate drift rejection before measured run.",
-    "Verify all 1M warmup/measured outputs and fixed sample membership before interpreting latency."
+    "Rebuild at corrected source commit; rerun eight library tests and two adapter timeout tests.",
+    "Repeat deliberate runtime drift rejection and accepted benchmark fixture, checking no parser error.",
+    "Validate all 1M outputs/sample membership before latency interpretation."
   ],
   "limits": [
-    "No Rust toolchain available in local Windows environment; source is not declared execution-validated.",
-    "CIMS login is currently disconnected.",
-    "No timing results exist yet."
+    "No latency result yet. Earlier failed adapter run is preserved; no measured-query outputs were produced."
   ],
   "validation_notes": [
     "Initial local byte check differed only because global Windows Git autocrlf converted output to CRLF. Repeated under explicit LF policy; patch application and exact bytes passed. No algorithm change was needed."
-  ]
+  ],
+  "observed_build_validation": {
+    "library_tests": 8,
+    "cli_fixture_cases": 96,
+    "qualification": "Built/tested on initial source 2e80ccdd6554881e8a8c1f6b57e5bf14954f7676; gate parser subsequently requires rebuild."
+  },
+  "failed_attempts": [
+    "Fixture checker initially lacked a copied CPU oracle; original stderr retained and exact parent copy enabled successful 96-case analysis.",
+    "Initial adapter fixture failed before query execution because the runner provided 185.0 to an integer timeout parser. Initial drift-rejection interpretation must be revalidated because this parser error was concurrent."
+  ],
+  "gate_fix_review": "Parse finite positive decimal seconds before emitting runtime snapshot; retain atomic report and reject/continue handshake. Add integer/decimal/fractional acceptance and invalid/nonfinite/nonpositive/unbounded rejection tests. Search loop, timer boundary, query/round settings and scoring unchanged."
 }

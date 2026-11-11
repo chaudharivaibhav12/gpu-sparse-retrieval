@@ -32,8 +32,17 @@ fn quoted(s: &str) -> String {
     format!("\"{}\"", s)
 }
 
+fn gate_timeout(value: &str) -> Result<Duration> {
+    // The Python runner serializes its floating-point CLI value as e.g. 185.0.
+    let seconds = value.parse::<f64>()?;
+    ensure!(seconds.is_finite() && seconds > 0.0 && seconds <= 86400.0,
+            "Runtime gate timeout must be finite and between zero and one day");
+    Ok(Duration::from_secs_f64(seconds))
+}
+
 fn gate(a: &Args, docs: usize, queries: usize, raw_block: usize, compressed_block: usize) -> Result<()> {
     let directory = match std::env::var("RESEARCH_RUNTIME_DIR") { Ok(s) => PathBuf::from(s), Err(_) => return Ok(()) };
+    let timeout = gate_timeout(&std::env::var("RESEARCH_GATE_SECONDS").unwrap_or_else(|_| "65".into()))?;
     let config = format!(concat!("{{\"mode\":\"bmp-resident-paired\",\"docs\":{},\"query_count\":{},",
         "\"k\":{},\"raw_block_size\":{},\"compressed_block_size\":{},\"cpu\":{},",
         "\"warmups\":{},\"repeats\":{},\"rayon_threads\":{},\"raw_index\":{},",
@@ -52,9 +61,8 @@ fn gate(a: &Args, docs: usize, queries: usize, raw_block: usize, compressed_bloc
     pending.sync_all()?;
     ensure!(!directory.join("runtime.json").exists(), "Duplicate runtime report");
     fs::rename(directory.join("runtime.pending"), directory.join("runtime.json"))?;
-    let seconds = std::env::var("RESEARCH_GATE_SECONDS").unwrap_or_else(|_| "65".into()).parse::<u64>()?;
     let start = Instant::now();
-    while start.elapsed() < Duration::from_secs(seconds) {
+    while start.elapsed() < timeout {
         ensure!(!directory.join("reject").exists(), "Runtime gate rejected");
         if directory.join("continue").exists() { return Ok(()); }
         thread::sleep(Duration::from_millis(25));
@@ -151,4 +159,24 @@ fn main() -> Result<()> {
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::gate_timeout;
+    use std::time::Duration;
+
+    #[test]
+    fn accepts_runner_decimal_timeout() {
+        assert_eq!(gate_timeout("185.0").unwrap(), Duration::from_secs(185));
+        assert_eq!(gate_timeout("65").unwrap(), Duration::from_secs(65));
+        assert_eq!(gate_timeout("0.5").unwrap(), Duration::from_millis(500));
+    }
+
+    #[test]
+    fn rejects_invalid_or_unbounded_timeout() {
+        for value in ["NaN", "inf", "-1", "0", "86401", "invalid"] {
+            assert!(gate_timeout(value).is_err(), "{}", value);
+        }
+    }
 }
