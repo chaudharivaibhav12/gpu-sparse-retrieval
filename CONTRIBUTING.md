@@ -6,7 +6,7 @@ Vaibhav, Parva and Arnav use this convention for each new experiment. Read the [
 
 - Create one branch per experiment using `exp/<owner>/<experiment-id>`. Use `vaibhav`, `parva` or `arnav` for the agreed owner.
 - Use `chore/<topic>` for repository organization and shared tooling changes.
-- Start from the current `main`, or document the exact parent experiment commit when extending another experiment.
+- Start each new experiment from the current `main`. For follow-on work, first merge the reviewed parent PR after authorization, update `main`, then create the new experiment branch. Record the parent experiment and exact commit.
 - Commit experiment changes on their experiment branch. Push the branch and open a pull request into `main` for review and integration.
 - Continue repetitions of the same frozen experiment on its branch with new run IDs. Start a new experiment branch when the research question, implementation treatment or scoring contract changes. Record the parent and explain the changes.
 - Keep native external baselines and corrected variants identifiable by revision, patch and separate experiment IDs.
