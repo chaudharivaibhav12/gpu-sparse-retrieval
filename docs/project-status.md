@@ -16,9 +16,9 @@ Read the [native experiment](../experiments/2026-11-10-bmp-native-alignment/READ
 
 ## Pending work
 
-1. Review the block-control PR; GPU top-k PR #6 is merged. Broaden calibration/process repetitions before final performance claims.
+1. Review the full-bound pruning result PR when opened; block-control PR #7 is merged. Broaden calibration/process repetitions before final performance claims.
 2. Use the validated CSR block-exhaustive control to define matched pruning timing and memory boundaries.
-3. Implement full-byte GPU seed/filter/scheduling and compare against its unpruned control.
+3. Replicate and broaden full-byte pruning calibration; profile actual traffic and stage costs before coarse/refinement ablations.
 4. Test coarse-only and selective refinement using the same seed, scorer and merger, with actual DRAM traffic measurements.
 5. Expand calibration, freeze settings before held-out evaluation, account for peak memory, reproduce released GPUSparse and test a second device.
 
@@ -35,3 +35,7 @@ The [GPU selection experiment](../experiments/2026-11-11-cuda-device-topk/README
 ## November 11: CSR block-exhaustive GPU control
 
 Block sizes 16 and 32 passed 350 independent fixture queries and 100 calibration query checks across 100K/1M, with no score/ranking mismatches. Identity block scheduling uses the same CSR payload and GPU merger for a future pruned counterpart. See [the experiment](../experiments/2026-11-11-cuda-block-control/README.md). No speedup or peak-memory claim; full-byte seed/bounds/filter is next.
+
+## November 11: full-byte pruning calibration
+
+Full-byte GPU pruning now has an initial [calibration result](../experiments/2026-11-11-cuda-fullbound-pruning/README.md): all correctness checks passed, and paired query-wise latency ratios were 0.7626 at B16 and 0.8415 at B32 (23.74% and 15.85% lower latency). These are conditional 25-query, 1M-passage results; some queries regress, full-byte maxima add substantial metadata, and no held-out, external-baseline or peak-memory conclusion is established. Next: replicate/expand calibration, then compare full/coarse/refinement with a fixed seed/scorer/merger.
