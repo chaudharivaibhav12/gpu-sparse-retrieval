@@ -1,0 +1,51 @@
+{
+  "native_revision": "67ad8c683fbc0c30145d1ee42c1dffbed8b12332",
+  "patch": "code/bmp-canonical.patch",
+  "dependency_lock": "experiments/2026-11-10-bmp-native-alignment/configs/BMP-Cargo.lock",
+  "fixture": {
+    "documents": 193,
+    "queries": 12,
+    "block_sizes": [
+      8,
+      32
+    ],
+    "compressed_ranges": [
+      false,
+      true
+    ],
+    "depths": [
+      10,
+      1000
+    ],
+    "alpha": 1.0,
+    "beta": 1.0,
+    "rayon_threads": 1,
+    "expected_attempts": 96,
+    "inputs": "unchanged native fixture and expected.json"
+  },
+  "real_data": {
+    "documents": 100000,
+    "queries": 25,
+    "query_membership": "first 25 lines of calibration-500.tsv in preserved order",
+    "block_size": 32,
+    "compressed_ranges": [
+      false,
+      true
+    ],
+    "k": 10,
+    "alpha": 1.0,
+    "beta": 1.0,
+    "rayon_threads": 1
+  },
+  "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+  "declared_changes": [
+    "final-block and empty-queue handling",
+    "empty query maximum",
+    "numeric original-ID canonical heap and equal-bound retention",
+    "zero-score eligibility and k capped at corpus size",
+    "u64 scores/bounds/selection/TREC",
+    "sorted wide bounds replace 16-bit buckets; prefetch/lookahead removed",
+    "raw/compressed bound weights paired independently"
+  ],
+  "validation": "All ordered IDs and integer scores must match; fixture CIFF unchanged; real GSP round trip byte-identical; no held-out queries or performance claims."
+}

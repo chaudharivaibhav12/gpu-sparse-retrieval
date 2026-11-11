@@ -20,9 +20,9 @@ Start with [CONTRIBUTING.md](CONTRIBUTING.md). Every new experiment uses `exp/<o
 
 ## Current state
 
-The sequential oracle and offline pruning pilot are implemented. The initial CUDA forward scorer has passed the preserved real-data correctness checks at 100K/1M passages with 25 calibration queries per size. It currently copies scores to the CPU for top-k selection. GPU top-k, the same-layout block-exhaustive control, GPU pruning and external baseline reproduction remain pending.
+The sequential oracle and offline pruning pilot are implemented. The initial CUDA forward scorer has passed the preserved real-data correctness checks at 100K/1M passages with 25 calibration queries per size. It currently copies scores to the CPU for top-k selection. GPU top-k, the same-layout block-exhaustive control and GPU pruning remain pending. CPU BMP correctness progress is summarized below; released GPUSparse reproduction remains pending.
 
-The optional runtime-reporting hooks were added after these historical results and still require a rebuilt CIMS fixture check. Do not interpret the offline pilot or single-observation CUDA timings as an established speedup.
+The rebuilt runtime hooks passed the CIMS checks. The native BMP comparison exposed correctness failures. Its corrected canonical variant passed all 96 fixture cases and both raw/compressed 100K comparisons on 25 calibration queries. See the [correction experiment](experiments/2026-11-10-bmp-correctness-fixes/README.md) for measured source, fixes and evidence. External performance measurement remains pending.
 
 ## Build and check on Linux/CIMS
 
@@ -51,6 +51,7 @@ The scoring contract uses exact uint8 document impacts, the pinned BMP float32/c
 ## Documentation
 
 - [Team contribution and experiment conventions](CONTRIBUTING.md)
+- [Prompt for a teammate’s Claude or ChatGPT](docs/TEAM-AI-PROMPT.md)
 - [Experiment index](experiments/README.md)
 - [Saved results layout](results/README.md)
 

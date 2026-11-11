@@ -1,0 +1,431 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-10-bmp-correctness-fixes",
+  "run_id": "20261110-corrected-real100k-01",
+  "status": "passed",
+  "executed_at_utc": null,
+  "recorded_at_utc": "2026-11-11T00:14:14.377949+00:00",
+  "packaged_at_utc": "2026-11-11T00:20:19.877929+00:00",
+  "qualification": "Corrected external BMP commands are uninstrumented observations; real CPU reference uses the runtime-gated recorder.",
+  "source": {
+    "repository": "chaudharivaibhav12/gpu-sparse-retrieval",
+    "branch": "exp/vaibhav/2026-11-10-bmp-correctness-fixes",
+    "commit": "ee099d4d98835d88f19a12cef2328308e2ba5479",
+    "native_revision": "67ad8c683fbc0c30145d1ee42c1dffbed8b12332",
+    "patch_sha256": "bfedc4c9787287723642df4d6c4a4bbc1fe31be4691a55b9d941b02400b8dc5b",
+    "patched_source_hashes": {
+      "bin/search.rs": "ac764ef0602ab4f7dc4735523371963f733d7d2b3acdafebafcb80dffa14c739",
+      "src/index/forward_index.rs": "2aee121ed226ade2ad8c9a00d19cbcafe81eff2cfc29b0e9fc91634cf3089e7f",
+      "src/query/live_block.rs": "b05c4260babffa06bbdbf585e415780b1311ea34bb5272f6bed8b97f4d66e906",
+      "src/query/mod.rs": "bcb03f03282efb3283ec200110639bcb0174e3744af33fed92e2aae37b65eae3",
+      "src/query/topk_heap.rs": "bbda6f60d30cacef87511ed3620542ac65e77ffa17798ca1f9af9d9862efc1dc",
+      "src/search.rs": "d00569052cbc0c070519e911553c3dabd0a2c58d84eae113c6241489517e26d2",
+      "src/util.rs": "6fabdaf31eb13fe15610edfa33ea88cee6290f6fc0b0714f266296916df2a19e"
+    }
+  },
+  "configuration": {
+    "native_revision": "67ad8c683fbc0c30145d1ee42c1dffbed8b12332",
+    "patch": "code/bmp-canonical.patch",
+    "dependency_lock": "experiments/2026-11-10-bmp-native-alignment/configs/BMP-Cargo.lock",
+    "fixture": {
+      "documents": 193,
+      "queries": 12,
+      "block_sizes": [
+        8,
+        32
+      ],
+      "compressed_ranges": [
+        false,
+        true
+      ],
+      "depths": [
+        10,
+        1000
+      ],
+      "alpha": 1.0,
+      "beta": 1.0,
+      "rayon_threads": 1,
+      "expected_attempts": 96,
+      "inputs": "unchanged native fixture and expected.json"
+    },
+    "real_data": {
+      "documents": 100000,
+      "queries": 25,
+      "query_membership": "first 25 lines of calibration-500.tsv in preserved order",
+      "block_size": 32,
+      "compressed_ranges": [
+        false,
+        true
+      ],
+      "k": 10,
+      "alpha": 1.0,
+      "beta": 1.0,
+      "rayon_threads": 1
+    },
+    "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+    "declared_changes": [
+      "final-block and empty-queue handling",
+      "empty query maximum",
+      "numeric original-ID canonical heap and equal-bound retention",
+      "zero-score eligibility and k capped at corpus size",
+      "u64 scores/bounds/selection/TREC",
+      "sorted wide bounds replace 16-bit buckets; prefetch/lookahead removed",
+      "raw/compressed bound weights paired independently"
+    ],
+    "validation": "All ordered IDs and integer scores must match; fixture CIFF unchanged; real GSP round trip byte-identical; no held-out queries or performance claims."
+  },
+  "inputs": {
+    "results/2026-11-10-bmp-native-alignment/20261110-native-fixture-01/raw/fixture.ciff": "b5cb40eac889d841cb5cee513a673a4a252d5938aabee4b0ecdf2425c0a78f24",
+    "results/2026-11-10-bmp-native-alignment/20261110-native-fixture-01/raw/all.pisa": "f1e017a5b483435b9bc22cad9d0b13d0b2e63eae8107f48cfafda3ae955c098a",
+    "results/2026-11-10-bmp-native-alignment/20261110-native-fixture-01/raw/expected.json": "f4d1360a732d802eb02cb48417691c9bca47b53fd9c470df6d7ff9b99247433e",
+    "results/2026-11-10-bmp-native-alignment/20261110-native-fixture-01/raw/oracle.tsv": "2c2e138ef2bcef12e83c5aec0f750c6ae469c56e490f1d61127f2e3266ba0437",
+    "data/derived/hash-100000.gsp": "ee7ffdb9c527f3e486fe560426e27f4f02d2a61b42b8f138eaf7671a8aeb73ab",
+    "data/derived/calibration-500.tsv": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+    "data/derived/calibration-500.tsv.split.tsv": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+  },
+  "build": {
+    "commands": [
+      [
+        "cargo",
+        "test",
+        "--locked",
+        "--lib",
+        "-j",
+        "2"
+      ],
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--bins",
+        "--locked",
+        "-j",
+        "2"
+      ]
+    ],
+    "compiler_version": "rustc 1.92.0",
+    "regression_tests_passed": 5,
+    "binary_hashes": {
+      "ciff2bmp": "eda1cf54ac8a30e43f8287ef5046cee8d9db98c337ed41f875ae5308e949043a",
+      "search": "1fe5865b774ce810bb9acc2f54e087dd63b9f8aca183e685a3b8d832feb8fded"
+    },
+    "dependency_lock": "../../../experiments/2026-11-10-bmp-native-alignment/configs/BMP-Cargo.lock"
+  },
+  "environment": {
+    "device": "CPU",
+    "allowed_environment": {
+      "RAYON_NUM_THREADS": "1"
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "./build/cpu_pilot",
+        "queries",
+        "build/real100k-export/queries.pisa",
+        "build/real100k-roundtrip.gsp",
+        "build/real100k-reprepared.tsv",
+        "25"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:15:20.737652+00:00",
+      "recording_id": "OBSERVATION-01a2f7ef8f42",
+      "record_type": "observation"
+    },
+    {
+      "argv": [
+        "build/BMP/target/release/ciff2bmp",
+        "--bsize",
+        "32",
+        "--ciff-file",
+        "build/real100k-export/subset.ciff",
+        "--output",
+        "build/real-b32-raw.bmp"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:15:26.935302+00:00",
+      "recording_id": "OBSERVATION-581f1b4f9955",
+      "record_type": "observation"
+    },
+    {
+      "argv": [
+        "./build/cpu_pilot",
+        "import",
+        "build/real100k-export/subset.ciff",
+        "build/real100k-roundtrip.gsp",
+        "100000"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:15:19.694057+00:00",
+      "recording_id": "OBSERVATION-689ded5bec20",
+      "record_type": "observation"
+    },
+    {
+      "argv": [
+        "build/BMP/target/release/search",
+        "--index",
+        "build/real-b32-raw.bmp",
+        "--queries",
+        "build/real100k-export/queries.pisa",
+        "--k",
+        "10",
+        "--alpha",
+        "1.0",
+        "--beta",
+        "1.0"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:15:27.976209+00:00",
+      "recording_id": "OBSERVATION-a374e2fe74b5",
+      "record_type": "observation"
+    },
+    {
+      "argv": [
+        "g++",
+        "-O3",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-std=c++17",
+        "src/cpu_pilot.cpp",
+        "-o",
+        "build/cpu_pilot"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:15:15.305575+00:00",
+      "recording_id": "OBSERVATION-a9b19e95f893",
+      "record_type": "observation"
+    },
+    {
+      "argv": [
+        "build/BMP/target/release/search",
+        "--index",
+        "build/real-b32-compressed.bmp",
+        "--queries",
+        "build/real100k-export/queries.pisa",
+        "--k",
+        "10",
+        "--alpha",
+        "1.0",
+        "--beta",
+        "1.0"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:15:33.284282+00:00",
+      "recording_id": "OBSERVATION-a9ed0d56bcb6",
+      "record_type": "observation"
+    },
+    {
+      "argv": [
+        "build/BMP/target/release/ciff2bmp",
+        "--bsize",
+        "32",
+        "--ciff-file",
+        "build/real100k-export/subset.ciff",
+        "--output",
+        "build/real-b32-compressed.bmp",
+        "--compress-range"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:15:32.448367+00:00",
+      "recording_id": "OBSERVATION-ab43a2eac9dd",
+      "record_type": "observation"
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "scripts/export_bmp_inputs.py",
+        "--index",
+        "data/derived/hash-100000.gsp",
+        "--queries",
+        "data/derived/calibration-500.tsv",
+        "--limit",
+        "25",
+        "--output",
+        "build/real100k-export"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:15:10.743180+00:00",
+      "recording_id": "OBSERVATION-fde24bf423ac",
+      "record_type": "observation"
+    },
+    {
+      "argv": [
+        "./build/cpu_pilot",
+        "score",
+        "data/derived/hash-100000.gsp",
+        "data/derived/calibration-500.tsv",
+        "results/2026-11-10-bmp-correctness-fixes/20261110-corrected-real100k-01/raw/oracle.tsv",
+        "10",
+        "25"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:15:22.934486+00:00",
+      "recording_id": "RUN_FINISHED-bf67cd86e29a",
+      "record_type": "run_finished"
+    }
+  ],
+  "timing_boundary": "Correctness only; no comparative performance claim.",
+  "correctness": {
+    "roundtrip_byte_identical": true,
+    "prepared_weights_byte_identical": true,
+    "source_commit": "ee099d4d98835d88f19a12cef2328308e2ba5479",
+    "layouts": [
+      {
+        "compressed": false,
+        "exit_code": 0,
+        "queries": 25,
+        "mismatched_query_ids": [],
+        "unexpected_query_ids": [],
+        "stdout": "results/2026-11-10-bmp-correctness-fixes/20261110-corrected-real100k-01/logs/real-b32-raw-search.stdout",
+        "observation": "OBSERVATION-a374e2fe74b5",
+        "index_sha256": "d6f8057701aa31bbc1c166eaa0d699cec332824aab2cd5eb15715494cd4755c4"
+      },
+      {
+        "compressed": true,
+        "exit_code": 0,
+        "queries": 25,
+        "mismatched_query_ids": [],
+        "unexpected_query_ids": [],
+        "stdout": "results/2026-11-10-bmp-correctness-fixes/20261110-corrected-real100k-01/logs/real-b32-compressed-search.stdout",
+        "observation": "OBSERVATION-a9ed0d56bcb6",
+        "index_sha256": "f2384ef3802739c294948284db1134051f896a08474f1241a60d4f1298500ad9"
+      }
+    ]
+  },
+  "recording_ids": [
+    "OBSERVATION-dc74a5192e59",
+    "OBSERVATION-01a2f7ef8f42",
+    "OBSERVATION-581f1b4f9955",
+    "OBSERVATION-689ded5bec20",
+    "OBSERVATION-a374e2fe74b5",
+    "OBSERVATION-a9b19e95f893",
+    "OBSERVATION-a9ed0d56bcb6",
+    "OBSERVATION-ab43a2eac9dd",
+    "OBSERVATION-fde24bf423ac",
+    "RUN_FINISHED-bf67cd86e29a"
+  ],
+  "artifacts": [
+    {
+      "path": "analysis/comparison.json",
+      "sha256": "679de2d43db63717686837201c7c508d41c86d0de166e166c5d92a3c6d0f076a",
+      "bytes": 994
+    },
+    {
+      "path": "logs/build-cpu-reference.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/build-cpu-reference.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/environment.txt",
+      "sha256": "6e2f1620a66c20299c5ad767e688e758d3eec91d53f8c58c4f3d9b23622ae22c",
+      "bytes": 3954
+    },
+    {
+      "path": "logs/export-real100k.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/export-real100k.stdout",
+      "sha256": "1eb40961e7b1f25e3df5f537fc9bdfc9a50ded5732a9aeaac05e370569f803ba",
+      "bytes": 995
+    },
+    {
+      "path": "logs/real-b32-compressed-import.stderr",
+      "sha256": "a24ba0e6e8be41a99d9c2c8eb9bb320979c90cf1560f8421c8d993b4bf553457",
+      "bytes": 180
+    },
+    {
+      "path": "logs/real-b32-compressed-import.stdout",
+      "sha256": "d35bac9c007a68c0c8f8fecea15d6b661d40fbdcfab2a80eea925421d17bb7f1",
+      "bytes": 251
+    },
+    {
+      "path": "logs/real-b32-compressed-search.stderr",
+      "sha256": "95a511b08be0de7b1c93ec60447285ba4923f415df23697ffa529fe9c52f36d6",
+      "bytes": 107
+    },
+    {
+      "path": "logs/real-b32-compressed-search.stdout",
+      "sha256": "20e1b2a3075a917ebb33d45eda30e4e3e2dc1d995fb4b914308b68781ef6cdbc",
+      "bytes": 7401
+    },
+    {
+      "path": "logs/real-b32-raw-import.stderr",
+      "sha256": "a24ba0e6e8be41a99d9c2c8eb9bb320979c90cf1560f8421c8d993b4bf553457",
+      "bytes": 180
+    },
+    {
+      "path": "logs/real-b32-raw-import.stdout",
+      "sha256": "1fd6d8df85c7234e712fcac4b6536428ed0a3f7ba0189bf312572178adc7964c",
+      "bytes": 244
+    },
+    {
+      "path": "logs/real-b32-raw-search.stderr",
+      "sha256": "79b33f591a798be10e2c47ce88ffb3b94a3ee57c8f24ea35d707b1d764783719",
+      "bytes": 107
+    },
+    {
+      "path": "logs/real-b32-raw-search.stdout",
+      "sha256": "20e1b2a3075a917ebb33d45eda30e4e3e2dc1d995fb4b914308b68781ef6cdbc",
+      "bytes": 7401
+    },
+    {
+      "path": "logs/reprepare-query-weights.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/reprepare-query-weights.stdout",
+      "sha256": "79205dd50b7e5e754c6f4546e7bc3985275823bd4420e8ca9efaaf67fcdb62c8",
+      "bytes": 132
+    },
+    {
+      "path": "logs/roundtrip-import.stderr",
+      "sha256": "471b6cd354e113ad3d3c6b23c7e020eda0076cd1b58d9e577562e6a7636e1f7c",
+      "bytes": 151
+    },
+    {
+      "path": "logs/roundtrip-import.stdout",
+      "sha256": "0aba405ac1aef0b0fce6d76ef901c7ce4d2ae53fa4b1bf57873376cdc7e55bbd",
+      "bytes": 110
+    },
+    {
+      "path": "raw/export-manifest.json",
+      "sha256": "1eb40961e7b1f25e3df5f537fc9bdfc9a50ded5732a9aeaac05e370569f803ba",
+      "bytes": 995
+    },
+    {
+      "path": "raw/oracle.tsv",
+      "sha256": "e9831c19e13ebc8789576bd582878d7fac54e217d4d9ba05eb81d061866b4f1a",
+      "bytes": 5683
+    },
+    {
+      "path": "raw/queries.pisa",
+      "sha256": "96825735d119df33620a0b0944d3457982e533bf53354804395d4b8f9bec0e7e",
+      "bytes": 49773
+    },
+    {
+      "path": "raw/real100k-reprepared.tsv",
+      "sha256": "70d07b5653c499a29c40a2e807b5fe32c1d69a99c238c8325f9dddb6f5df68f0",
+      "bytes": 8217
+    },
+    {
+      "path": "raw/real100k-reprepared.tsv.split.tsv",
+      "sha256": "4f113ab5725902b254a1f383d80a54b8bd438a11a226736cffefc230a3b9243b",
+      "bytes": 941
+    }
+  ],
+  "interpretation": "Both raw and compressed layouts match all 25 reference top-10 lists. Original subset/query weights survive byte-identical round trips.",
+  "limitations": [
+    "25-query real-data scope; no 1M external or held-out evaluation.",
+    "Native API bindings and approximate modes are outside this exact CLI validation."
+  ],
+  "next_action": "Review corrected variant and preregister matched performance measurements."
+}

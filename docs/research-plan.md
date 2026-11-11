@@ -3,7 +3,7 @@
 Exact GPU pruning for learned sparse passage retrieval
 **Shared research plan for Vaibhav, Parva and Arnav · Updated November 10, 2026**
 
-This is the main team document for understanding the research direction, completed experiments, and next work. Results below come from the saved CIMS logs and CSVs. Implementation status is explicit: our initial CUDA scorer works, while GPU pruning, GPU top-k and external baseline reproduction remain pending.
+This is the main team document for understanding the research direction, completed experiments, and next work. Results below come from the saved CIMS logs and CSVs. Implementation status is explicit: our initial CUDA scorer works, while GPU pruning and GPU top-k remain pending. The corrected CPU BMP comparison now passes its fixture and initial common-data correctness checks, and released GPUSparse reproduction remains pending.
 
 ## The decision
 
@@ -28,7 +28,7 @@ The main comparison is **CPU BMP, released GPUSparse, and our proposed exact pru
 | System | Purpose | Current status |
 |---|---|---|
 | Our sequential C++ scorer | Reference scores and a deterministic order for tied results | Implemented; independently checked on a Python fixture and compared with CUDA on real data |
-| Released CPU BMP | Strong external CPU retrieval baseline | Not yet built/run on the common subsets; scores and tie boundaries still need validation |
+| Released CPU BMP | Strong external CPU retrieval baseline | Native fixture failures recorded; corrected canonical variant passes all 96 fixture cases and 25-query top-10 checks at 100K for raw/compressed bounds. Performance comparison pending |
 | Released GPUSparse | External GPU baseline from the June paper, using the strongest applicable current path | Not yet reproduced; calibrate monolithic/chunked/compacted variants where supported |
 | Our initial exhaustive CUDA forward scorer | First GPU scoring correctness control | Implemented; all scores return to the CPU for top-k selection |
 | Our same-layout block-exhaustive GPU control | Isolate the effect of pruning while holding scoring layout and merge fixed | Pending |
@@ -51,6 +51,8 @@ These papers strengthen the comparison and constrain novelty; they do not yet es
 The broader novelty audit should also cover earlier GPU WAND/BMW and threshold-sharing work, GPU decoding, and bit-sliced top-k: [Huang et al.](https://nbjl.nankai.edu.cn/_upload/article/files/b8/df/788a01c9442a8597ae8379cb37f1/db04a5b3-a983-4cea-a7cb-f8127b031173.pdf), [Gaioso et al.](https://doi.org/10.1002/cpe.5474), [Griffin](https://www.cs.purdue.edu/homes/csjgwang/pubs/PPoPP18_Search.pdf), [threshold estimators](https://arxiv.org/abs/2412.10701), and [bit-sliced arithmetic](https://www.cs.umb.edu/~poneil/SIGBSTMH.pdf). A GPU port alone is insufficient evidence of a research contribution.
 
 ## What is completed and what the results mean
+
+**Later November 10 correctness update.** Rebuilt runtime hooks passed CIMS validation. The native pinned BMP failed its common synthetic fixture. The documented corrected variant passed five Rust tests and all 96 unchanged fixture cases. Both raw and compressed indexes matched every top-10 score and ID on the first 25 calibration queries at 100K passages, with byte-identical subset and query-weight round trips. Review the [correction experiment](../experiments/2026-11-10-bmp-correctness-fixes/README.md) for exact source, changes and raw evidence. GPU selection/pruning and repeated external performance comparisons remain pending. The historical results below retain their original scope.
 
 ### Environment, data and representation
 
@@ -157,7 +159,7 @@ Prioritize the exact full-bound GPU system and its exhaustive control before add
 ## Immediate continuation from November 10
 
 0. Rebuild the current CPU/CUDA sources and rerun the independent fixtures before new measurements. The optional reporting hooks and portability edits postdate the saved results; their rebuilt C++/CUDA integration is not yet validated.
-1. Validate a tiny common subset against pinned BMP, including exact scores and tied boundaries. Begin building released GPUSparse on supported hardware and document any representation or software incompatibility.
+1. Review the completed native/corrected BMP comparison and register matched external performance measurements. Begin building released GPUSparse on supported hardware and document any representation or software incompatibility.
 2. Implement GPU top-k/local-to-global merging, the same-layout block-exhaustive control, and a term-major exhaustive GPU competitor. Our current host-top-k scorer remains a labeled initial control.
 3. Implement GPU seed scoring, the full-byte bound pass, survivor scheduling and the byte ledger. Use the same exact contract as the CPU oracle.
 4. Implement coarse-only and progressive variants with the same seed, scorer and merge. Profile actual DRAM traffic and end-to-end time; retain progressive only if it earns its overhead.

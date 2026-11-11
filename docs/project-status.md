@@ -1,21 +1,25 @@
 # Implementation status
 
-## Completed evidence
+## Correctness progress through November 10, 2026
 
-- Independent Python fixture checks validated conversion, query scaling, scores, numeric-ID ties, zero/unknown queries, nested subsets and partial blocks: 1,800 synthetic pruning configurations passed.
-- The initial CUDA scorer passed 75 fixture query/size combinations.
-- The 100K/1M calibration runs used 25 queries per size. CUDA matched all 27,500,000 sequential document scores and ordered top-10 outputs.
-- All 1,200 offline real-data pruning configurations retained the exhaustive ordered top-k.
+| Work | Observed result |
+|---|---|
+| Independent CPU/GPU foundation | 1,800 CPU pruning configurations and 75 CUDA fixture query/size combinations passed. Historical 100K/1M runs matched 27.5 million document scores and ordered top-10 outputs across 25 calibration queries per size. |
+| Rebuilt runtime reporting | Accepted CPU/CUDA controls and deliberate depth-drift rejections passed on CIMS. |
+| Native pinned BMP comparison | 96 synthetic attempts produced 20 crashes and 50 successful attempts missing above-cutoff passages. All 5,120 emitted scores matched the reference. |
+| Corrected canonical BMP | Five Rust tests and all 96 unchanged fixture cases passed. Raw and compressed block-32 indexes each matched every top-10 ID and score on 100K passages and the first 25 calibration queries. |
+| Input equivalence | The exported real subset round-tripped to identical GSP bytes. Re-prepared effective query weights/order and the historical CPU top-10 output also matched byte-for-byte. |
 
-These statements describe the preserved historical outputs under the fixed scoring representation. They do not establish original-FP32 equivalence, external-baseline agreement, or a GPU pruning speedup.
+The corrected variant widens scores/bounds to u64, repairs traversal and empty cases, and implements all-passage eligibility with numeric original-ID ties. These are documented compound changes. The external BMP commands remain qualified uninstrumented observations. Results establish the tested correctness scopes. Repeated performance comparisons and held-out evaluation remain pending.
+
+Read the [native experiment](../experiments/2026-11-10-bmp-native-alignment/README.md) and [correction experiment](../experiments/2026-11-10-bmp-correctness-fixes/README.md). Each run links its raw output, logs, full settings and exact source provenance.
 
 ## Pending work
 
-1. Rebuild and validate the optional runtime hooks against independent fixtures.
-2. Validate scores and tie boundaries against pinned external BMP on common data.
-3. Implement GPU top-k and the same-layout block-exhaustive control.
-4. Implement GPU seed, full-byte bound filtering and candidate scheduling.
-5. Compare full-byte, coarse-only and selective-refinement modes using matched kernels and seeds.
-6. Run repeated matched timing, actual traffic/peak-memory measurements, external GPU baselines and a second device.
+1. Review the corrected BMP PR and register matched performance measurement, including complete timing boundaries and repeat/interleaving rules.
+2. Implement GPU top-k and the same-layout block-exhaustive control, preserving canonical scores and IDs.
+3. Implement full-byte GPU seed/filter/scheduling and compare against its unpruned control.
+4. Test coarse-only and selective refinement using the same seed, scorer and merger, with actual DRAM traffic measurements.
+5. Expand calibration, freeze settings before held-out evaluation, account for peak memory, reproduce released GPUSparse and test a second device.
 
-Raw calibration evidence and manifests live in `results/`. The initial CUDA program transfers dense scores for CPU top-k; its one-observation timings are preliminary and not a stable latency distribution.
+Task owners remain subject to team agreement. The initial CUDA control still transfers dense scores for CPU top-k.
