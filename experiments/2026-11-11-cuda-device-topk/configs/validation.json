@@ -1,0 +1,90 @@
+{
+  "parent_experiment": "2026-11-11-bmp-resident-timing",
+  "implementation_parent_experiment": "EXPERIMENT-a683032509a8",
+  "parent_cuda_run": "RUN_FINISHED-543e7821dc83",
+  "base_main_commit": "a7eb0e851a37e3c59606b364c8d53d945afd039c",
+  "parent_configuration": {
+    "mode": "cuda-forward-host-topk",
+    "docs": 100000,
+    "query_count": 25,
+    "k": 10,
+    "gpu_id": 0,
+    "index_path": "data/derived/hash-100000.gsp",
+    "queries_path": "data/derived/calibration-500.tsv"
+  },
+  "parent_behavior": {
+    "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+    "arithmetic": "uint64",
+    "document_impacts": "uint8-exact",
+    "query_policy": "BMP-f32-ceil-cap32",
+    "tie_order": "score_desc_original_numeric_id_asc",
+    "eligibility": "all_documents"
+  },
+  "configuration": {
+    "mode": "cuda-forward-device-topk",
+    "corpus_sizes": [
+      100000,
+      1000000
+    ],
+    "query_count": 25,
+    "k": 10,
+    "gpu_id": 0,
+    "verify_scores": 1,
+    "score_threads": 256,
+    "selection_threads": 256,
+    "max_supported_k": 128,
+    "selection": "hierarchical-local-topk",
+    "warmup_queries": 0,
+    "repeats": 1,
+    "arithmetic": "uint64",
+    "eligibility": "all_documents",
+    "tie_order": "score_desc_original_numeric_id_asc"
+  },
+  "fixture": {
+    "kernel_patterns": [
+      "zero",
+      "ties",
+      "wide",
+      "random"
+    ],
+    "kernel_docs": [
+      0,
+      1,
+      17,
+      255,
+      256,
+      257,
+      65537
+    ],
+    "depths": [
+      0,
+      1,
+      10,
+      100,
+      128
+    ],
+    "independent_gsp_docs": [
+      0,
+      1,
+      17,
+      255,
+      256,
+      257,
+      1025
+    ],
+    "independent_queries": 5
+  },
+  "declared_changes": {
+    "mode": "Replace host top-k with exact hierarchical device selection while retaining exhaustive forward scoring.",
+    "selection": "Add 256-thread repeated reduction and recursive local-winner merging; support k=0..128 explicitly.",
+    "transfer": "Only min(k,N) 24-byte winner records are copied inside retrieval boundary; optional dense validation copy remains outside.",
+    "warmup": "Zero warmup queries and one observation/query: correctness validation only, no latency comparison.",
+    "runtime_gate": "Report actual selection threads, supported k, merge levels, scratch bytes, verify flag, warmups/repeats and semantic marks; existing callers use empty extension defaults.",
+    "input_validation": "Reject duplicate original IDs and malformed/duplicate/out-of-cap32 prepared query terms before measurement."
+  },
+  "measurement": "Correctness only; diagnostic stage/query times are not a speedup claim. Query boundary includes weight preparation/upload, scoring, all selection levels and top-k result copy. Excludes index upload, gate, CPU reference, validation-only dense copy and file writes.",
+  "success_rule": "Zero GPU/Python fixture discrepancies and zero common-data full-score/top-k mismatches; fresh GPU TSVs must equal the historical canonical CPU outputs.",
+  "failure_rule": "Preserve failed attempt; separately review any correction before retry.",
+  "next_if_success": "Use this as ranking control for a separately branched same-layout block-exhaustive GPU control, then pruning.",
+  "unsupported": "k>128 is rejected; k1000, batch and other layout algorithms are later work."
+}

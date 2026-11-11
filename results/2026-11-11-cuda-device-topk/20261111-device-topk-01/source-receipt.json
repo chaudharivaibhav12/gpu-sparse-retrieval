@@ -1,0 +1,65 @@
+{
+  "source_commit": "6306666ddc70f9a7de733aa8f423ba995dda60b5",
+  "source_hashes": {
+    "src/cuda_device_topk.cu": "60be261cdb7cc5adb4dc1cf0fdc493d5cc59862a46284e60f4d9ef5eef1301f3",
+    "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+    "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+    "src/research_runtime.h": "29c8642d8e131c6d7a41ee557e90c56b8dc5c7403cb18f17afb68d4435ec292a",
+    "tests/cuda_topk_test.cu": "7d74498598175ad1086879dd6b3c17a3b9f63f1aa405d369f50a87bd07820c69",
+    "tests/prepare_gpu_topk_fixture.py": "c9ba599f191cf280f21bae3be9952bebd71f93244695e0a7ddadd622499c28aa"
+  },
+  "binary_hashes": {
+    "cuda_device_topk": "2462612d0adc0ea970c312a1d1cfb0cc09322ee8becdbe479ced8e5e705c7cce",
+    "cuda_topk_test": "21e5764ed7aa156188c15be9e5f93ece71ac2e4ae297da0026f2e919dc7f0441",
+    "cpu_pilot": "a22c375c1930fae6f4fbb51d0d2ad0981ae62bbd11a4911fa895775b921c2acc"
+  },
+  "commands": [
+    [
+      "nvcc",
+      "--version"
+    ],
+    [
+      "g++",
+      "--version"
+    ],
+    [
+      "nvcc",
+      "-O3",
+      "-lineinfo",
+      "-arch=sm_75",
+      "-std=c++17",
+      "src/cuda_device_topk.cu",
+      "-o",
+      "build/cuda_device_topk"
+    ],
+    [
+      "nvcc",
+      "-O3",
+      "-lineinfo",
+      "-arch=sm_75",
+      "-std=c++17",
+      "tests/cuda_topk_test.cu",
+      "-o",
+      "build/cuda_topk_test"
+    ],
+    [
+      "g++",
+      "-O3",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-std=c++17",
+      "src/cpu_pilot.cpp",
+      "-o",
+      "build/cpu_pilot"
+    ]
+  ],
+  "build_records": [
+    "OBSERVATION-8f9c5259ffde",
+    "OBSERVATION-1134da78c2a0",
+    "OBSERVATION-d5ff6f7bae07",
+    "OBSERVATION-148b92af3fa8",
+    "OBSERVATION-69884deef5e2"
+  ],
+  "protocol_record": "DECISION-6a0a83224ab2"
+}
