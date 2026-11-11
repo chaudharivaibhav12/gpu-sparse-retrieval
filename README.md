@@ -20,7 +20,7 @@ Start with [CONTRIBUTING.md](CONTRIBUTING.md). Every new experiment uses `exp/<o
 
 ## Current state
 
-The sequential oracle and offline pruning pilot are implemented. The initial CUDA forward scorer has passed the preserved real-data correctness checks at 100K/1M passages with 25 calibration queries per size. It currently copies scores to the CPU for top-k selection. GPU top-k, the same-layout block-exhaustive control and GPU pruning remain pending. CPU BMP correctness progress is summarized below; released GPUSparse reproduction remains pending.
+The sequential oracle, canonical GPU top-k, CSR block-exhaustive control and exact full-byte GPU pruning are implemented and validated. The [full-bound experiment](experiments/2026-11-11-cuda-fullbound-pruning/README.md) passed 820 fixture checks, 200 real-data checks and 2,300 paired outputs. Its 25-query calibration latency was 23.74% lower at B16 and 15.85% lower at B32; metadata adds substantial memory and these are conditional calibration results. [Replication and profiling](experiments/2026-11-11-pruning-replication-profile/README.md) now expands to 500 calibration queries and independent processes on RTX 2080 Ti and RTX 4070. Selective refinement, aligned released GPUSparse measurement and frozen held-out evaluation remain pending.
 
 The rebuilt runtime hooks passed the CIMS checks. The native BMP comparison exposed correctness failures. Its corrected canonical variant passed all 96 fixture cases and both raw/compressed 100K comparisons on 25 calibration queries. See the [correction experiment](experiments/2026-11-10-bmp-correctness-fixes/README.md) for measured source, fixes and evidence. External performance measurement remains pending.
 

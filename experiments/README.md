@@ -13,3 +13,4 @@ Each experiment has a branch and a folder. Read [CONTRIBUTING.md](../CONTRIBUTIN
 | [2026-11-11-cuda-fullbound-pruning](2026-11-11-cuda-fullbound-pruning/README.md) | Does exact full-byte pruning outweigh its overhead? | Vaibhav | `exp/vaibhav/2026-11-11-cuda-fullbound-pruning` | Correctness passed; conditional latency ratios 0.7626 / 0.8415 |
 
 Add new experiments here on their own branches. Merge index rows through pull requests as experiments are reviewed. The shared research plan contains proposed tracks and their dependencies. An index entry identifies recorded work and does not assign a teammate to future work.
+- [2026-11-11-pruning-replication-profile](2026-11-11-pruning-replication-profile/README.md): running — 500-query process replication on Turing/Ada and separate Nsight diagnostics.

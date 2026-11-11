@@ -39,3 +39,7 @@ Block sizes 16 and 32 passed 350 independent fixture queries and 100 calibration
 ## November 11: full-byte pruning calibration
 
 Full-byte GPU pruning now has an initial [calibration result](../experiments/2026-11-11-cuda-fullbound-pruning/README.md): all correctness checks passed, and paired query-wise latency ratios were 0.7626 at B16 and 0.8415 at B32 (23.74% and 15.85% lower latency). These are conditional 25-query, 1M-passage results; some queries regress, full-byte maxima add substantial metadata, and no held-out, external-baseline or peak-memory conclusion is established. Next: replicate/expand calibration, then compare full/coarse/refinement with a fixed seed/scorer/merger.
+
+## 500-query replication and two-architecture profiling — running
+
+Parent PR #8 is merged. The [new experiment](../experiments/2026-11-11-pruning-replication-profile/README.md) runs unchanged source `95ae7f1` on RTX 2080 Ti and RTX 4070. CPU and GPU builds passed on both nodes; the Turing CPU500 reference and both paired GPU safety cohorts passed. The fixed six timing processes per host and separate Nsight diagnostics are not yet complete. No held-out or external-baseline result is claimed. See the experiment protocol for the later public-summary packaging disclosure.
