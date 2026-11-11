@@ -31,4 +31,16 @@ Review code separately before each executable validation iteration. Correctness 
 
 The initial separate review checked heap ordering, equal-score replacement, k=0 and k>N, cached threshold safety, empty queries/queues, zero-result completion, partial tail blocks, wide scoring/bounds, raw/compressed weight pairing, and existing API callers. It also checked the exporter against the GSP wire layout and requires a fixture-byte and real-subset round-trip check. Regression tests will compile and execute before the corrected search is measured on fixture or calibration inputs.
 
-Native layout limits remain 16-bit term IDs and 8-bit within-block document offsets. The selected vocabulary and block sizes fit these limits. This experiment targets correctness. Build/test logs and run results will be linked here as they complete.
+Native layout limits remain 16-bit term IDs and 8-bit within-block document offsets. The selected vocabulary and block sizes fit these limits. This experiment targets correctness. Build/test logs and completed run results are linked below.
+
+## Completed results
+
+Five Rust regression tests passed. The unchanged 96-case fixture completed with zero crashes and exact canonical ordered-ID/score equality in every case. Both raw and compressed block-32 indexes matched all top-10 IDs and scores for the first 25 calibration queries at 100K passages. The original GSP subset and prepared weights passed byte-identical export/reimport checks. The fresh CPU reference was byte-identical to its historical top-10 output.
+
+- [Synthetic run and saved logs](runs/20261110-corrected-fixture-01/README.md)
+- [100K real-data run and saved logs](runs/20261110-corrected-real100k-01/README.md)
+- [Combined validation summary](analysis/validation-summary.json)
+- [Separate post-validation review](code/validation-review.json)
+- [Measured source receipt](code/source-receipt.json)
+
+The measured source commit is `ee099d4d98835d88f19a12cef2328308e2ba5479`. Later commits package results and documentation. The corrected external commands remain qualified uninstrumented observations. CPU reference runs have runtime-gated evidence. Validation at 1M passages, held-out queries, optional Python bindings and repeated performance comparisons remain future work.
