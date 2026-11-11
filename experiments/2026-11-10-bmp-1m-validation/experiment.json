@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-10-bmp-1m-validation",
+  "title": "Corrected BMP canonical correctness at one million passages",
+  "owner": "Vaibhav",
+  "branch": "exp/vaibhav/2026-11-10-bmp-1m-validation",
+  "status": "planned",
+  "parent_experiment": "2026-11-10-bmp-correctness-fixes",
+  "parent_source_commit": "d6dd1c60165516a982845e324efcb15ff229c9ae",
+  "question": "Does the validated corrected BMP preserve canonical top-10 results on the nested 1M subset?",
+  "hypothesis": "Both raw and compressed block-32 layouts exactly match the sequential oracle on the same 25 calibration queries.",
+  "motivation": "Establish next-scale external alignment before matched performance experiments.",
+  "code_paths": [
+    "scripts/export_bmp_inputs.py",
+    "src/cpu_pilot.cpp",
+    "src/research_runtime.h",
+    "experiments/2026-11-10-bmp-correctness-fixes/code/bmp-canonical.patch"
+  ],
+  "configuration_files": [
+    "configs/validation.json"
+  ],
+  "declared_changes": {
+    "configuration.documents": {
+      "from": 100000,
+      "to": 1000000,
+      "reason": "Test correctness at the next nested corpus size."
+    },
+    "inputs.index": "Use the preserved 1M GSP hash and original BP order. Query weights, membership/order and algorithm settings remain fixed."
+  },
+  "scoring_contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+  "input_manifest": "configs/validation.json",
+  "query_split": "first 25 calibration queries; no held-out evaluation",
+  "timing_boundary": "correctness only; no comparative timing statistic",
+  "correctness_rule": "Byte-identical CIFF-to-GSP and effective-query round trips; fresh gated CPU top-10 byte equality with historical reference; corrected raw/compressed outputs exactly equal all 25 canonical top-10 lists.",
+  "measurement_and_analysis_plan": "Byte-identical CIFF-to-GSP and effective-query round trips; fresh gated CPU top-10 byte equality with historical reference; corrected raw/compressed outputs exactly equal all 25 canonical top-10 lists.",
+  "success_rule": "Both layouts have zero exit failures and zero ordered-ID/score differences for all 25 queries.",
+  "failure_rule": "Retain any failed attempt and discrepancy before a reviewed correction; no performance claim.",
+  "next_if_negative": "Save minimal failing query and investigate the index, bounds, eligibility and tie behavior.",
+  "recording_ids": [
+    "DEC-20261110-BMP-CORRECTED-VALIDATED"
+  ],
+  "runs": []
+}

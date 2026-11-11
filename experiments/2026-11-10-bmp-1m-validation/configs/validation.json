@@ -1,0 +1,47 @@
+{
+  "parent_experiment": "2026-11-10-bmp-correctness-fixes",
+  "parent_measured_source_commit": "ee099d4d98835d88f19a12cef2328308e2ba5479",
+  "parent_result_commit": "c1a87fe78ce003f9db6f47c75b3c65a6a3fad345",
+  "native_revision": "67ad8c683fbc0c30145d1ee42c1dffbed8b12332",
+  "patch": "experiments/2026-11-10-bmp-correctness-fixes/code/bmp-canonical.patch",
+  "dependency_lock": "experiments/2026-11-10-bmp-native-alignment/configs/BMP-Cargo.lock",
+  "configuration": {
+    "documents": 1000000,
+    "queries": 25,
+    "query_membership": "first 25 lines of calibration-500.tsv in preserved order",
+    "block_size": 32,
+    "compressed_ranges": [
+      false,
+      true
+    ],
+    "k": 10,
+    "alpha": 1.0,
+    "beta": 1.0,
+    "rayon_threads": 1
+  },
+  "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+  "inputs": {
+    "index": "data/derived/hash-1000000.gsp",
+    "expected_index_sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37",
+    "queries": "data/derived/calibration-500.tsv",
+    "expected_queries_sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+    "split": "data/derived/calibration-500.tsv.split.tsv"
+  },
+  "declared_changes": {
+    "configuration.documents": {
+      "from": 100000,
+      "to": 1000000,
+      "reason": "Test correctness at the next nested corpus size."
+    },
+    "inputs.index": "Use the preserved 1M GSP hash and original BP order. Query weights, membership/order and algorithm settings remain fixed.",
+    "execution.command_timeout_seconds": "Larger command allowance for 10x corpus export/import; correctness scope only, no latency comparison."
+  },
+  "analysis_plan": "Byte-identical CIFF-to-GSP and effective-query round trips; fresh gated CPU top-10 byte equality with historical reference; corrected raw/compressed outputs exactly equal all 25 canonical top-10 lists.",
+  "failure_rule": "Retain any failed attempt and discrepancy before a reviewed correction; no performance claim.",
+  "reuse": "Verify and reuse the validated parent BMP and CPU binaries, dependency lock, applied native source hashes and code files. No retrieval algorithm edits.",
+  "execution": {
+    "command_timeout_seconds": 1800,
+    "heartbeat_seconds": 30,
+    "stopping_rule": "Complete exact input checks, CPU reference and both 25-query layouts; preserve any timeout/failure."
+  }
+}
