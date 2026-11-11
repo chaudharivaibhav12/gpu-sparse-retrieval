@@ -1,0 +1,17 @@
+{
+  "parent_experiment": "2026-11-11-cuda-device-topk",
+  "parent_source_commit": "6306666ddc70f9a7de733aa8f423ba995dda60b5",
+  "parent_review": "REVIEW-768fc2dda108",
+  "parent_registered_experiment": "EXPERIMENT-3a255e492d41",
+  "block_sizes": [
+    16,
+    32
+  ],
+  "score_threads": 32,
+  "layout": "csr-document-blocks",
+  "schedule": "identity-all-blocks",
+  "configuration_preserved": "Same uint8 impacts, cap32 prepared queries, uint64 scores, all-document eligibility, numeric original-ID ties, GPU merger k0..128, verification outside query boundary, zero warmup and one observation.",
+  "delta": "One warp CTA per block of 16/32 passages; identity block-ID scheduler supplies all blocks. CSR payload, per-document score loop, GPU merger and CPU reference unchanged. Count active block-ID bytes in allocation.",
+  "validation": "For each block size: 35 independent fixture configurations / 175 query cases; explicit block-size runtime drift rejection; 100K/1M first 25 queries, k10. Retain prior 140 merger unit cases as prior evidence, not a rerun.",
+  "limitations": "Correctness only; not a term-major control, pruning system, speedup or peak-VRAM result. Future pruning must define skipped-score initialization and timing identical to this scorer/merger."
+}

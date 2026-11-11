@@ -1,0 +1,19 @@
+{
+  "stage": "separate pre-execution source review",
+  "reviewed": [
+    "Loaded parent config and review. Scoring arithmetic and GPU merger unchanged.",
+    "Identity block IDs partition every passage exactly once; thread>=B and tail>=N guards handle B16/B32 and partial blocks.",
+    "Empty corpus launches no scoring CTA; k0/k>N behavior inherited from validated merger.",
+    "Scheduler bytes are included in device allocation, upload excluded from query boundary.",
+    "Block size, active block count, score threads, layout and schedule are reported before query compute.",
+    "Future pruned mode requires separately reviewed skipped-score initialization; this exhaustive mode writes every score."
+  ],
+  "pending": [
+    "CIMS nvcc compilation",
+    "Both block-size independent fixtures and common-data checks",
+    "Runtime rejection of block-size drift"
+  ],
+  "limits": [
+    "No new result or performance claim yet."
+  ]
+}
