@@ -1,0 +1,494 @@
+Generating SQLite file results/2026-11-11-pruning-replication-profile/20261111-cuda5-profile-01/raw/nsys-b32-m1.sqlite from results/2026-11-11-pruning-replication-profile/20261111-cuda5-profile-01/raw/nsys-b32-m1.nsys-rep
+Processing [results/2026-11-11-pruning-replication-profile/20261111-cuda5-profile-01/raw/nsys-b32-m1.sqlite] with [/misc/linux/rhel9/x86_64/local/stow/cuda-12.6/nsight-systems-2024.5.1/host-linux-x64/reports/cuda_gpu_kern_sum.py]... 
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+92.7,79779763,50,1595595.3,578967.5,16128,3873043,1683556.0,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+6.8,5890313,150,39268.8,9744.0,8863,193155,65279.2,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+0.2,163457,25,6538.3,5856.0,3200,11840,2233.8,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+0.1,120098,25,4803.9,4800.0,4769,4832,14.0,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+0.1,43200,25,1728.0,1728.0,1695,1760,20.7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+0.0,31361,25,1254.4,1248.0,1216,1408,40.4,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+
+Processing [results/2026-11-11-pruning-replication-profile/20261111-cuda5-profile-01/raw/nsys-b32-m1.sqlite] with [/misc/linux/rhel9/x86_64/local/stow/cuda-12.6/nsight-systems-2024.5.1/host-linux-x64/reports/cuda_gpu_mem_time_sum.py]... 
+Time (%),Total Time (ns),Count,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Operation
+100.0,1051677945,56,18779963.3,10656.0,320,660384962,97031067.9,[CUDA memcpy Host-to-Device]
+0.0,199744,25,7989.8,7968.0,7904,8384,95.4,[CUDA memset]
+0.0,79841,75,1064.5,960.0,863,9313,968.7,[CUDA memcpy Device-to-Host]
+
+Processing [results/2026-11-11-pruning-replication-profile/20261111-cuda5-profile-01/raw/nsys-b32-m1.sqlite] with [/misc/linux/rhel9/x86_64/local/stow/cuda-12.6/nsight-systems-2024.5.1/host-linux-x64/reports/cuda_gpu_mem_size_sum.py]... 
+Total (MB),Count,Avg (MB),Med (MB),Min (MB),Max (MB),StdDev (MB),Operation
+1508.727,56,26.942,0.115,0.001,896.219,134.989,[CUDA memcpy Host-to-Device]
+200.000,25,8.000,8.000,8.000,8.000,0.000,[CUDA memset]
+0.006,75,0.000,0.000,0.000,0.000,0.000,[CUDA memcpy Device-to-Host]
+
+Processing [results/2026-11-11-pruning-replication-profile/20261111-cuda5-profile-01/raw/nsys-b32-m1.sqlite] with [/misc/linux/rhel9/x86_64/local/stow/cuda-12.6/nsight-systems-2024.5.1/host-linux-x64/reports/cuda_api_sum.py]... 
+Time (%),Total Time (ns),Num Calls,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+98.9,1142301501,131,8719858.8,16488.0,13256,661121489,63813941.0,cudaMemcpy
+0.6,7380961,21,351474.3,9875.0,3844,1351982,496522.4,cudaFree
+0.3,2887262,300,9624.2,7505.0,6737,393621,22545.0,cudaLaunchKernel
+0.1,1503881,21,71613.4,7421.0,3991,468752,109993.9,cudaMalloc
+0.0,371865,25,14874.6,13003.0,12335,53555,8109.2,cudaMemset
+0.0,299231,50,5984.6,6147.0,4460,13628,1590.6,cudaEventRecord
+0.0,43237,25,1729.5,1661.0,1519,3078,303.1,cudaEventSynchronize
+0.0,19351,2,9675.5,9675.5,1034,18317,12220.9,cudaEventCreate
+0.0,3972,2,1986.0,1986.0,522,3450,2070.4,cudaEventDestroy
+0.0,1204,1,1204.0,1204.0,1204,1204,0.0,cuModuleGetLoadingMode
+
+Processing [results/2026-11-11-pruning-replication-profile/20261111-cuda5-profile-01/raw/nsys-b32-m1.sqlite] with [/misc/linux/rhel9/x86_64/local/stow/cuda-12.6/nsight-systems-2024.5.1/host-linux-x64/reports/cuda_gpu_trace.py]... 
+Start (ns),Duration (ns),CorrId,GrdX,GrdY,GrdZ,BlkX,BlkY,BlkZ,Reg/Trd,StcSMem (MB),DymSMem (MB),Bytes (MB),Throughput (MB/s),SrcMemKd,DstMemKd,Device,Ctx,GreenCtx,Strm,Name
+6539188446,4332729,130,,,,,,,,,,8.000,1840.002,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+6544154751,310187991,131,,,,,,,,,,474.798,1424.395,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+6854984158,72216112,132,,,,,,,,,,118.700,1543.095,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+6927858231,4265016,133,,,,,,,,,,8.000,1872.000,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+6932214608,11744,134,,,,,,,,,,0.125,10643.625,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+8982548847,660384962,136,,,,,,,,,,896.219,896.219,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9694178672,10944,149,,,,,,,,,,0.115,10482.060,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9694202384,320,150,,,,,,,,,,0.001,2125.000,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9694254161,8384,151,,,,,,,,,,8.000,954192.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9694649750,16800,152,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9694695479,11008,154,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9694707479,9152,156,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9694741463,11360,158,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9694773592,1760,160,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9694818200,4832,162,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9694846297,1248,164,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9694888825,1376,166,,,,,,,,,,0.000,2.907,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9694908666,3278570,167,25374,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9698187813,180098,169,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9698368519,12032,171,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9698381191,9280,173,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9698391463,9088,175,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9698406439,896,178,,,,,,,,,,0.000,267.857,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9698430376,960,181,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9698592394,11104,183,,,,,,,,,,0.115,10330.979,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9698610634,352,184,,,,,,,,,,0.001,1931.818,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9698623914,8032,185,,,,,,,,,,8.000,996008.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9698635434,16192,186,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9698652171,11424,188,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9698664139,9792,190,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9698674539,4608,192,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9698679787,1760,194,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9698682155,4832,196,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9698687659,1248,198,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9698698347,1024,200,,,,,,,,,,0.000,3.906,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9698714315,3353964,201,26272,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9702068919,188131,203,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9702257658,12160,205,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9702270458,9280,207,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9702280282,9184,209,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9702298714,864,212,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9702322779,960,215,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9702448668,10848,217,,,,,,,,,,0.115,10574.750,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9702467101,351,218,,,,,,,,,,0.001,1937.321,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9702479805,7968,219,,,,,,,,,,8.000,1004016.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9702490941,16416,220,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9702507965,11264,222,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9702519837,9760,224,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9702530173,6657,226,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9702537373,1728,228,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9702539741,4800,230,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9702545149,1280,232,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9702553214,1023,234,,,,,,,,,,0.000,3.910,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9702571518,3844754,235,30873,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9706416944,180802,237,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9706598354,12097,239,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9706611123,9504,241,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9706621203,9184,243,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9706636435,864,246,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9706657235,960,249,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9706799061,10848,251,,,,,,,,,,0.115,10574.750,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9706828822,351,252,,,,,,,,,,0.001,1937.321,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9706842070,7968,253,,,,,,,,,,8.000,1004016.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9706853430,16288,254,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9706870326,11296,256,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9706882262,9441,258,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9706892343,7743,260,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9706900726,1728,262,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9706903094,4801,264,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9706908470,1345,266,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9706917399,992,268,,,,,,,,,,0.000,4.032,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9706933527,3532686,269,27411,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9710466821,182818,271,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9710650248,12288,273,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9710663176,9504,275,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9710673288,9216,277,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9710692552,864,280,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9710711176,1184,283,,,,,,,,,,0.000,6.757,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9710840490,10656,285,,,,,,,,,,0.115,10765.294,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9710858506,320,286,,,,,,,,,,0.001,2125.000,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9710870891,7936,287,,,,,,,,,,8.000,1008064.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9710881483,16448,288,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9710898539,9440,290,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9710908587,9408,292,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9710918635,7008,294,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9710926283,1696,296,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9710928555,4800,298,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9710934123,1248,300,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9710945548,1023,302,,,,,,,,,,0.000,3.910,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9710961355,3058216,303,23345,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9714020180,185218,305,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9714206038,12256,307,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9714218966,9312,309,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9714229335,8863,311,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9714240759,864,314,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9714263831,960,317,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9714390905,10720,319,,,,,,,,,,0.115,10701.053,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9714408729,352,320,,,,,,,,,,0.001,1931.818,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9714421049,7936,321,,,,,,,,,,8.000,1008064.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9714431993,16160,322,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9714448825,10624,324,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9714460057,9345,326,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9714469977,4993,328,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9714475578,1695,330,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9714477818,4800,332,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9714483162,1248,334,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9714493210,992,336,,,,,,,,,,0.000,4.032,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9714508858,2481376,337,18705,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9716990811,187778,339,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9717179133,12928,341,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9717192701,9600,343,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9717202941,8864,345,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9717214494,863,348,,,,,,,,,,0.000,278.100,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9717234782,960,351,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9717364479,11328,353,,,,,,,,,,0.115,10126.670,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9717383104,352,354,,,,,,,,,,0.001,1931.818,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9717395616,7936,355,,,,,,,,,,8.000,1008064.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9717406240,16192,356,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9717423008,9472,358,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9717433120,9536,360,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9717443265,7679,362,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9717451584,1729,364,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9717453857,4800,366,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9717459297,1248,368,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9717466593,992,370,,,,,,,,,,0.000,4.032,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9717482657,2787333,371,21216,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9720270565,182019,373,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9720453160,12480,375,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9720466216,9376,377,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9720476200,8864,379,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9720490312,864,382,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9720510760,960,385,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9720633034,10592,387,,,,,,,,,,0.115,10830.338,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9720651755,351,388,,,,,,,,,,0.001,1937.321,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9720663819,8064,389,,,,,,,,,,8.000,992056.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9720674059,16576,390,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9720691211,11264,392,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9720703019,10528,394,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9720714187,11840,396,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9720726635,1728,398,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9720729035,4800,400,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9720734443,1248,402,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9720744268,1024,404,,,,,,,,,,0.000,3.906,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9720759788,3870451,405,31234,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9724630814,179363,407,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9724810785,12576,409,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9724823905,9312,411,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9724833761,9184,413,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9724847489,864,416,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9724870242,959,419,,,,,,,,,,0.000,8.342,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9724996451,10688,421,,,,,,,,,,0.115,10733.058,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9725014116,320,422,,,,,,,,,,0.001,2125.000,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9725026404,8000,423,,,,,,,,,,8.000,1000000.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9725036932,16224,424,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9725053732,10976,426,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9725065348,9568,428,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9725075524,9056,430,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9725085188,1697,432,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9725087460,4769,434,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9725092836,1248,436,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9725098821,991,438,,,,,,,,,,0.000,4.036,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9725113989,3692880,439,29153,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9728807445,180834,441,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9728988887,12033,443,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9729001560,9472,445,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9729012088,9216,447,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9729025464,864,450,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9729053145,960,453,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9729179994,10688,455,,,,,,,,,,0.115,10733.058,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9729197882,352,456,,,,,,,,,,0.001,1931.818,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9729211450,7968,457,,,,,,,,,,8.000,1004016.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9729222618,16673,458,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9729239931,9728,460,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9729250267,9376,462,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9729260187,5504,464,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9729266235,1728,466,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9729271419,4800,468,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9729279675,1248,470,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9729291259,993,472,,,,,,,,,,0.000,4.028,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9729306300,3544782,473,28027,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9732851626,183395,475,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9733035661,12512,477,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9733048717,9312,479,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9733058669,9216,481,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9733076461,864,484,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9733096845,960,487,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9733231215,10848,489,,,,,,,,,,0.115,10574.750,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9733249327,320,490,,,,,,,,,,0.001,2125.000,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9733261712,8000,491,,,,,,,,,,8.000,1000000.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9733271983,16321,492,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9733288880,11008,494,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9733300496,9664,496,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9733310704,5216,498,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9733316464,1760,500,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9733318864,4800,502,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9733324272,1248,504,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9733332688,993,506,,,,,,,,,,0.000,4.028,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9733348240,3566543,507,28356,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9736915423,185187,509,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9737101218,12032,511,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9737113826,9472,513,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9737123906,8896,515,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9737142818,864,518,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9737166338,993,521,,,,,,,,,,0.000,8.056,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9737288388,10944,523,,,,,,,,,,0.115,10482.060,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9737306148,320,524,,,,,,,,,,0.001,2125.000,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9737318180,7968,525,,,,,,,,,,8.000,1004016.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9737328485,16608,526,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9737345733,11488,528,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9737357925,9120,530,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9737367621,3200,532,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9737371429,1728,534,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9737373797,4800,536,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9737379557,1248,538,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9737390214,992,540,,,,,,,,,,0.000,4.032,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9737405158,2065787,541,15129,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9739471521,192770,543,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9739664931,13216,545,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9739678787,9281,547,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9739688643,9313,549,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9739707972,864,552,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9739729956,992,555,,,,,,,,,,0.000,8.065,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9739880134,10784,557,,,,,,,,,,0.115,10637.500,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9739898214,352,558,,,,,,,,,,0.001,1931.818,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9739910790,7936,559,,,,,,,,,,8.000,1008064.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9739921991,16544,560,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9739939175,11552,562,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9739951303,9152,564,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9739961095,6400,566,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9739968135,1760,568,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9739970535,4800,570,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9739975911,1248,572,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9739983719,993,574,,,,,,,,,,0.000,4.028,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9739998760,3822610,575,30627,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9743822010,181666,577,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9744004284,12000,579,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9744016828,9280,581,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9744027068,9216,583,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9744042620,9313,586,,,,,,,,,,0.000,25.770,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9744070013,960,589,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9744205055,10784,591,,,,,,,,,,0.115,10637.500,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9744222943,320,592,,,,,,,,,,0.001,2125.000,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9744235839,7936,593,,,,,,,,,,8.000,1008064.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9744246719,16321,594,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9744263615,11104,596,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9744275359,10273,598,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9744286304,4544,600,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9744291488,1728,602,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9744293760,4800,604,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9744299136,1216,606,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9744308704,992,608,,,,,,,,,,0.000,4.032,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9744324672,3873043,609,31234,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9748198291,187714,611,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9748386582,12159,613,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9748399381,9281,615,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9748409334,8864,617,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9748424374,864,620,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9748446486,992,623,,,,,,,,,,0.000,8.065,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9748567736,10816,625,,,,,,,,,,0.115,10606.068,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9748586072,320,626,,,,,,,,,,0.001,2125.000,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9748598232,7936,627,,,,,,,,,,8.000,1008064.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9748608664,16257,628,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9748625529,10720,630,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9748636825,9568,632,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9748647033,5632,634,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9748653305,1696,636,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9748655673,4800,638,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9748664281,1248,640,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9748674393,992,642,,,,,,,,,,0.000,4.032,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9748689817,3542863,643,28145,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9752233288,182818,645,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9752416714,11936,647,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9752429226,9281,649,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9752439050,8865,651,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9752456939,864,654,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9752478347,960,657,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9752613325,10656,659,,,,,,,,,,0.115,10765.294,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9752631437,320,660,,,,,,,,,,0.001,2125.000,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9752643693,7936,661,,,,,,,,,,8.000,1008064.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9752654573,16160,662,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9752671373,10113,664,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9752682126,9472,666,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9752692270,4352,668,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9752697262,1728,670,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9752699630,4800,672,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9752705006,1216,674,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9752715150,992,676,,,,,,,,,,0.000,4.032,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9752729966,1141135,677,9208,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9753871677,193155,679,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9754065408,13024,681,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9754079072,9312,683,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9754088928,8864,685,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9754102528,864,688,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9754121249,960,691,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9754244386,10688,693,,,,,,,,,,0.115,10733.058,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9754262530,352,694,,,,,,,,,,0.001,1931.818,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9754277986,7936,695,,,,,,,,,,8.000,1008064.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9754288867,16128,696,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9754305635,10304,698,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9754316611,9536,700,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9754326819,9568,702,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9754336963,1728,704,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9754339331,4800,706,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9754344707,1248,708,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9754350532,1023,710,,,,,,,,,,0.000,3.910,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9754367204,3765233,711,29759,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9758132981,178594,713,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9758312119,12032,715,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9758324791,9281,717,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9758335064,8864,719,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9758349112,864,722,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9758369048,960,725,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9758492826,10816,727,,,,,,,,,,0.115,10606.068,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9758510074,352,728,,,,,,,,,,0.001,1931.818,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9758521978,8128,729,,,,,,,,,,8.000,984248.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9758532218,16448,730,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9758549211,10688,732,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9758560539,9504,734,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9758570619,3616,736,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9758574843,1728,738,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9758577211,4800,740,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9758582907,1248,742,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9758593051,992,744,,,,,,,,,,0.000,4.032,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9758608763,2926310,745,23014,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9761535713,188515,747,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9761724836,12512,749,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9761738020,9280,751,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9761747844,8896,753,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9761766244,865,756,,,,,,,,,,0.000,277.457,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9761791717,992,759,,,,,,,,,,0.000,8.065,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9761914855,10912,761,,,,,,,,,,0.115,10512.804,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9761933543,320,762,,,,,,,,,,0.001,2125.000,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9761945543,8000,763,,,,,,,,,,8.000,1000000.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9761955719,16320,764,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9761972679,9472,766,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9761982695,9600,768,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9761992840,5120,770,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9761998536,1727,772,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9762000871,4801,774,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9762007624,1216,776,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9762018312,992,778,,,,,,,,,,0.000,4.032,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9762033896,1667798,779,13076,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9763702334,189442,781,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9763892352,13409,783,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9763906401,9280,785,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9763916225,8864,787,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9763935105,864,790,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9763958497,960,793,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9764082787,10624,795,,,,,,,,,,0.115,10797.758,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9764101091,352,796,,,,,,,,,,0.001,1931.818,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9764113667,7968,797,,,,,,,,,,8.000,1004016.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9764124035,16225,798,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9764140835,10401,800,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9764151844,9312,802,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9764161796,5536,804,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9764167940,1696,806,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9764172580,4800,808,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9764181188,1248,810,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9764191844,992,812,,,,,,,,,,0.000,4.032,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9764207461,3485229,813,27064,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9767693234,184194,815,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9767878036,12065,817,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9767890677,9504,819,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9767900789,8896,821,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9767917493,864,824,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9767938101,992,827,,,,,,,,,,0.000,8.065,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9768062007,10944,829,,,,,,,,,,0.115,10482.060,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9768080887,320,830,,,,,,,,,,0.001,2125.000,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9768093079,8000,831,,,,,,,,,,8.000,1000000.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9768103351,16513,832,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9768120440,11040,834,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9768132088,9120,836,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9768141816,8544,838,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9768150904,1760,840,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9768153272,4800,842,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9768158616,1248,844,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9768165048,992,846,,,,,,,,,,0.000,4.032,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9768180536,3588015,847,28305,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9771769159,182691,849,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9771952426,12128,851,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9771965098,9312,853,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9771975370,9120,855,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9771987946,864,858,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9772008298,960,861,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9772140396,11040,863,,,,,,,,,,0.115,10390.861,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9772158764,353,864,,,,,,,,,,0.001,1926.345,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9772170829,7968,865,,,,,,,,,,8.000,1004016.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9772181197,16480,866,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9772198317,11232,868,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9772210189,10080,870,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9772220909,5856,872,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9772227405,1728,874,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9772229678,4799,876,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9772235149,1408,878,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9772243085,993,880,,,,,,,,,,0.000,4.028,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9772258958,3701712,881,29447,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9775961310,184483,883,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9776146433,12160,885,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9776159201,9312,887,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9776169185,9120,889,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9776186401,864,892,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9776208834,960,895,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9776333635,10848,897,,,,,,,,,,0.115,10574.750,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9776351619,320,898,,,,,,,,,,0.001,2125.000,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9776363716,7904,899,,,,,,,,,,8.000,1012144.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9776374436,16288,900,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9776391364,9184,902,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9776401124,9120,904,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9776410852,6112,906,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9776417540,1728,908,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9776419940,4832,910,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9776425348,1248,912,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9776435652,1025,914,,,,,,,,,,0.000,3.902,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9776450661,1755127,915,12939,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9778206363,188803,917,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9778395742,12960,919,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9778409310,9600,921,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9778419518,8865,923,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9778431039,864,926,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9778451007,960,929,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9778580480,10817,931,,,,,,,,,,0.115,10605.150,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9778621345,320,932,,,,,,,,,,0.001,2125.000,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9778634721,8000,933,,,,,,,,,,8.000,1000000.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9778645538,16192,934,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9778662370,11072,936,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9778674114,9440,938,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9778684098,5248,940,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9778690018,1728,942,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9778692386,4800,944,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9778697826,1216,946,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9778706306,992,948,,,,,,,,,,0.000,4.032,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9778722690,3511854,949,27498,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9782235120,184515,951,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9782420243,12096,953,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9782432979,9376,955,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9782442963,8896,957,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9782461556,863,960,,,,,,,,,,0.000,278.100,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9782481108,960,963,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9782608949,11040,965,,,,,,,,,,0.115,10390.861,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9782627094,352,966,,,,,,,,,,0.001,1931.818,Pageable,Device,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Host-to-Device]
+9782641526,7936,967,,,,,,,,,,8.000,1008064.000,Device,,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memset]
+9782652630,16256,968,16,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9782669558,10816,970,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9782680918,9152,972,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9782690678,8065,974,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"full_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned long *, unsigned int *, unsigned long *)"
+9782699350,1728,976,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9782701751,4832,978,1,1,1,1,1,1,24,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9782707223,1248,980,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9782716087,992,982,,,,,,,,,,0.000,4.032,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9782732407,3512462,983,27916,1,1,32,1,1,32,0.000,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9786245445,182082,985,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9786428103,12064,987,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9786440744,9279,989,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9786451016,8863,991,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 4070 (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9786467496,864,994,,,,,,,,,,0.000,277.778,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+9786490760,960,997,,,,,,,,,,0.000,8.333,Device,Pageable,NVIDIA GeForce RTX 4070 (0),1,,7,[CUDA memcpy Device-to-Host]
+

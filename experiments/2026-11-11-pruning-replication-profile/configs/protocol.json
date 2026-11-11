@@ -1,0 +1,86 @@
+{
+  "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+  "application_source": "unchanged from parent merge95ae7f1",
+  "inputs": {
+    "index_sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37",
+    "queries_sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+    "split_sha256": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1",
+    "documents": 1000000,
+    "queries": 500,
+    "k": 10,
+    "held_out_access": false
+  },
+  "correctness": "Generate fresh sequentialCPU500 top10 and compare preserved first25; two paired verify1 rounds, one perB, with all scores/bounds/thresholds/schedules/skipped-losers and external ordered outputs checked before timing.",
+  "timing": {
+    "block_sizes": [
+      16,
+      32
+    ],
+    "processes_per_block_size": 3,
+    "mode": 2,
+    "verify_scores": 0,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "process_order": [
+      [
+        16,
+        32
+      ],
+      [
+        32,
+        16
+      ],
+      [
+        16,
+        32
+      ]
+    ],
+    "path_order": "alternating (round+query index+order)%2, as parent",
+    "boundary": "Unchanged parent query wall boundary includes weights/upload/reset, seed scoring/selection, bounds, compaction/count transfer, survivor scoring, merge and winner copy. Excludes index/plane preparation, oracle and diagnostic threshold transfer, file I/O.",
+    "primary": "Mean of query-wise log median(pruned)/median(control) across3processes and500queries, exponentiated; each process and historical25 also reported.",
+    "uncertainty": "10000 crossed process/query resamples, seed20261111; conditional repeated-calibration interval with only3processes.",
+    "stopping": "Fixed processes/rounds. Stop on correctness/runtime/build failure. Defer timing after10min occupied GPU; no optional stopping/tuning."
+  },
+  "hardware": [
+    {
+      "gpu": "RTX2080Ti",
+      "compute_capability": "7.5",
+      "architecture": "Turing",
+      "nvcc_arch": "sm_75"
+    },
+    {
+      "gpu": "RTX4070",
+      "compute_capability": "8.9",
+      "architecture": "Ada",
+      "nvcc_arch": "sm_89"
+    }
+  ],
+  "fixed_algorithm": {
+    "seed_budget_blocks": 16,
+    "seed_policy": "first16 identity blocks;256 seed documents atB16,512 atB32",
+    "bounds": "term-major full-byte maxima, weighteduint64 sum",
+    "skip": "strictly below kth real-seed threshold; retain equal bounds",
+    "scorer": "same CSR warp-per-block scorer",
+    "merger": "same hierarchical canonical GPU top-k"
+  },
+  "profiling": {
+    "queries": 25,
+    "rounds": 1,
+    "warmups": 0,
+    "execution_modes": [
+      0,
+      1
+    ],
+    "isolated_allocations": true,
+    "nsys": "CUDA kernel/API/memory trace plus application allocation tracking.",
+    "ncu": "DRAM read/write sum counters; kernel replay, cache-control none, clock-control none.",
+    "failure": "Retain missing counters/permissions as unknown; never replace them with analytical byte estimates.",
+    "qualification": "Profiled timings are diagnostic and not ordinary latency. Allocation tracking does not establish board/context peak."
+  },
+  "limits": [
+    "Both paths share pruning metadata in each paired timing process.",
+    "CPU and other host differences prevent attributing raw cross-host wall latency solely to GPU architecture.",
+    "No held-out, service-tail, memory-reduction or external-superiority claim."
+  ],
+  "public_summary_packaging": "Actual full specs/runtime gates precede compute in private records; this public summary is packaged after launch and discloses that deviation from CONTRIBUTING.md."
+}

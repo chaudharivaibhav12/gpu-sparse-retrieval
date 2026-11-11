@@ -39,3 +39,16 @@ Block sizes 16 and 32 passed 350 independent fixture queries and 100 calibration
 ## November 11: full-byte pruning calibration
 
 Full-byte GPU pruning now has an initial [calibration result](../experiments/2026-11-11-cuda-fullbound-pruning/README.md): all correctness checks passed, and paired query-wise latency ratios were 0.7626 at B16 and 0.8415 at B32 (23.74% and 15.85% lower latency). These are conditional 25-query, 1M-passage results; some queries regress, full-byte maxima add substantial metadata, and no held-out, external-baseline or peak-memory conclusion is established. Next: replicate/expand calibration, then compare full/coarse/refinement with a fixed seed/scorer/merger.
+
+## Completed replication and profiling
+
+[Two-architecture results](../experiments/2026-11-11-pruning-replication-profile/README.md) now pass local review: 500 calibration queries, three independent processes/B, all canonical outputs match.
+
+| GPU | B | Pruned/control latency | Conditional 95% interval | Lower latency |
+|---|---:|---:|---:|---:|
+| RTX 2080 Ti | 16 | 0.7553 | [0.7298, 0.7806] | 24.47% |
+| RTX 2080 Ti | 32 | 0.8151 | [0.7890, 0.8398] | 18.49% |
+| RTX 4070 | 16 | 0.7710 | [0.7458, 0.7959] | 22.90% |
+| RTX 4070 | 32 | 0.8146 | [0.7900, 0.8382] | 18.54% |
+
+Diagnostics show survivor scoring dominates; full-bound kernels are below 0.4% of kernel time, while pruning adds substantial resident metadata. Prioritize matched external/payload-layout evidence and retain the planned full/coarse/refinement ablation, including null outcomes. GPUSparse dependencies are prepared; its retrieval reproduction, broader supported depths/workloads, freeze/held-out evaluation and final report remain. No held-out or external-superiority claim.

@@ -39,12 +39,12 @@ The main comparison is **CPU BMP, released GPUSparse, and our proposed exact pru
 | System | Purpose | Current status |
 |---|---|---|
 | Our sequential C++ scorer | Reference scores and a deterministic order for tied results | Implemented; independently checked on a Python fixture and compared with CUDA on real data |
-| Released CPU BMP | Strong external CPU retrieval baseline | Native fixture failures recorded; corrected canonical variant passes all 96 fixture cases and 25-query top-10 checks at 100K and 1M for raw/compressed bounds. Performance comparison pending |
+| Released CPU BMP | Strong external CPU retrieval baseline | Native fixture failures recorded; corrected canonical variant passes all 96 fixture cases and 25-query top-10 checks at 100K and 1M for raw/compressed bounds. Paired first-25 timing completed; compressed bounds were 12.11% slower in the primary calibration statistic; raw is the provisional default |
 | Released GPUSparse | External GPU baseline from the June paper, using the strongest applicable current path | Not yet reproduced; calibrate monolithic/chunked/compacted variants where supported |
 | Our initial exhaustive CUDA forward scorer | First GPU scoring correctness control | Implemented; all scores return to the CPU for top-k selection |
 | Our forward scorer with GPU top-k | Canonical GPU ranking correctness control | Validated on fixtures and first 25 calibration queries at 100K/1M; no controlled performance claim |
-| Our same-layout block-exhaustive GPU control | Isolate the effect of pruning while holding scoring layout and merge fixed | CSR identity-scheduled B16/B32 control validated on fixtures and 100K/1M; timing comparison pending |
-| Our full-bound pruned GPU system | Proposed main exact GPU system | CPU offline candidate analysis completed; GPU implementation pending |
+| Our same-layout block-exhaustive GPU control | Isolate the effect of pruning while holding scoring layout and merge fixed | CSR identity-scheduled B16/B32 control validated; used as the matched baseline in full-bound paired calibration |
+| Our full-bound pruned GPU system | Proposed main exact GPU system | GPU full-byte path passed fixtures/real checks and initial paired calibration; 500-query process replication and profiling in progress |
 | Our progressive-bound variant | Test the proposed precision-refinement contribution | CPU decision analysis completed; GPU implementation and speed benefit unproven |
 
 ## Literature and how it affects the plan
@@ -213,3 +213,16 @@ Use the verified prototype GPU first, then reproduce on a second architecture wh
 | Nov 22Ã¢â‚¬â€œ25 | Integrate results and uncertainty into the scientific report | Clean CIMS build, run final reproductions, prepare stage plots | Finish limitations, index spec and reproducible README; freeze code and submit |
 
 Task owners remain unassigned until the team agrees. The columns above describe proposed work streams, not teammate commitments or results. By November 15, aim for one command that executes the same queries against the CPU and GPU and compares their ranked output. The minimum course target is a functional exact GPU scorer, same-layout pruning control, a credible external comparison, different data sizes and GPUs, and an explanation of measured costs. Full 8.8M residency and a second corpus remain conditional on data, hardware and time.
+
+## Completed replication and profiling
+
+[Two-architecture results](../experiments/2026-11-11-pruning-replication-profile/README.md) now pass local review: 500 calibration queries, three independent processes/B, all canonical outputs match.
+
+| GPU | B | Pruned/control latency | Conditional 95% interval | Lower latency |
+|---|---:|---:|---:|---:|
+| RTX 2080 Ti | 16 | 0.7553 | [0.7298, 0.7806] | 24.47% |
+| RTX 2080 Ti | 32 | 0.8151 | [0.7890, 0.8398] | 18.49% |
+| RTX 4070 | 16 | 0.7710 | [0.7458, 0.7959] | 22.90% |
+| RTX 4070 | 32 | 0.8146 | [0.7900, 0.8382] | 18.54% |
+
+Diagnostics show survivor scoring dominates; full-bound kernels are below 0.4% of kernel time, while pruning adds substantial resident metadata. Prioritize matched external/payload-layout evidence and retain the planned full/coarse/refinement ablation, including null outcomes. GPUSparse dependencies are prepared; its retrieval reproduction, broader supported depths/workloads, freeze/held-out evaluation and final report remain. No held-out or external-superiority claim.

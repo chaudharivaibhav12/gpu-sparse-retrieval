@@ -1,0 +1,3 @@
+# 20261111-cuda5-profile-01
+
+[RTX 4070 manifest](../../../../results/2026-11-11-pruning-replication-profile/20261111-cuda5-profile-01/manifest.json) · [raw data](../../../../results/2026-11-11-pruning-replication-profile/20261111-cuda5-profile-01/raw/) · [logs](../../../../results/2026-11-11-pruning-replication-profile/20261111-cuda5-profile-01/logs/) · [analysis](../../../../results/2026-11-11-pruning-replication-profile/20261111-cuda5-profile-01/analysis/) · [frozen resolved protocols](../../../../results/2026-11-11-pruning-replication-profile/20261111-cuda5-profile-01/protocols.json). Source `95ae7f1acd0b4a93286d368c85486fe7e8508d39`.

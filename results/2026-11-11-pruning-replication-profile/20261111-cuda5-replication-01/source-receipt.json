@@ -1,0 +1,53 @@
+{
+  "gpu": {
+    "source_commit": "95ae7f1acd0b4a93286d368c85486fe7e8508d39",
+    "binary_sha256": "60d7df1ff98ad7fe1067cce71dd6bab0321fd7cc391c3ce88e7f8110b76e7c87",
+    "command": [
+      "nvcc",
+      "-O3",
+      "-lineinfo",
+      "-arch=sm_89",
+      "-std=c++17",
+      "src/cuda_fullbound.cu",
+      "-o",
+      "build/cuda_fullbound"
+    ],
+    "build_observation": "OBSERVATION-142f7cd58970",
+    "source_hashes": {
+      "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+      "src/cuda_block_exhaustive.cu": "bd4f662e10df76a8200bbfdc3a7766359f4421bb0d9c5d5ba562b464d177c8a9",
+      "src/cuda_device_topk.cu": "60be261cdb7cc5adb4dc1cf0fdc493d5cc59862a46284e60f4d9ef5eef1301f3",
+      "src/cuda_exhaustive.cu": "670e5cf6771a323756978f7906f091162bd27d7ce6e706f46be20ae6794ce872",
+      "src/cuda_fullbound.cu": "e2fa14ea3d76620f539e47bb0bbb0cb29a25a62d3a854b0f33e474fccd34caac",
+      "src/cuda_smoke.cu": "500d1eedf86156013ac92ca887a7a9f3c0a98121043ea3d3f76ca3f99ec15c02",
+      "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+      "src/research_runtime.h": "29c8642d8e131c6d7a41ee557e90c56b8dc5c7403cb18f17afb68d4435ec292a"
+    }
+  },
+  "cpu": {
+    "source_commit": "95ae7f1acd0b4a93286d368c85486fe7e8508d39",
+    "binary_sha256": "a22c375c1930fae6f4fbb51d0d2ad0981ae62bbd11a4911fa895775b921c2acc",
+    "command": [
+      "g++",
+      "-O3",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-std=c++17",
+      "src/cpu_pilot.cpp",
+      "-o",
+      "build/cpu_pilot"
+    ],
+    "build_observation": "OBSERVATION-1a31a4b9290a",
+    "source_hashes": {
+      "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+      "src/cuda_block_exhaustive.cu": "bd4f662e10df76a8200bbfdc3a7766359f4421bb0d9c5d5ba562b464d177c8a9",
+      "src/cuda_device_topk.cu": "60be261cdb7cc5adb4dc1cf0fdc493d5cc59862a46284e60f4d9ef5eef1301f3",
+      "src/cuda_exhaustive.cu": "670e5cf6771a323756978f7906f091162bd27d7ce6e706f46be20ae6794ce872",
+      "src/cuda_fullbound.cu": "e2fa14ea3d76620f539e47bb0bbb0cb29a25a62d3a854b0f33e474fccd34caac",
+      "src/cuda_smoke.cu": "500d1eedf86156013ac92ca887a7a9f3c0a98121043ea3d3f76ca3f99ec15c02",
+      "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+      "src/research_runtime.h": "29c8642d8e131c6d7a41ee557e90c56b8dc5c7403cb18f17afb68d4435ec292a"
+    }
+  }
+}

@@ -1,0 +1,1172 @@
+[
+  {
+    "tag": "nsys-b16-m0",
+    "experiment": "EXPERIMENT-1af396d9809f",
+    "run": "RUN_FINISHED-1df302bcb0e9",
+    "expected": {
+      "mode": "cuda-fullbound-pruning",
+      "docs": 1000000,
+      "query_count": 25,
+      "k": 10,
+      "gpu_id": 0,
+      "index_path": "data/derived/hash-1000000.gsp",
+      "queries_path": "data/derived/calibration-500.tsv",
+      "block_size": 16,
+      "execution_mode": 0,
+      "score_threads": 32,
+      "selection_threads": 256,
+      "bound_threads": 256,
+      "compaction_threads": 256,
+      "max_supported_k": 128,
+      "selection_levels": 4,
+      "scratch_bytes": 1875360,
+      "seed_selection_scratch_bytes": 0,
+      "bounds_bytes": 0,
+      "seed_budget_blocks": 16,
+      "pruning_seed_blocks": 0,
+      "pruning_seed_docs": 0,
+      "max_query_terms": 85,
+      "verify_scores": 0,
+      "warmup_rounds": 0,
+      "repeats": 1,
+      "cpu_affinity": "0"
+    },
+    "behavior": {
+      "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+      "arithmetic": "uint64",
+      "document_impacts": "uint8-exact",
+      "query_policy": "BMP-f32-ceil-cap32",
+      "tie_order": "score_desc_original_numeric_id_asc",
+      "eligibility": "all_documents",
+      "selection": "hierarchical-local-topk",
+      "layout": "csr-document-blocks",
+      "bounds": "term-major-u8-max-u64-sum",
+      "seed": "first-16-identity-blocks",
+      "threshold": "distinct-seed-kth-or-zero",
+      "skip_rule": "strictly-below-threshold",
+      "compaction": "stable-three-pass-prefix",
+      "skipped_scores": "zeroed-before-each-query",
+      "paired_order": "alternating-round-plus-query"
+    },
+    "declared_changes": {
+      "config.bounds_bytes": "Diagnostic profile delta {\"left\": 1792437500, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.execution_mode": "Diagnostic profile delta {\"left\": 2, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.pruning_seed_blocks": "Diagnostic profile delta {\"left\": 16, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.pruning_seed_docs": "Diagnostic profile delta {\"left\": 256, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.repeats": "Diagnostic profile delta {\"left\": 20, \"right\": 1}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.seed_selection_scratch_bytes": "Diagnostic profile delta {\"left\": 480, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.warmup_rounds": "Diagnostic profile delta {\"left\": 3, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged."
+    },
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "data/derived/hash-1000000.gsp",
+        "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37"
+      },
+      {
+        "role": "input-1",
+        "path": "data/derived/calibration-500.tsv",
+        "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"
+      },
+      {
+        "role": "input-2",
+        "path": "data/derived/calibration-500.tsv.split.tsv",
+        "sha256": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+      },
+      {
+        "role": "input-3",
+        "path": "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/cpu-top10-500.tsv",
+        "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860"
+      }
+    ],
+    "build": {
+      "source_commit": "95ae7f1acd0b4a93286d368c85486fe7e8508d39",
+      "binary_sha256": "e4d1c9959c33a9c4573832ca757ab838f8dc8916ec6df5a046a2948d6a773544",
+      "command": [
+        "nvcc",
+        "-O3",
+        "-lineinfo",
+        "-arch=sm_75",
+        "-std=c++17",
+        "src/cuda_fullbound.cu",
+        "-o",
+        "build/cuda_fullbound"
+      ],
+      "build_observation": "OBSERVATION-77bfe4354420",
+      "source_hashes": {
+        "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+        "src/cuda_block_exhaustive.cu": "bd4f662e10df76a8200bbfdc3a7766359f4421bb0d9c5d5ba562b464d177c8a9",
+        "src/cuda_device_topk.cu": "60be261cdb7cc5adb4dc1cf0fdc493d5cc59862a46284e60f4d9ef5eef1301f3",
+        "src/cuda_exhaustive.cu": "670e5cf6771a323756978f7906f091162bd27d7ce6e706f46be20ae6794ce872",
+        "src/cuda_fullbound.cu": "e2fa14ea3d76620f539e47bb0bbb0cb29a25a62d3a854b0f33e474fccd34caac",
+        "src/cuda_smoke.cu": "500d1eedf86156013ac92ca887a7a9f3c0a98121043ea3d3f76ca3f99ec15c02",
+        "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+        "src/research_runtime.h": "29c8642d8e131c6d7a41ee557e90c56b8dc5c7403cb18f17afb68d4435ec292a"
+      },
+      "profiler_executable": "/usr/local/stow/cuda-12.6/bin/nsys",
+      "profiler_sha256": "5a20de5c819813d572a2cd6e0b4f719fc1e209c1e676b1d24c4365e870ae9579",
+      "profiler_argv": [
+        "nsys",
+        "profile",
+        "--trace=cuda",
+        "--cuda-memory-usage=true",
+        "--sample=none",
+        "--cpuctxsw=none",
+        "--output",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/nsys-b16-m0",
+        "build/cuda_fullbound",
+        "data/derived/hash-1000000.gsp",
+        "data/derived/calibration-500.tsv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/nsys-b16-m0.csv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/nsys-b16-m0.tsv",
+        "25",
+        "10",
+        "0",
+        "0",
+        "16",
+        "0",
+        "1",
+        "0"
+      ],
+      "qualification": "Diagnostic profiler wrapper plus runtime-gated native executable. Profiled wall/event times are perturbed and cannot support ordinary latency comparisons."
+    },
+    "timing_boundary": "Diagnostic trace covers load/setup and query calls; no profiler wall/event time is an ordinary latency result. Attribute kernels and query transfers separately; memory tracking includes setup allocations.",
+    "correctness_rule": "Every native query output compared with the fresh500 CPU reference subset; no use of held-out queries.",
+    "analysis_plan": {
+      "nsys": "CUDA kernel/API/memory trace and standalone allocation tracking at B16/B32 mode0/mode1; one round first25.",
+      "ncu": "Kernel replay; DRAM read/write sum counters, cache-control none, clock-control none; preserve raw report andCSV; do not interpret replay wall times aslatency.",
+      "counter_failure": "If ERR_NVGPUCTRPERM or unsupported GPU occurs, retain first failed attempt and mark remaining counters unavailable; no repeated permission attempts.",
+      "sources": [
+        "https://docs.nvidia.com/nsight-systems/UserGuide/",
+        "https://docs.nvidia.com/nsight-compute/NsightComputeCli/"
+      ]
+    }
+  },
+  {
+    "tag": "nsys-b16-m1",
+    "experiment": "EXPERIMENT-5d244d308d19",
+    "run": "RUN_FINISHED-d837ec8d8579",
+    "expected": {
+      "mode": "cuda-fullbound-pruning",
+      "docs": 1000000,
+      "query_count": 25,
+      "k": 10,
+      "gpu_id": 0,
+      "index_path": "data/derived/hash-1000000.gsp",
+      "queries_path": "data/derived/calibration-500.tsv",
+      "block_size": 16,
+      "execution_mode": 1,
+      "score_threads": 32,
+      "selection_threads": 256,
+      "bound_threads": 256,
+      "compaction_threads": 256,
+      "max_supported_k": 128,
+      "selection_levels": 4,
+      "scratch_bytes": 1875360,
+      "seed_selection_scratch_bytes": 480,
+      "bounds_bytes": 1792437500,
+      "seed_budget_blocks": 16,
+      "pruning_seed_blocks": 16,
+      "pruning_seed_docs": 256,
+      "max_query_terms": 85,
+      "verify_scores": 0,
+      "warmup_rounds": 0,
+      "repeats": 1,
+      "cpu_affinity": "0"
+    },
+    "behavior": {
+      "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+      "arithmetic": "uint64",
+      "document_impacts": "uint8-exact",
+      "query_policy": "BMP-f32-ceil-cap32",
+      "tie_order": "score_desc_original_numeric_id_asc",
+      "eligibility": "all_documents",
+      "selection": "hierarchical-local-topk",
+      "layout": "csr-document-blocks",
+      "bounds": "term-major-u8-max-u64-sum",
+      "seed": "first-16-identity-blocks",
+      "threshold": "distinct-seed-kth-or-zero",
+      "skip_rule": "strictly-below-threshold",
+      "compaction": "stable-three-pass-prefix",
+      "skipped_scores": "zeroed-before-each-query",
+      "paired_order": "alternating-round-plus-query"
+    },
+    "declared_changes": {
+      "config.execution_mode": "Diagnostic profile delta {\"left\": 2, \"right\": 1}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.repeats": "Diagnostic profile delta {\"left\": 20, \"right\": 1}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.warmup_rounds": "Diagnostic profile delta {\"left\": 3, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged."
+    },
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "data/derived/hash-1000000.gsp",
+        "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37"
+      },
+      {
+        "role": "input-1",
+        "path": "data/derived/calibration-500.tsv",
+        "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"
+      },
+      {
+        "role": "input-2",
+        "path": "data/derived/calibration-500.tsv.split.tsv",
+        "sha256": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+      },
+      {
+        "role": "input-3",
+        "path": "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/cpu-top10-500.tsv",
+        "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860"
+      }
+    ],
+    "build": {
+      "source_commit": "95ae7f1acd0b4a93286d368c85486fe7e8508d39",
+      "binary_sha256": "e4d1c9959c33a9c4573832ca757ab838f8dc8916ec6df5a046a2948d6a773544",
+      "command": [
+        "nvcc",
+        "-O3",
+        "-lineinfo",
+        "-arch=sm_75",
+        "-std=c++17",
+        "src/cuda_fullbound.cu",
+        "-o",
+        "build/cuda_fullbound"
+      ],
+      "build_observation": "OBSERVATION-77bfe4354420",
+      "source_hashes": {
+        "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+        "src/cuda_block_exhaustive.cu": "bd4f662e10df76a8200bbfdc3a7766359f4421bb0d9c5d5ba562b464d177c8a9",
+        "src/cuda_device_topk.cu": "60be261cdb7cc5adb4dc1cf0fdc493d5cc59862a46284e60f4d9ef5eef1301f3",
+        "src/cuda_exhaustive.cu": "670e5cf6771a323756978f7906f091162bd27d7ce6e706f46be20ae6794ce872",
+        "src/cuda_fullbound.cu": "e2fa14ea3d76620f539e47bb0bbb0cb29a25a62d3a854b0f33e474fccd34caac",
+        "src/cuda_smoke.cu": "500d1eedf86156013ac92ca887a7a9f3c0a98121043ea3d3f76ca3f99ec15c02",
+        "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+        "src/research_runtime.h": "29c8642d8e131c6d7a41ee557e90c56b8dc5c7403cb18f17afb68d4435ec292a"
+      },
+      "profiler_executable": "/usr/local/stow/cuda-12.6/bin/nsys",
+      "profiler_sha256": "5a20de5c819813d572a2cd6e0b4f719fc1e209c1e676b1d24c4365e870ae9579",
+      "profiler_argv": [
+        "nsys",
+        "profile",
+        "--trace=cuda",
+        "--cuda-memory-usage=true",
+        "--sample=none",
+        "--cpuctxsw=none",
+        "--output",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/nsys-b16-m1",
+        "build/cuda_fullbound",
+        "data/derived/hash-1000000.gsp",
+        "data/derived/calibration-500.tsv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/nsys-b16-m1.csv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/nsys-b16-m1.tsv",
+        "25",
+        "10",
+        "0",
+        "0",
+        "16",
+        "1",
+        "1",
+        "0"
+      ],
+      "qualification": "Diagnostic profiler wrapper plus runtime-gated native executable. Profiled wall/event times are perturbed and cannot support ordinary latency comparisons."
+    },
+    "timing_boundary": "Diagnostic trace covers load/setup and query calls; no profiler wall/event time is an ordinary latency result. Attribute kernels and query transfers separately; memory tracking includes setup allocations.",
+    "correctness_rule": "Every native query output compared with the fresh500 CPU reference subset; no use of held-out queries.",
+    "analysis_plan": {
+      "nsys": "CUDA kernel/API/memory trace and standalone allocation tracking at B16/B32 mode0/mode1; one round first25.",
+      "ncu": "Kernel replay; DRAM read/write sum counters, cache-control none, clock-control none; preserve raw report andCSV; do not interpret replay wall times aslatency.",
+      "counter_failure": "If ERR_NVGPUCTRPERM or unsupported GPU occurs, retain first failed attempt and mark remaining counters unavailable; no repeated permission attempts.",
+      "sources": [
+        "https://docs.nvidia.com/nsight-systems/UserGuide/",
+        "https://docs.nvidia.com/nsight-compute/NsightComputeCli/"
+      ]
+    }
+  },
+  {
+    "tag": "nsys-b32-m0",
+    "experiment": "EXPERIMENT-c2692b78ec5f",
+    "run": "RUN_FINISHED-d7638467d8c5",
+    "expected": {
+      "mode": "cuda-fullbound-pruning",
+      "docs": 1000000,
+      "query_count": 25,
+      "k": 10,
+      "gpu_id": 0,
+      "index_path": "data/derived/hash-1000000.gsp",
+      "queries_path": "data/derived/calibration-500.tsv",
+      "block_size": 32,
+      "execution_mode": 0,
+      "score_threads": 32,
+      "selection_threads": 256,
+      "bound_threads": 256,
+      "compaction_threads": 256,
+      "max_supported_k": 128,
+      "selection_levels": 4,
+      "scratch_bytes": 1875360,
+      "seed_selection_scratch_bytes": 0,
+      "bounds_bytes": 0,
+      "seed_budget_blocks": 16,
+      "pruning_seed_blocks": 0,
+      "pruning_seed_docs": 0,
+      "max_query_terms": 85,
+      "verify_scores": 0,
+      "warmup_rounds": 0,
+      "repeats": 1,
+      "cpu_affinity": "0"
+    },
+    "behavior": {
+      "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+      "arithmetic": "uint64",
+      "document_impacts": "uint8-exact",
+      "query_policy": "BMP-f32-ceil-cap32",
+      "tie_order": "score_desc_original_numeric_id_asc",
+      "eligibility": "all_documents",
+      "selection": "hierarchical-local-topk",
+      "layout": "csr-document-blocks",
+      "bounds": "term-major-u8-max-u64-sum",
+      "seed": "first-16-identity-blocks",
+      "threshold": "distinct-seed-kth-or-zero",
+      "skip_rule": "strictly-below-threshold",
+      "compaction": "stable-three-pass-prefix",
+      "skipped_scores": "zeroed-before-each-query",
+      "paired_order": "alternating-round-plus-query"
+    },
+    "declared_changes": {
+      "config.block_size": "Diagnostic profile delta {\"left\": 16, \"right\": 32}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.bounds_bytes": "Diagnostic profile delta {\"left\": 1792437500, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.execution_mode": "Diagnostic profile delta {\"left\": 2, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.pruning_seed_blocks": "Diagnostic profile delta {\"left\": 16, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.pruning_seed_docs": "Diagnostic profile delta {\"left\": 256, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.repeats": "Diagnostic profile delta {\"left\": 20, \"right\": 1}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.seed_selection_scratch_bytes": "Diagnostic profile delta {\"left\": 480, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.warmup_rounds": "Diagnostic profile delta {\"left\": 3, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged."
+    },
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "data/derived/hash-1000000.gsp",
+        "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37"
+      },
+      {
+        "role": "input-1",
+        "path": "data/derived/calibration-500.tsv",
+        "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"
+      },
+      {
+        "role": "input-2",
+        "path": "data/derived/calibration-500.tsv.split.tsv",
+        "sha256": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+      },
+      {
+        "role": "input-3",
+        "path": "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/cpu-top10-500.tsv",
+        "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860"
+      }
+    ],
+    "build": {
+      "source_commit": "95ae7f1acd0b4a93286d368c85486fe7e8508d39",
+      "binary_sha256": "e4d1c9959c33a9c4573832ca757ab838f8dc8916ec6df5a046a2948d6a773544",
+      "command": [
+        "nvcc",
+        "-O3",
+        "-lineinfo",
+        "-arch=sm_75",
+        "-std=c++17",
+        "src/cuda_fullbound.cu",
+        "-o",
+        "build/cuda_fullbound"
+      ],
+      "build_observation": "OBSERVATION-77bfe4354420",
+      "source_hashes": {
+        "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+        "src/cuda_block_exhaustive.cu": "bd4f662e10df76a8200bbfdc3a7766359f4421bb0d9c5d5ba562b464d177c8a9",
+        "src/cuda_device_topk.cu": "60be261cdb7cc5adb4dc1cf0fdc493d5cc59862a46284e60f4d9ef5eef1301f3",
+        "src/cuda_exhaustive.cu": "670e5cf6771a323756978f7906f091162bd27d7ce6e706f46be20ae6794ce872",
+        "src/cuda_fullbound.cu": "e2fa14ea3d76620f539e47bb0bbb0cb29a25a62d3a854b0f33e474fccd34caac",
+        "src/cuda_smoke.cu": "500d1eedf86156013ac92ca887a7a9f3c0a98121043ea3d3f76ca3f99ec15c02",
+        "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+        "src/research_runtime.h": "29c8642d8e131c6d7a41ee557e90c56b8dc5c7403cb18f17afb68d4435ec292a"
+      },
+      "profiler_executable": "/usr/local/stow/cuda-12.6/bin/nsys",
+      "profiler_sha256": "5a20de5c819813d572a2cd6e0b4f719fc1e209c1e676b1d24c4365e870ae9579",
+      "profiler_argv": [
+        "nsys",
+        "profile",
+        "--trace=cuda",
+        "--cuda-memory-usage=true",
+        "--sample=none",
+        "--cpuctxsw=none",
+        "--output",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/nsys-b32-m0",
+        "build/cuda_fullbound",
+        "data/derived/hash-1000000.gsp",
+        "data/derived/calibration-500.tsv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/nsys-b32-m0.csv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/nsys-b32-m0.tsv",
+        "25",
+        "10",
+        "0",
+        "0",
+        "32",
+        "0",
+        "1",
+        "0"
+      ],
+      "qualification": "Diagnostic profiler wrapper plus runtime-gated native executable. Profiled wall/event times are perturbed and cannot support ordinary latency comparisons."
+    },
+    "timing_boundary": "Diagnostic trace covers load/setup and query calls; no profiler wall/event time is an ordinary latency result. Attribute kernels and query transfers separately; memory tracking includes setup allocations.",
+    "correctness_rule": "Every native query output compared with the fresh500 CPU reference subset; no use of held-out queries.",
+    "analysis_plan": {
+      "nsys": "CUDA kernel/API/memory trace and standalone allocation tracking at B16/B32 mode0/mode1; one round first25.",
+      "ncu": "Kernel replay; DRAM read/write sum counters, cache-control none, clock-control none; preserve raw report andCSV; do not interpret replay wall times aslatency.",
+      "counter_failure": "If ERR_NVGPUCTRPERM or unsupported GPU occurs, retain first failed attempt and mark remaining counters unavailable; no repeated permission attempts.",
+      "sources": [
+        "https://docs.nvidia.com/nsight-systems/UserGuide/",
+        "https://docs.nvidia.com/nsight-compute/NsightComputeCli/"
+      ]
+    }
+  },
+  {
+    "tag": "nsys-b32-m1",
+    "experiment": "EXPERIMENT-ffe85284b81e",
+    "run": "RUN_FINISHED-a4fee616ab9a",
+    "expected": {
+      "mode": "cuda-fullbound-pruning",
+      "docs": 1000000,
+      "query_count": 25,
+      "k": 10,
+      "gpu_id": 0,
+      "index_path": "data/derived/hash-1000000.gsp",
+      "queries_path": "data/derived/calibration-500.tsv",
+      "block_size": 32,
+      "execution_mode": 1,
+      "score_threads": 32,
+      "selection_threads": 256,
+      "bound_threads": 256,
+      "compaction_threads": 256,
+      "max_supported_k": 128,
+      "selection_levels": 4,
+      "scratch_bytes": 1875360,
+      "seed_selection_scratch_bytes": 960,
+      "bounds_bytes": 896218750,
+      "seed_budget_blocks": 16,
+      "pruning_seed_blocks": 16,
+      "pruning_seed_docs": 512,
+      "max_query_terms": 85,
+      "verify_scores": 0,
+      "warmup_rounds": 0,
+      "repeats": 1,
+      "cpu_affinity": "0"
+    },
+    "behavior": {
+      "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+      "arithmetic": "uint64",
+      "document_impacts": "uint8-exact",
+      "query_policy": "BMP-f32-ceil-cap32",
+      "tie_order": "score_desc_original_numeric_id_asc",
+      "eligibility": "all_documents",
+      "selection": "hierarchical-local-topk",
+      "layout": "csr-document-blocks",
+      "bounds": "term-major-u8-max-u64-sum",
+      "seed": "first-16-identity-blocks",
+      "threshold": "distinct-seed-kth-or-zero",
+      "skip_rule": "strictly-below-threshold",
+      "compaction": "stable-three-pass-prefix",
+      "skipped_scores": "zeroed-before-each-query",
+      "paired_order": "alternating-round-plus-query"
+    },
+    "declared_changes": {
+      "config.block_size": "Diagnostic profile delta {\"left\": 16, \"right\": 32}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.bounds_bytes": "Diagnostic profile delta {\"left\": 1792437500, \"right\": 896218750}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.execution_mode": "Diagnostic profile delta {\"left\": 2, \"right\": 1}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.pruning_seed_docs": "Diagnostic profile delta {\"left\": 256, \"right\": 512}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.repeats": "Diagnostic profile delta {\"left\": 20, \"right\": 1}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.seed_selection_scratch_bytes": "Diagnostic profile delta {\"left\": 480, \"right\": 960}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.warmup_rounds": "Diagnostic profile delta {\"left\": 3, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged."
+    },
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "data/derived/hash-1000000.gsp",
+        "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37"
+      },
+      {
+        "role": "input-1",
+        "path": "data/derived/calibration-500.tsv",
+        "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"
+      },
+      {
+        "role": "input-2",
+        "path": "data/derived/calibration-500.tsv.split.tsv",
+        "sha256": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+      },
+      {
+        "role": "input-3",
+        "path": "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/cpu-top10-500.tsv",
+        "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860"
+      }
+    ],
+    "build": {
+      "source_commit": "95ae7f1acd0b4a93286d368c85486fe7e8508d39",
+      "binary_sha256": "e4d1c9959c33a9c4573832ca757ab838f8dc8916ec6df5a046a2948d6a773544",
+      "command": [
+        "nvcc",
+        "-O3",
+        "-lineinfo",
+        "-arch=sm_75",
+        "-std=c++17",
+        "src/cuda_fullbound.cu",
+        "-o",
+        "build/cuda_fullbound"
+      ],
+      "build_observation": "OBSERVATION-77bfe4354420",
+      "source_hashes": {
+        "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+        "src/cuda_block_exhaustive.cu": "bd4f662e10df76a8200bbfdc3a7766359f4421bb0d9c5d5ba562b464d177c8a9",
+        "src/cuda_device_topk.cu": "60be261cdb7cc5adb4dc1cf0fdc493d5cc59862a46284e60f4d9ef5eef1301f3",
+        "src/cuda_exhaustive.cu": "670e5cf6771a323756978f7906f091162bd27d7ce6e706f46be20ae6794ce872",
+        "src/cuda_fullbound.cu": "e2fa14ea3d76620f539e47bb0bbb0cb29a25a62d3a854b0f33e474fccd34caac",
+        "src/cuda_smoke.cu": "500d1eedf86156013ac92ca887a7a9f3c0a98121043ea3d3f76ca3f99ec15c02",
+        "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+        "src/research_runtime.h": "29c8642d8e131c6d7a41ee557e90c56b8dc5c7403cb18f17afb68d4435ec292a"
+      },
+      "profiler_executable": "/usr/local/stow/cuda-12.6/bin/nsys",
+      "profiler_sha256": "5a20de5c819813d572a2cd6e0b4f719fc1e209c1e676b1d24c4365e870ae9579",
+      "profiler_argv": [
+        "nsys",
+        "profile",
+        "--trace=cuda",
+        "--cuda-memory-usage=true",
+        "--sample=none",
+        "--cpuctxsw=none",
+        "--output",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/nsys-b32-m1",
+        "build/cuda_fullbound",
+        "data/derived/hash-1000000.gsp",
+        "data/derived/calibration-500.tsv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/nsys-b32-m1.csv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/nsys-b32-m1.tsv",
+        "25",
+        "10",
+        "0",
+        "0",
+        "32",
+        "1",
+        "1",
+        "0"
+      ],
+      "qualification": "Diagnostic profiler wrapper plus runtime-gated native executable. Profiled wall/event times are perturbed and cannot support ordinary latency comparisons."
+    },
+    "timing_boundary": "Diagnostic trace covers load/setup and query calls; no profiler wall/event time is an ordinary latency result. Attribute kernels and query transfers separately; memory tracking includes setup allocations.",
+    "correctness_rule": "Every native query output compared with the fresh500 CPU reference subset; no use of held-out queries.",
+    "analysis_plan": {
+      "nsys": "CUDA kernel/API/memory trace and standalone allocation tracking at B16/B32 mode0/mode1; one round first25.",
+      "ncu": "Kernel replay; DRAM read/write sum counters, cache-control none, clock-control none; preserve raw report andCSV; do not interpret replay wall times aslatency.",
+      "counter_failure": "If ERR_NVGPUCTRPERM or unsupported GPU occurs, retain first failed attempt and mark remaining counters unavailable; no repeated permission attempts.",
+      "sources": [
+        "https://docs.nvidia.com/nsight-systems/UserGuide/",
+        "https://docs.nvidia.com/nsight-compute/NsightComputeCli/"
+      ]
+    }
+  },
+  {
+    "tag": "ncu-b16-m0",
+    "experiment": "EXPERIMENT-edc72a09ec50",
+    "run": "RUN_FINISHED-0f1bea6a9a47",
+    "expected": {
+      "mode": "cuda-fullbound-pruning",
+      "docs": 1000000,
+      "query_count": 25,
+      "k": 10,
+      "gpu_id": 0,
+      "index_path": "data/derived/hash-1000000.gsp",
+      "queries_path": "data/derived/calibration-500.tsv",
+      "block_size": 16,
+      "execution_mode": 0,
+      "score_threads": 32,
+      "selection_threads": 256,
+      "bound_threads": 256,
+      "compaction_threads": 256,
+      "max_supported_k": 128,
+      "selection_levels": 4,
+      "scratch_bytes": 1875360,
+      "seed_selection_scratch_bytes": 0,
+      "bounds_bytes": 0,
+      "seed_budget_blocks": 16,
+      "pruning_seed_blocks": 0,
+      "pruning_seed_docs": 0,
+      "max_query_terms": 85,
+      "verify_scores": 0,
+      "warmup_rounds": 0,
+      "repeats": 1,
+      "cpu_affinity": "0"
+    },
+    "behavior": {
+      "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+      "arithmetic": "uint64",
+      "document_impacts": "uint8-exact",
+      "query_policy": "BMP-f32-ceil-cap32",
+      "tie_order": "score_desc_original_numeric_id_asc",
+      "eligibility": "all_documents",
+      "selection": "hierarchical-local-topk",
+      "layout": "csr-document-blocks",
+      "bounds": "term-major-u8-max-u64-sum",
+      "seed": "first-16-identity-blocks",
+      "threshold": "distinct-seed-kth-or-zero",
+      "skip_rule": "strictly-below-threshold",
+      "compaction": "stable-three-pass-prefix",
+      "skipped_scores": "zeroed-before-each-query",
+      "paired_order": "alternating-round-plus-query"
+    },
+    "declared_changes": {
+      "config.bounds_bytes": "Diagnostic profile delta {\"left\": 1792437500, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.execution_mode": "Diagnostic profile delta {\"left\": 2, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.pruning_seed_blocks": "Diagnostic profile delta {\"left\": 16, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.pruning_seed_docs": "Diagnostic profile delta {\"left\": 256, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.repeats": "Diagnostic profile delta {\"left\": 20, \"right\": 1}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.seed_selection_scratch_bytes": "Diagnostic profile delta {\"left\": 480, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.warmup_rounds": "Diagnostic profile delta {\"left\": 3, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged."
+    },
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "data/derived/hash-1000000.gsp",
+        "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37"
+      },
+      {
+        "role": "input-1",
+        "path": "data/derived/calibration-500.tsv",
+        "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"
+      },
+      {
+        "role": "input-2",
+        "path": "data/derived/calibration-500.tsv.split.tsv",
+        "sha256": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+      },
+      {
+        "role": "input-3",
+        "path": "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/cpu-top10-500.tsv",
+        "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860"
+      }
+    ],
+    "build": {
+      "source_commit": "95ae7f1acd0b4a93286d368c85486fe7e8508d39",
+      "binary_sha256": "e4d1c9959c33a9c4573832ca757ab838f8dc8916ec6df5a046a2948d6a773544",
+      "command": [
+        "nvcc",
+        "-O3",
+        "-lineinfo",
+        "-arch=sm_75",
+        "-std=c++17",
+        "src/cuda_fullbound.cu",
+        "-o",
+        "build/cuda_fullbound"
+      ],
+      "build_observation": "OBSERVATION-77bfe4354420",
+      "source_hashes": {
+        "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+        "src/cuda_block_exhaustive.cu": "bd4f662e10df76a8200bbfdc3a7766359f4421bb0d9c5d5ba562b464d177c8a9",
+        "src/cuda_device_topk.cu": "60be261cdb7cc5adb4dc1cf0fdc493d5cc59862a46284e60f4d9ef5eef1301f3",
+        "src/cuda_exhaustive.cu": "670e5cf6771a323756978f7906f091162bd27d7ce6e706f46be20ae6794ce872",
+        "src/cuda_fullbound.cu": "e2fa14ea3d76620f539e47bb0bbb0cb29a25a62d3a854b0f33e474fccd34caac",
+        "src/cuda_smoke.cu": "500d1eedf86156013ac92ca887a7a9f3c0a98121043ea3d3f76ca3f99ec15c02",
+        "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+        "src/research_runtime.h": "29c8642d8e131c6d7a41ee557e90c56b8dc5c7403cb18f17afb68d4435ec292a"
+      },
+      "profiler_executable": "/usr/local/stow/cuda-12.6/bin/ncu",
+      "profiler_sha256": "02fffd2174c647582a6faa3829bcab06ca66dfb026c7b0e8f863fbbfb0cca877",
+      "profiler_argv": [
+        "ncu",
+        "--metrics",
+        "dram__bytes_read.sum,dram__bytes_write.sum",
+        "--replay-mode",
+        "kernel",
+        "--cache-control",
+        "none",
+        "--clock-control",
+        "none",
+        "--csv",
+        "--page",
+        "raw",
+        "--log-file",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b16-m0-counters.csv",
+        "--export",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b16-m0",
+        "build/cuda_fullbound",
+        "data/derived/hash-1000000.gsp",
+        "data/derived/calibration-500.tsv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b16-m0.csv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b16-m0.tsv",
+        "25",
+        "10",
+        "0",
+        "0",
+        "16",
+        "0",
+        "1",
+        "0"
+      ],
+      "qualification": "Diagnostic profiler wrapper plus runtime-gated native executable. Profiled wall/event times are perturbed and cannot support ordinary latency comparisons."
+    },
+    "timing_boundary": "Diagnostic trace covers load/setup and query calls; no profiler wall/event time is an ordinary latency result. Attribute kernels and query transfers separately; memory tracking includes setup allocations.",
+    "correctness_rule": "Every native query output compared with the fresh500 CPU reference subset; no use of held-out queries.",
+    "analysis_plan": {
+      "nsys": "CUDA kernel/API/memory trace and standalone allocation tracking at B16/B32 mode0/mode1; one round first25.",
+      "ncu": "Kernel replay; DRAM read/write sum counters, cache-control none, clock-control none; preserve raw report andCSV; do not interpret replay wall times aslatency.",
+      "counter_failure": "If ERR_NVGPUCTRPERM or unsupported GPU occurs, retain first failed attempt and mark remaining counters unavailable; no repeated permission attempts.",
+      "sources": [
+        "https://docs.nvidia.com/nsight-systems/UserGuide/",
+        "https://docs.nvidia.com/nsight-compute/NsightComputeCli/"
+      ]
+    }
+  },
+  {
+    "tag": "ncu-b16-m1",
+    "experiment": "EXPERIMENT-3bafd12b55c7",
+    "run": "RUN_FINISHED-ff794347bf51",
+    "expected": {
+      "mode": "cuda-fullbound-pruning",
+      "docs": 1000000,
+      "query_count": 25,
+      "k": 10,
+      "gpu_id": 0,
+      "index_path": "data/derived/hash-1000000.gsp",
+      "queries_path": "data/derived/calibration-500.tsv",
+      "block_size": 16,
+      "execution_mode": 1,
+      "score_threads": 32,
+      "selection_threads": 256,
+      "bound_threads": 256,
+      "compaction_threads": 256,
+      "max_supported_k": 128,
+      "selection_levels": 4,
+      "scratch_bytes": 1875360,
+      "seed_selection_scratch_bytes": 480,
+      "bounds_bytes": 1792437500,
+      "seed_budget_blocks": 16,
+      "pruning_seed_blocks": 16,
+      "pruning_seed_docs": 256,
+      "max_query_terms": 85,
+      "verify_scores": 0,
+      "warmup_rounds": 0,
+      "repeats": 1,
+      "cpu_affinity": "0"
+    },
+    "behavior": {
+      "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+      "arithmetic": "uint64",
+      "document_impacts": "uint8-exact",
+      "query_policy": "BMP-f32-ceil-cap32",
+      "tie_order": "score_desc_original_numeric_id_asc",
+      "eligibility": "all_documents",
+      "selection": "hierarchical-local-topk",
+      "layout": "csr-document-blocks",
+      "bounds": "term-major-u8-max-u64-sum",
+      "seed": "first-16-identity-blocks",
+      "threshold": "distinct-seed-kth-or-zero",
+      "skip_rule": "strictly-below-threshold",
+      "compaction": "stable-three-pass-prefix",
+      "skipped_scores": "zeroed-before-each-query",
+      "paired_order": "alternating-round-plus-query"
+    },
+    "declared_changes": {
+      "config.execution_mode": "Diagnostic profile delta {\"left\": 2, \"right\": 1}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.repeats": "Diagnostic profile delta {\"left\": 20, \"right\": 1}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.warmup_rounds": "Diagnostic profile delta {\"left\": 3, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged."
+    },
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "data/derived/hash-1000000.gsp",
+        "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37"
+      },
+      {
+        "role": "input-1",
+        "path": "data/derived/calibration-500.tsv",
+        "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"
+      },
+      {
+        "role": "input-2",
+        "path": "data/derived/calibration-500.tsv.split.tsv",
+        "sha256": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+      },
+      {
+        "role": "input-3",
+        "path": "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/cpu-top10-500.tsv",
+        "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860"
+      }
+    ],
+    "build": {
+      "source_commit": "95ae7f1acd0b4a93286d368c85486fe7e8508d39",
+      "binary_sha256": "e4d1c9959c33a9c4573832ca757ab838f8dc8916ec6df5a046a2948d6a773544",
+      "command": [
+        "nvcc",
+        "-O3",
+        "-lineinfo",
+        "-arch=sm_75",
+        "-std=c++17",
+        "src/cuda_fullbound.cu",
+        "-o",
+        "build/cuda_fullbound"
+      ],
+      "build_observation": "OBSERVATION-77bfe4354420",
+      "source_hashes": {
+        "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+        "src/cuda_block_exhaustive.cu": "bd4f662e10df76a8200bbfdc3a7766359f4421bb0d9c5d5ba562b464d177c8a9",
+        "src/cuda_device_topk.cu": "60be261cdb7cc5adb4dc1cf0fdc493d5cc59862a46284e60f4d9ef5eef1301f3",
+        "src/cuda_exhaustive.cu": "670e5cf6771a323756978f7906f091162bd27d7ce6e706f46be20ae6794ce872",
+        "src/cuda_fullbound.cu": "e2fa14ea3d76620f539e47bb0bbb0cb29a25a62d3a854b0f33e474fccd34caac",
+        "src/cuda_smoke.cu": "500d1eedf86156013ac92ca887a7a9f3c0a98121043ea3d3f76ca3f99ec15c02",
+        "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+        "src/research_runtime.h": "29c8642d8e131c6d7a41ee557e90c56b8dc5c7403cb18f17afb68d4435ec292a"
+      },
+      "profiler_executable": "/usr/local/stow/cuda-12.6/bin/ncu",
+      "profiler_sha256": "02fffd2174c647582a6faa3829bcab06ca66dfb026c7b0e8f863fbbfb0cca877",
+      "profiler_argv": [
+        "ncu",
+        "--metrics",
+        "dram__bytes_read.sum,dram__bytes_write.sum",
+        "--replay-mode",
+        "kernel",
+        "--cache-control",
+        "none",
+        "--clock-control",
+        "none",
+        "--csv",
+        "--page",
+        "raw",
+        "--log-file",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b16-m1-counters.csv",
+        "--export",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b16-m1",
+        "build/cuda_fullbound",
+        "data/derived/hash-1000000.gsp",
+        "data/derived/calibration-500.tsv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b16-m1.csv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b16-m1.tsv",
+        "25",
+        "10",
+        "0",
+        "0",
+        "16",
+        "1",
+        "1",
+        "0"
+      ],
+      "qualification": "Diagnostic profiler wrapper plus runtime-gated native executable. Profiled wall/event times are perturbed and cannot support ordinary latency comparisons."
+    },
+    "timing_boundary": "Diagnostic trace covers load/setup and query calls; no profiler wall/event time is an ordinary latency result. Attribute kernels and query transfers separately; memory tracking includes setup allocations.",
+    "correctness_rule": "Every native query output compared with the fresh500 CPU reference subset; no use of held-out queries.",
+    "analysis_plan": {
+      "nsys": "CUDA kernel/API/memory trace and standalone allocation tracking at B16/B32 mode0/mode1; one round first25.",
+      "ncu": "Kernel replay; DRAM read/write sum counters, cache-control none, clock-control none; preserve raw report andCSV; do not interpret replay wall times aslatency.",
+      "counter_failure": "If ERR_NVGPUCTRPERM or unsupported GPU occurs, retain first failed attempt and mark remaining counters unavailable; no repeated permission attempts.",
+      "sources": [
+        "https://docs.nvidia.com/nsight-systems/UserGuide/",
+        "https://docs.nvidia.com/nsight-compute/NsightComputeCli/"
+      ]
+    }
+  },
+  {
+    "tag": "ncu-b32-m0",
+    "experiment": "EXPERIMENT-32eca89504cf",
+    "run": "RUN_FINISHED-ca89b87e7ca3",
+    "expected": {
+      "mode": "cuda-fullbound-pruning",
+      "docs": 1000000,
+      "query_count": 25,
+      "k": 10,
+      "gpu_id": 0,
+      "index_path": "data/derived/hash-1000000.gsp",
+      "queries_path": "data/derived/calibration-500.tsv",
+      "block_size": 32,
+      "execution_mode": 0,
+      "score_threads": 32,
+      "selection_threads": 256,
+      "bound_threads": 256,
+      "compaction_threads": 256,
+      "max_supported_k": 128,
+      "selection_levels": 4,
+      "scratch_bytes": 1875360,
+      "seed_selection_scratch_bytes": 0,
+      "bounds_bytes": 0,
+      "seed_budget_blocks": 16,
+      "pruning_seed_blocks": 0,
+      "pruning_seed_docs": 0,
+      "max_query_terms": 85,
+      "verify_scores": 0,
+      "warmup_rounds": 0,
+      "repeats": 1,
+      "cpu_affinity": "0"
+    },
+    "behavior": {
+      "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+      "arithmetic": "uint64",
+      "document_impacts": "uint8-exact",
+      "query_policy": "BMP-f32-ceil-cap32",
+      "tie_order": "score_desc_original_numeric_id_asc",
+      "eligibility": "all_documents",
+      "selection": "hierarchical-local-topk",
+      "layout": "csr-document-blocks",
+      "bounds": "term-major-u8-max-u64-sum",
+      "seed": "first-16-identity-blocks",
+      "threshold": "distinct-seed-kth-or-zero",
+      "skip_rule": "strictly-below-threshold",
+      "compaction": "stable-three-pass-prefix",
+      "skipped_scores": "zeroed-before-each-query",
+      "paired_order": "alternating-round-plus-query"
+    },
+    "declared_changes": {
+      "config.block_size": "Diagnostic profile delta {\"left\": 16, \"right\": 32}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.bounds_bytes": "Diagnostic profile delta {\"left\": 1792437500, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.execution_mode": "Diagnostic profile delta {\"left\": 2, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.pruning_seed_blocks": "Diagnostic profile delta {\"left\": 16, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.pruning_seed_docs": "Diagnostic profile delta {\"left\": 256, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.repeats": "Diagnostic profile delta {\"left\": 20, \"right\": 1}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.seed_selection_scratch_bytes": "Diagnostic profile delta {\"left\": 480, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.warmup_rounds": "Diagnostic profile delta {\"left\": 3, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged."
+    },
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "data/derived/hash-1000000.gsp",
+        "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37"
+      },
+      {
+        "role": "input-1",
+        "path": "data/derived/calibration-500.tsv",
+        "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"
+      },
+      {
+        "role": "input-2",
+        "path": "data/derived/calibration-500.tsv.split.tsv",
+        "sha256": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+      },
+      {
+        "role": "input-3",
+        "path": "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/cpu-top10-500.tsv",
+        "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860"
+      }
+    ],
+    "build": {
+      "source_commit": "95ae7f1acd0b4a93286d368c85486fe7e8508d39",
+      "binary_sha256": "e4d1c9959c33a9c4573832ca757ab838f8dc8916ec6df5a046a2948d6a773544",
+      "command": [
+        "nvcc",
+        "-O3",
+        "-lineinfo",
+        "-arch=sm_75",
+        "-std=c++17",
+        "src/cuda_fullbound.cu",
+        "-o",
+        "build/cuda_fullbound"
+      ],
+      "build_observation": "OBSERVATION-77bfe4354420",
+      "source_hashes": {
+        "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+        "src/cuda_block_exhaustive.cu": "bd4f662e10df76a8200bbfdc3a7766359f4421bb0d9c5d5ba562b464d177c8a9",
+        "src/cuda_device_topk.cu": "60be261cdb7cc5adb4dc1cf0fdc493d5cc59862a46284e60f4d9ef5eef1301f3",
+        "src/cuda_exhaustive.cu": "670e5cf6771a323756978f7906f091162bd27d7ce6e706f46be20ae6794ce872",
+        "src/cuda_fullbound.cu": "e2fa14ea3d76620f539e47bb0bbb0cb29a25a62d3a854b0f33e474fccd34caac",
+        "src/cuda_smoke.cu": "500d1eedf86156013ac92ca887a7a9f3c0a98121043ea3d3f76ca3f99ec15c02",
+        "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+        "src/research_runtime.h": "29c8642d8e131c6d7a41ee557e90c56b8dc5c7403cb18f17afb68d4435ec292a"
+      },
+      "profiler_executable": "/usr/local/stow/cuda-12.6/bin/ncu",
+      "profiler_sha256": "02fffd2174c647582a6faa3829bcab06ca66dfb026c7b0e8f863fbbfb0cca877",
+      "profiler_argv": [
+        "ncu",
+        "--metrics",
+        "dram__bytes_read.sum,dram__bytes_write.sum",
+        "--replay-mode",
+        "kernel",
+        "--cache-control",
+        "none",
+        "--clock-control",
+        "none",
+        "--csv",
+        "--page",
+        "raw",
+        "--log-file",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b32-m0-counters.csv",
+        "--export",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b32-m0",
+        "build/cuda_fullbound",
+        "data/derived/hash-1000000.gsp",
+        "data/derived/calibration-500.tsv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b32-m0.csv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b32-m0.tsv",
+        "25",
+        "10",
+        "0",
+        "0",
+        "32",
+        "0",
+        "1",
+        "0"
+      ],
+      "qualification": "Diagnostic profiler wrapper plus runtime-gated native executable. Profiled wall/event times are perturbed and cannot support ordinary latency comparisons."
+    },
+    "timing_boundary": "Diagnostic trace covers load/setup and query calls; no profiler wall/event time is an ordinary latency result. Attribute kernels and query transfers separately; memory tracking includes setup allocations.",
+    "correctness_rule": "Every native query output compared with the fresh500 CPU reference subset; no use of held-out queries.",
+    "analysis_plan": {
+      "nsys": "CUDA kernel/API/memory trace and standalone allocation tracking at B16/B32 mode0/mode1; one round first25.",
+      "ncu": "Kernel replay; DRAM read/write sum counters, cache-control none, clock-control none; preserve raw report andCSV; do not interpret replay wall times aslatency.",
+      "counter_failure": "If ERR_NVGPUCTRPERM or unsupported GPU occurs, retain first failed attempt and mark remaining counters unavailable; no repeated permission attempts.",
+      "sources": [
+        "https://docs.nvidia.com/nsight-systems/UserGuide/",
+        "https://docs.nvidia.com/nsight-compute/NsightComputeCli/"
+      ]
+    }
+  },
+  {
+    "tag": "ncu-b32-m1",
+    "experiment": "EXPERIMENT-69b3aba66b69",
+    "run": "RUN_FINISHED-da7654399806",
+    "expected": {
+      "mode": "cuda-fullbound-pruning",
+      "docs": 1000000,
+      "query_count": 25,
+      "k": 10,
+      "gpu_id": 0,
+      "index_path": "data/derived/hash-1000000.gsp",
+      "queries_path": "data/derived/calibration-500.tsv",
+      "block_size": 32,
+      "execution_mode": 1,
+      "score_threads": 32,
+      "selection_threads": 256,
+      "bound_threads": 256,
+      "compaction_threads": 256,
+      "max_supported_k": 128,
+      "selection_levels": 4,
+      "scratch_bytes": 1875360,
+      "seed_selection_scratch_bytes": 960,
+      "bounds_bytes": 896218750,
+      "seed_budget_blocks": 16,
+      "pruning_seed_blocks": 16,
+      "pruning_seed_docs": 512,
+      "max_query_terms": 85,
+      "verify_scores": 0,
+      "warmup_rounds": 0,
+      "repeats": 1,
+      "cpu_affinity": "0"
+    },
+    "behavior": {
+      "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+      "arithmetic": "uint64",
+      "document_impacts": "uint8-exact",
+      "query_policy": "BMP-f32-ceil-cap32",
+      "tie_order": "score_desc_original_numeric_id_asc",
+      "eligibility": "all_documents",
+      "selection": "hierarchical-local-topk",
+      "layout": "csr-document-blocks",
+      "bounds": "term-major-u8-max-u64-sum",
+      "seed": "first-16-identity-blocks",
+      "threshold": "distinct-seed-kth-or-zero",
+      "skip_rule": "strictly-below-threshold",
+      "compaction": "stable-three-pass-prefix",
+      "skipped_scores": "zeroed-before-each-query",
+      "paired_order": "alternating-round-plus-query"
+    },
+    "declared_changes": {
+      "config.block_size": "Diagnostic profile delta {\"left\": 16, \"right\": 32}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.bounds_bytes": "Diagnostic profile delta {\"left\": 1792437500, \"right\": 896218750}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.execution_mode": "Diagnostic profile delta {\"left\": 2, \"right\": 1}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.pruning_seed_docs": "Diagnostic profile delta {\"left\": 256, \"right\": 512}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.repeats": "Diagnostic profile delta {\"left\": 20, \"right\": 1}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.seed_selection_scratch_bytes": "Diagnostic profile delta {\"left\": 480, \"right\": 960}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged.",
+      "config.warmup_rounds": "Diagnostic profile delta {\"left\": 3, \"right\": 0}; first25 calibration, one round, no warmup, isolated control/prune allocation; all scoring, seed, bound and merge semantics unchanged."
+    },
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "data/derived/hash-1000000.gsp",
+        "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37"
+      },
+      {
+        "role": "input-1",
+        "path": "data/derived/calibration-500.tsv",
+        "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"
+      },
+      {
+        "role": "input-2",
+        "path": "data/derived/calibration-500.tsv.split.tsv",
+        "sha256": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+      },
+      {
+        "role": "input-3",
+        "path": "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/cpu-top10-500.tsv",
+        "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860"
+      }
+    ],
+    "build": {
+      "source_commit": "95ae7f1acd0b4a93286d368c85486fe7e8508d39",
+      "binary_sha256": "e4d1c9959c33a9c4573832ca757ab838f8dc8916ec6df5a046a2948d6a773544",
+      "command": [
+        "nvcc",
+        "-O3",
+        "-lineinfo",
+        "-arch=sm_75",
+        "-std=c++17",
+        "src/cuda_fullbound.cu",
+        "-o",
+        "build/cuda_fullbound"
+      ],
+      "build_observation": "OBSERVATION-77bfe4354420",
+      "source_hashes": {
+        "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+        "src/cuda_block_exhaustive.cu": "bd4f662e10df76a8200bbfdc3a7766359f4421bb0d9c5d5ba562b464d177c8a9",
+        "src/cuda_device_topk.cu": "60be261cdb7cc5adb4dc1cf0fdc493d5cc59862a46284e60f4d9ef5eef1301f3",
+        "src/cuda_exhaustive.cu": "670e5cf6771a323756978f7906f091162bd27d7ce6e706f46be20ae6794ce872",
+        "src/cuda_fullbound.cu": "e2fa14ea3d76620f539e47bb0bbb0cb29a25a62d3a854b0f33e474fccd34caac",
+        "src/cuda_smoke.cu": "500d1eedf86156013ac92ca887a7a9f3c0a98121043ea3d3f76ca3f99ec15c02",
+        "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+        "src/research_runtime.h": "29c8642d8e131c6d7a41ee557e90c56b8dc5c7403cb18f17afb68d4435ec292a"
+      },
+      "profiler_executable": "/usr/local/stow/cuda-12.6/bin/ncu",
+      "profiler_sha256": "02fffd2174c647582a6faa3829bcab06ca66dfb026c7b0e8f863fbbfb0cca877",
+      "profiler_argv": [
+        "ncu",
+        "--metrics",
+        "dram__bytes_read.sum,dram__bytes_write.sum",
+        "--replay-mode",
+        "kernel",
+        "--cache-control",
+        "none",
+        "--clock-control",
+        "none",
+        "--csv",
+        "--page",
+        "raw",
+        "--log-file",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b32-m1-counters.csv",
+        "--export",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b32-m1",
+        "build/cuda_fullbound",
+        "data/derived/hash-1000000.gsp",
+        "data/derived/calibration-500.tsv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b32-m1.csv",
+        "results/2026-11-11-pruning-replication-profile/20261111-profile-01/raw/ncu-b32-m1.tsv",
+        "25",
+        "10",
+        "0",
+        "0",
+        "32",
+        "1",
+        "1",
+        "0"
+      ],
+      "qualification": "Diagnostic profiler wrapper plus runtime-gated native executable. Profiled wall/event times are perturbed and cannot support ordinary latency comparisons."
+    },
+    "timing_boundary": "Diagnostic trace covers load/setup and query calls; no profiler wall/event time is an ordinary latency result. Attribute kernels and query transfers separately; memory tracking includes setup allocations.",
+    "correctness_rule": "Every native query output compared with the fresh500 CPU reference subset; no use of held-out queries.",
+    "analysis_plan": {
+      "nsys": "CUDA kernel/API/memory trace and standalone allocation tracking at B16/B32 mode0/mode1; one round first25.",
+      "ncu": "Kernel replay; DRAM read/write sum counters, cache-control none, clock-control none; preserve raw report andCSV; do not interpret replay wall times aslatency.",
+      "counter_failure": "If ERR_NVGPUCTRPERM or unsupported GPU occurs, retain first failed attempt and mark remaining counters unavailable; no repeated permission attempts.",
+      "sources": [
+        "https://docs.nvidia.com/nsight-systems/UserGuide/",
+        "https://docs.nvidia.com/nsight-compute/NsightComputeCli/"
+      ]
+    }
+  }
+]
