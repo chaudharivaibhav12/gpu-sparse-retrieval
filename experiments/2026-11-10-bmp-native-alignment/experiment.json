@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-10-bmp-native-alignment",
+  "title": "Pinned native BMP score and tie alignment",
+  "owner": "Vaibhav",
+  "branch": "exp/vaibhav/2026-11-10-bmp-native-alignment",
+  "status": "completed-with-native-correctness-failures",
+  "parent_experiment": null,
+  "parent_source_commit": "817e3c3204d71130abe2342ed7341fb25f8219ff",
+  "question": "Does the pinned native BMP return scores and ranked passages consistent with the shared reference?",
+  "hypothesis": "Returned positive scores agree with the independent uint64 oracle; every missing winner, tie difference or crash can be explained.",
+  "motivation": "Test TASK-001 equivalence and characterize native ties, zero eligibility, empty queries and final queued block handling.",
+  "code_paths": [
+    "scripts/check_bmp_alignment.py",
+    "tests/check_cpu_pilot.py",
+    "src/cpu_pilot.cpp",
+    "src/research_runtime.h"
+  ],
+  "configuration_files": [
+    "configs/fixture.json",
+    "configs/BMP-Cargo.lock"
+  ],
+  "declared_changes": {
+    "packaging": "Retrospective organization only; raw native outputs preserved byte-for-byte."
+  },
+  "scoring_contract": {
+    "oracle": "uint8 impacts; BMP-f32-ceil-cap32 query weights; uint64 accumulation; all documents eligible; score descending then numeric original ID ascending",
+    "native_BMP": "u16 score/bound path; strict heap admission; native result ordering retained and separately canonicalized",
+    "fixture_maximum_score": 9120
+  },
+  "input_manifest": "../../results/2026-11-10-bmp-native-alignment/20261110-native-fixture-01/manifest.json",
+  "query_split": "synthetic fixture; no held-out queries",
+  "timing_boundary": "correctness only",
+  "correctness_rule": "CPU output equals every independent Python score. Native score errors, missing above-cutoff winners, missing positive scores at k=1000 and crashes are counted, retained and explained.",
+  "measurement_and_analysis_plan": "12 queries x 2 block sizes x 2 bound representations x 2 depths; retain native exit/score/missing-winner evidence.",
+  "success_rule": "CPU output equals every independent Python score. Native score errors, missing above-cutoff winners, missing positive scores at k=1000 and crashes are counted, retained and explained.",
+  "failure_rule": "Any unexplained discrepancy blocks treating native BMP as an aligned exact baseline.",
+  "next_if_negative": "Create a separately labeled corrected variant and rerun this fixture, then common calibration data.",
+  "recording_ids": [
+    "OBSERVATION-b9bc4c099d6f",
+    "OBSERVATION-0d60a10132e0",
+    "OBSERVATION-699eae60ef87",
+    "DECISION-22f62726d1a2"
+  ],
+  "runs": [
+    "20261110-native-fixture-01"
+  ]
+}
