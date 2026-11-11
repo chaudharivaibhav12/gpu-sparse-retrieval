@@ -54,14 +54,14 @@
         2
       ],
       [
-        2,
         1,
+        2,
         0
       ],
       [
-        1,
+        2,
         0,
-        2
+        1
       ]
     ],
     "block_order": [
@@ -98,5 +98,31 @@
     "RTX4070/sm89"
   ],
   "held_out": false,
-  "deployment": "Commit code/config locally before compute; deploy exact commit using a private Gitbundle. Public publication may follow completed review; do not claim earlier public preregistration."
+  "deployment": "Commit code/config locally before compute; deploy exact commit using a private Gitbundle. Public publication may follow completed review; do not claim earlier public preregistration.",
+  "profiling": {
+    "after_fixed_timing": true,
+    "queries": 25,
+    "warmup_rounds": 0,
+    "measured_rounds": 1,
+    "cases": "Standalonepruned: all3precisions x B16/B32; controlmode0 atprecision0 once/B. Bothhosts.",
+    "nsys": [
+      "--trace=cuda",
+      "--cuda-memory-usage=true",
+      "--sample=none",
+      "--cpuctxsw=none"
+    ],
+    "ncu": [
+      "--metrics",
+      "dram__bytes_read.sum,dram__bytes_write.sum",
+      "--replay-mode",
+      "kernel",
+      "--cache-control",
+      "none",
+      "--clock-control",
+      "none"
+    ],
+    "lock_policy": "User-privateTMPDIR, after observing no otherncu and idletargetGPU; never remove sharedlock or changepermissions.",
+    "failure_policy": "Retain failed diagnostics and review; stop repeatedpermission/unsupportedcounter attempts; no substitute analytic bytes. Nativeoutput mismatch blocks interpretation.",
+    "analysis": "Match all kernel names/geometries to native counts, including uncertaintycompaction/refinekernel; sum kernelstage times andDRAM, balance allocation lifetimes against nativebufferbytes. Exclude copies/memsets/CPU/contextoverhead and replaylatency from ordinaryclaims."
+  }
 }
