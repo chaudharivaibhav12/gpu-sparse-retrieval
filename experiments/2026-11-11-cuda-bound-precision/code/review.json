@@ -1,0 +1,22 @@
+{
+  "title": "Precision iteration2 and engineering checks separate review",
+  "motivation": "Correct truthful runtime marks and validate new interval/packing checks before any build or execution.",
+  "changes": [
+    "Full mode now reports exact-u8 interval/packing and disabledrefinement; coarse and selective report their actual storage/rule.",
+    "Hostunit exercises every single impact0..255 and weight0..32, two-term weighted intervals, all equality boundaries, UINT64_MAX threshold and oddpacked matrices.",
+    "Independent fixture extension covers seedthreshold15*32 and16*32, zero/15/16/17/31/32/255 maxima, partialtail and originalIDs0/UINT64_MAX.",
+    "Review found duplicated parent query defaults; extension oracle now parses actual generated query bytes instead."
+  ],
+  "review": "Separately inspected all source deltas again: no scorer/merger/seed/scoring/input-policy change; uncertainty buffer written for everyblock before scan; active-list reuse ordered indefaultstream; exact CPUhost oracle independent of packeddecoder; memory/count-transfer accounting and empty/k0 cases checked.",
+  "validation": "Fixture Python syntax passes. CUDA and host compilation plus actual fixture runs are pending; localC++/CUDA toolchain is unavailable.",
+  "qualification": "The hostunit is an engineering build/test observation, not an instrumented retrieval benchmark. Native CUDA research will be registered and runtime-gated.",
+  "source_sha256": {
+    "src/cuda_bound_precision.cu": "824a2ef4696069e1e77175211dc699258e1549d7f704674ed69547e0b4f0da51",
+    "src/bound_precision.h": "c7848b2df924a4e24a2b5da60e8b12fbee2a08ae159207ab8fdb89556213810b",
+    "tests/bound_precision_host.cpp": "a29cc044812257d8f29647f9d25d83aa7789e152da08934d281f46b661dae0ed",
+    "tests/prepare_precision_fixture.py": "70cc2fcf95790702b6388b0cb6c908be64bc40283ed0d3028de5e0442b2eac82"
+  },
+  "refs": [
+    "OBS-20261111-PRECISION-REVIEW1"
+  ]
+}

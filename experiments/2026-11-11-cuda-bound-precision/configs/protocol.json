@@ -1,0 +1,102 @@
+{
+  "question": "Do packed coarse bounds or ambiguity-only low-nibble refinement improve the full-byte CSR pruning path?",
+  "hypothesis": "All treatments remain canonical; selective schedules equal full-byte and coarse schedules are supersets. Coarse halves bound storage; selective latency may be null/negative because the parent bound stage is small.",
+  "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+  "precisions": {
+    "0": "Exactu8 maxima",
+    "1": "Packedhi4;L=16*weightedhi,U=L+15*sumweights;keep U>=tau",
+    "2": "Packedhi4+lo4;skip U<tau,accept L>=tau,refine only L<tau<=U"
+  },
+  "fixed": {
+    "seed": "first16 identityblocks, actual distinct passage witnesses",
+    "scorer": "parent CSR warp-per-block",
+    "merger": "parent hierarchical canonical GPU topk",
+    "depth": 10,
+    "query_policy": "BMP-f32-ceil-cap32",
+    "arithmetic": "uint64",
+    "eligibility": "all_documents",
+    "ties": "score descending/original numericID ascending"
+  },
+  "correctness": {
+    "fixtures": "Parent9 independent cases plus2 interval-boundary cases, five queries each; k in0/10/128 where applicable, B16/B32, all3 precisions, prune mode1; control regressions at empty/257/8193 and runtime precision-mismatch rejection.",
+    "inherited": "Parent merger unit/fixture coverage for other depths remains inherited; shared scorer/merger source unchanged.",
+    "real": "All500 calibration queries at1M, paired control/pruned, VERIFY1,1round0warmups, everyB/precision; old canonicalCPU500 reference retained byhash.",
+    "checks": [
+      "Every evaluated score/canonical winner",
+      "Every variant-specific conservative upperbound against independent host maxima and true document-block maximum",
+      "Selective uncertainty flags/count, final stable list and strict skipped-loser safety",
+      "Selective/full survivor identity; coarse safe superset at identical seedthreshold"
+    ]
+  },
+  "timing": {
+    "only_after_correctness": true,
+    "documents": 1000000,
+    "queries": 500,
+    "k": 10,
+    "block_sizes": [
+      16,
+      32
+    ],
+    "precisions": [
+      0,
+      1,
+      2
+    ],
+    "processes_per_precision_B": 3,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "execution_mode": 2,
+    "verify": 0,
+    "treatment_order": [
+      [
+        0,
+        1,
+        2
+      ],
+      [
+        2,
+        1,
+        0
+      ],
+      [
+        1,
+        0,
+        2
+      ]
+    ],
+    "block_order": [
+      [
+        16,
+        32
+      ],
+      [
+        32,
+        16
+      ],
+      [
+        16,
+        32
+      ]
+    ],
+    "path_order": "Parent alternating(round+query index+order)%2",
+    "cpu_affinity": "minimum allowed CPU, resolved and frozen before execution",
+    "boundary": "Weights/upload/reset, exact seed score/topk, bound treatment, all uncertainty/final compactions and both count transfers forselective, survivor scorer, global merger and winnercopy.",
+    "excluded": "Index/maxima/packing setup, runtime gate, CPUoracle/validation, diagnostic threshold copy, file I/O.",
+    "primary": "Geometric mean of query-wise pruned medians relative to full-byte, matchedprocessindex; equally weighted over500queries and3processes.",
+    "sensitivity": "Normalize eachpruned latency by its own matchedcontrol before contrasting withfull.",
+    "uncertainty": "10000 crossed query/process percentile bootstrap draws, seed20261111; conditional calibration only.",
+    "success": "Zero correctness errors; 95%interval upperend<1 supports conditional latency improvement. Null/negative outcomes reported equally.",
+    "stopping": "Fixed processes/rounds; no optional stopping or held-out tuning; stop on failure; defer timing if GPU remains occupied10minutes."
+  },
+  "memory": {
+    "full": "One u8 plane",
+    "coarse": "One packedhi4 plane, ceil(flatentries/2)",
+    "selective": "Packedhi4+lo4 planes plus uncertainty flags; no claim of lower totalresident boundstorage thanfull."
+  },
+  "hardware": [
+    "RTX2080Ti/sm75",
+    "RTX4070/sm89"
+  ],
+  "held_out": false,
+  "deployment": "Commit code/config locally before compute; deploy exact commit using a private Gitbundle. Public publication may follow completed review; do not claim earlier public preregistration."
+}
