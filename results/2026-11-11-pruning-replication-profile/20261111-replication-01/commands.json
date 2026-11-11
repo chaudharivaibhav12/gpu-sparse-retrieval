@@ -1,0 +1,814 @@
+[
+  {
+    "tag": "cpu-reference500",
+    "experiment": "EXPERIMENT-534f2829230f",
+    "run": "RUN_FINISHED-a8d9e6a33224",
+    "status": "EXECUTED",
+    "command": [
+      "build/cpu_pilot",
+      "score",
+      "data/derived/hash-1000000.gsp",
+      "data/derived/calibration-500.tsv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/cpu-top10-500.tsv",
+      "10",
+      "500"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "runtime": {
+      "config": {
+        "mode": "cpu-sequential",
+        "docs": 1000000,
+        "query_count": 500,
+        "k": 10,
+        "gpu_id": -1,
+        "index_path": "data/derived/hash-1000000.gsp",
+        "queries_path": "data/derived/calibration-500.tsv"
+      },
+      "behavior": {
+        "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+        "arithmetic": "uint64",
+        "document_impacts": "uint8-exact",
+        "query_policy": "BMP-f32-ceil-cap32",
+        "tie_order": "score_desc_original_numeric_id_asc",
+        "eligibility": "all_documents"
+      }
+    },
+    "runtime_delta": {},
+    "environment": {
+      "host": "cuda2.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.9.25 (main, Oct 14 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-14)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 2080 Ti, GPU-d5a480cd-7661-ba98-5d22-663c910e1001, 595.104.02, 11264 MiB, 300 MHz, P8\nNVIDIA GeForce RTX 2080 Ti, GPU-4183474a-7cb0-c9cd-c8ab-e13d3330a5df, 595.104.02, 11264 MiB, 300 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "verify-b16",
+    "experiment": "EXPERIMENT-1b0e483339ee",
+    "run": "RUN_FINISHED-200e9d9f1700",
+    "status": "EXECUTED",
+    "command": [
+      "build/cuda_fullbound",
+      "data/derived/hash-1000000.gsp",
+      "data/derived/calibration-500.tsv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/verify-b16.csv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/verify-b16.tsv",
+      "500",
+      "10",
+      "0",
+      "1",
+      "16",
+      "2",
+      "1",
+      "0"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "runtime": {
+      "config": {
+        "mode": "cuda-fullbound-pruning",
+        "docs": 1000000,
+        "query_count": 500,
+        "k": 10,
+        "gpu_id": 0,
+        "index_path": "data/derived/hash-1000000.gsp",
+        "queries_path": "data/derived/calibration-500.tsv",
+        "block_size": 16,
+        "execution_mode": 2,
+        "score_threads": 32,
+        "selection_threads": 256,
+        "bound_threads": 256,
+        "compaction_threads": 256,
+        "max_supported_k": 128,
+        "selection_levels": 4,
+        "scratch_bytes": 1875360,
+        "seed_selection_scratch_bytes": 480,
+        "bounds_bytes": 1792437500,
+        "seed_budget_blocks": 16,
+        "pruning_seed_blocks": 16,
+        "pruning_seed_docs": 256,
+        "max_query_terms": 95,
+        "verify_scores": 1,
+        "warmup_rounds": 0,
+        "repeats": 1,
+        "cpu_affinity": "0"
+      },
+      "behavior": {
+        "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+        "arithmetic": "uint64",
+        "document_impacts": "uint8-exact",
+        "query_policy": "BMP-f32-ceil-cap32",
+        "tie_order": "score_desc_original_numeric_id_asc",
+        "eligibility": "all_documents",
+        "selection": "hierarchical-local-topk",
+        "layout": "csr-document-blocks",
+        "bounds": "term-major-u8-max-u64-sum",
+        "seed": "first-16-identity-blocks",
+        "threshold": "distinct-seed-kth-or-zero",
+        "skip_rule": "strictly-below-threshold",
+        "compaction": "stable-three-pass-prefix",
+        "skipped_scores": "zeroed-before-each-query",
+        "paired_order": "alternating-round-plus-query"
+      }
+    },
+    "runtime_delta": {},
+    "environment": {
+      "host": "cuda2.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.9.25 (main, Oct 14 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-14)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 2080 Ti, GPU-d5a480cd-7661-ba98-5d22-663c910e1001, 595.104.02, 11264 MiB, 300 MHz, P8\nNVIDIA GeForce RTX 2080 Ti, GPU-4183474a-7cb0-c9cd-c8ab-e13d3330a5df, 595.104.02, 11264 MiB, 300 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "verify-b32",
+    "experiment": "EXPERIMENT-d5869165e0dc",
+    "run": "RUN_FINISHED-9e7276a74bba",
+    "status": "EXECUTED",
+    "command": [
+      "build/cuda_fullbound",
+      "data/derived/hash-1000000.gsp",
+      "data/derived/calibration-500.tsv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/verify-b32.csv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/verify-b32.tsv",
+      "500",
+      "10",
+      "0",
+      "1",
+      "32",
+      "2",
+      "1",
+      "0"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "runtime": {
+      "config": {
+        "mode": "cuda-fullbound-pruning",
+        "docs": 1000000,
+        "query_count": 500,
+        "k": 10,
+        "gpu_id": 0,
+        "index_path": "data/derived/hash-1000000.gsp",
+        "queries_path": "data/derived/calibration-500.tsv",
+        "block_size": 32,
+        "execution_mode": 2,
+        "score_threads": 32,
+        "selection_threads": 256,
+        "bound_threads": 256,
+        "compaction_threads": 256,
+        "max_supported_k": 128,
+        "selection_levels": 4,
+        "scratch_bytes": 1875360,
+        "seed_selection_scratch_bytes": 960,
+        "bounds_bytes": 896218750,
+        "seed_budget_blocks": 16,
+        "pruning_seed_blocks": 16,
+        "pruning_seed_docs": 512,
+        "max_query_terms": 95,
+        "verify_scores": 1,
+        "warmup_rounds": 0,
+        "repeats": 1,
+        "cpu_affinity": "0"
+      },
+      "behavior": {
+        "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+        "arithmetic": "uint64",
+        "document_impacts": "uint8-exact",
+        "query_policy": "BMP-f32-ceil-cap32",
+        "tie_order": "score_desc_original_numeric_id_asc",
+        "eligibility": "all_documents",
+        "selection": "hierarchical-local-topk",
+        "layout": "csr-document-blocks",
+        "bounds": "term-major-u8-max-u64-sum",
+        "seed": "first-16-identity-blocks",
+        "threshold": "distinct-seed-kth-or-zero",
+        "skip_rule": "strictly-below-threshold",
+        "compaction": "stable-three-pass-prefix",
+        "skipped_scores": "zeroed-before-each-query",
+        "paired_order": "alternating-round-plus-query"
+      }
+    },
+    "runtime_delta": {},
+    "environment": {
+      "host": "cuda2.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.9.25 (main, Oct 14 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-14)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 2080 Ti, GPU-d5a480cd-7661-ba98-5d22-663c910e1001, 595.104.02, 11264 MiB, 300 MHz, P8\nNVIDIA GeForce RTX 2080 Ti, GPU-4183474a-7cb0-c9cd-c8ab-e13d3330a5df, 595.104.02, 11264 MiB, 300 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "timing-p0-b16",
+    "experiment": "EXPERIMENT-c72de1abab90",
+    "run": "RUN_FINISHED-589a590ce7b4",
+    "status": "EXECUTED",
+    "command": [
+      "build/cuda_fullbound",
+      "data/derived/hash-1000000.gsp",
+      "data/derived/calibration-500.tsv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/timing-p0-b16.csv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/timing-p0-b16.tsv",
+      "500",
+      "10",
+      "0",
+      "0",
+      "16",
+      "2",
+      "20",
+      "3"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "runtime": {
+      "config": {
+        "mode": "cuda-fullbound-pruning",
+        "docs": 1000000,
+        "query_count": 500,
+        "k": 10,
+        "gpu_id": 0,
+        "index_path": "data/derived/hash-1000000.gsp",
+        "queries_path": "data/derived/calibration-500.tsv",
+        "block_size": 16,
+        "execution_mode": 2,
+        "score_threads": 32,
+        "selection_threads": 256,
+        "bound_threads": 256,
+        "compaction_threads": 256,
+        "max_supported_k": 128,
+        "selection_levels": 4,
+        "scratch_bytes": 1875360,
+        "seed_selection_scratch_bytes": 480,
+        "bounds_bytes": 1792437500,
+        "seed_budget_blocks": 16,
+        "pruning_seed_blocks": 16,
+        "pruning_seed_docs": 256,
+        "max_query_terms": 95,
+        "verify_scores": 0,
+        "warmup_rounds": 3,
+        "repeats": 20,
+        "cpu_affinity": "0"
+      },
+      "behavior": {
+        "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+        "arithmetic": "uint64",
+        "document_impacts": "uint8-exact",
+        "query_policy": "BMP-f32-ceil-cap32",
+        "tie_order": "score_desc_original_numeric_id_asc",
+        "eligibility": "all_documents",
+        "selection": "hierarchical-local-topk",
+        "layout": "csr-document-blocks",
+        "bounds": "term-major-u8-max-u64-sum",
+        "seed": "first-16-identity-blocks",
+        "threshold": "distinct-seed-kth-or-zero",
+        "skip_rule": "strictly-below-threshold",
+        "compaction": "stable-three-pass-prefix",
+        "skipped_scores": "zeroed-before-each-query",
+        "paired_order": "alternating-round-plus-query"
+      }
+    },
+    "runtime_delta": {},
+    "environment": {
+      "host": "cuda2.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.9.25 (main, Oct 14 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-14)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 2080 Ti, GPU-d5a480cd-7661-ba98-5d22-663c910e1001, 595.104.02, 11264 MiB, 300 MHz, P8\nNVIDIA GeForce RTX 2080 Ti, GPU-4183474a-7cb0-c9cd-c8ab-e13d3330a5df, 595.104.02, 11264 MiB, 300 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "timing-p0-b32",
+    "experiment": "EXPERIMENT-0b31ad753057",
+    "run": "RUN_FINISHED-3e1ccff73307",
+    "status": "EXECUTED",
+    "command": [
+      "build/cuda_fullbound",
+      "data/derived/hash-1000000.gsp",
+      "data/derived/calibration-500.tsv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/timing-p0-b32.csv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/timing-p0-b32.tsv",
+      "500",
+      "10",
+      "0",
+      "0",
+      "32",
+      "2",
+      "20",
+      "3"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "runtime": {
+      "config": {
+        "mode": "cuda-fullbound-pruning",
+        "docs": 1000000,
+        "query_count": 500,
+        "k": 10,
+        "gpu_id": 0,
+        "index_path": "data/derived/hash-1000000.gsp",
+        "queries_path": "data/derived/calibration-500.tsv",
+        "block_size": 32,
+        "execution_mode": 2,
+        "score_threads": 32,
+        "selection_threads": 256,
+        "bound_threads": 256,
+        "compaction_threads": 256,
+        "max_supported_k": 128,
+        "selection_levels": 4,
+        "scratch_bytes": 1875360,
+        "seed_selection_scratch_bytes": 960,
+        "bounds_bytes": 896218750,
+        "seed_budget_blocks": 16,
+        "pruning_seed_blocks": 16,
+        "pruning_seed_docs": 512,
+        "max_query_terms": 95,
+        "verify_scores": 0,
+        "warmup_rounds": 3,
+        "repeats": 20,
+        "cpu_affinity": "0"
+      },
+      "behavior": {
+        "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+        "arithmetic": "uint64",
+        "document_impacts": "uint8-exact",
+        "query_policy": "BMP-f32-ceil-cap32",
+        "tie_order": "score_desc_original_numeric_id_asc",
+        "eligibility": "all_documents",
+        "selection": "hierarchical-local-topk",
+        "layout": "csr-document-blocks",
+        "bounds": "term-major-u8-max-u64-sum",
+        "seed": "first-16-identity-blocks",
+        "threshold": "distinct-seed-kth-or-zero",
+        "skip_rule": "strictly-below-threshold",
+        "compaction": "stable-three-pass-prefix",
+        "skipped_scores": "zeroed-before-each-query",
+        "paired_order": "alternating-round-plus-query"
+      }
+    },
+    "runtime_delta": {},
+    "environment": {
+      "host": "cuda2.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.9.25 (main, Oct 14 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-14)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 2080 Ti, GPU-d5a480cd-7661-ba98-5d22-663c910e1001, 595.104.02, 11264 MiB, 300 MHz, P8\nNVIDIA GeForce RTX 2080 Ti, GPU-4183474a-7cb0-c9cd-c8ab-e13d3330a5df, 595.104.02, 11264 MiB, 300 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "timing-p1-b32",
+    "experiment": "EXPERIMENT-d3021a8c584c",
+    "run": "RUN_FINISHED-befa9611dc7f",
+    "status": "EXECUTED",
+    "command": [
+      "build/cuda_fullbound",
+      "data/derived/hash-1000000.gsp",
+      "data/derived/calibration-500.tsv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/timing-p1-b32.csv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/timing-p1-b32.tsv",
+      "500",
+      "10",
+      "0",
+      "0",
+      "32",
+      "2",
+      "20",
+      "3"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "runtime": {
+      "config": {
+        "mode": "cuda-fullbound-pruning",
+        "docs": 1000000,
+        "query_count": 500,
+        "k": 10,
+        "gpu_id": 0,
+        "index_path": "data/derived/hash-1000000.gsp",
+        "queries_path": "data/derived/calibration-500.tsv",
+        "block_size": 32,
+        "execution_mode": 2,
+        "score_threads": 32,
+        "selection_threads": 256,
+        "bound_threads": 256,
+        "compaction_threads": 256,
+        "max_supported_k": 128,
+        "selection_levels": 4,
+        "scratch_bytes": 1875360,
+        "seed_selection_scratch_bytes": 960,
+        "bounds_bytes": 896218750,
+        "seed_budget_blocks": 16,
+        "pruning_seed_blocks": 16,
+        "pruning_seed_docs": 512,
+        "max_query_terms": 95,
+        "verify_scores": 0,
+        "warmup_rounds": 3,
+        "repeats": 20,
+        "cpu_affinity": "0"
+      },
+      "behavior": {
+        "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+        "arithmetic": "uint64",
+        "document_impacts": "uint8-exact",
+        "query_policy": "BMP-f32-ceil-cap32",
+        "tie_order": "score_desc_original_numeric_id_asc",
+        "eligibility": "all_documents",
+        "selection": "hierarchical-local-topk",
+        "layout": "csr-document-blocks",
+        "bounds": "term-major-u8-max-u64-sum",
+        "seed": "first-16-identity-blocks",
+        "threshold": "distinct-seed-kth-or-zero",
+        "skip_rule": "strictly-below-threshold",
+        "compaction": "stable-three-pass-prefix",
+        "skipped_scores": "zeroed-before-each-query",
+        "paired_order": "alternating-round-plus-query"
+      }
+    },
+    "runtime_delta": {},
+    "environment": {
+      "host": "cuda2.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.9.25 (main, Oct 14 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-14)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 2080 Ti, GPU-d5a480cd-7661-ba98-5d22-663c910e1001, 595.104.02, 11264 MiB, 300 MHz, P8\nNVIDIA GeForce RTX 2080 Ti, GPU-4183474a-7cb0-c9cd-c8ab-e13d3330a5df, 595.104.02, 11264 MiB, 300 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "timing-p1-b16",
+    "experiment": "EXPERIMENT-abeda101575d",
+    "run": "RUN_FINISHED-31111a561bbc",
+    "status": "EXECUTED",
+    "command": [
+      "build/cuda_fullbound",
+      "data/derived/hash-1000000.gsp",
+      "data/derived/calibration-500.tsv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/timing-p1-b16.csv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/timing-p1-b16.tsv",
+      "500",
+      "10",
+      "0",
+      "0",
+      "16",
+      "2",
+      "20",
+      "3"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "runtime": {
+      "config": {
+        "mode": "cuda-fullbound-pruning",
+        "docs": 1000000,
+        "query_count": 500,
+        "k": 10,
+        "gpu_id": 0,
+        "index_path": "data/derived/hash-1000000.gsp",
+        "queries_path": "data/derived/calibration-500.tsv",
+        "block_size": 16,
+        "execution_mode": 2,
+        "score_threads": 32,
+        "selection_threads": 256,
+        "bound_threads": 256,
+        "compaction_threads": 256,
+        "max_supported_k": 128,
+        "selection_levels": 4,
+        "scratch_bytes": 1875360,
+        "seed_selection_scratch_bytes": 480,
+        "bounds_bytes": 1792437500,
+        "seed_budget_blocks": 16,
+        "pruning_seed_blocks": 16,
+        "pruning_seed_docs": 256,
+        "max_query_terms": 95,
+        "verify_scores": 0,
+        "warmup_rounds": 3,
+        "repeats": 20,
+        "cpu_affinity": "0"
+      },
+      "behavior": {
+        "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+        "arithmetic": "uint64",
+        "document_impacts": "uint8-exact",
+        "query_policy": "BMP-f32-ceil-cap32",
+        "tie_order": "score_desc_original_numeric_id_asc",
+        "eligibility": "all_documents",
+        "selection": "hierarchical-local-topk",
+        "layout": "csr-document-blocks",
+        "bounds": "term-major-u8-max-u64-sum",
+        "seed": "first-16-identity-blocks",
+        "threshold": "distinct-seed-kth-or-zero",
+        "skip_rule": "strictly-below-threshold",
+        "compaction": "stable-three-pass-prefix",
+        "skipped_scores": "zeroed-before-each-query",
+        "paired_order": "alternating-round-plus-query"
+      }
+    },
+    "runtime_delta": {},
+    "environment": {
+      "host": "cuda2.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.9.25 (main, Oct 14 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-14)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 2080 Ti, GPU-d5a480cd-7661-ba98-5d22-663c910e1001, 595.104.02, 11264 MiB, 300 MHz, P8\nNVIDIA GeForce RTX 2080 Ti, GPU-4183474a-7cb0-c9cd-c8ab-e13d3330a5df, 595.104.02, 11264 MiB, 300 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "timing-p2-b16",
+    "experiment": "EXPERIMENT-1f6b7b1c7642",
+    "run": "RUN_FINISHED-be3ad6e5469c",
+    "status": "EXECUTED",
+    "command": [
+      "build/cuda_fullbound",
+      "data/derived/hash-1000000.gsp",
+      "data/derived/calibration-500.tsv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/timing-p2-b16.csv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/timing-p2-b16.tsv",
+      "500",
+      "10",
+      "0",
+      "0",
+      "16",
+      "2",
+      "20",
+      "3"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "runtime": {
+      "config": {
+        "mode": "cuda-fullbound-pruning",
+        "docs": 1000000,
+        "query_count": 500,
+        "k": 10,
+        "gpu_id": 0,
+        "index_path": "data/derived/hash-1000000.gsp",
+        "queries_path": "data/derived/calibration-500.tsv",
+        "block_size": 16,
+        "execution_mode": 2,
+        "score_threads": 32,
+        "selection_threads": 256,
+        "bound_threads": 256,
+        "compaction_threads": 256,
+        "max_supported_k": 128,
+        "selection_levels": 4,
+        "scratch_bytes": 1875360,
+        "seed_selection_scratch_bytes": 480,
+        "bounds_bytes": 1792437500,
+        "seed_budget_blocks": 16,
+        "pruning_seed_blocks": 16,
+        "pruning_seed_docs": 256,
+        "max_query_terms": 95,
+        "verify_scores": 0,
+        "warmup_rounds": 3,
+        "repeats": 20,
+        "cpu_affinity": "0"
+      },
+      "behavior": {
+        "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+        "arithmetic": "uint64",
+        "document_impacts": "uint8-exact",
+        "query_policy": "BMP-f32-ceil-cap32",
+        "tie_order": "score_desc_original_numeric_id_asc",
+        "eligibility": "all_documents",
+        "selection": "hierarchical-local-topk",
+        "layout": "csr-document-blocks",
+        "bounds": "term-major-u8-max-u64-sum",
+        "seed": "first-16-identity-blocks",
+        "threshold": "distinct-seed-kth-or-zero",
+        "skip_rule": "strictly-below-threshold",
+        "compaction": "stable-three-pass-prefix",
+        "skipped_scores": "zeroed-before-each-query",
+        "paired_order": "alternating-round-plus-query"
+      }
+    },
+    "runtime_delta": {},
+    "environment": {
+      "host": "cuda2.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.9.25 (main, Oct 14 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-14)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 2080 Ti, GPU-d5a480cd-7661-ba98-5d22-663c910e1001, 595.104.02, 11264 MiB, 300 MHz, P8\nNVIDIA GeForce RTX 2080 Ti, GPU-4183474a-7cb0-c9cd-c8ab-e13d3330a5df, 595.104.02, 11264 MiB, 300 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "timing-p2-b32",
+    "experiment": "EXPERIMENT-6f9aee9e8068",
+    "run": "RUN_FINISHED-7bfb4c3723e8",
+    "status": "EXECUTED",
+    "command": [
+      "build/cuda_fullbound",
+      "data/derived/hash-1000000.gsp",
+      "data/derived/calibration-500.tsv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/timing-p2-b32.csv",
+      "results/2026-11-11-pruning-replication-profile/20261111-replication-01/raw/timing-p2-b32.tsv",
+      "500",
+      "10",
+      "0",
+      "0",
+      "32",
+      "2",
+      "20",
+      "3"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "runtime": {
+      "config": {
+        "mode": "cuda-fullbound-pruning",
+        "docs": 1000000,
+        "query_count": 500,
+        "k": 10,
+        "gpu_id": 0,
+        "index_path": "data/derived/hash-1000000.gsp",
+        "queries_path": "data/derived/calibration-500.tsv",
+        "block_size": 32,
+        "execution_mode": 2,
+        "score_threads": 32,
+        "selection_threads": 256,
+        "bound_threads": 256,
+        "compaction_threads": 256,
+        "max_supported_k": 128,
+        "selection_levels": 4,
+        "scratch_bytes": 1875360,
+        "seed_selection_scratch_bytes": 960,
+        "bounds_bytes": 896218750,
+        "seed_budget_blocks": 16,
+        "pruning_seed_blocks": 16,
+        "pruning_seed_docs": 512,
+        "max_query_terms": 95,
+        "verify_scores": 0,
+        "warmup_rounds": 3,
+        "repeats": 20,
+        "cpu_affinity": "0"
+      },
+      "behavior": {
+        "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+        "arithmetic": "uint64",
+        "document_impacts": "uint8-exact",
+        "query_policy": "BMP-f32-ceil-cap32",
+        "tie_order": "score_desc_original_numeric_id_asc",
+        "eligibility": "all_documents",
+        "selection": "hierarchical-local-topk",
+        "layout": "csr-document-blocks",
+        "bounds": "term-major-u8-max-u64-sum",
+        "seed": "first-16-identity-blocks",
+        "threshold": "distinct-seed-kth-or-zero",
+        "skip_rule": "strictly-below-threshold",
+        "compaction": "stable-three-pass-prefix",
+        "skipped_scores": "zeroed-before-each-query",
+        "paired_order": "alternating-round-plus-query"
+      }
+    },
+    "runtime_delta": {},
+    "environment": {
+      "host": "cuda2.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.9.25 (main, Oct 14 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-14)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 2080 Ti, GPU-d5a480cd-7661-ba98-5d22-663c910e1001, 595.104.02, 11264 MiB, 300 MHz, P8\nNVIDIA GeForce RTX 2080 Ti, GPU-4183474a-7cb0-c9cd-c8ab-e13d3330a5df, 595.104.02, 11264 MiB, 300 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  }
+]

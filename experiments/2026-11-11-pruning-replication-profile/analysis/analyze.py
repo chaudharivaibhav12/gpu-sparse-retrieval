@@ -1,8 +1,10 @@
 """Compute frozen replication statistics from already-validated raw CSVs."""
-import argparse,collections,csv,json,math,random,statistics
+import argparse,collections,csv,gzip,json,math,random,statistics
 from pathlib import Path
 def rows(path):
-    with Path(path).open(newline='',encoding='utf-8') as f:return list(csv.DictReader(f))
+    path=Path(path)
+    stream=gzip.open(path,'rt',newline='',encoding='utf-8') if path.suffix=='.gz' else path.open(newline='',encoding='utf-8')
+    with stream as f:return list(csv.DictReader(f))
 def aggregate(paths,first25):
     matrix=[];per=[];queries=None
     for path in paths:

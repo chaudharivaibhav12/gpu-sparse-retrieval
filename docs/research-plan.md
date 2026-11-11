@@ -214,8 +214,15 @@ Use the verified prototype GPU first, then reproduce on a second architecture wh
 
 Task owners remain unassigned until the team agrees. The columns above describe proposed work streams, not teammate commitments or results. By November 15, aim for one command that executes the same queries against the CPU and GPU and compares their ranked output. The minimum course target is a functional exact GPU scorer, same-layout pruning control, a credible external comparison, different data sizes and GPUs, and an explanation of measured costs. Full 8.8M residency and a second corpus remain conditional on data, hardware and time.
 
-## Active replication and profiling
+## Completed replication and profiling
 
-PR #8 was merged as `95ae7f1acd0b4a93286d368c85486fe7e8508d39`. The [follow-on experiment](../experiments/2026-11-11-pruning-replication-profile/README.md) uses unchanged application source, 500 calibration queries, three fresh paired processes per block size, and separate diagnostic profiles on RTX 2080 Ti (Turing) and RTX 4070 (Ada). Every process retains the historical first-25 subset for replication. Held-out queries remain unused. Results are pending until all fixed processes and output checks complete.
+[Two-architecture results](../experiments/2026-11-11-pruning-replication-profile/README.md) now pass local review: 500 calibration queries, three independent processes/B, all canonical outputs match.
 
-The dependency order is replication/profile review; full-byte versus coarse-only versus selective refinement with fixed seed/scorer/merger; aligned released baseline; broader supported depths/workloads; then a recorded freeze, held-out evaluation and final report. No teammate ownership is assumed.
+| GPU | B | Pruned/control latency | Conditional 95% interval | Lower latency |
+|---|---:|---:|---:|---:|
+| RTX 2080 Ti | 16 | 0.7553 | [0.7298, 0.7806] | 24.47% |
+| RTX 2080 Ti | 32 | 0.8151 | [0.7890, 0.8398] | 18.49% |
+| RTX 4070 | 16 | 0.7710 | [0.7458, 0.7959] | 22.90% |
+| RTX 4070 | 32 | 0.8146 | [0.7900, 0.8382] | 18.54% |
+
+Diagnostics show survivor scoring dominates; full-bound kernels are below 0.4% of kernel time, while pruning adds substantial resident metadata. Prioritize matched external/payload-layout evidence and retain the planned full/coarse/refinement ablation, including null outcomes. GPUSparse dependencies are prepared; its retrieval reproduction, broader supported depths/workloads, freeze/held-out evaluation and final report remain. No held-out or external-superiority claim.
