@@ -16,8 +16,8 @@ Read the [native experiment](../experiments/2026-11-10-bmp-native-alignment/READ
 
 ## Pending work
 
-1. Review the GPU top-k PR; CPU timing PR #5 is merged. Broaden calibration/process repetitions before final performance claims.
-2. Implement the matching block-exhaustive GPU control using the now-validated GPU top-k, preserving canonical scores and IDs.
+1. Review the block-control PR; GPU top-k PR #6 is merged. Broaden calibration/process repetitions before final performance claims.
+2. Use the validated CSR block-exhaustive control to define matched pruning timing and memory boundaries.
 3. Implement full-byte GPU seed/filter/scheduling and compare against its unpruned control.
 4. Test coarse-only and selective refinement using the same seed, scorer and merger, with actual DRAM traffic measurements.
 5. Expand calibration, freeze settings before held-out evaluation, account for peak memory, reproduce released GPUSparse and test a second device.
@@ -31,3 +31,7 @@ The [timing experiment](../experiments/2026-11-11-bmp-resident-timing/README.md)
 ## November 11: canonical GPU top-k validated
 
 The [GPU selection experiment](../experiments/2026-11-11-cuda-device-topk/README.md) passed 140 kernel cases, 175 independent fixture query checks and all 50 real-data queries across 100K/1M. GPU top-10 files match historical CPU bytes; the new selection-thread gate rejected drift and legacy gate compatibility passed. The retrieval path returns ten 24-byte winners per query; dense validation copies are separate. Exhaustive forward scoring remains; no pruning, speedup, held-out or peak-memory claim is established. Next: matching block-exhaustive GPU control, then full-bound pruning.
+
+## November 11: CSR block-exhaustive GPU control
+
+Block sizes 16 and 32 passed 350 independent fixture queries and 100 calibration query checks across 100K/1M, with no score/ranking mismatches. Identity block scheduling uses the same CSR payload and GPU merger for a future pruned counterpart. See [the experiment](../experiments/2026-11-11-cuda-block-control/README.md). No speedup or peak-memory claim; full-byte seed/bounds/filter is next.

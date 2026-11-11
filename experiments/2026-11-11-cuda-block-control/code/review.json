@@ -1,0 +1,591 @@
+{
+  "stage": "completed separate source/orchestration and evidence reviews",
+  "reviewed": [
+    "Loaded parent config and review. Scoring arithmetic and GPU merger unchanged.",
+    "Identity block IDs partition every passage exactly once; thread>=B and tail>=N guards handle B16/B32 and partial blocks.",
+    "Empty corpus launches no scoring CTA; k0/k>N behavior inherited from validated merger.",
+    "Scheduler bytes are included in device allocation, upload excluded from query boundary.",
+    "Block size, active block count, score threads, layout and schedule are reported before query compute.",
+    "Future pruned mode requires separately reviewed skipped-score initialization; this exhaustive mode writes every score."
+  ],
+  "pending": [],
+  "limits": [
+    "First 25 calibration queries per size/block setting; no held-out, speedup or peak-memory claim.",
+    "CSR block scheduling control; term-major competitor and GPU pruning remain pending."
+  ],
+  "result": {
+    "success": true,
+    "source_commit": "89a896fd2e7eec5f0d5434cee89ca40555ccd047",
+    "blocks": [
+      {
+        "success": true,
+        "source_commit": "89a896fd2e7eec5f0d5434cee89ca40555ccd047",
+        "block_size": 16,
+        "prior_kernel_cases": 140,
+        "independent_fixture_configurations": 35,
+        "independent_fixture_queries": 175,
+        "fixtures": [
+          {
+            "docs": 0,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-651fcbcf7f32",
+            "mismatches": 0
+          },
+          {
+            "docs": 0,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-c93eb07d74a8",
+            "mismatches": 0
+          },
+          {
+            "docs": 0,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-c27d17b21c7d",
+            "mismatches": 0
+          },
+          {
+            "docs": 0,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-f123f3481730",
+            "mismatches": 0
+          },
+          {
+            "docs": 0,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-518330c62ae1",
+            "mismatches": 0
+          },
+          {
+            "docs": 1,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-b907422e6580",
+            "mismatches": 0
+          },
+          {
+            "docs": 1,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-ccca59a8ccfe",
+            "mismatches": 0
+          },
+          {
+            "docs": 1,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-1e942ad87bc2",
+            "mismatches": 0
+          },
+          {
+            "docs": 1,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-bef2cd6527e7",
+            "mismatches": 0
+          },
+          {
+            "docs": 1,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-5b9cce66e5de",
+            "mismatches": 0
+          },
+          {
+            "docs": 17,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-95ae3079f51f",
+            "mismatches": 0
+          },
+          {
+            "docs": 17,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-ab670480f5df",
+            "mismatches": 0
+          },
+          {
+            "docs": 17,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-12a0074e1a56",
+            "mismatches": 0
+          },
+          {
+            "docs": 17,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-32468cfd7169",
+            "mismatches": 0
+          },
+          {
+            "docs": 17,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-29293bfadcf8",
+            "mismatches": 0
+          },
+          {
+            "docs": 255,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-da43a0703a10",
+            "mismatches": 0
+          },
+          {
+            "docs": 255,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-2394901e6ace",
+            "mismatches": 0
+          },
+          {
+            "docs": 255,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-aa375c5ac2d4",
+            "mismatches": 0
+          },
+          {
+            "docs": 255,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-91f3a009cd85",
+            "mismatches": 0
+          },
+          {
+            "docs": 255,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-ea7899873a3f",
+            "mismatches": 0
+          },
+          {
+            "docs": 256,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-aa83542c002f",
+            "mismatches": 0
+          },
+          {
+            "docs": 256,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-5418fcea6d4c",
+            "mismatches": 0
+          },
+          {
+            "docs": 256,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-8c7b513049c6",
+            "mismatches": 0
+          },
+          {
+            "docs": 256,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-9024084e9bca",
+            "mismatches": 0
+          },
+          {
+            "docs": 256,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-0624c85a4395",
+            "mismatches": 0
+          },
+          {
+            "docs": 257,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-64c1ab36e620",
+            "mismatches": 0
+          },
+          {
+            "docs": 257,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-0d9036dd3802",
+            "mismatches": 0
+          },
+          {
+            "docs": 257,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-fd8ce692df2b",
+            "mismatches": 0
+          },
+          {
+            "docs": 257,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-4e2a1c373719",
+            "mismatches": 0
+          },
+          {
+            "docs": 257,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-30e799734f2c",
+            "mismatches": 0
+          },
+          {
+            "docs": 1025,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-ea5d82c285f8",
+            "mismatches": 0
+          },
+          {
+            "docs": 1025,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-110805c0ab4f",
+            "mismatches": 0
+          },
+          {
+            "docs": 1025,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-b7a6d1348120",
+            "mismatches": 0
+          },
+          {
+            "docs": 1025,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-09b782cd5536",
+            "mismatches": 0
+          },
+          {
+            "docs": 1025,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-3a634861da5d",
+            "mismatches": 0
+          }
+        ],
+        "real_data": [
+          {
+            "docs": 100000,
+            "queries": 25,
+            "run": "RUN_FINISHED-24c8191db65d",
+            "mismatches": 0,
+            "top10_byte_identical": true,
+            "query_result_transfer_bytes": 240,
+            "validation_dense_score_transfer_bytes": 800000,
+            "scratch_bytes": 187680,
+            "device_allocation_bytes": 62140699
+          },
+          {
+            "docs": 1000000,
+            "queries": 25,
+            "run": "RUN_FINISHED-9f40238de691",
+            "mismatches": 0,
+            "top10_byte_identical": true,
+            "query_result_transfer_bytes": 240,
+            "validation_dense_score_transfer_bytes": 8000000,
+            "scratch_bytes": 1875360,
+            "device_allocation_bytes": 619738009
+          }
+        ],
+        "deliberate_selection_drift_rejected": true,
+        "inherited_merger_unchanged": true,
+        "qualification": "Correctness-only: one observation/query, zero warmup, no comparative speed or peak-memory claim."
+      },
+      {
+        "success": true,
+        "source_commit": "89a896fd2e7eec5f0d5434cee89ca40555ccd047",
+        "block_size": 32,
+        "prior_kernel_cases": 140,
+        "independent_fixture_configurations": 35,
+        "independent_fixture_queries": 175,
+        "fixtures": [
+          {
+            "docs": 0,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-a05b52edc7cc",
+            "mismatches": 0
+          },
+          {
+            "docs": 0,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-a225c6c64685",
+            "mismatches": 0
+          },
+          {
+            "docs": 0,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-2be7fd54fd01",
+            "mismatches": 0
+          },
+          {
+            "docs": 0,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-ceca33e9e72b",
+            "mismatches": 0
+          },
+          {
+            "docs": 0,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-91e649c2fec8",
+            "mismatches": 0
+          },
+          {
+            "docs": 1,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-a67cf89fc60f",
+            "mismatches": 0
+          },
+          {
+            "docs": 1,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-92dbe04bf036",
+            "mismatches": 0
+          },
+          {
+            "docs": 1,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-5a1447254c20",
+            "mismatches": 0
+          },
+          {
+            "docs": 1,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-36319ee19ce5",
+            "mismatches": 0
+          },
+          {
+            "docs": 1,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-c5053f921de8",
+            "mismatches": 0
+          },
+          {
+            "docs": 17,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-5c038c2b5ff4",
+            "mismatches": 0
+          },
+          {
+            "docs": 17,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-a5c4d76c0df7",
+            "mismatches": 0
+          },
+          {
+            "docs": 17,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-98923599bb39",
+            "mismatches": 0
+          },
+          {
+            "docs": 17,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-31a2619ee7bf",
+            "mismatches": 0
+          },
+          {
+            "docs": 17,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-7d064d884528",
+            "mismatches": 0
+          },
+          {
+            "docs": 255,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-92b1e2b6fe2a",
+            "mismatches": 0
+          },
+          {
+            "docs": 255,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-e96c709bfead",
+            "mismatches": 0
+          },
+          {
+            "docs": 255,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-0f9586b83381",
+            "mismatches": 0
+          },
+          {
+            "docs": 255,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-db072159454a",
+            "mismatches": 0
+          },
+          {
+            "docs": 255,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-6917ed1bd500",
+            "mismatches": 0
+          },
+          {
+            "docs": 256,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-1534dd49ad90",
+            "mismatches": 0
+          },
+          {
+            "docs": 256,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-20e534d24e29",
+            "mismatches": 0
+          },
+          {
+            "docs": 256,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-d6d26e57c184",
+            "mismatches": 0
+          },
+          {
+            "docs": 256,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-97cd65720002",
+            "mismatches": 0
+          },
+          {
+            "docs": 256,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-8219fd04af16",
+            "mismatches": 0
+          },
+          {
+            "docs": 257,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-0a728e0bf3b2",
+            "mismatches": 0
+          },
+          {
+            "docs": 257,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-143967054ecc",
+            "mismatches": 0
+          },
+          {
+            "docs": 257,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-40dfabfebf89",
+            "mismatches": 0
+          },
+          {
+            "docs": 257,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-5d2a395e3497",
+            "mismatches": 0
+          },
+          {
+            "docs": 257,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-a50948a11e09",
+            "mismatches": 0
+          },
+          {
+            "docs": 1025,
+            "k": 0,
+            "queries": 5,
+            "run": "RUN_FINISHED-11519d8e46c2",
+            "mismatches": 0
+          },
+          {
+            "docs": 1025,
+            "k": 1,
+            "queries": 5,
+            "run": "RUN_FINISHED-78e0847e41b4",
+            "mismatches": 0
+          },
+          {
+            "docs": 1025,
+            "k": 10,
+            "queries": 5,
+            "run": "RUN_FINISHED-085b6c5746e9",
+            "mismatches": 0
+          },
+          {
+            "docs": 1025,
+            "k": 100,
+            "queries": 5,
+            "run": "RUN_FINISHED-568078178bc4",
+            "mismatches": 0
+          },
+          {
+            "docs": 1025,
+            "k": 128,
+            "queries": 5,
+            "run": "RUN_FINISHED-911d3f6c44f3",
+            "mismatches": 0
+          }
+        ],
+        "real_data": [
+          {
+            "docs": 100000,
+            "queries": 25,
+            "run": "RUN_FINISHED-b4825c09b68a",
+            "mismatches": 0,
+            "top10_byte_identical": true,
+            "query_result_transfer_bytes": 240,
+            "validation_dense_score_transfer_bytes": 800000,
+            "scratch_bytes": 187680,
+            "device_allocation_bytes": 62128199
+          },
+          {
+            "docs": 1000000,
+            "queries": 25,
+            "run": "RUN_FINISHED-3adb30f19762",
+            "mismatches": 0,
+            "top10_byte_identical": true,
+            "query_result_transfer_bytes": 240,
+            "validation_dense_score_transfer_bytes": 8000000,
+            "scratch_bytes": 1875360,
+            "device_allocation_bytes": 619613009
+          }
+        ],
+        "deliberate_selection_drift_rejected": true,
+        "inherited_merger_unchanged": true,
+        "qualification": "Correctness-only: one observation/query, zero warmup, no comparative speed or peak-memory claim."
+      }
+    ],
+    "independent_fixture_configurations": 70,
+    "independent_fixture_queries": 350,
+    "real_queries": 100,
+    "canonical_mismatches": 0,
+    "dense_score_comparisons_reported": 55000000
+  }
+}
