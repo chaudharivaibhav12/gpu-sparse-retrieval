@@ -1,0 +1,123 @@
+[
+  {
+    "argv": [
+      "/usr/bin/python3",
+      "scripts/export_bmp_inputs.py",
+      "--index",
+      "data/derived/hash-1000000.gsp",
+      "--queries",
+      "data/derived/calibration-500.tsv",
+      "--limit",
+      "25",
+      "--output",
+      "build/real1m-export"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "recording_id": "OBSERVATION-4f359ce36156",
+    "stdout": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/export-real1m.stdout",
+    "stderr": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/export-real1m.stderr"
+  },
+  {
+    "argv": [
+      "./build/cpu_pilot",
+      "import",
+      "build/real1m-export/subset.ciff",
+      "build/real1m-roundtrip.gsp",
+      "1000000"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "recording_id": "OBSERVATION-d800b9c87fec",
+    "stdout": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/roundtrip-import.stdout",
+    "stderr": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/roundtrip-import.stderr"
+  },
+  {
+    "argv": [
+      "./build/cpu_pilot",
+      "queries",
+      "build/real1m-export/queries.pisa",
+      "build/real1m-roundtrip.gsp",
+      "build/real1m-reprepared.tsv",
+      "25"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "recording_id": "OBSERVATION-2083edd8460e",
+    "stdout": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/reprepare-query-weights.stdout",
+    "stderr": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/reprepare-query-weights.stderr"
+  },
+  {
+    "argv": [
+      "build/BMP/target/release/ciff2bmp",
+      "--bsize",
+      "32",
+      "--ciff-file",
+      "build/real1m-export/subset.ciff",
+      "--output",
+      "build/real-b32-raw.bmp"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "recording_id": "OBSERVATION-361271b7432a",
+    "stdout": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/real-b32-raw-import.stdout",
+    "stderr": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/real-b32-raw-import.stderr"
+  },
+  {
+    "argv": [
+      "build/BMP/target/release/search",
+      "--index",
+      "build/real-b32-raw.bmp",
+      "--queries",
+      "build/real1m-export/queries.pisa",
+      "--k",
+      "10",
+      "--alpha",
+      "1.0",
+      "--beta",
+      "1.0"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "recording_id": "OBSERVATION-85127399c223",
+    "stdout": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/real-b32-raw-search.stdout",
+    "stderr": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/real-b32-raw-search.stderr"
+  },
+  {
+    "argv": [
+      "build/BMP/target/release/ciff2bmp",
+      "--bsize",
+      "32",
+      "--ciff-file",
+      "build/real1m-export/subset.ciff",
+      "--output",
+      "build/real-b32-compressed.bmp",
+      "--compress-range"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "recording_id": "OBSERVATION-374e38198149",
+    "stdout": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/real-b32-compressed-import.stdout",
+    "stderr": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/real-b32-compressed-import.stderr"
+  },
+  {
+    "argv": [
+      "build/BMP/target/release/search",
+      "--index",
+      "build/real-b32-compressed.bmp",
+      "--queries",
+      "build/real1m-export/queries.pisa",
+      "--k",
+      "10",
+      "--alpha",
+      "1.0",
+      "--beta",
+      "1.0"
+    ],
+    "exit_code": 0,
+    "error": null,
+    "recording_id": "OBSERVATION-7a35242ac2f2",
+    "stdout": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/real-b32-compressed-search.stdout",
+    "stderr": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/real-b32-compressed-search.stderr"
+  }
+]

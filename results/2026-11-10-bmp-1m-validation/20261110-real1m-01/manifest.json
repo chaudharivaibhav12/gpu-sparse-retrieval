@@ -1,0 +1,407 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-10-bmp-1m-validation",
+  "run_id": "20261110-real1m-01",
+  "status": "passed",
+  "executed_at_utc": null,
+  "recorded_at_utc": "2026-11-11T00:43:52.400836+00:00",
+  "packaged_at_utc": "2026-11-11T00:56:46.757025+00:00",
+  "qualification": "Corrected external commands are uninstrumented observations; CPU reference is runtime-gated. Correctness scope only.",
+  "source": {
+    "repository": "chaudharivaibhav12/gpu-sparse-retrieval",
+    "branch": "exp/vaibhav/2026-11-10-bmp-1m-validation",
+    "commit": "069adb1378582174f42416fba969fe4539cfc879",
+    "binary_build_source_commit": "ee099d4d98835d88f19a12cef2328308e2ba5479",
+    "native_revision": "67ad8c683fbc0c30145d1ee42c1dffbed8b12332",
+    "patch_sha256": "bfedc4c9787287723642df4d6c4a4bbc1fe31be4691a55b9d941b02400b8dc5b",
+    "patched_source_hashes": {
+      "bin/search.rs": "ac764ef0602ab4f7dc4735523371963f733d7d2b3acdafebafcb80dffa14c739",
+      "src/index/forward_index.rs": "2aee121ed226ade2ad8c9a00d19cbcafe81eff2cfc29b0e9fc91634cf3089e7f",
+      "src/query/live_block.rs": "b05c4260babffa06bbdbf585e415780b1311ea34bb5272f6bed8b97f4d66e906",
+      "src/query/mod.rs": "bcb03f03282efb3283ec200110639bcb0174e3744af33fed92e2aae37b65eae3",
+      "src/query/topk_heap.rs": "bbda6f60d30cacef87511ed3620542ac65e77ffa17798ca1f9af9d9862efc1dc",
+      "src/search.rs": "d00569052cbc0c070519e911553c3dabd0a2c58d84eae113c6241489517e26d2",
+      "src/util.rs": "6fabdaf31eb13fe15610edfa33ea88cee6290f6fc0b0714f266296916df2a19e"
+    },
+    "shared_source_hashes": {
+      "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+      "src/research_runtime.h": "4f1785402cd8e83a0856b11cea8c2588a7210296e4fa720c68ac1daf9bed2ac2",
+      "scripts/export_bmp_inputs.py": "73ebe516ac049aeb5bc3b53c71ad716f23852ada0be6c5b283cb694ef5670118",
+      "tests/check_cpu_pilot.py": "414cec6d3c33ebc5792bfe9cabc795e15af4a4f806e880ba4118820cc1aee361"
+    }
+  },
+  "configuration": {
+    "parent_experiment": "2026-11-10-bmp-correctness-fixes",
+    "parent_measured_source_commit": "ee099d4d98835d88f19a12cef2328308e2ba5479",
+    "parent_result_commit": "c1a87fe78ce003f9db6f47c75b3c65a6a3fad345",
+    "native_revision": "67ad8c683fbc0c30145d1ee42c1dffbed8b12332",
+    "patch": "experiments/2026-11-10-bmp-correctness-fixes/code/bmp-canonical.patch",
+    "dependency_lock": "experiments/2026-11-10-bmp-native-alignment/configs/BMP-Cargo.lock",
+    "configuration": {
+      "documents": 1000000,
+      "queries": 25,
+      "query_membership": "first 25 lines of calibration-500.tsv in preserved order",
+      "block_size": 32,
+      "compressed_ranges": [
+        false,
+        true
+      ],
+      "k": 10,
+      "alpha": 1.0,
+      "beta": 1.0,
+      "rayon_threads": 1
+    },
+    "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+    "inputs": {
+      "index": "data/derived/hash-1000000.gsp",
+      "expected_index_sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37",
+      "queries": "data/derived/calibration-500.tsv",
+      "expected_queries_sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "split": "data/derived/calibration-500.tsv.split.tsv"
+    },
+    "declared_changes": {
+      "configuration.documents": {
+        "from": 100000,
+        "to": 1000000,
+        "reason": "Test correctness at the next nested corpus size."
+      },
+      "inputs.index": "Use the preserved 1M GSP hash and original BP order. Query weights, membership/order and algorithm settings remain fixed.",
+      "execution.command_timeout_seconds": "Larger command allowance for 10x corpus export/import; correctness scope only, no latency comparison."
+    },
+    "analysis_plan": "Byte-identical CIFF-to-GSP and effective-query round trips; fresh gated CPU top-10 byte equality with historical reference; corrected raw/compressed outputs exactly equal all 25 canonical top-10 lists.",
+    "failure_rule": "Retain any failed attempt and discrepancy before a reviewed correction; no performance claim.",
+    "reuse": "Verify and reuse the validated parent BMP and CPU binaries, dependency lock, applied native source hashes and code files. No retrieval algorithm edits.",
+    "execution": {
+      "command_timeout_seconds": 1800,
+      "heartbeat_seconds": 30,
+      "stopping_rule": "Complete exact input checks, CPU reference and both 25-query layouts; preserve any timeout/failure."
+    }
+  },
+  "inputs": {
+    "data/derived/hash-1000000.gsp": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37",
+    "data/derived/calibration-500.tsv": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+    "data/derived/calibration-500.tsv.split.tsv": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+  },
+  "build": {
+    "provenance": "Validated parent binaries reused after equality checks. Parent Rust tests and 96-case fixture are prior evidence; no rebuild or new fixture run claimed.",
+    "binary_hashes": {
+      "ciff2bmp": "eda1cf54ac8a30e43f8287ef5046cee8d9db98c337ed41f875ae5308e949043a",
+      "search": "1fe5865b774ce810bb9acc2f54e087dd63b9f8aca183e685a3b8d832feb8fded"
+    },
+    "cpu_binary_sha256": "767455641e369b9822fa096c74faeba4050f18919c336cfde74858ba5913f8dc",
+    "dependency_lock_sha256": "b91150c01efcae565c7144a49d7fdf1e3b0f52518bf33b93503b99c6de26f07e",
+    "compiler_version": "parent Rust 1.92.0 and GCC 11.5.0 builds"
+  },
+  "environment": {
+    "device": "CPU",
+    "allowed_environment": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "details": "logs/environment.txt"
+  },
+  "commands": [
+    {
+      "argv": [
+        "./build/cpu_pilot",
+        "queries",
+        "build/real1m-export/queries.pisa",
+        "build/real1m-roundtrip.gsp",
+        "build/real1m-reprepared.tsv",
+        "25"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:52:09.845395+00:00",
+      "record_type": "observation",
+      "recording_id": "OBSERVATION-2083edd8460e"
+    },
+    {
+      "argv": [
+        "build/BMP/target/release/ciff2bmp",
+        "--bsize",
+        "32",
+        "--ciff-file",
+        "build/real1m-export/subset.ciff",
+        "--output",
+        "build/real-b32-raw.bmp"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:53:07.885988+00:00",
+      "record_type": "observation",
+      "recording_id": "OBSERVATION-361271b7432a"
+    },
+    {
+      "argv": [
+        "build/BMP/target/release/ciff2bmp",
+        "--bsize",
+        "32",
+        "--ciff-file",
+        "build/real1m-export/subset.ciff",
+        "--output",
+        "build/real-b32-compressed.bmp",
+        "--compress-range"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:54:02.155091+00:00",
+      "record_type": "observation",
+      "recording_id": "OBSERVATION-374e38198149"
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "scripts/export_bmp_inputs.py",
+        "--index",
+        "data/derived/hash-1000000.gsp",
+        "--queries",
+        "data/derived/calibration-500.tsv",
+        "--limit",
+        "25",
+        "--output",
+        "build/real1m-export"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:51:09.214078+00:00",
+      "record_type": "observation",
+      "recording_id": "OBSERVATION-4f359ce36156"
+    },
+    {
+      "argv": [
+        "build/BMP/target/release/search",
+        "--index",
+        "build/real-b32-compressed.bmp",
+        "--queries",
+        "build/real1m-export/queries.pisa",
+        "--k",
+        "10",
+        "--alpha",
+        "1.0",
+        "--beta",
+        "1.0"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:54:09.247908+00:00",
+      "record_type": "observation",
+      "recording_id": "OBSERVATION-7a35242ac2f2"
+    },
+    {
+      "argv": [
+        "build/BMP/target/release/search",
+        "--index",
+        "build/real-b32-raw.bmp",
+        "--queries",
+        "build/real1m-export/queries.pisa",
+        "--k",
+        "10",
+        "--alpha",
+        "1.0",
+        "--beta",
+        "1.0"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:53:15.800692+00:00",
+      "record_type": "observation",
+      "recording_id": "OBSERVATION-85127399c223"
+    },
+    {
+      "argv": [
+        "./build/cpu_pilot",
+        "import",
+        "build/real1m-export/subset.ciff",
+        "build/real1m-roundtrip.gsp",
+        "1000000"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:52:00.600739+00:00",
+      "record_type": "observation",
+      "recording_id": "OBSERVATION-d800b9c87fec"
+    },
+    {
+      "argv": [
+        "./build/cpu_pilot",
+        "score",
+        "data/derived/hash-1000000.gsp",
+        "data/derived/calibration-500.tsv",
+        "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/raw/oracle.tsv",
+        "10",
+        "25"
+      ],
+      "exit_code": 0,
+      "recorded_at_utc": "2026-11-11T00:52:25.852028+00:00",
+      "record_type": "run_finished",
+      "recording_id": "RUN_FINISHED-3c3d411d7708"
+    }
+  ],
+  "timing_boundary": "Correctness only; no comparative performance claim.",
+  "correctness": {
+    "source_commit": "069adb1378582174f42416fba969fe4539cfc879",
+    "binary_build_source_commit": "ee099d4d98835d88f19a12cef2328308e2ba5479",
+    "documents": 1000000,
+    "queries_per_layout": 25,
+    "k": 10,
+    "block_size": 32,
+    "layouts": [
+      {
+        "compressed": false,
+        "exit_code": 0,
+        "queries": 25,
+        "mismatched_query_ids": [],
+        "unexpected_query_ids": [],
+        "stdout": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/real-b32-raw-search.stdout",
+        "recording_id": "OBSERVATION-85127399c223",
+        "index_sha256": "2a47def0141e18903e05bb7934618102f5048a881fce0fa250b843b19e1f0ba8",
+        "index_bytes": 1588159243
+      },
+      {
+        "compressed": true,
+        "exit_code": 0,
+        "queries": 25,
+        "mismatched_query_ids": [],
+        "unexpected_query_ids": [],
+        "stdout": "results/2026-11-10-bmp-1m-validation/20261110-real1m-01/logs/real-b32-compressed-search.stdout",
+        "recording_id": "OBSERVATION-7a35242ac2f2",
+        "index_sha256": "14c33d7844b28f1ebecf7fd4fa3956710cb4e36aeb6ed7ac89285f28338c3838",
+        "index_bytes": 1114914705
+      }
+    ],
+    "roundtrip_byte_identical": true,
+    "prepared_weights_byte_identical": true,
+    "parent_100k_pisa_byte_identical": true,
+    "historical_cpu_top10_byte_identical": true,
+    "success": true,
+    "qualification": "Corrected external commands are uninstrumented observations; CPU reference is runtime-gated. Correctness scope only."
+  },
+  "recording_ids": [
+    "OBSERVATION-7c9c557b640d",
+    "OBSERVATION-2083edd8460e",
+    "OBSERVATION-361271b7432a",
+    "OBSERVATION-374e38198149",
+    "OBSERVATION-4f359ce36156",
+    "OBSERVATION-7a35242ac2f2",
+    "OBSERVATION-85127399c223",
+    "OBSERVATION-d800b9c87fec",
+    "RUN_FINISHED-3c3d411d7708"
+  ],
+  "artifacts": [
+    {
+      "path": "analysis/comparison.json",
+      "sha256": "a4fa12d2924cb495f8f3cb86a94bbdeffb3bc94c878df2f55a079d966e28f88e",
+      "bytes": 1437
+    },
+    {
+      "path": "commands.json",
+      "sha256": "af096322f04a237d0aaf17b50378f09e0829a5975b09d6900d0900b88f7597f6",
+      "bytes": 3739
+    },
+    {
+      "path": "logs/environment.txt",
+      "sha256": "8e2911172f1545b9a430818f10ade0ab41754d96a4e114d088cdf2793c073447",
+      "bytes": 3584
+    },
+    {
+      "path": "logs/export-real1m.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/export-real1m.stdout",
+      "sha256": "ccc617c0e769513fb6c291f47d93b620ec52c466398a1401b848631157750616",
+      "bytes": 998
+    },
+    {
+      "path": "logs/real-b32-compressed-import.stderr",
+      "sha256": "8be16ffe1355a7e5369774b65a963442fb2a918bc425957669754540f8f03b95",
+      "bytes": 180
+    },
+    {
+      "path": "logs/real-b32-compressed-import.stdout",
+      "sha256": "eff41b567ae65e20f51c93c27a9e96dd4a6c6d264aa6998b2a81239b39457548",
+      "bytes": 252
+    },
+    {
+      "path": "logs/real-b32-compressed-search.stderr",
+      "sha256": "fbe42f61fa31f4d293ae7c2c3716699b7d63bd91698db1b188952a1b43782d43",
+      "bytes": 107
+    },
+    {
+      "path": "logs/real-b32-compressed-search.stdout",
+      "sha256": "743fdb4c972d7c2e37e70817ee19812d899fb9b79b28e2da362e08bb8913c781",
+      "bytes": 7467
+    },
+    {
+      "path": "logs/real-b32-raw-import.stderr",
+      "sha256": "8be16ffe1355a7e5369774b65a963442fb2a918bc425957669754540f8f03b95",
+      "bytes": 180
+    },
+    {
+      "path": "logs/real-b32-raw-import.stdout",
+      "sha256": "2b138339b6c33bbd2c278eb0f5eded96a78b7908caec3db7cfab29a66e6e6038",
+      "bytes": 245
+    },
+    {
+      "path": "logs/real-b32-raw-search.stderr",
+      "sha256": "40a1a7ffce0f48d789790d9c710702e00df48bc43de09e646a02a087bcd273d5",
+      "bytes": 107
+    },
+    {
+      "path": "logs/real-b32-raw-search.stdout",
+      "sha256": "743fdb4c972d7c2e37e70817ee19812d899fb9b79b28e2da362e08bb8913c781",
+      "bytes": 7467
+    },
+    {
+      "path": "logs/reprepare-query-weights.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/reprepare-query-weights.stdout",
+      "sha256": "79205dd50b7e5e754c6f4546e7bc3985275823bd4420e8ca9efaaf67fcdb62c8",
+      "bytes": 132
+    },
+    {
+      "path": "logs/roundtrip-import.stderr",
+      "sha256": "471b6cd354e113ad3d3c6b23c7e020eda0076cd1b58d9e577562e6a7636e1f7c",
+      "bytes": 151
+    },
+    {
+      "path": "logs/roundtrip-import.stdout",
+      "sha256": "21c6ae151a27ed98c7c2fa5670624af83ea2b24118df1c319489277feeb56523",
+      "bytes": 114
+    },
+    {
+      "path": "raw/export-manifest.json",
+      "sha256": "ccc617c0e769513fb6c291f47d93b620ec52c466398a1401b848631157750616",
+      "bytes": 998
+    },
+    {
+      "path": "raw/oracle.tsv",
+      "sha256": "571d781415b781f7620ff542486803133d71f1dea4714dd300b273d6f935088d",
+      "bytes": 5749
+    },
+    {
+      "path": "raw/queries.pisa",
+      "sha256": "96825735d119df33620a0b0944d3457982e533bf53354804395d4b8f9bec0e7e",
+      "bytes": 49773
+    },
+    {
+      "path": "raw/real1m-reprepared.tsv",
+      "sha256": "70d07b5653c499a29c40a2e807b5fe32c1d69a99c238c8325f9dddb6f5df68f0",
+      "bytes": 8217
+    },
+    {
+      "path": "raw/real1m-reprepared.tsv.split.tsv",
+      "sha256": "4f113ab5725902b254a1f383d80a54b8bd438a11a226736cffefc230a3b9243b",
+      "bytes": 941
+    },
+    {
+      "path": "source-receipt.json",
+      "sha256": "a9f9453c7ffbe8774792f133625f34042c3c3bd3d8b859ad8d86e0cb68311ddf",
+      "bytes": 1968
+    }
+  ],
+  "interpretation": "Both representations reproduce all 25 canonical top-10 lists at 1M. Subset/query conversion and historical reference equality passed.",
+  "limitations": [
+    "First 25 calibration queries, k=10, block size 32 and this nested 1M subset.",
+    "External BMP commands remain uninstrumented observations; CPU reference is runtime-gated.",
+    "No held-out evaluation or repeated/interleaved timing comparison."
+  ],
+  "next_action": "Review the 1M experiment PR, then register a matched baseline timing protocol."
+}

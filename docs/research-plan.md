@@ -5,6 +5,8 @@ Exact GPU pruning for learned sparse passage retrieval
 
 This is the main team document for understanding the research direction, completed experiments, and next work. Results below come from the saved CIMS logs and CSVs. Implementation status is explicit: our initial CUDA scorer works, while GPU pruning and GPU top-k remain pending. The corrected CPU BMP comparison now passes its fixture and initial common-data correctness checks, and released GPUSparse reproduction remains pending.
 
+The [1M validation](../experiments/2026-11-10-bmp-1m-validation/README.md), branched from main after PR #3 merged, passed all 25 canonical top-10 lists for both raw and compressed bounds. Input/query round trips and historical CPU-reference byte equality passed. This establishes this calibration correctness scope; repeated timing and held-out evaluation remain pending.
+
 ## The decision
 
 Build an exact block-pruned SPLADE retriever with a control that uses the same GPU kernel to score every block. The first research extension should be **selective refinement of block-score bounds**. Give the GPU a cheap interval for each block’s full upper bound. Read the remaining precision only when it could change the skip decision. Test whether this reduces memory traffic enough to improve end-to-end latency. This is a candidate contribution whose value depends on measurement.
@@ -28,7 +30,7 @@ The main comparison is **CPU BMP, released GPUSparse, and our proposed exact pru
 | System | Purpose | Current status |
 |---|---|---|
 | Our sequential C++ scorer | Reference scores and a deterministic order for tied results | Implemented; independently checked on a Python fixture and compared with CUDA on real data |
-| Released CPU BMP | Strong external CPU retrieval baseline | Native fixture failures recorded; corrected canonical variant passes all 96 fixture cases and 25-query top-10 checks at 100K for raw/compressed bounds. Performance comparison pending |
+| Released CPU BMP | Strong external CPU retrieval baseline | Native fixture failures recorded; corrected canonical variant passes all 96 fixture cases and 25-query top-10 checks at 100K and 1M for raw/compressed bounds. Performance comparison pending |
 | Released GPUSparse | External GPU baseline from the June paper, using the strongest applicable current path | Not yet reproduced; calibrate monolithic/chunked/compacted variants where supported |
 | Our initial exhaustive CUDA forward scorer | First GPU scoring correctness control | Implemented; all scores return to the CPU for top-k selection |
 | Our same-layout block-exhaustive GPU control | Isolate the effect of pruning while holding scoring layout and merge fixed | Pending |
