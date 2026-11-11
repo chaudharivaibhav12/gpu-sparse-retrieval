@@ -7,9 +7,11 @@ This is the main team document for understanding the research direction, complet
 
 The [1M validation](../experiments/2026-11-10-bmp-1m-validation/README.md), branched from main after PR #3 merged, passed all 25 canonical top-10 lists for both raw and compressed bounds. Input/query round trips and historical CPU-reference byte equality passed. This establishes this calibration correctness scope; repeated timing and held-out evaluation remain pending.
 
-The [November 11 resident BMP timing](../experiments/2026-11-11-bmp-resident-timing/README.md) matched all 1,650 output checks. Compression took 12.11% longer on the primary paired statistic for this 25-query calibration workload (compressed/raw 1.1211, conditional bootstrap interval 1.0957â€“1.1501). This is a corrected CPU-variant result with index loading excluded; the matching GPU control, broader calibration, process-level repetition and held-out evaluation remain pending.
+The [November 11 resident BMP timing](../experiments/2026-11-11-bmp-resident-timing/README.md) matched all 1,650 output checks. Compression took 12.11% longer on the primary paired statistic for this 25-query calibration workload (compressed/raw 1.1211, conditional bootstrap interval 1.0957â€“1.1501). This is a corrected CPU-variant result with index loading excluded; broader calibration, process-level repetition and held-out evaluation remain pending.
 
-The [GPU top-k correctness experiment](../experiments/2026-11-11-cuda-device-topk/README.md) passed 140 selection cases, 175 independent fixture queries and all 50 real-data queries across 100K/1M. Canonical GPU winners match historical CPU bytes. This completes the forward-layout ranking control in the tested scope; the matching block-exhaustive layout, pruning and controlled GPU performance remain pending.
+The [GPU top-k correctness experiment](../experiments/2026-11-11-cuda-device-topk/README.md) passed 140 selection cases, 175 independent fixture queries and all 50 real-data queries across 100K/1M. Canonical GPU winners match historical CPU bytes. This completes the forward-layout ranking control in the tested scope; CSR block-exhaustive correctness is now validated; pruning and controlled GPU performance remain pending.
+
+The [CSR block-exhaustive control](../experiments/2026-11-11-cuda-block-control/README.md) now passes B16/B32 correctness checks (350 fixture and 100 real-data queries). This provides the unpruned scoring/merging path for a future filtered counterpart; controlled timing and full-byte pruning remain pending.
 
 ## The decision
 
@@ -38,7 +40,7 @@ The main comparison is **CPU BMP, released GPUSparse, and our proposed exact pru
 | Released GPUSparse | External GPU baseline from the June paper, using the strongest applicable current path | Not yet reproduced; calibrate monolithic/chunked/compacted variants where supported |
 | Our initial exhaustive CUDA forward scorer | First GPU scoring correctness control | Implemented; all scores return to the CPU for top-k selection |
 | Our forward scorer with GPU top-k | Canonical GPU ranking correctness control | Validated on fixtures and first 25 calibration queries at 100K/1M; no controlled performance claim |
-| Our same-layout block-exhaustive GPU control | Isolate the effect of pruning while holding scoring layout and merge fixed | Pending |
+| Our same-layout block-exhaustive GPU control | Isolate the effect of pruning while holding scoring layout and merge fixed | CSR identity-scheduled B16/B32 control validated on fixtures and 100K/1M; timing comparison pending |
 | Our full-bound pruned GPU system | Proposed main exact GPU system | CPU offline candidate analysis completed; GPU implementation pending |
 | Our progressive-bound variant | Test the proposed precision-refinement contribution | CPU decision analysis completed; GPU implementation and speed benefit unproven |
 
