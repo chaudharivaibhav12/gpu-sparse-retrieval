@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-11-bmp-resident-timing",
+  "title": "Resident raw-versus-compressed corrected BMP timing",
+  "owner": "Vaibhav",
+  "branch": "exp/vaibhav/2026-11-11-bmp-resident-timing",
+  "parent_experiment": "2026-11-10-bmp-1m-validation",
+  "base_main_commit": "ffb206e424b776f4063b677c69233364bb1382ca",
+  "status": "completed-calibration-timing",
+  "configuration_files": [
+    "configs/timing.json"
+  ],
+  "code_paths": [
+    "code/resident-context.patch",
+    "code/project_benchmark.rs",
+    "analysis/analyze.py"
+  ],
+  "runs": [
+    "20261111-resident-01",
+    "20261111-resident-02"
+  ],
+  "question": "What is the latency effect of compressed versus raw block bounds in the corrected BMP implementation on the fixed resident 1M calibration workload?",
+  "hypothesis": "Compression may change bound processing cost; direction is an empirical question. Correctness must remain identical.",
+  "success_rule": "All fixed warmup/measured output lists exactly equal the oracle, complete fixed paired samples, accepted actual runtime config and preserved build/source evidence.",
+  "failure_rule": "Any mismatch, runtime drift or missing evidence blocks latency interpretation. Preserve failed attempts.",
+  "declared_changes": "Resident metadata hoist and new matched timing/gating adapter; scoring and pruning logic fixed.",
+  "qualification": "A new adapter for the corrected variant, not a measurement of unmodified upstream BMP or a GPU speedup.",
+  "measured_source_commit": "9cdc3c9fab1b8e7c88c3a694e957a0aa005dfc8e"
+}

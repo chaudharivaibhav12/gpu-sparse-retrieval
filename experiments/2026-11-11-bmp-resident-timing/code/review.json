@@ -1,0 +1,58 @@
+{
+  "stage": "completed separate source reviews plus post-execution evidence review",
+  "parent_experiment": "2026-11-10-bmp-1m-validation",
+  "parent_result_commit": "1e4b1314691aae5c46e6eb211229d663d8c97a9c",
+  "reviewed": [
+    "Loaded parent full configuration and saved correctness review.",
+    "Diffed search loop: scoring, bounds, seed, candidate order, heap admission and zero eligibility are unchanged. Numeric ID/zero order construction moves to resident corpus context. Native entry points retain their arguments and defaults.",
+    "Gate follows actual index loads, document mapping/count/block/layout checks, query count and single-CPU affinity resolution, and precedes all warmup/measured queries.",
+    "Timed boundary spans fresh cursor creation through canonical TREC string construction. Query file reads, corpus context, monitoring and output writes are outside timing.",
+    "Fixed rounds and alternating order; all warmup/measured outputs retained and checked before statistics.",
+    "Bootstrap resamples query pairs, preserves within-query median pairing and labels calibration/shared-host limits.",
+    "Fresh output creation and per-round flush preserve partial evidence; no credential or environment dump."
+  ],
+  "findings_fixed": [
+    "Imported RangeMaxScoreCursor trait needed for range representation checks.",
+    "Tightened analysis to require frozen oracle query order, not merely unique query positions.",
+    "Replaced inherited binary-reuse statement with mandatory rebuild after the new overlay.",
+    "Allow safe fixture query IDs as well as numeric real-data query IDs."
+  ],
+  "local_checks": {
+    "python_syntax": "PASS",
+    "analysis_checks_passed": 7,
+    "analysis_checks": "Known 2x ratio/interval plus missing, duplicate, wrong-order, zero-time, query-order drift and wrong-score rejection.",
+    "overlay_apply": "PASS: git apply --check and exact reviewed-source bytes with core.autocrlf=false"
+  },
+  "pending": [],
+  "limits": [
+    "25 repeated calibration queries on one shared CPU host; not held-out/general-population or service-tail inference.",
+    "Both indexes resident; repeated-cache workload; resident context and file I/O excluded.",
+    "Boundary includes cursor preparation through ordered TREC string construction; not GPU or load-inclusive latency.",
+    "Affinity and round-level CPU snapshots do not guarantee exclusive cores or fixed frequency."
+  ],
+  "validation_notes": [
+    "Initial local byte check differed only because global Windows Git autocrlf converted output to CRLF. Repeated under explicit LF policy; patch application and exact bytes passed. No algorithm change was needed."
+  ],
+  "observed_build_validation": {
+    "library_tests": 8,
+    "cli_fixture_cases": 96,
+    "qualification": "Built/tested on initial source 2e80ccdd6554881e8a8c1f6b57e5bf14954f7676; gate parser subsequently requires rebuild."
+  },
+  "failed_attempts": [
+    "Fixture checker initially lacked a copied CPU oracle; original stderr retained and exact parent copy enabled successful 96-case analysis.",
+    "Initial adapter fixture failed before query execution because the runner provided 185.0 to an integer timeout parser. Initial drift-rejection interpretation must be revalidated because this parser error was concurrent."
+  ],
+  "gate_fix_review": "Parse finite positive decimal seconds before emitting runtime snapshot; retain atomic report and reject/continue handshake. Add integer/decimal/fractional acceptance and invalid/nonfinite/nonpositive/unbounded rejection tests. Search loop, timer boundary, query/round settings and scoring unchanged.",
+  "validated": {
+    "measured_source_commit": "9cdc3c9fab1b8e7c88c3a694e957a0aa005dfc8e",
+    "library_tests": 8,
+    "timeout_parser_tests": 2,
+    "prior_cli_fixture_cases": 96,
+    "adapter_fixture_outputs": 48,
+    "deliberate_drift_rejected": true,
+    "measured_and_warmup_outputs": 1650,
+    "canonical_mismatches": 0,
+    "raw_samples_locally_reanalyzed": true,
+    "independent_primary_statistic_check": true
+  }
+}

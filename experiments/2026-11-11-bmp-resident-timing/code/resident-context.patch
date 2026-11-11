@@ -1,0 +1,99 @@
+--- a/src/search.rs
++++ b/src/search.rs
+@@ -18,7 +18,7 @@
+     queries: Vec<Vec<PostingListIterator>>, forward_index: &BlockForwardIndex,
+     k: usize, alpha: f32, terms_r: f32, verbose: bool,
+ ) -> Vec<TopKHeap<u64>> {
+-    search_with_ids(queries, forward_index, k, alpha, terms_r, verbose, None)
++    search_with_ids(queries, forward_index, k, alpha, terms_r, verbose, None, &[])
+ }
+ 
+ /// Project-contract CLI entry point. Native API entry points remain callable.
+@@ -27,21 +27,43 @@
+     document_names: &[String], k: usize, alpha: f32, terms_r: f32,
+ ) -> Vec<TopKHeap<u64>> {
+     assert!(alpha == 1.0 && terms_r == 1.0, "Canonical exact mode requires alpha=beta=1");
+-    let ids: Vec<u64> = document_names.iter().map(|s|
+-        s.parse::<u64>().expect("Canonical exact mode requires numeric passage IDs")).collect();
+-    assert_eq!(ids.iter().collect::<HashSet<_>>().len(), ids.len(), "Duplicate passage ID");
+-    search_with_ids(queries, forward_index, k, alpha, terms_r, true, Some(&ids))
++    let context = CanonicalContext::new(document_names);
++    canonical_prepared(queries, forward_index, k, &context, true)
++}
++
++/// Resident corpus metadata; identical eligibility and numeric tie policy.
++pub struct CanonicalContext {
++    ids: Vec<u64>,
++    zero_order: Vec<usize>,
++}
++
++impl CanonicalContext {
++    pub fn new(document_names: &[String]) -> Self {
++        let ids: Vec<u64> = document_names.iter().map(|s|
++            s.parse::<u64>().expect("Canonical exact mode requires numeric passage IDs")).collect();
++        assert_eq!(ids.iter().collect::<HashSet<_>>().len(), ids.len(), "Duplicate passage ID");
++        let mut zero_order: Vec<usize> = (0..ids.len()).collect();
++        zero_order.sort_unstable_by_key(|&d| ids[d]);
++        Self { ids, zero_order }
++    }
++}
++
++/// Exact alpha=beta=1 only; the caller owns resident corpus metadata.
++pub fn canonical_prepared(
++    queries: Vec<Vec<PostingListIterator>>, forward_index: &BlockForwardIndex,
++    k: usize, context: &CanonicalContext, verbose: bool,
++) -> Vec<TopKHeap<u64>> {
++    search_with_ids(queries, forward_index, k, 1.0, 1.0, verbose,
++                    Some(&context.ids), &context.zero_order)
+ }
+ 
+ fn search_with_ids(
+     mut queries: Vec<Vec<PostingListIterator>>, forward_index: &BlockForwardIndex,
+-    k: usize, alpha: f32, terms_r: f32, verbose: bool, numeric_ids: Option<&[u64]>,
++    k: usize, alpha: f32, terms_r: f32, verbose: bool, numeric_ids: Option<&[u64]>, zero_order: &[usize],
+ ) -> Vec<TopKHeap<u64>> {
+     let mut results = Vec::new();
+     let progress = if verbose { Some(progress_bar("Forward index-based search", queries.len())) } else { None };
+     let limit = numeric_ids.map_or(k, |ids| k.min(ids.len()));
+-    let mut zero_order: Vec<usize> = numeric_ids.map_or_else(Vec::new, |ids| (0..ids.len()).collect());
+-    if let Some(ids) = numeric_ids { zero_order.sort_unstable_by_key(|&d| ids[d]); }
+     let mut search_elapsed = 0;
+     for query in queries.iter_mut() {
+         query.sort_by(|a, b| b.term_weight().cmp(&a.term_weight()));
+@@ -83,7 +105,7 @@
+             if let Some(ids) = numeric_ids {
+                 if topk.len() < limit {
+                     let present: HashSet<_> = topk.clone().to_sorted_vec().iter().map(|e| e.doc_id.0 as usize).collect();
+-                    for &doc in &zero_order {
++                    for &doc in zero_order {
+                         if !present.contains(&doc) { topk.insert_with_tie(DocId(doc as u32), 0, ids[doc]); }
+                         if topk.len() == limit { break; }
+                     }
+@@ -98,3 +120,27 @@
+     if verbose && !results.is_empty() { eprintln!("search_elapsed = {}", search_elapsed / results.len() as u128); }
+     results
+ }
++
++#[cfg(test)]
++mod resident_context_tests {
++    use super::CanonicalContext;
++
++    #[test]
++    fn resident_zero_order_uses_numeric_ids() {
++        let context = CanonicalContext::new(&["10".into(), "2".into(), "1".into()]);
++        assert_eq!(context.ids, vec![10, 2, 1]);
++        assert_eq!(context.zero_order, vec![2, 1, 0]);
++    }
++
++    #[test]
++    fn resident_empty_context_is_valid() {
++        let context = CanonicalContext::new(&[]);
++        assert!(context.ids.is_empty() && context.zero_order.is_empty());
++    }
++
++    #[test]
++    #[should_panic(expected = "Duplicate passage ID")]
++    fn resident_duplicate_numeric_ids_rejected() {
++        CanonicalContext::new(&["1".into(), "01".into()]);
++    }
++}

@@ -1,0 +1,63 @@
+{
+  "parent_experiment": "2026-11-10-bmp-1m-validation",
+  "parent_measured_source_commit": "ee099d4d98835d88f19a12cef2328308e2ba5479",
+  "parent_result_commit": "1e4b1314691aae5c46e6eb211229d663d8c97a9c",
+  "native_revision": "67ad8c683fbc0c30145d1ee42c1dffbed8b12332",
+  "patch": "experiments/2026-11-10-bmp-correctness-fixes/code/bmp-canonical.patch",
+  "dependency_lock": "experiments/2026-11-10-bmp-native-alignment/configs/BMP-Cargo.lock",
+  "configuration": {
+    "documents": 1000000,
+    "queries": 25,
+    "query_membership": "first 25 lines of calibration-500.tsv in preserved order",
+    "block_size": 32,
+    "compressed_ranges": [
+      false,
+      true
+    ],
+    "k": 10,
+    "alpha": 1.0,
+    "beta": 1.0,
+    "rayon_threads": 1
+  },
+  "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+  "inputs": {
+    "index": "data/derived/hash-1000000.gsp",
+    "expected_index_sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37",
+    "queries": "data/derived/calibration-500.tsv",
+    "expected_queries_sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+    "split": "data/derived/calibration-500.tsv.split.tsv"
+  },
+  "declared_changes": {
+    "measurement": "Add matched resident-query timing to prior correctness-only protocol.",
+    "resident_context": "Hoist deterministic numeric-ID validation and zero-completion ordering from each search invocation into per-index setup; preserve search loop and scoring semantics.",
+    "instrumentation": "Add runtime-gated Rust benchmark adapter; no external search commands treated as instrumented without the adapter."
+  },
+  "analysis_plan": "Every warmup and measured top-10 must equal the saved 1M oracle before any latency interpretation; analyze all fixed paired rounds and retain raw samples.",
+  "failure_rule": "Any output mismatch, runtime drift, failed command, or missing/duplicate sample blocks timing interpretation. Preserve partial evidence and separately review corrections before retry.",
+  "reuse": "Reuse hash-validated parent index blobs and effective query/oracle files. Rebuild Rust library and binaries after the reviewed resident-context overlay; do not reuse prior search binary for new measurements.",
+  "execution": {
+    "command_timeout_seconds": 1800,
+    "heartbeat_seconds": 30,
+    "stopping_rule": "Complete exact input checks, CPU reference and both 25-query layouts; preserve any timeout/failure."
+  },
+  "measurement": {
+    "documents": 1000000,
+    "queries": 25,
+    "warmup_rounds": 3,
+    "measured_rounds": 30,
+    "order": "query order fixed; raw/compressed order alternates by (round+query_index)%2",
+    "cpu_affinity": "one allowed logical CPU, frozen after CIMS preflight",
+    "threads": 1,
+    "time_unit": "nanoseconds",
+    "boundary": "resident index: cursor creation from preloaded effective PISA text, query preparation, bounds, candidate scheduling, scoring, top-k and ordered TREC string construction",
+    "excluded": "index load, numeric-ID validation/zero-order setup, query file I/O, runtime gate, output file I/O, monitoring, correctness analysis",
+    "cache_policy": "both indexes resident; repeated calibration workload; no cache flushing",
+    "statistic": "geometric mean across query-wise ratios of compressed median / raw median; lower is faster",
+    "confidence": "95% percentile bootstrap across 25 query pairs, 10000 resamples, seed 20261111; exploratory calibration scope",
+    "stopping": "fixed rounds; preserve partial output on failure; no optional stopping",
+    "timeout_seconds": 1800,
+    "monitoring": "CPU affinity, /proc/stat and load/frequency snapshots outside each round; shared-host contention remains a limit"
+  },
+  "timing_overlay": "code/resident-context.patch",
+  "benchmark_source": "code/project_benchmark.rs"
+}

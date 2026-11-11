@@ -1,0 +1,113 @@
+{
+  "validation": {
+    "success": true,
+    "queries": 12,
+    "warmup_rounds": 0,
+    "measured_rounds": 2,
+    "samples": 48,
+    "expected_samples": 48,
+    "failures": []
+  },
+  "timing": {
+    "primary": "geometric mean of query-wise compressed/raw median ratios",
+    "compressed_over_raw": 1.0013991931576371,
+    "bootstrap_95_interval": [
+      0.9267043756120683,
+      1.0875496252117767
+    ],
+    "bootstrap_seed": 20261111,
+    "bootstrap_unit": "query pair; conditional on the 25 calibration queries and this execution",
+    "per_query": [
+      {
+        "query_id": "empty",
+        "raw_median_ms": 0.006448,
+        "compressed_median_ms": 0.005043,
+        "compressed_over_raw": 0.7821029776674938
+      },
+      {
+        "query_id": "unknown",
+        "raw_median_ms": 0.0115815,
+        "compressed_median_ms": 0.011337,
+        "compressed_over_raw": 0.97888874498122
+      },
+      {
+        "query_id": "tie",
+        "raw_median_ms": 0.007948,
+        "compressed_median_ms": 0.007912,
+        "compressed_over_raw": 0.9954705586311021
+      },
+      {
+        "query_id": "scale",
+        "raw_median_ms": 0.020646,
+        "compressed_median_ms": 0.020492,
+        "compressed_over_raw": 0.992540928024799
+      },
+      {
+        "query_id": "nibble",
+        "raw_median_ms": 0.011325,
+        "compressed_median_ms": 0.0117335,
+        "compressed_over_raw": 1.0360706401766004
+      },
+      {
+        "query_id": "single_live_block",
+        "raw_median_ms": 0.0049115,
+        "compressed_median_ms": 0.00535,
+        "compressed_over_raw": 1.0892802606128473
+      },
+      {
+        "query_id": "constant_score",
+        "raw_median_ms": 0.007034,
+        "compressed_median_ms": 0.007529,
+        "compressed_over_raw": 1.0703724765425078
+      },
+      {
+        "query_id": "random0",
+        "raw_median_ms": 0.024321,
+        "compressed_median_ms": 0.01963,
+        "compressed_over_raw": 0.8071214177048641
+      },
+      {
+        "query_id": "random1",
+        "raw_median_ms": 0.0207025,
+        "compressed_median_ms": 0.0290615,
+        "compressed_over_raw": 1.403767660910518
+      },
+      {
+        "query_id": "random2",
+        "raw_median_ms": 0.018047,
+        "compressed_median_ms": 0.0182915,
+        "compressed_over_raw": 1.0135479581093811
+      },
+      {
+        "query_id": "random3",
+        "raw_median_ms": 0.0203975,
+        "compressed_median_ms": 0.01951,
+        "compressed_over_raw": 0.9564897659026842
+      },
+      {
+        "query_id": "random4",
+        "raw_median_ms": 0.021383,
+        "compressed_median_ms": 0.021665,
+        "compressed_over_raw": 1.0131880465790581
+      }
+    ],
+    "layouts": {
+      "raw": {
+        "observations": 24,
+        "pooled_median_ms": 0.015043500000000001,
+        "pooled_p95_ms": 0.022529749999999998
+      },
+      "compressed": {
+        "observations": 24,
+        "pooled_median_ms": 0.0143015,
+        "pooled_p95_ms": 0.022347000000000002
+      }
+    }
+  },
+  "limitations": [
+    "25 repeated calibration queries on one shared CPU host; not held-out/general-population or service-tail inference.",
+    "Both indexes resident; repeated-cache workload; resident context and file I/O excluded.",
+    "Boundary includes cursor preparation through ordered TREC string construction; not GPU or load-inclusive latency.",
+    "Affinity and round-level CPU snapshots do not guarantee exclusive cores or fixed frequency."
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "status": "validation-and-failed-adapter-attempts",
+  "source_commit": "2e80ccdd6554881e8a8c1f6b57e5bf14954f7676",
+  "rust_library_tests": 8,
+  "cli_fixture_cases_passed": 96,
+  "fixture_checker_issue": "Initial analysis command lacked copied oracle.tsv. The exact parent oracle was supplied and only analysis was repeated; original failure is preserved privately.",
+  "adapter_issue": "Runner supplied decimal timeout 185.0 to an integer parser. Accepted fixture exited before query rows. Initial drift attempt also had this parser error and is not used as handshake validation.",
+  "adapter_failure_record": "RUN_FINISHED-b11e3d4c3189",
+  "concurrent_drift_record": "RUN_FINISHED-26a2fe3ae83a",
+  "other_orchestration_issue": "The first invocation after rebuilding stopped on an existing immutable input symlink. Guarded reuse now verifies the exact resolved target and frozen SHA-256; no query execution occurred in that stopped invocation.",
+  "correction": "Decimal parser and focused tests committed at 9cdc3c9fab1b8e7c88c3a694e957a0aa005dfc8e. Original attempts were retained; accepted/rejected gate checks and timing use a fresh result folder.",
+  "fixture_ciff": "Use the byte-identical parent fixture at results/2026-11-10-bmp-correctness-fixes/20261110-corrected-fixture-01/raw/fixture.ciff",
+  "performance_claim": false
+}
