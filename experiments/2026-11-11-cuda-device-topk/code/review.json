@@ -1,5 +1,5 @@
 {
-  "stage": "separate pre-execution source review",
+  "stage": "separate source review and completed post-execution evidence review",
   "reviewed": [
     "Loaded the parent CUDA registered config/review and preserved same uint8/cap32/u64 numeric-ID contract.",
     "Local top-k sufficiency proof; groups are disjoint, every global winner is a local winner.",
@@ -18,14 +18,24 @@
   "local_checks": [
     "Python independent fixture generator syntax passed."
   ],
-  "pending": [
-    "nvcc build and 140 kernel cases plus unsupported-depth rejection on CIMS.",
-    "35 instrumented independent fixture configurations, 175 query cases, compared against Python oracle.",
-    "Intentional selection-thread runtime drift rejection before query kernels.",
-    "100K/1M first-25 calibration full-score and raw top-k equality with historical CPU outputs."
-  ],
+  "pending": [],
   "limits": [
-    "No local Windows CUDA toolchain; no GPU result or performance improvement claimed yet.",
-    "Correctness first; later controlled timings, peak memory, same-layout control and held-out remain pending."
-  ]
+    "Real-data scope is the first 25 calibration queries at 100K and 1M, k10.",
+    "k=0..128 supported; k>128 rejected; no k1000 claim.",
+    "Scoring is still exhaustive forward layout; same-layout block-exhaustive control, pruning and GPUSparse remain pending.",
+    "Explicit allocation bytes exclude CUDA context/driver overhead and are not measured peak VRAM.",
+    "Correctness-only dense score copies occur outside the retrieval boundary; total validation-process transfer includes them."
+  ],
+  "validated": {
+    "kernel_cases_verified": 140,
+    "independent_fixture_configurations_verified": 35,
+    "independent_fixture_queries_verified": 175,
+    "real_queries_verified": 50,
+    "real_topk_entries": 500,
+    "dense_score_comparisons_reported": 27500000,
+    "historical_topk_byte_equality": true,
+    "runtime_gate_drift_rejected": true,
+    "qualification": "Transferred per-query outputs rechecked; dense-score comparison counts are reported by the source-bound CUDA executable. No full per-document score vectors are published."
+  },
+  "source_commit": "6306666ddc70f9a7de733aa8f423ba995dda60b5"
 }
