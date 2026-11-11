@@ -1,0 +1,41 @@
+{
+  "stage": "separate pre-execution review; CIMS compile/regression validation pending",
+  "parent_experiment": "2026-11-10-bmp-1m-validation",
+  "parent_result_commit": "1e4b1314691aae5c46e6eb211229d663d8c97a9c",
+  "reviewed": [
+    "Loaded parent full configuration and saved correctness review.",
+    "Diffed search loop: scoring, bounds, seed, candidate order, heap admission and zero eligibility are unchanged. Numeric ID/zero order construction moves to resident corpus context. Native entry points retain their arguments and defaults.",
+    "Gate follows actual index loads, document mapping/count/block/layout checks, query count and single-CPU affinity resolution, and precedes all warmup/measured queries.",
+    "Timed boundary spans fresh cursor creation through canonical TREC string construction. Query file reads, corpus context, monitoring and output writes are outside timing.",
+    "Fixed rounds and alternating order; all warmup/measured outputs retained and checked before statistics.",
+    "Bootstrap resamples query pairs, preserves within-query median pairing and labels calibration/shared-host limits.",
+    "Fresh output creation and per-round flush preserve partial evidence; no credential or environment dump."
+  ],
+  "findings_fixed": [
+    "Imported RangeMaxScoreCursor trait needed for range representation checks.",
+    "Tightened analysis to require frozen oracle query order, not merely unique query positions.",
+    "Replaced inherited binary-reuse statement with mandatory rebuild after the new overlay.",
+    "Allow safe fixture query IDs as well as numeric real-data query IDs."
+  ],
+  "local_checks": {
+    "python_syntax": "PASS",
+    "analysis_checks_passed": 7,
+    "analysis_checks": "Known 2x ratio/interval plus missing, duplicate, wrong-order, zero-time, query-order drift and wrong-score rejection.",
+    "overlay_apply": "PASS: git apply --check and exact reviewed-source bytes with core.autocrlf=false"
+  },
+  "pending": [
+    "Compile Rust with pinned Cargo.lock on CIMS.",
+    "Run eight expected Rust tests (five parent plus three context tests).",
+    "Rerun unchanged 96 CLI fixture cases and benchmark-specific fixture output checks.",
+    "Verify runtime-gate deliberate drift rejection before measured run.",
+    "Verify all 1M warmup/measured outputs and fixed sample membership before interpreting latency."
+  ],
+  "limits": [
+    "No Rust toolchain available in local Windows environment; source is not declared execution-validated.",
+    "CIMS login is currently disconnected.",
+    "No timing results exist yet."
+  ],
+  "validation_notes": [
+    "Initial local byte check differed only because global Windows Git autocrlf converted output to CRLF. Repeated under explicit LF policy; patch application and exact bytes passed. No algorithm change was needed."
+  ]
+}
