@@ -1,0 +1,31 @@
+{
+  "stage": "separate pre-execution source review",
+  "reviewed": [
+    "Loaded the parent CUDA registered config/review and preserved same uint8/cap32/u64 numeric-ID contract.",
+    "Local top-k sufficiency proof; groups are disjoint, every global winner is a local winner.",
+    "Validity flag keeps zero scores and UINT64_MAX IDs valid; invalid padding is distinct.",
+    "All threads reach each reduction barrier, including tail groups; final read/write barrier prevents next-round races.",
+    "Mark selected original internal doc once; recursive merging carries full original ID and score.",
+    "k=0/N=0 skip launches safely; k>N returns min(k,N); k<=128 ensures each multi-group recursion shrinks.",
+    "Scratch buffers cover largest first-stage output, avoid aliasing, and are included in allocation accounting.",
+    "No host ranking in retrieval path; CPU ranking and optional dense device-score copy happen only after query timing.",
+    "Runtime report contains resolved new algorithm settings before query kernels; legacy extension defaults preserve old reports.",
+    "Direct kernel selection suite also emits a runtime report with its frozen source/seed/sizes/depths/patterns before its first GPU kernel; runs through research.py."
+  ],
+  "findings_fixed": [
+    "A verify_scores=0 output initially implied full-score validation. It now reports not_checked explicitly."
+  ],
+  "local_checks": [
+    "Python independent fixture generator syntax passed."
+  ],
+  "pending": [
+    "nvcc build and 140 kernel cases plus unsupported-depth rejection on CIMS.",
+    "35 instrumented independent fixture configurations, 175 query cases, compared against Python oracle.",
+    "Intentional selection-thread runtime drift rejection before query kernels.",
+    "100K/1M first-25 calibration full-score and raw top-k equality with historical CPU outputs."
+  ],
+  "limits": [
+    "No local Windows CUDA toolchain; no GPU result or performance improvement claimed yet.",
+    "Correctness first; later controlled timings, peak memory, same-layout control and held-out remain pending."
+  ]
+}
