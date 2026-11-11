@@ -1,0 +1,497 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-11-bmp-resident-timing",
+  "run_id": "20261111-resident-02",
+  "status": "passed",
+  "source_commit": "9cdc3c9fab1b8e7c88c3a694e957a0aa005dfc8e",
+  "started_recorded_at_utc": "2026-11-11T05:27:52.172088+00:00",
+  "finished_recorded_at_utc": "2026-11-11T05:28:33.784540+00:00",
+  "build": {
+    "source_commit": "9cdc3c9fab1b8e7c88c3a694e957a0aa005dfc8e",
+    "native_revision": "67ad8c683fbc0c30145d1ee42c1dffbed8b12332",
+    "parent_patch_sha256": "bfedc4c9787287723642df4d6c4a4bbc1fe31be4691a55b9d941b02400b8dc5b",
+    "overlay_sha256": "ed6067e9f551c61a946b7ca58e6fcf9e02e6f89fcb722c9f63a71b2aed60ed3d",
+    "benchmark_source_sha256": "7eddaaa7519c38a887cf7b2680ff12d6c6842f6b5bc1ad5b3809bd46a23dc8c3",
+    "search_source_sha256": "6813b72b846f23cbd31fd9dcf176f2bef4067c573a94ca2824c064b943ba6b76",
+    "dependency_lock_sha256": "b91150c01efcae565c7144a49d7fdf1e3b0f52518bf33b93503b99c6de26f07e",
+    "binary_sha256": {
+      "search": "5e85fd329f25d6c25e56bb344de4f096c39b0176416c8d78f36dd3f80892d35a",
+      "ciff2bmp": "656f6e9bfa0335d96138b482136cccaa00d8103261a3f5d0b5fe5041072e983e",
+      "project_benchmark": "79bbe63676f0c4e425255968b9aef42981ea53c9dbe0d0d674a49f2fd773da1b"
+    },
+    "build_argv": [
+      "cargo",
+      "build",
+      "--release",
+      "--bins",
+      "--locked",
+      "-j",
+      "2"
+    ],
+    "parent_source_commit": "2e80ccdd6554881e8a8c1f6b57e5bf14954f7676"
+  },
+  "environment": "logs/environment.txt",
+  "runtime_configuration": {
+    "config": {
+      "mode": "bmp-resident-paired",
+      "docs": 1000000,
+      "query_count": 25,
+      "k": 10,
+      "raw_block_size": 32,
+      "compressed_block_size": 32,
+      "cpu": 0,
+      "warmups": 3,
+      "repeats": 30,
+      "rayon_threads": 1,
+      "raw_index": "build/real-b32-raw.bmp",
+      "compressed_index": "build/real-b32-compressed.bmp",
+      "queries_path": "results/2026-11-11-bmp-resident-timing/20261111-resident-02/raw/queries.pisa",
+      "alpha": 1.0,
+      "beta": 1.0,
+      "order": "alternating-round-plus-query",
+      "boundary": "resident-query-through-trec"
+    },
+    "behavior": {
+      "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+      "arithmetic": "uint64",
+      "document_impacts": "uint8-exact",
+      "query_policy": "BMP-f32-ceil-cap32",
+      "tie_order": "score_desc_original_numeric_id_asc",
+      "eligibility": "all_documents",
+      "resident_context": "numeric-ids-and-zero-order",
+      "bounds": "raw-and-compressed",
+      "selection": "sorted-wide-block-candidates"
+    }
+  },
+  "measurement": {
+    "documents": 1000000,
+    "queries": 25,
+    "warmup_rounds": 3,
+    "measured_rounds": 30,
+    "order": "query order fixed; raw/compressed order alternates by (round+query_index)%2",
+    "cpu_affinity": "one allowed logical CPU, frozen after CIMS preflight",
+    "threads": 1,
+    "time_unit": "nanoseconds",
+    "boundary": "resident index: cursor creation from preloaded effective PISA text, query preparation, bounds, candidate scheduling, scoring, top-k and ordered TREC string construction",
+    "excluded": "index load, numeric-ID validation/zero-order setup, query file I/O, runtime gate, output file I/O, monitoring, correctness analysis",
+    "cache_policy": "both indexes resident; repeated calibration workload; no cache flushing",
+    "statistic": "geometric mean across query-wise ratios of compressed median / raw median; lower is faster",
+    "confidence": "95% percentile bootstrap across 25 query pairs, 10000 resamples, seed 20261111; exploratory calibration scope",
+    "stopping": "fixed rounds; preserve partial output on failure; no optional stopping",
+    "timeout_seconds": 1800,
+    "monitoring": "CPU affinity, /proc/stat and load/frequency snapshots outside each round; shared-host contention remains a limit"
+  },
+  "inputs": [
+    {
+      "role": "input-0",
+      "path": "build/real-b32-raw.bmp",
+      "sha256": "2a47def0141e18903e05bb7934618102f5048a881fce0fa250b843b19e1f0ba8"
+    },
+    {
+      "role": "input-1",
+      "path": "build/real-b32-compressed.bmp",
+      "sha256": "14c33d7844b28f1ebecf7fd4fa3956710cb4e36aeb6ed7ac89285f28338c3838"
+    },
+    {
+      "role": "input-2",
+      "path": "results/2026-11-11-bmp-resident-timing/20261111-resident-02/raw/queries.pisa",
+      "sha256": "96825735d119df33620a0b0944d3457982e533bf53354804395d4b8f9bec0e7e"
+    },
+    {
+      "role": "input-3",
+      "path": "results/2026-11-11-bmp-resident-timing/20261111-resident-02/raw/oracle.tsv",
+      "sha256": "571d781415b781f7620ff542486803133d71f1dea4714dd300b273d6f935088d"
+    },
+    {
+      "role": "input-4",
+      "path": "data/derived/hash-1000000.gsp",
+      "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37"
+    },
+    {
+      "role": "input-5",
+      "path": "data/derived/calibration-500.tsv",
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"
+    },
+    {
+      "role": "input-6",
+      "path": "data/derived/calibration-500.tsv.split.tsv",
+      "sha256": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+    }
+  ],
+  "command": [
+    "build/BMP/target/release/project_benchmark",
+    "--raw-index",
+    "build/real-b32-raw.bmp",
+    "--compressed-index",
+    "build/real-b32-compressed.bmp",
+    "--queries",
+    "results/2026-11-11-bmp-resident-timing/20261111-resident-02/raw/queries.pisa",
+    "--samples",
+    "results/2026-11-11-bmp-resident-timing/20261111-resident-02/raw/paired-1m/samples.tsv",
+    "--results",
+    "results/2026-11-11-bmp-resident-timing/20261111-resident-02/raw/paired-1m/results.tsv",
+    "--monitoring",
+    "results/2026-11-11-bmp-resident-timing/20261111-resident-02/raw/paired-1m/monitoring.tsv",
+    "--expected-docs",
+    "1000000",
+    "--expected-queries",
+    "25",
+    "--cpu",
+    "0",
+    "--k",
+    "10",
+    "--block-size",
+    "32",
+    "--warmups",
+    "3",
+    "--repeats",
+    "30"
+  ],
+  "qualification": "Runtime-gated paired adapter for the corrected variant; build and direct CLI fixture commands are separately recorded uninstrumented observations.",
+  "validation": {
+    "success": true,
+    "queries": 25,
+    "warmup_rounds": 3,
+    "measured_rounds": 30,
+    "samples": 1650,
+    "expected_samples": 1650,
+    "failures": []
+  },
+  "timing": {
+    "primary": "geometric mean of query-wise compressed/raw median ratios",
+    "compressed_over_raw": 1.1211453758526606,
+    "bootstrap_95_interval": [
+      1.095660908265729,
+      1.1500710932744975
+    ],
+    "bootstrap_seed": 20261111,
+    "bootstrap_unit": "query pair; conditional on the 25 calibration queries and this execution",
+    "per_query": [
+      {
+        "query_id": "688644",
+        "raw_median_ms": 9.87317,
+        "compressed_median_ms": 10.3984255,
+        "compressed_over_raw": 1.0532002892687962
+      },
+      {
+        "query_id": "986793",
+        "raw_median_ms": 3.926123,
+        "compressed_median_ms": 4.148913,
+        "compressed_over_raw": 1.0567455477069874
+      },
+      {
+        "query_id": "1068715",
+        "raw_median_ms": 2.493324,
+        "compressed_median_ms": 2.9880375,
+        "compressed_over_raw": 1.1984152480784687
+      },
+      {
+        "query_id": "479284",
+        "raw_median_ms": 2.400253,
+        "compressed_median_ms": 2.768323,
+        "compressed_over_raw": 1.1533463347405462
+      },
+      {
+        "query_id": "8798",
+        "raw_median_ms": 5.380275,
+        "compressed_median_ms": 5.5535905,
+        "compressed_over_raw": 1.0322131303697302
+      },
+      {
+        "query_id": "590433",
+        "raw_median_ms": 1.1120765,
+        "compressed_median_ms": 1.304871,
+        "compressed_over_raw": 1.1733644223216657
+      },
+      {
+        "query_id": "70852",
+        "raw_median_ms": 8.405329,
+        "compressed_median_ms": 8.8762295,
+        "compressed_over_raw": 1.0560240414146786
+      },
+      {
+        "query_id": "1094693",
+        "raw_median_ms": 8.8384295,
+        "compressed_median_ms": 9.8044525,
+        "compressed_over_raw": 1.109298037620824
+      },
+      {
+        "query_id": "515335",
+        "raw_median_ms": 2.255478,
+        "compressed_median_ms": 3.095694,
+        "compressed_over_raw": 1.3725223655473473
+      },
+      {
+        "query_id": "305650",
+        "raw_median_ms": 7.0166565,
+        "compressed_median_ms": 7.3051435,
+        "compressed_over_raw": 1.0411145963893202
+      },
+      {
+        "query_id": "996623",
+        "raw_median_ms": 1.0192865,
+        "compressed_median_ms": 1.235033,
+        "compressed_over_raw": 1.2116642376799849
+      },
+      {
+        "query_id": "85018",
+        "raw_median_ms": 0.507447,
+        "compressed_median_ms": 0.59485,
+        "compressed_over_raw": 1.172240647791789
+      },
+      {
+        "query_id": "774087",
+        "raw_median_ms": 4.2663705,
+        "compressed_median_ms": 4.656584,
+        "compressed_over_raw": 1.0914626378557606
+      },
+      {
+        "query_id": "991383",
+        "raw_median_ms": 1.113764,
+        "compressed_median_ms": 1.2606175,
+        "compressed_over_raw": 1.131853336972644
+      },
+      {
+        "query_id": "522953",
+        "raw_median_ms": 2.205714,
+        "compressed_median_ms": 2.4410315,
+        "compressed_over_raw": 1.1066854088970737
+      },
+      {
+        "query_id": "455862",
+        "raw_median_ms": 1.1379825,
+        "compressed_median_ms": 1.258855,
+        "compressed_over_raw": 1.106216483996898
+      },
+      {
+        "query_id": "1023850",
+        "raw_median_ms": 3.93213,
+        "compressed_median_ms": 4.4721485,
+        "compressed_over_raw": 1.1373348541375794
+      },
+      {
+        "query_id": "830040",
+        "raw_median_ms": 0.6567435,
+        "compressed_median_ms": 0.7356575,
+        "compressed_over_raw": 1.120159544784227
+      },
+      {
+        "query_id": "259885",
+        "raw_median_ms": 1.419927,
+        "compressed_median_ms": 1.689604,
+        "compressed_over_raw": 1.1899231439362727
+      },
+      {
+        "query_id": "659182",
+        "raw_median_ms": 0.9807825,
+        "compressed_median_ms": 1.1263125,
+        "compressed_over_raw": 1.1483815218970568
+      },
+      {
+        "query_id": "989855",
+        "raw_median_ms": 3.593243,
+        "compressed_median_ms": 3.9231895,
+        "compressed_over_raw": 1.0918241543920075
+      },
+      {
+        "query_id": "978605",
+        "raw_median_ms": 2.671744,
+        "compressed_median_ms": 2.991446,
+        "compressed_over_raw": 1.1196604165668567
+      },
+      {
+        "query_id": "527568",
+        "raw_median_ms": 5.2878565,
+        "compressed_median_ms": 5.5496005,
+        "compressed_over_raw": 1.0494990739631456
+      },
+      {
+        "query_id": "880766",
+        "raw_median_ms": 6.7630115,
+        "compressed_median_ms": 7.03381,
+        "compressed_over_raw": 1.0400411118626665
+      },
+      {
+        "query_id": "583369",
+        "raw_median_ms": 2.076779,
+        "compressed_median_ms": 2.327236,
+        "compressed_over_raw": 1.1205987733889835
+      }
+    ],
+    "layouts": {
+      "raw": {
+        "observations": 750,
+        "pooled_median_ms": 2.4958489999999998,
+        "pooled_p95_ms": 8.931437299999999
+      },
+      "compressed": {
+        "observations": 750,
+        "pooled_median_ms": 3.0270254999999997,
+        "pooled_p95_ms": 9.84241655
+      }
+    }
+  },
+  "comparison_record": "COMPARISON-635d2c12f0a3",
+  "run_record": "RUN_FINISHED-95bcc7cecc28",
+  "comparison_method": "Within-run paired representation comparison using the same process/binary/CPU and alternating query/layout order. No fabricated independent second run.",
+  "prior_validation": {
+    "initial_source": "2e80ccdd6554881e8a8c1f6b57e5bf14954f7676",
+    "cli_fixture_cases": 96,
+    "qualification": "Retained after gate-only parser correction; no second 96-case execution claimed.",
+    "retested_library_tests": 8,
+    "adapter_timeout_tests": 2,
+    "adapter_fixture_outputs": 48,
+    "deliberate_drift": "Rejected for config.repeats before query rows."
+  },
+  "artifacts": [
+    {
+      "path": "analysis/adapter-fixture.json",
+      "sha256": "ea84da47efa7e479c6002a1d55b26c24ac437a3f96ddd238a4646d727ace515a",
+      "bytes": 3450
+    },
+    {
+      "path": "analysis/comparison.json",
+      "sha256": "6481967815bdce9a9e0a09fd726c6b899d9ae749b66baeeb97adaf6f6e86d1b8",
+      "bytes": 5706
+    },
+    {
+      "path": "analysis/fixture-parent.json",
+      "sha256": "a216afbf8f60b64917451e910bb5e3fe9a05f5b1a8c937a89ccc867886bb3e3f",
+      "bytes": 51253
+    },
+    {
+      "path": "commands.json",
+      "sha256": "d51f5284f07571a308ab1fcd30319335e8e8b4a73ce55087798e1d8d8c0f2393",
+      "bytes": 3256
+    },
+    {
+      "path": "logs/adapter-fixture-runtime.json",
+      "sha256": "d3f28294852af0169752eac62e21efb2c5bf40dd58cbc1be1f793242d004ba22",
+      "bytes": 830
+    },
+    {
+      "path": "logs/adapter-fixture-stderr.txt",
+      "sha256": "f4195678a60f6a0eb8b78649001cf9fdc2d2f721942234c1f7edb00d006ee016",
+      "bytes": 52
+    },
+    {
+      "path": "logs/adapter-fixture-stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/deliberate-drift-runtime.json",
+      "sha256": "dee5e0bb3dce539d5c60b571069aa6011221bcca7f439705fbfabe1fa9f783b6",
+      "bytes": 830
+    },
+    {
+      "path": "logs/deliberate-drift-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/deliberate-drift-stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/environment.txt",
+      "sha256": "fdd926c42be394e077141284e7e64b98baac4b8ad653a5a6b355c6896fee535d",
+      "bytes": 3706
+    },
+    {
+      "path": "logs/paired-1m-runtime.json",
+      "sha256": "a4accce533dc9d33deb65bd0bb243e374f3d4ad18e591dc7bc683e6811281c91",
+      "bytes": 811
+    },
+    {
+      "path": "logs/paired-1m-stderr.txt",
+      "sha256": "d560ac3b0169d3e4a9bd0b250ac082a40b2b7d61f905a40942ff03471cbe2ccb",
+      "bytes": 872
+    },
+    {
+      "path": "logs/paired-1m-stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "protocol.json",
+      "sha256": "da25cf68a6295395032c1d2862974a4165498ac6368e230bdb069d0910be4133",
+      "bytes": 4788
+    },
+    {
+      "path": "raw/adapter-fixture/monitoring.tsv",
+      "sha256": "564e33c26087b857095094060da7e319959699bf13c40942e78f0734b803362a",
+      "bytes": 465
+    },
+    {
+      "path": "raw/adapter-fixture/results.tsv",
+      "sha256": "59addbefbcdcd630f3602b2d38b94b0305b490fabcb01dbefaddd5f3550a5510",
+      "bytes": 18379
+    },
+    {
+      "path": "raw/adapter-fixture/samples.tsv",
+      "sha256": "a5bd5797959971f8a42c1f47e38852f358400f85668e81c3172c21a73ee2edeb",
+      "bytes": 1833
+    },
+    {
+      "path": "raw/deliberate-drift/monitoring.tsv",
+      "sha256": "1d69b47180bccec5d2b0d12956990d6f72447f8b4b504b7f51a3f1f84ef2c445",
+      "bytes": 59
+    },
+    {
+      "path": "raw/deliberate-drift/results.tsv",
+      "sha256": "02fcc1b1342673d3a6c9f553822035e967a010bec1203a32030b30fbd5c88475",
+      "bytes": 51
+    },
+    {
+      "path": "raw/deliberate-drift/samples.tsv",
+      "sha256": "269acfebb3aceebb229505322dab9c152d5a2fe33bee4cae5fd4ab7a4922be16",
+      "bytes": 57
+    },
+    {
+      "path": "raw/fixture-top10.tsv",
+      "sha256": "e933c6758a6c786bd9ec3e4daf9fd5986ef63727f84dab119b8818c5e6eeb0da",
+      "bytes": 2515
+    },
+    {
+      "path": "raw/oracle.tsv",
+      "sha256": "571d781415b781f7620ff542486803133d71f1dea4714dd300b273d6f935088d",
+      "bytes": 5749
+    },
+    {
+      "path": "raw/paired-1m/monitoring.tsv",
+      "sha256": "805d607afe82d651d86b13c1891c00fa8b9ceb5c9bc231b01bb85541379ecbd4",
+      "bytes": 6786
+    },
+    {
+      "path": "raw/paired-1m/results.tsv",
+      "sha256": "d0bf4e4acdfba10ccaadfea6430014ef78323609dae3dcd8439280a1c3b6db28",
+      "bytes": 689623
+    },
+    {
+      "path": "raw/paired-1m/samples.tsv",
+      "sha256": "4709ec885bee035e897edb46d946700892a7e299c3711af1898272729af0348e",
+      "bytes": 63448
+    },
+    {
+      "path": "raw/queries.pisa",
+      "sha256": "96825735d119df33620a0b0944d3457982e533bf53354804395d4b8f9bec0e7e",
+      "bytes": 49773
+    },
+    {
+      "path": "source-receipt.json",
+      "sha256": "1cb4edd716d9f49adf46af8057353d943870b76728e5a298cadd265be5b464e3",
+      "bytes": 1067
+    }
+  ],
+  "interpretation": "Compressed bounds took 12.11% longer on the primary query-wise paired statistic for this resident calibration workload.",
+  "limitations": [
+    "25 repeated calibration queries on one shared CPU host; not held-out/general-population or service-tail inference.",
+    "Both indexes resident; repeated-cache workload; resident context and file I/O excluded.",
+    "Boundary includes cursor preparation through ordered TREC string construction; not GPU or load-inclusive latency.",
+    "Affinity and round-level CPU snapshots do not guarantee exclusive cores or fixed frequency.",
+    "No held-out, GPU, unmodified-upstream BMP, peak-memory or cross-process repetition claim."
+  ],
+  "next_action": "Retain raw bounds as the provisional latency choice for this operating point; expand calibration and process-level repetitions before generalizing. GPU top-k and same-layout GPU control remain pending."
+}

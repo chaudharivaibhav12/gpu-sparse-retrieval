@@ -16,10 +16,14 @@ Read the [native experiment](../experiments/2026-11-10-bmp-native-alignment/READ
 
 ## Pending work
 
-1. Review the 1M validation PR (the correctness-fixes PR #3 is merged) and register matched performance measurement, including complete timing boundaries and repeat/interleaving rules.
+1. Review the resident timing PR (correctness PRs #3 and #4 are merged) and register matched performance measurement, including complete timing boundaries and repeat/interleaving rules.
 2. Implement GPU top-k and the same-layout block-exhaustive control, preserving canonical scores and IDs.
 3. Implement full-byte GPU seed/filter/scheduling and compare against its unpruned control.
 4. Test coarse-only and selective refinement using the same seed, scorer and merger, with actual DRAM traffic measurements.
 5. Expand calibration, freeze settings before held-out evaluation, account for peak memory, reproduce released GPUSparse and test a second device.
 
 Task owners remain subject to team agreement. The initial CUDA control still transfers dense scores for CPU top-k.
+
+## November 11: resident CPU BMP timing
+
+The [timing experiment](../experiments/2026-11-11-bmp-resident-timing/README.md) passed all 1,650 output checks. Raw and compressed layouts each produced 750 measured samples on the first 25 calibration queries at 1M, k10, b32. The primary compressed/raw query-wise ratio was 1.1211 (conditional bootstrap interval 1.0957–1.1501); compression took 12.11% longer. This applies to the corrected variant under the declared resident-query boundary on a shared CPU. Failed adapter attempts and corrections are retained. No GPU, held-out or peak-memory conclusion follows. Raw is the provisional latency choice for this point; expand calibration/process repeats and implement GPU top-k/control next.

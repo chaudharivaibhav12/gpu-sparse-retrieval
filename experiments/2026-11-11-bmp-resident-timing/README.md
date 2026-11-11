@@ -21,6 +21,22 @@ The primary statistic is the geometric mean across 25 query-wise compressed/raw 
 
 The overlay hoists deterministic numeric-ID validation and zero-completion ordering into a resident context; the search loop retains its scoring, pruning and tie semantics. Rebuild with the pinned dependency lock, run the parent and new context tests, rerun the unchanged 96 fixture cases, verify the benchmark on fixture outputs, and demonstrate runtime drift rejection before the measured run.
 
-## Current state
+## Completed result
 
-Prepared. Local Python syntax and seven analysis checks passed. Rust compilation, CIMS regression checks and measured execution are pending connection. No timing result or speed improvement is claimed. Freeze the actual allowed CPU and full resolved settings in the research runner before compute; preserve them in the run manifest.
+All 1,650 warmup/measured query outputs matched the canonical oracle: 25 queries, three warmup rounds, 30 measured rounds, two layouts. There were zero mismatches. Eight library tests, two timeout-parser tests, 48 adapter-fixture outputs and deliberate runtime drift rejection passed. The earlier unchanged 96 CLI cases passed before the gate-only parser fix; they were retained as prior evidence.
+
+| Layout | Measured samples | Pooled median (ms) | Pooled p95 (ms) |
+|---|---:|---:|---:|
+| Raw | 750 | 2.4958 | 8.9314 |
+| Compressed | 750 | 3.0270 | 9.8424 |
+
+The primary query-wise compressed/raw geometric ratio was **1.1211**, corresponding to **12.11% longer** for compressed bounds. Its conditional query-pair bootstrap 95% interval was 1.0957–1.1501. Pooled medians/p95 are descriptive; their ratio is not the primary statistic.
+
+- [Successful timing run and full manifest](runs/20261111-resident-02/README.md)
+- [Initial validation and failed adapter attempts](runs/20261111-resident-01/README.md)
+- [Per-query comparison](analysis/comparison.json)
+- [Final review](code/review.json)
+
+Measured source: `9cdc3c9fab1b8e7c88c3a694e957a0aa005dfc8e`. The initial timeout parser failure and missing-checker-input issue are preserved and corrected; no measured query was run before the corrected gate checks passed. A guarded input-link reuse correction also retained its stopped attempt. Legacy `search_elapsed` fields in CLI fixture logs are diagnostics and are not used for the latency result.
+
+This is a repeated resident calibration workload on one pinned logical CPU (CPU 0) of one shared host. It does not establish held-out/general service latency, GPU speedup or peak-memory reduction. Keep raw bounds as a provisional latency choice at this operating point; expand calibration/process-level repetitions before generalizing. GPU top-k and same-layout GPU control remain unfinished.

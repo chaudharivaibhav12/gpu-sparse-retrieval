@@ -1,5 +1,5 @@
 {
-  "stage": "Second separate pre-execution review: runtime gate timeout parsing correction",
+  "stage": "completed separate source reviews plus post-execution evidence review",
   "parent_experiment": "2026-11-10-bmp-1m-validation",
   "parent_result_commit": "1e4b1314691aae5c46e6eb211229d663d8c97a9c",
   "reviewed": [
@@ -23,13 +23,12 @@
     "analysis_checks": "Known 2x ratio/interval plus missing, duplicate, wrong-order, zero-time, query-order drift and wrong-score rejection.",
     "overlay_apply": "PASS: git apply --check and exact reviewed-source bytes with core.autocrlf=false"
   },
-  "pending": [
-    "Rebuild at corrected source commit; rerun eight library tests and two adapter timeout tests.",
-    "Repeat deliberate runtime drift rejection and accepted benchmark fixture, checking no parser error.",
-    "Validate all 1M outputs/sample membership before latency interpretation."
-  ],
+  "pending": [],
   "limits": [
-    "No latency result yet. Earlier failed adapter run is preserved; no measured-query outputs were produced."
+    "25 repeated calibration queries on one shared CPU host; not held-out/general-population or service-tail inference.",
+    "Both indexes resident; repeated-cache workload; resident context and file I/O excluded.",
+    "Boundary includes cursor preparation through ordered TREC string construction; not GPU or load-inclusive latency.",
+    "Affinity and round-level CPU snapshots do not guarantee exclusive cores or fixed frequency."
   ],
   "validation_notes": [
     "Initial local byte check differed only because global Windows Git autocrlf converted output to CRLF. Repeated under explicit LF policy; patch application and exact bytes passed. No algorithm change was needed."
@@ -43,5 +42,17 @@
     "Fixture checker initially lacked a copied CPU oracle; original stderr retained and exact parent copy enabled successful 96-case analysis.",
     "Initial adapter fixture failed before query execution because the runner provided 185.0 to an integer timeout parser. Initial drift-rejection interpretation must be revalidated because this parser error was concurrent."
   ],
-  "gate_fix_review": "Parse finite positive decimal seconds before emitting runtime snapshot; retain atomic report and reject/continue handshake. Add integer/decimal/fractional acceptance and invalid/nonfinite/nonpositive/unbounded rejection tests. Search loop, timer boundary, query/round settings and scoring unchanged."
+  "gate_fix_review": "Parse finite positive decimal seconds before emitting runtime snapshot; retain atomic report and reject/continue handshake. Add integer/decimal/fractional acceptance and invalid/nonfinite/nonpositive/unbounded rejection tests. Search loop, timer boundary, query/round settings and scoring unchanged.",
+  "validated": {
+    "measured_source_commit": "9cdc3c9fab1b8e7c88c3a694e957a0aa005dfc8e",
+    "library_tests": 8,
+    "timeout_parser_tests": 2,
+    "prior_cli_fixture_cases": 96,
+    "adapter_fixture_outputs": 48,
+    "deliberate_drift_rejected": true,
+    "measured_and_warmup_outputs": 1650,
+    "canonical_mismatches": 0,
+    "raw_samples_locally_reanalyzed": true,
+    "independent_primary_statistic_check": true
+  }
 }
