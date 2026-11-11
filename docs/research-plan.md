@@ -3,7 +3,7 @@
 Exact GPU pruning for learned sparse passage retrieval
 **Shared research plan for Vaibhav, Parva and Arnav Ã‚Â· Updated November 10, 2026**
 
-This is the main team document for understanding the research direction, completed experiments, and next work. Results below come from the saved CIMS logs and CSVs. Implementation status is explicit: our initial CUDA scorer works and canonical GPU top-k now passes its correctness checks; GPU pruning remains pending. The corrected CPU BMP comparison now passes its fixture and initial common-data correctness checks, and released GPUSparse reproduction remains pending.
+This is the main team document for understanding the research direction, completed experiments, and next work. Results below come from the saved CIMS logs and CSVs. Implementation status is explicit: our initial CUDA scorer works and canonical GPU top-k now passes its correctness checks; full-byte GPU pruning now passes correctness and initial paired calibration; selective bound refinement remains pending. The corrected CPU BMP comparison now passes its fixture and initial common-data correctness checks, and released GPUSparse reproduction remains pending.
 
 The [1M validation](../experiments/2026-11-10-bmp-1m-validation/README.md), branched from main after PR #3 merged, passed all 25 canonical top-10 lists for both raw and compressed bounds. Input/query round trips and historical CPU-reference byte equality passed. This establishes this calibration correctness scope; repeated timing and held-out evaluation remain pending.
 
@@ -12,6 +12,9 @@ The [November 11 resident BMP timing](../experiments/2026-11-11-bmp-resident-tim
 The [GPU top-k correctness experiment](../experiments/2026-11-11-cuda-device-topk/README.md) passed 140 selection cases, 175 independent fixture queries and all 50 real-data queries across 100K/1M. Canonical GPU winners match historical CPU bytes. This completes the forward-layout ranking control in the tested scope; CSR block-exhaustive correctness is now validated; pruning and controlled GPU performance remain pending.
 
 The [CSR block-exhaustive control](../experiments/2026-11-11-cuda-block-control/README.md) now passes B16/B32 correctness checks (350 fixture and 100 real-data queries). This provides the unpruned scoring/merging path for a future filtered counterpart; controlled timing and full-byte pruning remain pending.
+
+
+Full-byte GPU pruning now has an initial [calibration result](../experiments/2026-11-11-cuda-fullbound-pruning/README.md): all correctness checks passed, and paired query-wise latency ratios were 0.7626 at B16 and 0.8415 at B32 (23.74% and 15.85% lower latency). These are conditional 25-query, 1M-passage results; some queries regress, full-byte maxima add substantial metadata, and no held-out, external-baseline or peak-memory conclusion is established. Next: replicate/expand calibration, then compare full/coarse/refinement with a fixed seed/scorer/merger.
 
 ## The decision
 
