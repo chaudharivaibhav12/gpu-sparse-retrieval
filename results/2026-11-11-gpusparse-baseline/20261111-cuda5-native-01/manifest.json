@@ -1,0 +1,478 @@
+{
+  "experiment": "2026-11-11-gpusparse-baseline",
+  "run": "20261111-cuda5-native-01",
+  "source": {
+    "source_commit": "b953e0874523c2aec8a320377f8aaace6fe1d4d7",
+    "native_revision": "92bb87b36f10e78ab39c81e9db2412dbb7a3b650",
+    "native_hashes": {
+      "triton_kernel.py": "ef298aba741b6fe86a31021369b808549fa465c7011444cb98770808bcf79fd0",
+      "triton_kernel_chunked.py": "444457e5ba207a0cf231693fdf6a3223c716fac1b4a19f03d59c5ef3adcdb761",
+      "fused_topk.py": "e0ac84cc83a847267ce855aab7965326df8e68b6125d953e43a42b3eb7a24546"
+    },
+    "source_bundle_sha256": "eaa817fd6f3bb9e1171fc6a4e43861ee1045eb1b7d6db612445d3afa7e354979",
+    "code_hashes": {
+      "expected_config.py": "da0d28c50c1c347c712ace7a5bdc69878751b298524753d44b7a96f70a8c6b8a",
+      "gsp_input.py": "18a40a366eec676dfa0fd0cdba700d590445286278c5d1b63eff6ebc5c2baa54",
+      "native_baseline.py": "4b3e448cd558ea9091707e084deb49176032899c18078b111a006be30ed08790",
+      "runtime_gate.py": "6f151ff4f7266b2d8b05bc93dedc5570d13d535286141cad681b9b6919e4c450"
+    },
+    "environment": {
+      "python": "3.12.7 (main, Nov 19 2024, 12:50:44) [GCC 11.5.0 20240719 (Red Hat 11.5.0-2)]",
+      "gpu_name": "NVIDIA GeForce RTX 4070",
+      "compute_capability": "8.9",
+      "torch_version": "2.6.0+cu126",
+      "triton_version": "3.2.0",
+      "numpy_version": "2.2.6",
+      "scipy_version": "1.15.3",
+      "torch_cuda_version": "12.6"
+    },
+    "dependency_wheel_manifest_sha256": "50bc20dd4e27e3b1e90276931523386dff8439ca34d196517f73554ce793f01e",
+    "qualification": "Python/Torch/Triton native adapter; generated JIT binaries/IR recorded after each gated attempt, dependency wheels pinned in prepared environment."
+  },
+  "packaged_at_utc": "2026-11-12T03:47:36.613821+00:00",
+  "execution_status": "failed-correctness-gate",
+  "attempt_counts": {
+    "SPEC_VIOLATION": 1,
+    "EXECUTED": 10,
+    "FAILED": 1
+  },
+  "planned_attempts": 127,
+  "timing_processes_executed": 0,
+  "protocol": "experiments/2026-11-11-gpusparse-baseline/configs/protocol.json",
+  "normalization": "Log paths replace session root with $RUN_ROOT and prepared dependency root with $NATIVE_ENV; raw outputs unchanged. Private recording infrastructure/authentication files excluded.",
+  "omitted_payloads": "JIT binary/IR cache bytes preserved privately; original native JIT manifests and hashes included. Failed adapter emitted no JIT manifest.",
+  "files": {
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/attempts.json": {
+      "sha256": "9a638a3df37e9fab605ae5e7910d8a966fbafc2a52573daa08745d6001767da0",
+      "bytes": 44491
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/README.md": {
+      "sha256": "97b55cb2c38818b4f4c30621aed33837ea173f736a16d63c1ba9643e66e9a001",
+      "bytes": 271
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/analysis/local-audit.json": {
+      "sha256": "16336fcb06821ebe36caea5d45280f950c36d6c9b16966fbcc0f5896481e406d",
+      "bytes": 3621
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/environment.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/environment.stdout": {
+      "sha256": "8ac087e289474941fdc485e0ee2603d0a5bac73f01ee1fc606e61100d421f7a0",
+      "bytes": 302
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k1-chunked-runtime.json": {
+      "sha256": "554d8fa4145de3d8bda90ccaecfb6888adaa76e90ea2bc48506a2dc81b8bae5f",
+      "bytes": 3170
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k1-chunked-stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k1-chunked-stdout.txt": {
+      "sha256": "71a7771d2fa59bf032068f01a84c244735ee7ba3ff1b4fa61f747b3843fa86d4",
+      "bytes": 642
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k1-compacted-runtime.json": {
+      "sha256": "b8eabbbc14511efa9f184eae14779768dcbd27726894c1091aaf9512eabe551a",
+      "bytes": 3211
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k1-compacted-stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k1-compacted-stdout.txt": {
+      "sha256": "71a7771d2fa59bf032068f01a84c244735ee7ba3ff1b4fa61f747b3843fa86d4",
+      "bytes": 642
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k1-monolithic-runtime.json": {
+      "sha256": "4db29f69c8289522c750eca74dadc12d5fe73e187c57d4a8bd02ef9f8241c12a",
+      "bytes": 3172
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k1-monolithic-stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k1-monolithic-stdout.txt": {
+      "sha256": "8a20b73577fd791fcccef5af63ce052cc14abf78a6f1a276c33a61f3792859b4",
+      "bytes": 642
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k10-chunked-runtime.json": {
+      "sha256": "884766221710ef333822ee964d5483d6979df756777783d6c594d1f6ba8ef175",
+      "bytes": 3171
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k10-chunked-stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k10-chunked-stdout.txt": {
+      "sha256": "71a7771d2fa59bf032068f01a84c244735ee7ba3ff1b4fa61f747b3843fa86d4",
+      "bytes": 642
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k10-compacted-runtime.json": {
+      "sha256": "0ad930482f430073acf88ac7024408048d5c47e508343374c57b25ae42ecbf3a",
+      "bytes": 3212
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k10-compacted-stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k10-compacted-stdout.txt": {
+      "sha256": "71a7771d2fa59bf032068f01a84c244735ee7ba3ff1b4fa61f747b3843fa86d4",
+      "bytes": 642
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k10-monolithic-runtime.json": {
+      "sha256": "5528d4d5096cfdd5e7558ffc1ca816e4cb5a2454e5a3a8487a4d9bb5ae990504",
+      "bytes": 3173
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k10-monolithic-stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k10-monolithic-stdout.txt": {
+      "sha256": "8a20b73577fd791fcccef5af63ce052cc14abf78a6f1a276c33a61f3792859b4",
+      "bytes": 642
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k128-chunked-runtime.json": {
+      "sha256": "cdc5451b666fb4637ba2cdd6eefe07c710fd7d119ded901902519793e4289101",
+      "bytes": 3172
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k128-chunked-stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k128-chunked-stdout.txt": {
+      "sha256": "71a7771d2fa59bf032068f01a84c244735ee7ba3ff1b4fa61f747b3843fa86d4",
+      "bytes": 642
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k128-compacted-runtime.json": {
+      "sha256": "8d3ff011163943f1372e4d9f918fb4faa86be204f3fb7e2ea4f80ddf298658ef",
+      "bytes": 3213
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k128-compacted-stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k128-compacted-stdout.txt": {
+      "sha256": "71a7771d2fa59bf032068f01a84c244735ee7ba3ff1b4fa61f747b3843fa86d4",
+      "bytes": 642
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k128-monolithic-runtime.json": {
+      "sha256": "9007ce10b979a138095c0909a06a7340f4ce0c982fe0a68c68701d67f956027e",
+      "bytes": 3174
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k128-monolithic-stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-0-k128-monolithic-stdout.txt": {
+      "sha256": "8a20b73577fd791fcccef5af63ce052cc14abf78a6f1a276c33a61f3792859b4",
+      "bytes": 642
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-1-k1-chunked-runtime.json": {
+      "sha256": "8df5a6e47397091499ab5fbe36be219a11e180c6e27e0cbef5a1d2824fd9ac32",
+      "bytes": 3170
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-1-k1-chunked-stderr.txt": {
+      "sha256": "c8adface357f10d0d8b6e9ffc3eb0db3eca6f089d34bda39fb24209b5c7c13f0",
+      "bytes": 2295
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-1-k1-chunked-stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-1-k1-monolithic-runtime.json": {
+      "sha256": "4f7d00e4dde0d9e4d5b79cd44c56ba2fa37aaedf9dfc3acd54becb5ee6648833",
+      "bytes": 3172
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-1-k1-monolithic-stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/fixture-1-k1-monolithic-stdout.txt": {
+      "sha256": "4b27ba2f9ddc262a301e0333438e4d6fbc532c13f42351cbf16e4042483ffbe5",
+      "bytes": 642
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/wrong-block-pl-runtime.json": {
+      "sha256": "63763cae16cee5af51654025e182603ec084ae91aa561863a97bbedcd40cfc19",
+      "bytes": 3180
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/wrong-block-pl-stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/logs/wrong-block-pl-stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-chunked-jit.json": {
+      "sha256": "ea7aec7c8fef933d167814100e74a956e6b2f8e261d5cdffa94590fb789b1e70",
+      "bytes": 432
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-chunked-validation.json": {
+      "sha256": "50ae19021579ee6e7d4f730ebffde0097eeda413cde52d712071a265205ba22e",
+      "bytes": 662
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-chunked.csv": {
+      "sha256": "1a61b5a0b00ccc1779cdf11bc435fc64269b8c795e07768ebd8b680273b084e7",
+      "bytes": 573
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-chunked.tsv": {
+      "sha256": "c4798530e8c6856473213ff49a99d1700b5c8f23fd12d5acbea0d785200b2989",
+      "bytes": 74
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-compacted-jit.json": {
+      "sha256": "0065f496ca4c81880f797fa6aa5dbef460523e139a8a85f4e12bbb1260ec414e",
+      "bytes": 434
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-compacted-validation.json": {
+      "sha256": "50ae19021579ee6e7d4f730ebffde0097eeda413cde52d712071a265205ba22e",
+      "bytes": 662
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-compacted.csv": {
+      "sha256": "e31db4a657da9ca871f473a03de20272eba740b7951223a225ba7c7084459a77",
+      "bytes": 585
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-compacted.tsv": {
+      "sha256": "c4798530e8c6856473213ff49a99d1700b5c8f23fd12d5acbea0d785200b2989",
+      "bytes": 74
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-monolithic-jit.json": {
+      "sha256": "ea606ac3e4cea8e27e0e7529c6dfccebb16b56028f6a7bba7dfddfc306a01ca6",
+      "bytes": 5925
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-monolithic-validation.json": {
+      "sha256": "42dde4fe0d03f1f78cb0c8d51e5cc6ef1bf2c980c974624dfe8c750ffc4be56a",
+      "bytes": 662
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-monolithic.csv": {
+      "sha256": "9505762b107686a179bd9758377c517785b15fc821f5cf8469da688ded5924ee",
+      "bytes": 585
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-monolithic.tsv": {
+      "sha256": "c4798530e8c6856473213ff49a99d1700b5c8f23fd12d5acbea0d785200b2989",
+      "bytes": 74
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-chunked-jit.json": {
+      "sha256": "53ea6b6a8a702fce1a65b045a4b0ac45cf83c26b6c8f535541b69b5f2d84072a",
+      "bytes": 433
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-chunked-validation.json": {
+      "sha256": "50ae19021579ee6e7d4f730ebffde0097eeda413cde52d712071a265205ba22e",
+      "bytes": 662
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-chunked.csv": {
+      "sha256": "dd0329d89ae98b934f3daa02ff0bdb3b81f025d8814dbe9899b2e2542ba67176",
+      "bytes": 579
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-chunked.tsv": {
+      "sha256": "c4798530e8c6856473213ff49a99d1700b5c8f23fd12d5acbea0d785200b2989",
+      "bytes": 74
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-compacted-jit.json": {
+      "sha256": "36f5b33def5fdc9883227fccd88de8e3cdf50cac92725dfdb0415c31d1415db5",
+      "bytes": 435
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-compacted-validation.json": {
+      "sha256": "50ae19021579ee6e7d4f730ebffde0097eeda413cde52d712071a265205ba22e",
+      "bytes": 662
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-compacted.csv": {
+      "sha256": "ab317833c7e5844d76d1fe8934cbb461f39d78c370678e91f90d71fbf5840e83",
+      "bytes": 585
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-compacted.tsv": {
+      "sha256": "c4798530e8c6856473213ff49a99d1700b5c8f23fd12d5acbea0d785200b2989",
+      "bytes": 74
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-monolithic-jit.json": {
+      "sha256": "4b1a261dfb96ae01ca923535fc7e85b501bc6a602c207a0e8c6ba3f2dc78d846",
+      "bytes": 5944
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-monolithic-validation.json": {
+      "sha256": "42dde4fe0d03f1f78cb0c8d51e5cc6ef1bf2c980c974624dfe8c750ffc4be56a",
+      "bytes": 662
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-monolithic.csv": {
+      "sha256": "8efc009208a676423579621ed7f021d3eef85fbda7e79b8d38085437de8dec30",
+      "bytes": 592
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-monolithic.tsv": {
+      "sha256": "c4798530e8c6856473213ff49a99d1700b5c8f23fd12d5acbea0d785200b2989",
+      "bytes": 74
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-chunked-jit.json": {
+      "sha256": "1828968af78b640ad2e5029d08632d078e59436d666ff2184c0e29886381159d",
+      "bytes": 434
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-chunked-validation.json": {
+      "sha256": "50ae19021579ee6e7d4f730ebffde0097eeda413cde52d712071a265205ba22e",
+      "bytes": 662
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-chunked.csv": {
+      "sha256": "5961a43f3e84bf677ee965ae0d723a7a9dc354c3407a7fa71cc251eac6dca7d6",
+      "bytes": 584
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-chunked.tsv": {
+      "sha256": "c4798530e8c6856473213ff49a99d1700b5c8f23fd12d5acbea0d785200b2989",
+      "bytes": 74
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-compacted-jit.json": {
+      "sha256": "abb6c1ec9e8c1cd191a8ea08e2c7f3eef521db630966fd201c838aa81f3df097",
+      "bytes": 436
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-compacted-validation.json": {
+      "sha256": "50ae19021579ee6e7d4f730ebffde0097eeda413cde52d712071a265205ba22e",
+      "bytes": 662
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-compacted.csv": {
+      "sha256": "7a8ab6a35b608f02a213b3fc9dd3850edc859dfd7c37926982875e661a71f046",
+      "bytes": 593
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-compacted.tsv": {
+      "sha256": "c4798530e8c6856473213ff49a99d1700b5c8f23fd12d5acbea0d785200b2989",
+      "bytes": 74
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-monolithic-jit.json": {
+      "sha256": "4526be209815f610896d5541f4ed8e2aadde595614d188f2dc5ad81d357796b2",
+      "bytes": 5963
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-monolithic-validation.json": {
+      "sha256": "42dde4fe0d03f1f78cb0c8d51e5cc6ef1bf2c980c974624dfe8c750ffc4be56a",
+      "bytes": 662
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-monolithic.csv": {
+      "sha256": "49a095ca693e33b6542bbac296f41b80947506f2134428f80a0c2bfcfa1b970c",
+      "bytes": 594
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-monolithic.tsv": {
+      "sha256": "c4798530e8c6856473213ff49a99d1700b5c8f23fd12d5acbea0d785200b2989",
+      "bytes": 74
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-chunked.csv": {
+      "sha256": "de22b2b3e708243bc09c2fc9fe4c361d06c39eb1d11c7e0a4da68f9fdfbddb56",
+      "bytes": 208
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-chunked.tsv": {
+      "sha256": "c4798530e8c6856473213ff49a99d1700b5c8f23fd12d5acbea0d785200b2989",
+      "bytes": 74
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-monolithic-jit.json": {
+      "sha256": "7b35e7d5b5287b322022c78c8db66ebb227df8e3c7d0d6bb60f34f2e93f6af53",
+      "bytes": 5925
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-monolithic-validation.json": {
+      "sha256": "7bc19bcef7a28f6cb789ed1bdfedae890ab4abc860a05e0c0c7daa34a3360315",
+      "bytes": 662
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-monolithic.csv": {
+      "sha256": "0dcdb8b42774906c52013deb0a19d6af5cb14536a07f8774b7bad70ac43fd21d",
+      "bytes": 589
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-monolithic.tsv": {
+      "sha256": "2a7de9a2903075436e67f9489052e1fa243995d61c8c0c92c15f46eb64e13748",
+      "bytes": 278
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json": {
+      "sha256": "33b22c281f4616545985dfb47d24ada66d57b47090d381e6346d984a72aa73fc",
+      "bytes": 77
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-1.json": {
+      "sha256": "acd3d40722cfd37551b9a90d190a8ab09908b6f30ad939839183f3b81b22ca9f",
+      "bytes": 252
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-1025.json": {
+      "sha256": "46dd08ec00fb463df13e2486d2c7ac65975c437cccbcc42411b9b4966025587d",
+      "bytes": 174916
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-17.json": {
+      "sha256": "9f4fb62bddf5ad260624d125b80c90481cc0637bdfe563c01fc51a20294da370",
+      "bytes": 2988
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-255.json": {
+      "sha256": "7d32442b05ee04c646d4f38387bca3a86adaceb03a1dd9ded5d520cee849e393",
+      "bytes": 43525
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-256.json": {
+      "sha256": "38425e8c42b02df291c3dd0c8e4ed691ca88eb0cbb4cdd63cfa03fd3e24041ac",
+      "bytes": 43781
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-257.json": {
+      "sha256": "a66f8d6361d6b35b731f3a3db9fae461f730604a28ef5d36a08711dc59f27b61",
+      "bytes": 43936
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-8193.json": {
+      "sha256": "d39870d6471fb6e54339f40c3787c6db8a432d18d18ad34448150dfa49cbbb39",
+      "bytes": 1397684
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-interval-seed15-1025.json": {
+      "sha256": "06c13b11a51edaddf14f7f04273f3c4c1ea5278105dd4ac66f4cd31458e86ab6",
+      "bytes": 174210
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-interval-seed16-1025.json": {
+      "sha256": "7c33cf9925d38db1315e3af625721f3044ede38b16b44337c298533fa961b12c",
+      "bytes": 174210
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-prunable-1025.json": {
+      "sha256": "2909053f0de324ef3cd5b69148f489cd9b108ed6fa777762b29dfab889b8ce54",
+      "bytes": 171349
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp": {
+      "sha256": "fbc25aa8acb75f7e7373505ba07d40a6d3c4bb301a18d58cdb33bb1300ec02de",
+      "bytes": 253
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-1.gsp": {
+      "sha256": "c401a169e9a36edc7f726624bc270eb888382933b67d55968917b37beb9f1558",
+      "bytes": 269
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-1025.gsp": {
+      "sha256": "26026e34501ee2ebba4b35fa14b69f18c66a6edd54a9d57224c9e1c3f7507b8a",
+      "bytes": 55523
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-17.gsp": {
+      "sha256": "d8d24d6ee3c401d35d3e69343f3604f44dfb7a2d10679939eaf1f3d519b40c9a",
+      "bytes": 1350
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-255.gsp": {
+      "sha256": "68ff6bb6d54ab16ff4a4899f54bd3818dbf19c7889d69b937acbb7ac7609dc7e",
+      "bytes": 14003
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-256.gsp": {
+      "sha256": "f345be441d51e4c75e77377665b9a49197bbd9c20561e267812c85a052b7800f",
+      "bytes": 14164
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-257.gsp": {
+      "sha256": "0491445c7b6aefa11dfe390ccf3fcd7e236f477b10f45b794bb8a7687b22618d",
+      "bytes": 14685
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-8193.gsp": {
+      "sha256": "3e83c33b2277465a93ac6236e2532cbcd5cff8b72940f80142016d4323a6c6c1",
+      "bytes": 440256
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-interval-seed15-1025.gsp": {
+      "sha256": "572b806998c481e9985bb6f70042558de3250db0fb119b49358b7d4de9df7122",
+      "bytes": 21458
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-interval-seed16-1025.gsp": {
+      "sha256": "48a178a35229b5b8e6e1a0bff6527c26f796b51dc58dfaf1f8e2f8c906cb129d",
+      "bytes": 21458
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-prunable-1025.gsp": {
+      "sha256": "807d39cb7f15cc998836d421e21860d45760438abb8aa801f43867cee7ed444a",
+      "bytes": 21778
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/manifest.json": {
+      "sha256": "75f8fb7cb4faeb223df64e0167432d11026068a46c6aa50e8c964644ae5088c5",
+      "bytes": 1183
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/precision-manifest.json": {
+      "sha256": "854fa43e9ebc03ea736eddda5cd667110c5760aec8a8a57ca9ffa0edb8494169",
+      "bytes": 1449
+    },
+    "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv": {
+      "sha256": "bcda8b7e914f26c7928913b09f7a2468523868daccf58ecd31b1ffbb1904ab65",
+      "bytes": 242
+    }
+  }
+}

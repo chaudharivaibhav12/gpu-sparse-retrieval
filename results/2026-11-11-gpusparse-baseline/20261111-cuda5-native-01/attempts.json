@@ -1,0 +1,1111 @@
+[
+  {
+    "tag": "wrong-block-pl",
+    "run": "RUN_FINISHED-ad905a929da8",
+    "experiment": "EXPERIMENT-5ac402674994",
+    "status": "SPEC_VIOLATION",
+    "exit_code": -15,
+    "runtime_delta": {
+      "config.block_pl": {
+        "left": 64,
+        "right": 128
+      }
+    },
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-17.gsp",
+        "sha256": "d8d24d6ee3c401d35d3e69343f3604f44dfb7a2d10679939eaf1f3d519b40c9a",
+        "bytes": 1350
+      },
+      {
+        "role": "input-1",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+        "sha256": "bcda8b7e914f26c7928913b09f7a2468523868daccf58ecd31b1ffbb1904ab65",
+        "bytes": 242
+      },
+      {
+        "role": "input-2",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-17.json",
+        "sha256": "9f4fb62bddf5ad260624d125b80c90481cc0637bdfe563c01fc51a20294da370",
+        "bytes": 2988
+      }
+    ],
+    "command": [
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/venv/bin/python",
+      "experiments/2026-11-11-gpusparse-baseline/code/native_baseline.py",
+      "--variant",
+      "monolithic",
+      "--index",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-17.gsp",
+      "--queries",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+      "--reference",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-17.json",
+      "--native-repo",
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/source",
+      "--csv",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/wrong-block-pl.csv",
+      "--top",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/wrong-block-pl.tsv",
+      "--validation",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/wrong-block-pl-validation.json",
+      "--jit-manifest",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/wrong-block-pl-jit.json",
+      "--limit",
+      "5",
+      "--k",
+      "10",
+      "--gpu",
+      "0",
+      "--block-pl",
+      "128",
+      "--doc-chunk",
+      "128",
+      "--max-cand",
+      "32",
+      "--repeats",
+      "1",
+      "--warmups",
+      "0",
+      "--verify",
+      "1"
+    ],
+    "environment": {
+      "host": "cuda5.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.12.7 (main, Nov 19 2024, 12:50:44) [GCC 11.5.0 20240719 (Red Hat 11.5.0-2)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "1"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 4070, GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7, 595.104.02, 12282 MiB, 210 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "fixture-0-k1-monolithic",
+    "run": "RUN_FINISHED-8e7b45ecb703",
+    "experiment": "EXPERIMENT-afad609d415f",
+    "status": "EXECUTED",
+    "exit_code": 0,
+    "runtime_delta": {},
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+        "sha256": "fbc25aa8acb75f7e7373505ba07d40a6d3c4bb301a18d58cdb33bb1300ec02de",
+        "bytes": 253
+      },
+      {
+        "role": "input-1",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+        "sha256": "bcda8b7e914f26c7928913b09f7a2468523868daccf58ecd31b1ffbb1904ab65",
+        "bytes": 242
+      },
+      {
+        "role": "input-2",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+        "sha256": "33b22c281f4616545985dfb47d24ada66d57b47090d381e6346d984a72aa73fc",
+        "bytes": 77
+      }
+    ],
+    "command": [
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/venv/bin/python",
+      "experiments/2026-11-11-gpusparse-baseline/code/native_baseline.py",
+      "--variant",
+      "monolithic",
+      "--index",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+      "--queries",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+      "--reference",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+      "--native-repo",
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/source",
+      "--csv",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-monolithic.csv",
+      "--top",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-monolithic.tsv",
+      "--validation",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-monolithic-validation.json",
+      "--jit-manifest",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-monolithic-jit.json",
+      "--limit",
+      "5",
+      "--k",
+      "1",
+      "--gpu",
+      "0",
+      "--block-pl",
+      "128",
+      "--doc-chunk",
+      "128",
+      "--max-cand",
+      "32",
+      "--repeats",
+      "1",
+      "--warmups",
+      "0",
+      "--verify",
+      "1"
+    ],
+    "environment": {
+      "host": "cuda5.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.12.7 (main, Nov 19 2024, 12:50:44) [GCC 11.5.0 20240719 (Red Hat 11.5.0-2)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "1"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 4070, GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7, 595.104.02, 12282 MiB, 210 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "fixture-0-k1-chunked",
+    "run": "RUN_FINISHED-4971d639d393",
+    "experiment": "EXPERIMENT-5990e15117eb",
+    "status": "EXECUTED",
+    "exit_code": 0,
+    "runtime_delta": {},
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+        "sha256": "fbc25aa8acb75f7e7373505ba07d40a6d3c4bb301a18d58cdb33bb1300ec02de",
+        "bytes": 253
+      },
+      {
+        "role": "input-1",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+        "sha256": "bcda8b7e914f26c7928913b09f7a2468523868daccf58ecd31b1ffbb1904ab65",
+        "bytes": 242
+      },
+      {
+        "role": "input-2",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+        "sha256": "33b22c281f4616545985dfb47d24ada66d57b47090d381e6346d984a72aa73fc",
+        "bytes": 77
+      }
+    ],
+    "command": [
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/venv/bin/python",
+      "experiments/2026-11-11-gpusparse-baseline/code/native_baseline.py",
+      "--variant",
+      "chunked",
+      "--index",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+      "--queries",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+      "--reference",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+      "--native-repo",
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/source",
+      "--csv",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-chunked.csv",
+      "--top",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-chunked.tsv",
+      "--validation",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-chunked-validation.json",
+      "--jit-manifest",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-chunked-jit.json",
+      "--limit",
+      "5",
+      "--k",
+      "1",
+      "--gpu",
+      "0",
+      "--block-pl",
+      "128",
+      "--doc-chunk",
+      "128",
+      "--max-cand",
+      "32",
+      "--repeats",
+      "1",
+      "--warmups",
+      "0",
+      "--verify",
+      "1"
+    ],
+    "environment": {
+      "host": "cuda5.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.12.7 (main, Nov 19 2024, 12:50:44) [GCC 11.5.0 20240719 (Red Hat 11.5.0-2)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "1"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 4070, GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7, 595.104.02, 12282 MiB, 210 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "fixture-0-k1-compacted",
+    "run": "RUN_FINISHED-1f17b3e6950c",
+    "experiment": "EXPERIMENT-410defa29933",
+    "status": "EXECUTED",
+    "exit_code": 0,
+    "runtime_delta": {},
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+        "sha256": "fbc25aa8acb75f7e7373505ba07d40a6d3c4bb301a18d58cdb33bb1300ec02de",
+        "bytes": 253
+      },
+      {
+        "role": "input-1",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+        "sha256": "bcda8b7e914f26c7928913b09f7a2468523868daccf58ecd31b1ffbb1904ab65",
+        "bytes": 242
+      },
+      {
+        "role": "input-2",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+        "sha256": "33b22c281f4616545985dfb47d24ada66d57b47090d381e6346d984a72aa73fc",
+        "bytes": 77
+      }
+    ],
+    "command": [
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/venv/bin/python",
+      "experiments/2026-11-11-gpusparse-baseline/code/native_baseline.py",
+      "--variant",
+      "compacted",
+      "--index",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+      "--queries",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+      "--reference",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+      "--native-repo",
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/source",
+      "--csv",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-compacted.csv",
+      "--top",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-compacted.tsv",
+      "--validation",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-compacted-validation.json",
+      "--jit-manifest",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k1-compacted-jit.json",
+      "--limit",
+      "5",
+      "--k",
+      "1",
+      "--gpu",
+      "0",
+      "--block-pl",
+      "128",
+      "--doc-chunk",
+      "128",
+      "--max-cand",
+      "32",
+      "--repeats",
+      "1",
+      "--warmups",
+      "0",
+      "--verify",
+      "1"
+    ],
+    "environment": {
+      "host": "cuda5.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.12.7 (main, Nov 19 2024, 12:50:44) [GCC 11.5.0 20240719 (Red Hat 11.5.0-2)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "1"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 4070, GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7, 595.104.02, 12282 MiB, 210 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "fixture-0-k10-monolithic",
+    "run": "RUN_FINISHED-398411385129",
+    "experiment": "EXPERIMENT-21da71c77a83",
+    "status": "EXECUTED",
+    "exit_code": 0,
+    "runtime_delta": {},
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+        "sha256": "fbc25aa8acb75f7e7373505ba07d40a6d3c4bb301a18d58cdb33bb1300ec02de",
+        "bytes": 253
+      },
+      {
+        "role": "input-1",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+        "sha256": "bcda8b7e914f26c7928913b09f7a2468523868daccf58ecd31b1ffbb1904ab65",
+        "bytes": 242
+      },
+      {
+        "role": "input-2",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+        "sha256": "33b22c281f4616545985dfb47d24ada66d57b47090d381e6346d984a72aa73fc",
+        "bytes": 77
+      }
+    ],
+    "command": [
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/venv/bin/python",
+      "experiments/2026-11-11-gpusparse-baseline/code/native_baseline.py",
+      "--variant",
+      "monolithic",
+      "--index",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+      "--queries",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+      "--reference",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+      "--native-repo",
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/source",
+      "--csv",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-monolithic.csv",
+      "--top",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-monolithic.tsv",
+      "--validation",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-monolithic-validation.json",
+      "--jit-manifest",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-monolithic-jit.json",
+      "--limit",
+      "5",
+      "--k",
+      "10",
+      "--gpu",
+      "0",
+      "--block-pl",
+      "128",
+      "--doc-chunk",
+      "128",
+      "--max-cand",
+      "32",
+      "--repeats",
+      "1",
+      "--warmups",
+      "0",
+      "--verify",
+      "1"
+    ],
+    "environment": {
+      "host": "cuda5.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.12.7 (main, Nov 19 2024, 12:50:44) [GCC 11.5.0 20240719 (Red Hat 11.5.0-2)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "1"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 4070, GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7, 595.104.02, 12282 MiB, 210 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "fixture-0-k10-chunked",
+    "run": "RUN_FINISHED-7dab362aa72d",
+    "experiment": "EXPERIMENT-6f947243034b",
+    "status": "EXECUTED",
+    "exit_code": 0,
+    "runtime_delta": {},
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+        "sha256": "fbc25aa8acb75f7e7373505ba07d40a6d3c4bb301a18d58cdb33bb1300ec02de",
+        "bytes": 253
+      },
+      {
+        "role": "input-1",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+        "sha256": "bcda8b7e914f26c7928913b09f7a2468523868daccf58ecd31b1ffbb1904ab65",
+        "bytes": 242
+      },
+      {
+        "role": "input-2",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+        "sha256": "33b22c281f4616545985dfb47d24ada66d57b47090d381e6346d984a72aa73fc",
+        "bytes": 77
+      }
+    ],
+    "command": [
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/venv/bin/python",
+      "experiments/2026-11-11-gpusparse-baseline/code/native_baseline.py",
+      "--variant",
+      "chunked",
+      "--index",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+      "--queries",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+      "--reference",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+      "--native-repo",
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/source",
+      "--csv",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-chunked.csv",
+      "--top",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-chunked.tsv",
+      "--validation",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-chunked-validation.json",
+      "--jit-manifest",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-chunked-jit.json",
+      "--limit",
+      "5",
+      "--k",
+      "10",
+      "--gpu",
+      "0",
+      "--block-pl",
+      "128",
+      "--doc-chunk",
+      "128",
+      "--max-cand",
+      "32",
+      "--repeats",
+      "1",
+      "--warmups",
+      "0",
+      "--verify",
+      "1"
+    ],
+    "environment": {
+      "host": "cuda5.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.12.7 (main, Nov 19 2024, 12:50:44) [GCC 11.5.0 20240719 (Red Hat 11.5.0-2)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "1"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 4070, GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7, 595.104.02, 12282 MiB, 210 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "fixture-0-k10-compacted",
+    "run": "RUN_FINISHED-3cde086689ab",
+    "experiment": "EXPERIMENT-30f73ac5083c",
+    "status": "EXECUTED",
+    "exit_code": 0,
+    "runtime_delta": {},
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+        "sha256": "fbc25aa8acb75f7e7373505ba07d40a6d3c4bb301a18d58cdb33bb1300ec02de",
+        "bytes": 253
+      },
+      {
+        "role": "input-1",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+        "sha256": "bcda8b7e914f26c7928913b09f7a2468523868daccf58ecd31b1ffbb1904ab65",
+        "bytes": 242
+      },
+      {
+        "role": "input-2",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+        "sha256": "33b22c281f4616545985dfb47d24ada66d57b47090d381e6346d984a72aa73fc",
+        "bytes": 77
+      }
+    ],
+    "command": [
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/venv/bin/python",
+      "experiments/2026-11-11-gpusparse-baseline/code/native_baseline.py",
+      "--variant",
+      "compacted",
+      "--index",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+      "--queries",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+      "--reference",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+      "--native-repo",
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/source",
+      "--csv",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-compacted.csv",
+      "--top",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-compacted.tsv",
+      "--validation",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-compacted-validation.json",
+      "--jit-manifest",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k10-compacted-jit.json",
+      "--limit",
+      "5",
+      "--k",
+      "10",
+      "--gpu",
+      "0",
+      "--block-pl",
+      "128",
+      "--doc-chunk",
+      "128",
+      "--max-cand",
+      "32",
+      "--repeats",
+      "1",
+      "--warmups",
+      "0",
+      "--verify",
+      "1"
+    ],
+    "environment": {
+      "host": "cuda5.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.12.7 (main, Nov 19 2024, 12:50:44) [GCC 11.5.0 20240719 (Red Hat 11.5.0-2)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "1"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 4070, GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7, 595.104.02, 12282 MiB, 210 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "fixture-0-k128-monolithic",
+    "run": "RUN_FINISHED-881515450b3e",
+    "experiment": "EXPERIMENT-4558b219648b",
+    "status": "EXECUTED",
+    "exit_code": 0,
+    "runtime_delta": {},
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+        "sha256": "fbc25aa8acb75f7e7373505ba07d40a6d3c4bb301a18d58cdb33bb1300ec02de",
+        "bytes": 253
+      },
+      {
+        "role": "input-1",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+        "sha256": "bcda8b7e914f26c7928913b09f7a2468523868daccf58ecd31b1ffbb1904ab65",
+        "bytes": 242
+      },
+      {
+        "role": "input-2",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+        "sha256": "33b22c281f4616545985dfb47d24ada66d57b47090d381e6346d984a72aa73fc",
+        "bytes": 77
+      }
+    ],
+    "command": [
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/venv/bin/python",
+      "experiments/2026-11-11-gpusparse-baseline/code/native_baseline.py",
+      "--variant",
+      "monolithic",
+      "--index",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+      "--queries",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+      "--reference",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+      "--native-repo",
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/source",
+      "--csv",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-monolithic.csv",
+      "--top",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-monolithic.tsv",
+      "--validation",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-monolithic-validation.json",
+      "--jit-manifest",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-monolithic-jit.json",
+      "--limit",
+      "5",
+      "--k",
+      "128",
+      "--gpu",
+      "0",
+      "--block-pl",
+      "128",
+      "--doc-chunk",
+      "128",
+      "--max-cand",
+      "32",
+      "--repeats",
+      "1",
+      "--warmups",
+      "0",
+      "--verify",
+      "1"
+    ],
+    "environment": {
+      "host": "cuda5.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.12.7 (main, Nov 19 2024, 12:50:44) [GCC 11.5.0 20240719 (Red Hat 11.5.0-2)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "1"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 4070, GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7, 595.104.02, 12282 MiB, 210 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "fixture-0-k128-chunked",
+    "run": "RUN_FINISHED-17e8dddce4c8",
+    "experiment": "EXPERIMENT-8fa0ca3b19cf",
+    "status": "EXECUTED",
+    "exit_code": 0,
+    "runtime_delta": {},
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+        "sha256": "fbc25aa8acb75f7e7373505ba07d40a6d3c4bb301a18d58cdb33bb1300ec02de",
+        "bytes": 253
+      },
+      {
+        "role": "input-1",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+        "sha256": "bcda8b7e914f26c7928913b09f7a2468523868daccf58ecd31b1ffbb1904ab65",
+        "bytes": 242
+      },
+      {
+        "role": "input-2",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+        "sha256": "33b22c281f4616545985dfb47d24ada66d57b47090d381e6346d984a72aa73fc",
+        "bytes": 77
+      }
+    ],
+    "command": [
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/venv/bin/python",
+      "experiments/2026-11-11-gpusparse-baseline/code/native_baseline.py",
+      "--variant",
+      "chunked",
+      "--index",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+      "--queries",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+      "--reference",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+      "--native-repo",
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/source",
+      "--csv",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-chunked.csv",
+      "--top",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-chunked.tsv",
+      "--validation",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-chunked-validation.json",
+      "--jit-manifest",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-chunked-jit.json",
+      "--limit",
+      "5",
+      "--k",
+      "128",
+      "--gpu",
+      "0",
+      "--block-pl",
+      "128",
+      "--doc-chunk",
+      "128",
+      "--max-cand",
+      "32",
+      "--repeats",
+      "1",
+      "--warmups",
+      "0",
+      "--verify",
+      "1"
+    ],
+    "environment": {
+      "host": "cuda5.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.12.7 (main, Nov 19 2024, 12:50:44) [GCC 11.5.0 20240719 (Red Hat 11.5.0-2)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "1"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 4070, GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7, 595.104.02, 12282 MiB, 210 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "fixture-0-k128-compacted",
+    "run": "RUN_FINISHED-85c91a7528b2",
+    "experiment": "EXPERIMENT-916128c7e7f3",
+    "status": "EXECUTED",
+    "exit_code": 0,
+    "runtime_delta": {},
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+        "sha256": "fbc25aa8acb75f7e7373505ba07d40a6d3c4bb301a18d58cdb33bb1300ec02de",
+        "bytes": 253
+      },
+      {
+        "role": "input-1",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+        "sha256": "bcda8b7e914f26c7928913b09f7a2468523868daccf58ecd31b1ffbb1904ab65",
+        "bytes": 242
+      },
+      {
+        "role": "input-2",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+        "sha256": "33b22c281f4616545985dfb47d24ada66d57b47090d381e6346d984a72aa73fc",
+        "bytes": 77
+      }
+    ],
+    "command": [
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/venv/bin/python",
+      "experiments/2026-11-11-gpusparse-baseline/code/native_baseline.py",
+      "--variant",
+      "compacted",
+      "--index",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-0.gsp",
+      "--queries",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+      "--reference",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-0.json",
+      "--native-repo",
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/source",
+      "--csv",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-compacted.csv",
+      "--top",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-compacted.tsv",
+      "--validation",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-compacted-validation.json",
+      "--jit-manifest",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-0-k128-compacted-jit.json",
+      "--limit",
+      "5",
+      "--k",
+      "128",
+      "--gpu",
+      "0",
+      "--block-pl",
+      "128",
+      "--doc-chunk",
+      "128",
+      "--max-cand",
+      "32",
+      "--repeats",
+      "1",
+      "--warmups",
+      "0",
+      "--verify",
+      "1"
+    ],
+    "environment": {
+      "host": "cuda5.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.12.7 (main, Nov 19 2024, 12:50:44) [GCC 11.5.0 20240719 (Red Hat 11.5.0-2)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "1"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 4070, GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7, 595.104.02, 12282 MiB, 210 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "fixture-1-k1-monolithic",
+    "run": "RUN_FINISHED-71e8100595d8",
+    "experiment": "EXPERIMENT-46b72009eff0",
+    "status": "EXECUTED",
+    "exit_code": 0,
+    "runtime_delta": {},
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-1.gsp",
+        "sha256": "c401a169e9a36edc7f726624bc270eb888382933b67d55968917b37beb9f1558",
+        "bytes": 269
+      },
+      {
+        "role": "input-1",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+        "sha256": "bcda8b7e914f26c7928913b09f7a2468523868daccf58ecd31b1ffbb1904ab65",
+        "bytes": 242
+      },
+      {
+        "role": "input-2",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-1.json",
+        "sha256": "acd3d40722cfd37551b9a90d190a8ab09908b6f30ad939839183f3b81b22ca9f",
+        "bytes": 252
+      }
+    ],
+    "command": [
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/venv/bin/python",
+      "experiments/2026-11-11-gpusparse-baseline/code/native_baseline.py",
+      "--variant",
+      "monolithic",
+      "--index",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-1.gsp",
+      "--queries",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+      "--reference",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-1.json",
+      "--native-repo",
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/source",
+      "--csv",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-monolithic.csv",
+      "--top",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-monolithic.tsv",
+      "--validation",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-monolithic-validation.json",
+      "--jit-manifest",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-monolithic-jit.json",
+      "--limit",
+      "5",
+      "--k",
+      "1",
+      "--gpu",
+      "0",
+      "--block-pl",
+      "128",
+      "--doc-chunk",
+      "128",
+      "--max-cand",
+      "32",
+      "--repeats",
+      "1",
+      "--warmups",
+      "0",
+      "--verify",
+      "1"
+    ],
+    "environment": {
+      "host": "cuda5.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.12.7 (main, Nov 19 2024, 12:50:44) [GCC 11.5.0 20240719 (Red Hat 11.5.0-2)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "1"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 4070, GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7, 595.104.02, 12282 MiB, 210 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  },
+  {
+    "tag": "fixture-1-k1-chunked",
+    "run": "RUN_FINISHED-699c1b1a7725",
+    "experiment": "EXPERIMENT-152cdd7f3077",
+    "status": "FAILED",
+    "exit_code": 1,
+    "runtime_delta": {},
+    "inputs": [
+      {
+        "role": "input-0",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-1.gsp",
+        "sha256": "c401a169e9a36edc7f726624bc270eb888382933b67d55968917b37beb9f1558",
+        "bytes": 269
+      },
+      {
+        "role": "input-1",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+        "sha256": "bcda8b7e914f26c7928913b09f7a2468523868daccf58ecd31b1ffbb1904ab65",
+        "bytes": 242
+      },
+      {
+        "role": "input-2",
+        "path": "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-1.json",
+        "sha256": "acd3d40722cfd37551b9a90d190a8ab09908b6f30ad939839183f3b81b22ca9f",
+        "bytes": 252
+      }
+    ],
+    "command": [
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/venv/bin/python",
+      "experiments/2026-11-11-gpusparse-baseline/code/native_baseline.py",
+      "--variant",
+      "chunked",
+      "--index",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/fixture-1.gsp",
+      "--queries",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/queries.tsv",
+      "--reference",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture/expected-1.json",
+      "--native-repo",
+      "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/source",
+      "--csv",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-chunked.csv",
+      "--top",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-chunked.tsv",
+      "--validation",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-chunked-validation.json",
+      "--jit-manifest",
+      "results/2026-11-11-gpusparse-baseline/20261111-cuda5-native-01/raw/fixture-1-k1-chunked-jit.json",
+      "--limit",
+      "5",
+      "--k",
+      "1",
+      "--gpu",
+      "0",
+      "--block-pl",
+      "128",
+      "--doc-chunk",
+      "128",
+      "--max-cand",
+      "32",
+      "--repeats",
+      "1",
+      "--warmups",
+      "0",
+      "--verify",
+      "1"
+    ],
+    "environment": {
+      "host": "cuda5.cims.nyu.edu",
+      "platform": "Linux-5.14.0-687.61.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.12.7 (main, Nov 19 2024, 12:50:44) [GCC 11.5.0 20240719 (Red Hat 11.5.0-2)]",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "1"
+      },
+      "gpu": {
+        "exit_code": 0,
+        "stdout": "NVIDIA GeForce RTX 4070, GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7, 595.104.02, 12282 MiB, 210 MHz, P8\n",
+        "stderr": ""
+      },
+      "compiler": {
+        "exit_code": 0,
+        "stdout": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      "cuda_compiler": {
+        "exit_code": 0,
+        "stdout": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Oct_29_23:50:19_PDT_2024\nCuda compilation tools, release 12.6, V12.6.85\nBuild cuda_12.6.r12.6/compiler.35059454_0\n",
+        "stderr": ""
+      }
+    }
+  }
+]

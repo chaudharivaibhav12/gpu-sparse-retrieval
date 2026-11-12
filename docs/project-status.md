@@ -1,12 +1,12 @@
 # Current project status
 
-Updated November 11, 2026. The scoring contract is exact uint8 impacts, BMP float32/ceil cap32 queries, uint64 accumulation, all-passage eligibility and score-descending/original-numeric-ID-ascending ties.
+Updated November 11, 2026. The scoring contract is exact uint8 impacts, BMP float32/ceil cap 32 queries, uint64 accumulation, all-passage eligibility and score-descending/original-numeric-ID-ascending ties.
 
 | Work | Completed evidence |
 |---|---|
 | Sequential/initial CUDA foundation | Independent conversion/scoring/pruning fixtures and common-data comparisons preserved. |
-| Corrected canonical BMP | Native failures and fixes retained; all 96 fixture cases and first 25 queries at 100K/1M passed for raw/compressed indexes. Resident CPU timing passed 1,650 output checks; compression took 12.11% longer in its declared scope. |
-| Canonical GPU top-k | 140 selection cases, 175 fixture query checks and 50 real queries passed. Current supported k is0â€“128. |
+| Corrected canonical BMP | Native failures and fixes retained; all 96 fixture cases and first 25 queries at 100 K/1M passed for raw/compressed indexes. Resident CPU timing passed 1,650 output checks; compression took 12.11% longer in its declared scope. |
+| Canonical GPU top-k | 140 selection cases, 175 fixture query checks and 50 real queries passed. Current supported k is 0â€“128. |
 | CSR block control | B16/B32 passed 350 fixture and 100 real query checks. |
 | Full-byte pruning | Initial correctness and 25-query latency study followed by 500-query/three-process replication on Turing/Ada; 18.49â€“24.47%lower latency against matched CSR controls. |
 | Precision ablation | Both GPUs: 192 fixture configs, six 500-query safety cohorts, 18 timing processes and 16 checked profiles; 842,720 output groups validated across study. Coarse and selective preserve tested canonical outputs but increase latency against full byte. |
@@ -30,10 +30,14 @@ Read [the complete experiment](../experiments/2026-11-11-cuda-bound-precision/re
 
 ## Remaining work in order
 
-1. Review/publish/merge the complete precision package, then create the next source branch from updated main.
-2. Instrument the pinned released GPUSparse baseline with truthful arithmetic/tie contracts and explicitly measured canonical adaptation overhead.
-3. Test scoring/payload-layout alternatives and broader supported corpus/depth workloads, retaining failures/OOM and negative outcomes.
-4. Freeze source/configuration and evaluation protocol before using the 6,480 held-out queries.
-5. Complete held-out analysis, reproducibility materials and the final report.
+1. Review/publish the complete native-failure and compatibility-success package; obtain separate merge authorization.
+2. After that parent merge, create a new branch for a reviewed canonical adaptation before primary-U64 baseline comparisons.
+3. Test scoring/payload-layout alternatives and broader workloads, retaining technical failures and scientific negative outcomes.
+4. Freeze source/configuration and evaluation protocol before the 6480 held-out queries, then complete the final report.
 
 Team task owners remain unassigned until agreed. No held-out, original-model FP32 or external-superiority claim is established.
+
+
+## Completed GPUSparse compatibility result
+
+The [compatibility repair1 study](../experiments/2026-11-11-gpusparse-baseline/compat-r1-report.md) passed 108 fixture/regression configurations,6 real correctness cohorts and 18 timing processes. The original native failure is preserved. Monolithic is faster than chunked/compacted within this guarded FP32/native-tie, batch 1 calibration scope. No held-out or primary-U64 speedup claim is established.

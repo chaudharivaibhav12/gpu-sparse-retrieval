@@ -1,0 +1,109 @@
+{
+  "question": "What scores, native tie behavior and resident-query costs do the pinned released GPUSparse paths produce on the shared capped integer input?",
+  "hypothesis": "All native top-k score sequences and returned-passage scores match the independent integer oracle under the exact FP32 domain bound; canonical numeric-ID ties may differ. Relative cost of native monolithic/chunked/compacted paths remains empirical.",
+  "native_revision": "92bb87b36f10e78ab39c81e9db2412dbb7a3b650",
+  "parent_merge": "69fc31bdf1a40c9a550b9f1d1688c414232478dd",
+  "contract": "GSP-CAP32-F32-NATIVE-TIES-v1",
+  "canonical_adaptation": false,
+  "variants": [
+    "monolithic",
+    "chunked",
+    "compacted"
+  ],
+  "source_functions": [
+    "triton_kernel.triton_fused_score",
+    "triton_kernel_chunked.triton_chunked_score",
+    "fused_topk.triton_chunked_score_fused"
+  ],
+  "representation": "Shared uint8 impacts and cap32 integer queries converted exactly to float32; every nonnegative score bound255*sumweights must be<=2^24. This is not original-model float-native quality reproduction.",
+  "index": "CPU GSP CSR to sorted CSC conversion; all original numeric IDs retained and mapped on output. No native score/selector source modifications.",
+  "correctness": {
+    "fixtures": 11,
+    "requested_depths": [
+      1,
+      10,
+      128
+    ],
+    "large_fixture_extra_depth": 1000,
+    "large_fixture_docs": 8193,
+    "variants": 3,
+    "configurations": 102,
+    "queries_per_fixture": 5,
+    "block_pl": 128,
+    "doc_chunk": 128,
+    "max_cand": 32,
+    "repeats": 1,
+    "warmups": 0,
+    "verify": 1,
+    "real_queries": 500,
+    "real_configurations": 6,
+    "runtime_negative_test": "Wrong expectedBLOCKPL must reject before any query computation and before output files.",
+    "unsupported": "Requestedk0 rejected uniformly: pinned compacted multichunk source indexes the zero-width runningthreshold. Positive requestedk with empty corpus remains tested.",
+    "rule": "All score sequences, actual returned-passage integer scores, position range/uniqueness and counts pass. Canonical ID disagreements are retained as native tie audit, not silently corrected."
+  },
+  "timing": {
+    "host": "cuda5/RTX4070 initially",
+    "documents": 1000000,
+    "queries": 500,
+    "k": 10,
+    "batch_size": 1,
+    "block_pl": [
+      128,
+      512
+    ],
+    "doc_chunk": 131072,
+    "max_cand": 8192,
+    "processes_per_setting": 3,
+    "variant_order": [
+      [
+        "monolithic",
+        "chunked",
+        "compacted"
+      ],
+      [
+        "chunked",
+        "compacted",
+        "monolithic"
+      ],
+      [
+        "compacted",
+        "monolithic",
+        "chunked"
+      ]
+    ],
+    "block_order": [
+      [
+        128,
+        512
+      ],
+      [
+        512,
+        128
+      ],
+      [
+        128,
+        512
+      ]
+    ],
+    "warmups": 3,
+    "repeats": 20,
+    "processes": 18,
+    "verify": 0,
+    "post_timing_validation": "Every returned passage score checked against direct integer CSR scoring after all query timers finish.",
+    "boundary": "CPU query padding, query H2D copies, complete released native function, result D2H copies, original numeric-ID mapping and synchronization.",
+    "excluded": "Index conversion/load/upload and native chunk-boundary construction; runtime gate; independent CPU score validation; file I/O.",
+    "primary": "AtBLOCKPL512, query-wise median wall latency ratios of chunked/compacted to monolithic, equal weighting over500queries and3processes.",
+    "sensitivity": "Full128 series retained as shipped-default sensitivity. No causal acrossBLOCKPL conclusion from unbalanced three-series block order.",
+    "uncertainty": "10000 crossed query/process bootstrap draws, seed20261111; conditional calibration only.",
+    "rationale": "Pinned README reports512 strongest in its own priorstudy, while128 is the APIdefault. Both are measured here; its published magnitude is not transferred to our capped workload.",
+    "stopping": "All correctness before timing; fixed processes/rounds, no optional stopping or tuning on heldout. Defer if target remains occupied10minutes."
+  },
+  "environment": "Prepared isolated Python3.12/torch2.6.0+cu126/triton3.2.0/numpy2.2.6/scipy1.15.3 compatibility environment; actual imports/device info observed and runtime-gated.",
+  "provenance": "Exact local code commit before compute, native Git/source hashes, environment/wheel metadata, original outputs and actual post-run JIT artifact hashes/bytes preserved. Native internal compiler defaults pinned to library version and source; no guessed custom launch settings.",
+  "limits": [
+    "No canonical tie guarantee, no direct primary-U64 contract speedup claim or policy waiver.",
+    "Allocator peak since postsetup reset includes resident index/querybuffers but excludes setuptransients, context/driver/non-Torch allocations.",
+    "Calibration only; no heldout or service-tail claim.",
+    "No new CIMS retrieval before separate code/CPU/config and launch-driver review."
+  ]
+}
