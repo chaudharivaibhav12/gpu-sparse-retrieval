@@ -13,3 +13,5 @@ New runs use `results/<experiment-id>/<run-id>/`. Open the corresponding [experi
 Use a fresh run ID for each attempt, such as `20261111T140500Z-01`, and retain failed/negative outcomes. Keep the recorded execution date distinct from a later packaging date. Review logs for credentials and machine-specific session information before publishing. Bulk inputs, executables and large profiler files stay outside Git with reproducible hashes and acquisition/location records.
 
 Copy the manifest shape in [_template/manifest.json](_template/manifest.json), fill it, and list all raw and derived artifacts with SHA-256 hashes. Relative paths in the artifact list are relative to the manifest directory. The private recording system remains the full research record.
+
+Latest: [bound-precision evidence](2026-11-11-cuda-bound-precision/README.md), including directly browsable timing/profiles and lossless indexed fixture bundles.

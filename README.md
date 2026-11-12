@@ -20,9 +20,11 @@ Start with [CONTRIBUTING.md](CONTRIBUTING.md). Every new experiment uses `exp/<o
 
 ## Current state
 
-The sequential oracle, canonical GPU top-k, CSR block-exhaustive control and exact full-byte GPU pruning are implemented and validated. The [full-bound experiment](experiments/2026-11-11-cuda-fullbound-pruning/README.md) passed 820 fixture checks, 200 real-data checks and 2,300 paired outputs. Its 25-query calibration latency was 23.74% lower at B16 and 15.85% lower at B32; metadata adds substantial memory and these are conditional calibration results. [Replication and profiling](experiments/2026-11-11-pruning-replication-profile/README.md) passed on 500 calibration queries and three independent processes per block size on RTX 2080 Ti and RTX 4070; latency reductions were 24.47%/18.49% and 22.90%/18.54% respectively at B16/B32. Selective refinement, aligned released GPUSparse measurement and frozen held-out evaluation remain pending.
+The sequential oracle, canonical GPU top-k, matched CSR block-exhaustive control and exact full-byte pruning are implemented and validated. [Replication and profiling](experiments/2026-11-11-pruning-replication-profile/README.md) on 500 calibration queries and three processes/B found 18.49–24.47% lower latency than the matched unpruned CSR control across RTX 2080 Ti/RTX 4070 and B16/B32.
 
-The rebuilt runtime hooks passed the CIMS checks. The native BMP comparison exposed correctness failures. Its corrected canonical variant passed all 96 fixture cases and both raw/compressed 100K comparisons on 25 calibration queries. See the [correction experiment](experiments/2026-11-10-bmp-correctness-fixes/README.md) for measured source, fixes and evidence. External performance measurement remains pending.
+The [precision ablation](experiments/2026-11-11-cuda-bound-precision/README.md) is complete: all tested outputs remain canonical; coarse bounds halve bound storage but increase latency 21–36%, and selective refinement increases latency 0.8–4.9% relative to full byte. Full byte remains the current CSR latency reference. These are conditional calibration results; the next decisive comparison is contract-aligned released GPUSparse, followed by broader workloads and frozen held-out evaluation.
+
+The corrected canonical BMP variant passed its fixture/common-data checks and [resident CPU timing](experiments/2026-11-11-bmp-resident-timing/README.md); compressed bounds took 12.11% longer than raw on the first-25 calibration workload. Its documented corrections are distinct from native released BMP.
 
 ## Build and check on Linux/CIMS
 
