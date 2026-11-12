@@ -30,10 +30,14 @@ Read [the complete experiment](../experiments/2026-11-11-cuda-bound-precision/re
 
 ## Remaining work in order
 
-1. Review/publish/merge the complete precision package, then create the next source branch from updated main.
-2. Instrument the pinned released GPUSparse baseline with truthful arithmetic/tie contracts and explicitly measured canonical adaptation overhead.
-3. Test scoring/payload-layout alternatives and broader supported corpus/depth workloads, retaining failures/OOM and negative outcomes.
-4. Freeze source/configuration and evaluation protocol before using the 6,480 held-out queries.
-5. Complete held-out analysis, reproducibility materials and the final report.
+1. Review and publish the stopped native GPUSparse package, then obtain separate merge authorization.
+2. Identify a separate compatibility repair or canonical adaptation, review it before CIMS submission and register fresh correctness attempts after the parent merge workflow.
+3. Complete nontrivial native/common-data correctness before any baseline timing.
+4. Test scoring/payload-layout alternatives and broader workloads, retaining failures/OOM and negative outcomes.
+5. Freeze source/configuration and evaluation protocol before the 6,480 held-out queries, then complete the final report.
 
 Team task owners remain unassigned until agreed. No held-out, original-model FP32 or external-superiority claim is established.
+
+## Native baseline update
+
+Precision PR #10 is merged. The [native GPUSparse audit](../experiments/2026-11-11-gpusparse-baseline/README.md), measured at `b953e0874523c2aec8a320377f8aaace6fe1d4d7`, stopped on its one-document chunked fixture with a Triton constexpr conversion error. Ten trivial fixture configurations passed; real-data correctness and all timing remain unexecuted. Preserve this failure before a separately identified compatibility repair or canonical adaptation. No held-out work has begun.

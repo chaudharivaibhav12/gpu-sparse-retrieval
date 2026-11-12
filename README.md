@@ -26,6 +26,8 @@ The [precision ablation](experiments/2026-11-11-cuda-bound-precision/README.md) 
 
 The corrected canonical BMP variant passed its fixture/common-data checks and [resident CPU timing](experiments/2026-11-11-bmp-resident-timing/README.md); compressed bounds took 12.11% longer than raw on the first-25 calibration workload. Its documented corrections are distinct from native released BMP.
 
+The [pinned native GPUSparse audit](experiments/2026-11-11-gpusparse-baseline/README.md) stopped on a Triton compilation error in its one-document chunked fixture. Only trivial fixture outputs passed; real-data correctness and timing were blocked. No external performance result is claimed.
+
 ## Build and check on Linux/CIMS
 
 ```bash

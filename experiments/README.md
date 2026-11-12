@@ -16,3 +16,5 @@ Add new experiments here on their own branches. Merge index rows through pull re
 - [2026-11-11-pruning-replication-profile](2026-11-11-pruning-replication-profile/README.md): complete — verified 500-query replication on Turing/Ada, separate stage/allocation/DRAM diagnostics, retained failures and reviewed retries.
 
 - [2026-11-11-cuda-bound-precision](2026-11-11-cuda-bound-precision/README.md): complete — canonical full/coarse/selective ablation on Turing/Ada; coarse memory/latency tradeoff and selective negative latency result, with full repeated timings and checked profiles.
+
+- [Native GPUSparse audit](2026-11-11-gpusparse-baseline/README.md): stopped at a native Triton compilation failure; no timing result.

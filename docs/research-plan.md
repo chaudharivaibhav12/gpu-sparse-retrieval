@@ -33,8 +33,8 @@ Keep full byte as the current CSR latency reference. Preserve coarse as a measur
 
 ## Next experiments and dependencies
 
-1. Finish precision package review and merge before its follow-on source branch.
-2. Reproduce pinned GPUSparse `92bb87b36f10e78ab39c81e9db2412dbb7a3b650`. Its isolated environment is prepared; retrieval has not yet been measured. Retain every effective query term. Native FP32/topk behavior and a canonical adapted path need distinct truthful contracts and complete timing boundaries. The capped 500-query integer domain has a conservative score maximum 180,540, below 2^24; that supports an arithmetic exactness argument but does not validate the external implementation or native ties. Final-output sorting cannot repair canonical candidates already dropped by chunk-local top-k.
+1. Precision PR #10 is merged. Review/publish the stopped native baseline package, then obtain separate parent-merge authorization before a follow-on branch.
+2. The pinned native GPUSparse study stopped at a Triton3.2.0 compilation failure on its one-document chunked fixture. Only empty/zero-posting groups passed; real-data correctness and timing were not reached. Preserve this result and identify a compatibility repair separately. Retain every query term and distinguish native FP32/unspecified ties from any future canonical adaptation. Final-output sorting cannot recover candidates already discarded by local selectors.
 3. Use measured scoring/traffic evidence to test a payload-layout/scoring alternative. Hold scorer/selector/seed changes apart where possible; declare compound changes when necessary.
 4. Broaden supported workload/depth/scaling evidence with the same contract and explicit memory/OOM reporting. Current GPU selection supports k0â€“128; k=1000 needs a separately reviewed implementation and cannot be enabled by changing a constant.
 5. Freeze source, algorithm/configuration, timing protocol, inputs and hypotheses before the untouched 6,480-query evaluation. Do not tune on held-out outcomes.
@@ -57,3 +57,7 @@ Run independently within an agreed frozen protocol on separate branches and outp
 Use `exp/<owner>/<experiment-id>`, `experiments/<experiment-id>/` and one canonical `results/<experiment-id>/<run-id>/` folder with links from the experiment. Record the question, rationale, actual parent/settings/behavior delta and decision rules before execution. Review code separately, then validate exactness before timing. Preserve per-query outputs, source/binary/input hashes, environment, timing boundary, failures, interpretations and next action. Read [CONTRIBUTING.md](../CONTRIBUTING.md) and the [team AI prompt](TEAM-AI-PROMPT.md).
 
 Calibration uses 500 queries; evaluation uses 6,480 held-out queries. Current latency intervals are conditional on three processes and shared-node calibration, not serving-tail guarantees. Application-buffer peaks exclude context/driver/profiler overhead; kernel DRAM counters exclude copies/memsets/CPU and do not measure full-query traffic. No external-superiority or broad novelty claim is established yet.
+
+## Native baseline update
+
+Precision PR #10 is merged. The [native GPUSparse audit](../experiments/2026-11-11-gpusparse-baseline/README.md), measured at `b953e0874523c2aec8a320377f8aaace6fe1d4d7`, stopped on its one-document chunked fixture with a Triton constexpr conversion error. Ten trivial fixture configurations passed; real-data correctness and all timing remain unexecuted. Preserve this failure before a separately identified compatibility repair or canonical adaptation. No held-out work has begun.
