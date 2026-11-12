@@ -5,7 +5,7 @@ Each experiment has a branch and a folder. Read [CONTRIBUTING.md](../CONTRIBUTIN
 | Experiment ID | Question | Owner | Branch | State |
 |---|---|---|---|---|
 | `2026-11-10-bmp-native-alignment` | Do the pinned native BMP scores and rankings agree with the shared oracle? | Vaibhav | `exp/vaibhav/2026-11-10-bmp-native-alignment` | Retrospective packaging of completed fixture comparison; see experiment branch |
-| [2026-11-10-bmp-correctness-fixes](2026-11-10-bmp-correctness-fixes/README.md) | Do the documented corrections satisfy canonical fixture and common-data results? | Vaibhav | `exp/vaibhav/2026-11-10-bmp-correctness-fixes` | 96 fixture cases and both 100K/25-query layouts passed; merged through PR #3 |
+| [2026-11-10-bmp-correctness-fixes](2026-11-10-bmp-correctness-fixes/README.md) | Do the documented corrections satisfy canonical fixture and common-data results? | Vaibhav | `exp/vaibhav/2026-11-10-bmp-correctness-fixes` | 96 fixture cases and both 100 K/25-query layouts passed; merged through PR #3 |
 | [2026-11-10-bmp-1m-validation](2026-11-10-bmp-1m-validation/README.md) | Does corrected BMP preserve canonical top-10 at 1M? | Vaibhav | `exp/vaibhav/2026-11-10-bmp-1m-validation` | Both 25-query representations passed; merged through PR #4 |
 | [2026-11-11-bmp-resident-timing](2026-11-11-bmp-resident-timing/README.md) | How do raw/compressed bounds affect resident-query latency? | Vaibhav | `exp/vaibhav/2026-11-11-bmp-resident-timing` | Completed: 1,650 correct outputs; compressed/raw paired ratio 1.1211; merged through PR #5 |
 | [2026-11-11-cuda-device-topk](2026-11-11-cuda-device-topk/README.md) | Does GPU selection preserve canonical top-k? | Vaibhav | `exp/vaibhav/2026-11-11-cuda-device-topk` | 140 kernel / 175 fixture query cases and 50 real queries passed |
@@ -17,4 +17,4 @@ Add new experiments here on their own branches. Merge index rows through pull re
 
 - [2026-11-11-cuda-bound-precision](2026-11-11-cuda-bound-precision/README.md): complete — canonical full/coarse/selective ablation on Turing/Ada; coarse memory/latency tradeoff and selective negative latency result, with full repeated timings and checked profiles.
 
-- [Native GPUSparse audit](2026-11-11-gpusparse-baseline/README.md): stopped at a native Triton compilation failure; no timing result.
+- [Native GPUSparse audit](2026-11-11-gpusparse-baseline/README.md): original native compilation failure preserved; explicit compatibility repair completed correctness and repeated calibration timing.

@@ -26,7 +26,7 @@ The [precision ablation](experiments/2026-11-11-cuda-bound-precision/README.md) 
 
 The corrected canonical BMP variant passed its fixture/common-data checks and [resident CPU timing](experiments/2026-11-11-bmp-resident-timing/README.md); compressed bounds took 12.11% longer than raw on the first-25 calibration workload. Its documented corrections are distinct from native released BMP.
 
-The [pinned native GPUSparse audit](experiments/2026-11-11-gpusparse-baseline/README.md) stopped on a Triton compilation error in its one-document chunked fixture. Only trivial fixture outputs passed; real-data correctness and timing were blocked. No external performance result is claimed.
+The [GPUSparse compatibility rerun](experiments/2026-11-11-gpusparse-baseline/compat-r1-report.md) is complete: the disclosed one-line repair passed all correctness and timing gates. Monolithic is fastest among these three native paths on the studied batch 1 calibration workload. Native tie semantics remain distinct from the primary canonical contract.
 
 ## Build and check on Linux/CIMS
 
@@ -50,7 +50,7 @@ Choose compiler architecture flags appropriate to the device actually used. CMak
 
 Bulk input/index files are reproducible from pinned metadata and excluded from Git. Start with [implementation notes](docs/implementation-notes.md) for acquisition, subset selection, query preparation and exact command syntax. Shell drivers resolve the checkout relative to their location; load the CUDA toolkit on PATH before running the CUDA driver. They refuse existing experiment output files.
 
-The scoring contract uses exact uint8 document impacts, the pinned BMP float32/ceil cap32 query transformation, uint64 accumulation, and score-descending/original-numeric-ID-ascending ties. These semantics do not establish equivalence to original model FP32 retrieval.
+The scoring contract uses exact uint8 document impacts, the pinned BMP float32/ceil cap 32 query transformation, uint64 accumulation, and score-descending/original-numeric-ID-ascending ties. These semantics do not establish equivalence to original model FP32 retrieval.
 
 ## Documentation
 
