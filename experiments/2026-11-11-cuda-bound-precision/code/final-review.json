@@ -1,0 +1,58 @@
+{
+  "source_commit": "07d499067c261c4265db2373c0ec6bcaceb2b781",
+  "validation": {
+    "cuda2": {
+      "success": true,
+      "complete_fixed_timing": true,
+      "validated_runs": 232,
+      "fixture_configurations": 192,
+      "real_safety_configurations": 6,
+      "timing_processes": 18,
+      "expected_runtime_rejections": [
+        "RUN_FINISHED-60f2bc35659d"
+      ],
+      "samples": 421360,
+      "diagnostics_checked": 16,
+      "diagnostics_not_checked": [],
+      "statistics_server_match_within_tolerance": true,
+      "numeric_tolerance": {
+        "relative": 1e-12,
+        "absolute": 1e-15,
+        "reason": "Linux/Windows math libraries and Python float-sum implementation can differ in last bits; labels, counts, query membership and seed remain exact."
+      },
+      "limitations": [
+        "Local replay verifies original output/input hashes and canonical results. Bulk1M index is not duplicated locally; its hash is bound by native runtime records.",
+        "Conditional calibration comparison; shared nodes/clocks/cache and only3processes. No held-out/service-tail or external-baseline claim.",
+        "Profiler claims require separately checked exports; incomplete/failed diagnostics are retained and scoped."
+      ]
+    },
+    "cuda5": {
+      "success": true,
+      "complete_fixed_timing": true,
+      "validated_runs": 232,
+      "fixture_configurations": 192,
+      "real_safety_configurations": 6,
+      "timing_processes": 18,
+      "expected_runtime_rejections": [
+        "RUN_FINISHED-19426dc8c043"
+      ],
+      "samples": 421360,
+      "diagnostics_checked": 16,
+      "diagnostics_not_checked": [],
+      "statistics_server_match_within_tolerance": true,
+      "numeric_tolerance": {
+        "relative": 1e-12,
+        "absolute": 1e-15,
+        "reason": "Linux/Windows math libraries and Python float-sum implementation can differ in last bits; labels, counts, query membership and seed remain exact."
+      },
+      "limitations": [
+        "Local replay verifies original output/input hashes and canonical results. Bulk1M index is not duplicated locally; its hash is bound by native runtime records.",
+        "Conditional calibration comparison; shared nodes/clocks/cache and only3processes. No held-out/service-tail or external-baseline claim.",
+        "Profiler claims require separately checked exports; incomplete/failed diagnostics are retained and scoped."
+      ]
+    }
+  },
+  "summary_review": "Checked complete canonical outputs, strict storage/schedule/runtime contracts, all fixed treatment orders, independent statistics, trace/counter launch attribution, allocation lifetimes and sampled monitor qualifications. No native source change after measured commit.",
+  "figure_review": "All4panels inspected; labels, conditional intervals and zero-based axes legible.",
+  "limits": "Calibration and fixed capped-integer representation only. No original-FP32, held-out, service-tail, external-superiority or general progressive-retrieval conclusion."
+}

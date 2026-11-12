@@ -14,3 +14,5 @@ Each experiment has a branch and a folder. Read [CONTRIBUTING.md](../CONTRIBUTIN
 
 Add new experiments here on their own branches. Merge index rows through pull requests as experiments are reviewed. The shared research plan contains proposed tracks and their dependencies. An index entry identifies recorded work and does not assign a teammate to future work.
 - [2026-11-11-pruning-replication-profile](2026-11-11-pruning-replication-profile/README.md): complete — verified 500-query replication on Turing/Ada, separate stage/allocation/DRAM diagnostics, retained failures and reviewed retries.
+
+- [2026-11-11-cuda-bound-precision](2026-11-11-cuda-bound-precision/README.md): complete — canonical full/coarse/selective ablation on Turing/Ada; coarse memory/latency tradeoff and selective negative latency result, with full repeated timings and checked profiles.

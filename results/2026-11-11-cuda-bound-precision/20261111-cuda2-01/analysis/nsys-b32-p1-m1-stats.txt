@@ -1,0 +1,494 @@
+Generating SQLite file results/2026-11-11-cuda-bound-precision/20261111-cuda2-01/raw/nsys-b32-p1-m1.sqlite from results/2026-11-11-cuda-bound-precision/20261111-cuda2-01/raw/nsys-b32-p1-m1.nsys-rep
+Processing [results/2026-11-11-cuda-bound-precision/20261111-cuda2-01/raw/nsys-b32-p1-m1.sqlite] with [/misc/linux/rhel9/x86_64/local/stow/cuda-12.6/nsight-systems-2024.5.1/host-linux-x64/reports/cuda_gpu_kern_sum.py]... 
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+93.5,144813737,50,2896274.7,2195037.5,22240,5916922,2909998.6,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+6.1,9496076,150,63307.2,16704.0,11744,337951,105880.2,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+0.1,226208,25,9048.3,8160.0,4672,16544,3139.6,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+0.1,174112,25,6964.5,7456.0,5759,7584,765.5,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+0.0,64959,25,2598.4,2752.0,2144,2848,275.2,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+0.0,51233,25,2049.3,2144.0,1664,2272,219.0,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+
+Processing [results/2026-11-11-cuda-bound-precision/20261111-cuda2-01/raw/nsys-b32-p1-m1.sqlite] with [/misc/linux/rhel9/x86_64/local/stow/cuda-12.6/nsight-systems-2024.5.1/host-linux-x64/reports/cuda_gpu_mem_time_sum.py]... 
+Time (%),Total Time (ns),Count,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Operation
+99.7,114270849,56,2040550.9,10976.0,352,50769866,9434195.2,[CUDA memcpy Host-to-Device]
+0.2,278145,25,11125.8,11296.0,10400,11840,416.2,[CUDA memset]
+0.1,81311,75,1084.1,1055.0,895,1824,129.6,[CUDA memcpy Device-to-Host]
+
+Processing [results/2026-11-11-cuda-bound-precision/20261111-cuda2-01/raw/nsys-b32-p1-m1.sqlite] with [/misc/linux/rhel9/x86_64/local/stow/cuda-12.6/nsight-systems-2024.5.1/host-linux-x64/reports/cuda_gpu_mem_size_sum.py]... 
+Total (MB),Count,Avg (MB),Med (MB),Min (MB),Max (MB),StdDev (MB),Operation
+1060.617,56,18.940,0.115,0.001,474.798,87.424,[CUDA memcpy Host-to-Device]
+200.000,25,8.000,8.000,8.000,8.000,0.000,[CUDA memset]
+0.006,75,0.000,0.000,0.000,0.000,0.000,[CUDA memcpy Device-to-Host]
+
+Processing [results/2026-11-11-cuda-bound-precision/20261111-cuda2-01/raw/nsys-b32-p1-m1.sqlite] with [/misc/linux/rhel9/x86_64/local/stow/cuda-12.6/nsight-systems-2024.5.1/host-linux-x64/reports/cuda_api_sum.py]... 
+Time (%),Total Time (ns),Num Calls,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+96.0,270323078,131,2063534.9,19588.0,10436,50896910,6542681.4,cudaMemcpy
+2.6,7284992,21,346904.4,9229.0,3350,1767985,532955.6,cudaFree
+0.7,1940720,300,6469.1,4276.0,3675,425704,24487.8,cudaLaunchKernel
+0.5,1314373,21,62589.2,10848.0,3383,338229,83726.7,cudaMalloc
+0.1,354394,50,7087.9,4049.0,3322,144003,19809.6,cudaEventRecord
+0.1,306664,25,12266.6,10760.0,10134,41771,6208.1,cudaMemset
+0.0,39076,25,1563.0,1529.0,1293,2416,215.7,cudaEventSynchronize
+0.0,16424,2,8212.0,8212.0,2259,14165,8418.8,cudaEventCreate
+0.0,3184,2,1592.0,1592.0,487,2697,1562.7,cudaEventDestroy
+0.0,974,1,974.0,974.0,974,974,0.0,cuModuleGetLoadingMode
+
+Processing [results/2026-11-11-cuda-bound-precision/20261111-cuda2-01/raw/nsys-b32-p1-m1.sqlite] with [/misc/linux/rhel9/x86_64/local/stow/cuda-12.6/nsight-systems-2024.5.1/host-linux-x64/reports/cuda_gpu_trace.py]... 
+Start (ns),Duration (ns),CorrId,GrdX,GrdY,GrdZ,BlkX,BlkY,BlkZ,Reg/Trd,StcSMem (MB),DymSMem (MB),Bytes (MB),Throughput (MB/s),SrcMemKd,DstMemKd,Device,Ctx,GreenCtx,Strm,Name
+6431298454,849407,130,,,,,,,,,,8.000,9416.009,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+6432262005,50769866,131,,,,,,,,,,474.798,9021.168,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+6483148319,12650802,132,,,,,,,,,,118.700,9377.267,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+6495919505,812831,133,,,,,,,,,,8.000,9840.000,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+6496748624,13152,134,,,,,,,,,,0.125,9504.250,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+8804019671,48881387,136,,,,,,,,,,448.109,8962.188,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+8982401015,11296,149,,,,,,,,,,0.115,10155.349,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+8982423095,512,150,,,,,,,,,,0.001,1328.125,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+8982463735,11840,151,,,,,,,,,,8.000,675672.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+8982889495,27263,152,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+8982936022,19200,154,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8982956118,15776,156,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8982975510,16096,158,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+8982995094,2784,160,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+8983013846,7488,162,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+8983033782,2176,164,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+8983072502,1824,166,,,,,,,,,,0.000,2.193,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+8983088726,5914586,167,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+8989004048,312735,169,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8989317615,21376,171,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8989339855,16289,173,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8989356879,15712,175,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8989378352,1023,178,,,,,,,,,,0.000,234.604,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+8989397679,1152,181,,,,,,,,,,0.000,6.944,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+8989513135,11680,183,,,,,,,,,,0.115,9821.525,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+8989531631,512,184,,,,,,,,,,0.001,1328.125,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+8989543375,11360,185,,,,,,,,,,8.000,704224.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+8989556175,26432,186,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+8989583375,20640,188,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8989604719,16992,190,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8989622415,6880,192,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+8989630063,2816,194,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+8989633679,7520,196,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+8989641999,2144,198,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+8989644879,1152,200,,,,,,,,,,0.000,3.472,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+8989657359,5912730,201,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+8995570825,330015,203,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8995901640,21280,205,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8995923656,16288,207,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8995940808,15904,209,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8995962665,1023,212,,,,,,,,,,0.000,234.604,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+8995981064,1152,215,,,,,,,,,,0.000,6.944,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+8996040712,11136,217,,,,,,,,,,0.115,10301.267,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+8996058440,512,218,,,,,,,,,,0.001,1328.125,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+8996069064,11488,219,,,,,,,,,,8.000,696376.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+8996081416,26368,220,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+8996108616,20384,222,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8996129800,16928,224,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+8996147432,9472,226,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+8996157640,2752,228,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+8996161256,7424,230,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+8996169544,2208,232,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+8996173608,1184,234,,,,,,,,,,0.000,3.378,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+8996186344,5908026,235,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9002095106,316543,237,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9002412513,21280,239,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9002434625,16800,241,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9002452225,15968,243,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9002473249,1024,246,,,,,,,,,,0.000,234.375,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9002490561,1184,249,,,,,,,,,,0.000,6.757,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9002547937,11232,251,,,,,,,,,,0.115,10213.280,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9002565537,480,252,,,,,,,,,,0.001,1416.666,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9002576001,11424,253,,,,,,,,,,8.000,700280.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9002588353,26176,254,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9002615361,20384,256,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9002636641,16320,258,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9002653761,10656,260,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9002665409,2784,262,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9002668929,7456,264,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9002677185,2240,266,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9002680097,1184,268,,,,,,,,,,0.000,3.378,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9002692993,5907546,269,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9008601467,319967,271,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9008922330,21888,273,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9008945051,16767,275,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9008962683,15935,277,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9008984858,1024,280,,,,,,,,,,0.000,234.375,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9009001978,1153,283,,,,,,,,,,0.000,6.938,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9009058938,11584,285,,,,,,,,,,0.115,9902.859,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9009077402,480,286,,,,,,,,,,0.001,1416.666,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9009087450,11200,287,,,,,,,,,,8.000,714280.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9009099514,26880,288,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9009127162,16832,290,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9009144858,16224,292,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9009161882,10464,294,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9009173402,2752,296,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9009176986,7456,298,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9009185274,2144,300,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9009189658,1184,302,,,,,,,,,,0.000,3.378,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9009202394,5909946,303,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9015113172,322111,305,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9015436084,21312,307,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9015458324,16287,309,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9015475411,15328,311,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9015498516,1023,314,,,,,,,,,,0.000,234.604,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9015515508,1183,317,,,,,,,,,,0.000,6.762,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9015572307,11328,319,,,,,,,,,,0.115,10126.670,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9015589843,512,320,,,,,,,,,,0.001,1328.125,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9015599923,11200,321,,,,,,,,,,8.000,714280.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9015611859,26752,322,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9015639283,19040,324,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9015659155,16192,326,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9015676051,7296,328,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9015684115,2752,330,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9015687731,7456,332,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9015696051,2176,334,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9015702291,1184,336,,,,,,,,,,0.000,3.378,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9015714547,5916922,337,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9021632333,323264,339,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9021956332,21537,341,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9021978733,16863,343,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9021996268,15360,345,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9022016268,1024,348,,,,,,,,,,0.000,234.375,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9022036525,1183,351,,,,,,,,,,0.000,6.762,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9022095404,10912,353,,,,,,,,,,0.115,10512.804,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9022112492,512,354,,,,,,,,,,0.001,1328.125,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9022123244,11232,355,,,,,,,,,,8.000,712248.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9022135276,26592,356,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9022162668,16768,358,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9022180268,16480,360,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9022197516,10784,362,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9022209164,2816,364,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9022212844,7456,366,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9022221164,2208,368,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9022227212,1184,370,,,,,,,,,,0.000,3.378,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9022239564,5900602,371,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9028140902,314527,373,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9028456198,21247,375,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9028478309,16448,377,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9028495557,15297,379,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9028520709,1024,382,,,,,,,,,,0.000,234.375,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9028538405,1185,385,,,,,,,,,,0.000,6.751,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9028596133,11616,387,,,,,,,,,,0.115,9875.671,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9028614405,480,388,,,,,,,,,,0.001,1416.666,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9028624485,11232,389,,,,,,,,,,8.000,712248.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9028636581,26720,390,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9028664197,20384,392,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9028685381,18400,394,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9028704677,16544,396,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9028722213,2784,398,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9028725733,7584,400,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9028734053,2144,402,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9028737061,1152,404,,,,,,,,,,0.000,3.472,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9028750245,5904602,405,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9034655551,313600,407,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9034970014,21632,409,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9034992542,16320,411,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9035009631,15839,413,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9035028223,1023,416,,,,,,,,,,0.000,234.604,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9035046302,1184,419,,,,,,,,,,0.000,6.757,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9035107198,12032,421,,,,,,,,,,0.115,9534.161,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9035125470,512,422,,,,,,,,,,0.001,1328.125,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9035135550,11328,423,,,,,,,,,,8.000,706208.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9035147774,26464,424,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9035174974,19680,426,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9035195422,16544,428,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9035212702,12832,430,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9035226206,2784,432,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9035229854,7456,434,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9035238142,2208,436,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9035246782,1184,438,,,,,,,,,,0.000,3.378,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9035259294,5909754,439,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9041169880,315839,441,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9041486615,21537,443,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9041508887,16736,445,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9041526360,15903,447,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9041549047,1024,450,,,,,,,,,,0.000,234.375,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9041567511,1153,453,,,,,,,,,,0.000,6.938,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9041625335,11104,455,,,,,,,,,,0.115,10330.979,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9041642519,480,456,,,,,,,,,,0.001,1416.666,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9041655767,11424,457,,,,,,,,,,8.000,700280.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9041667895,26752,458,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9041695447,17344,460,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9041713655,16192,462,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9041730551,8160,464,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9041739415,2752,466,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9041743063,7456,468,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9041751191,2240,470,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9041760471,1152,472,,,,,,,,,,0.000,3.472,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9041773143,5908762,473,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9047682705,319999,475,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9048003537,21824,477,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9048026192,16288,479,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9048043313,15903,481,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9048063729,1023,484,,,,,,,,,,0.000,234.604,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9048081712,1153,487,,,,,,,,,,0.000,6.938,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9048141072,11392,489,,,,,,,,,,0.115,10069.770,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9048158640,480,490,,,,,,,,,,0.001,1416.666,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9048168816,11584,491,,,,,,,,,,8.000,690600.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9048181136,26176,492,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9048208144,19744,494,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9048228752,16736,496,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9048246192,7744,498,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9048254640,2784,500,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9048258256,7456,502,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9048266576,2208,504,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9048271600,1184,506,,,,,,,,,,0.000,3.378,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9048284496,5906042,507,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9054191242,324671,509,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9054516778,21632,511,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9054539306,16736,513,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9054556809,15328,515,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9054580457,1024,518,,,,,,,,,,0.000,234.375,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9054598217,1152,521,,,,,,,,,,0.000,6.944,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9054654473,11328,523,,,,,,,,,,0.115,10126.670,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9054671913,480,524,,,,,,,,,,0.001,1416.666,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9054681609,11296,525,,,,,,,,,,8.000,708208.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9054693833,26368,526,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9054720937,20832,528,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9054742473,15808,530,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9054759113,4832,532,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9054764681,2784,534,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9054768297,7488,536,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9054776585,2272,538,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9054781161,1184,540,,,,,,,,,,0.000,3.378,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9054793737,5907610,541,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9060702115,337951,543,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9061040930,22177,545,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9061063938,16417,547,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9061081186,16128,549,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9061106402,1056,552,,,,,,,,,,0.000,227.273,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9061121346,1152,555,,,,,,,,,,0.000,6.944,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9061186018,11552,557,,,,,,,,,,0.115,9930.391,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9061204066,480,558,,,,,,,,,,0.001,1416.666,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9061213762,11456,559,,,,,,,,,,8.000,698320.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9061226274,26528,560,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9061253538,20736,562,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9061275042,15840,564,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9061291586,9568,566,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9061301986,2752,568,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9061305602,7456,570,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9061313922,2144,572,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9061317346,1184,574,,,,,,,,,,0.000,3.378,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9061329698,5903994,575,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9067234588,317311,577,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9067552636,21119,579,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9067574651,16289,581,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9067591739,15904,583,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9067618011,1025,586,,,,,,,,,,0.000,234.146,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9067640891,1184,589,,,,,,,,,,0.000,6.757,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9067700795,11552,591,,,,,,,,,,0.115,9930.391,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9067718555,512,592,,,,,,,,,,0.001,1328.125,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9067729819,11360,593,,,,,,,,,,8.000,704224.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9067742043,26944,594,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9067769819,20160,596,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9067790683,18016,598,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9067809403,6976,600,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9067817275,2784,602,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9067820923,7520,604,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9067829115,2240,606,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9067835099,1184,608,,,,,,,,,,0.000,3.378,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9067848219,5910074,609,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9073758997,330048,611,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9074089876,21536,613,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9074112148,16256,615,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9074129205,15295,617,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9074152148,1056,620,,,,,,,,,,0.000,227.273,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9074167732,1152,623,,,,,,,,,,0.000,6.944,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9074223732,11136,625,,,,,,,,,,0.115,10301.267,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9074241524,512,626,,,,,,,,,,0.001,1328.125,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9074251252,11360,627,,,,,,,,,,8.000,704224.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9074263380,26624,628,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9074290804,19232,630,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9074310772,16544,632,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9074328212,8384,634,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9074337332,2848,636,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9074340916,7456,638,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9074349268,2144,640,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9074353876,1184,642,,,,,,,,,,0.000,3.378,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9074366324,5906746,643,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9080273806,320031,645,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9080594574,21119,647,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9080616429,16320,649,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9080633453,15296,651,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9080657614,1055,654,,,,,,,,,,0.000,227.488,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9080675309,1185,657,,,,,,,,,,0.000,6.751,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9080732109,11264,659,,,,,,,,,,0.115,10184.257,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9080749645,512,660,,,,,,,,,,0.001,1328.125,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9080759213,11360,661,,,,,,,,,,8.000,704224.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9080771373,26432,662,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9080798637,17984,664,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9080817453,16352,666,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9080834669,6656,668,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9080842029,2784,670,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9080845549,7488,672,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9080853901,2144,674,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9080863437,1184,676,,,,,,,,,,0.000,3.378,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9080875917,5034011,677,26163,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9085910792,330751,679,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9086242408,21312,681,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9086264616,16287,683,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9086281671,15232,685,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9086304967,1056,688,,,,,,,,,,0.000,227.273,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9086323655,1185,691,,,,,,,,,,0.000,6.751,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9086380263,11040,693,,,,,,,,,,0.115,10390.861,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9086397543,512,694,,,,,,,,,,0.001,1328.125,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9086407719,11456,695,,,,,,,,,,8.000,698320.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9086420199,26624,696,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9086447687,18400,698,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9086466919,16544,700,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9086484135,13984,702,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9086498919,2784,704,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9086502503,7488,706,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9086510855,2240,708,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9086519431,1184,710,,,,,,,,,,0.000,3.378,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9086531847,5893242,711,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9092425697,252064,713,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9092678401,17344,715,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9092696417,13055,717,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9092710176,12192,719,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9092732545,896,722,,,,,,,,,,0.000,267.857,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9092750048,1025,725,,,,,,,,,,0.000,7.805,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9092806656,11040,727,,,,,,,,,,0.115,10390.861,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9092823744,384,728,,,,,,,,,,0.001,1770.833,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9092833568,10592,729,,,,,,,,,,8.000,755280.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9092844768,23072,730,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9092868448,15456,732,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9092884576,13184,734,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9092898464,4672,736,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9092904032,2272,738,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9092906912,6016,740,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9092913504,1824,742,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9092919968,1024,744,,,,,,,,,,0.000,3.906,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9092932992,5765146,745,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9098698746,265152,747,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9098964506,17696,749,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9098982874,13088,751,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9098996634,12256,753,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9099013754,896,756,,,,,,,,,,0.000,267.857,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9099030586,1024,759,,,,,,,,,,0.000,7.812,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9099085498,10784,761,,,,,,,,,,0.115,10637.500,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9099102490,384,762,,,,,,,,,,0.001,1770.833,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9099112570,10528,763,,,,,,,,,,8.000,759872.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9099123738,23264,764,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9099147610,13600,766,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9099161818,13312,768,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9099175706,6464,770,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9099182810,2239,772,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9099185689,6049,774,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9099192346,1824,776,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9099200153,1024,778,,,,,,,,,,0.000,3.906,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9099212217,4362812,779,22166,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9103575637,263648,781,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9103839861,17247,783,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9103857684,13089,785,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9103871316,12225,787,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9103892085,895,790,,,,,,,,,,0.000,268.156,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9103908501,1023,793,,,,,,,,,,0.000,7.820,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9103978325,11199,795,,,,,,,,,,0.115,10243.336,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9103995252,384,796,,,,,,,,,,0.001,1770.833,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9104005268,10721,797,,,,,,,,,,8.000,746192.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9104016564,23072,798,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9104040276,14976,800,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9104055860,12864,802,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9104069396,7136,804,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9104077108,2208,806,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9104079988,5984,808,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9104086612,1760,810,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9104092820,1024,812,,,,,,,,,,0.000,3.906,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9104104980,5754202,813,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9109859790,250528,815,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9110110926,16832,817,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9110128334,12960,819,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9110141966,11808,821,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9110156910,896,824,,,,,,,,,,0.000,267.857,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9110172238,992,827,,,,,,,,,,0.000,8.065,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9110228750,10784,829,,,,,,,,,,0.115,10637.500,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9110245806,383,830,,,,,,,,,,0.001,1775.457,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9110255214,10400,831,,,,,,,,,,8.000,769224.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9110266253,22560,832,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9110289358,15519,834,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9110305485,12257,836,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9110318445,9985,838,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9110329102,2208,840,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9110331918,5792,842,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9110338318,1696,844,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9110342253,1025,846,,,,,,,,,,0.000,3.902,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9110354190,5751449,847,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9116106247,248736,849,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9116355591,16896,851,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9116373127,12704,853,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9116386439,12192,855,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9116407399,896,858,,,,,,,,,,0.000,267.857,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9116424679,1056,861,,,,,,,,,,0.000,7.576,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9116625575,11232,863,,,,,,,,,,0.115,10213.280,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9116642695,352,864,,,,,,,,,,0.001,1931.818,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9116653831,10752,865,,,,,,,,,,8.000,744040.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9116665095,22752,866,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9116688519,15680,868,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9116704775,13631,870,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9116719015,7103,872,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9116726663,2176,874,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9116729479,5792,876,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9116735911,1664,878,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9116740199,1024,880,,,,,,,,,,0.000,3.906,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9116752423,5746553,881,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9122499520,251872,883,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9122752000,17312,885,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9122769920,12608,887,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9122783200,12160,889,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9122799200,896,892,,,,,,,,,,0.000,267.857,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9122814784,1024,895,,,,,,,,,,0.000,7.812,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9122878336,11264,897,,,,,,,,,,0.115,10184.257,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9122895456,384,898,,,,,,,,,,0.001,1770.833,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9122905536,10464,899,,,,,,,,,,8.000,764520.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9122916544,22240,900,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9122939328,12704,902,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9122952672,12224,904,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9122965536,7488,906,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9122973600,2144,908,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9122976384,5760,910,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9122982720,1760,912,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9122990688,1024,914,,,,,,,,,,0.000,3.906,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9123002688,5751130,915,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9128754362,249855,917,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9129004825,16640,919,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9129022073,13088,921,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9129035834,11808,923,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9129053786,895,926,,,,,,,,,,0.000,268.156,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9129070873,1024,929,,,,,,,,,,0.000,7.812,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9129134714,11359,931,,,,,,,,,,0.115,10099.023,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9129151993,384,932,,,,,,,,,,0.001,1770.833,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9129162425,10560,933,,,,,,,,,,8.000,757568.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9129173657,22528,934,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9129196761,15520,936,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9129212857,12672,938,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9129226137,6176,940,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9129232889,2176,942,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9129235641,5856,944,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9129242105,1696,946,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9129248345,1024,948,,,,,,,,,,0.000,3.906,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9129260921,5746042,949,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9135007475,251648,951,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9135259699,17088,953,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9135277427,12608,955,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9135290579,11776,957,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9135306323,896,960,,,,,,,,,,0.000,267.857,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9135323187,992,963,,,,,,,,,,0.000,8.065,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9135380115,11071,965,,,,,,,,,,0.115,10361.837,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9135396979,352,966,,,,,,,,,,0.001,1931.818,Pageable,Device,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Host-to-Device]
+9135406707,10528,967,,,,,,,,,,8.000,759872.000,Device,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memset]
+9135417875,22304,968,16,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9135440819,15136,970,2,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9135456563,12224,972,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9135469491,9856,974,123,1,1,256,1,1,26,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"coarse_bounds(unsigned int, const unsigned char *, const WeightedTerm *, unsigned int, unsigned long, unsigned int, unsigned int, unsigned int, const GpuCandidate *, unsigned int, unsigned long *, unsigned int *, unsigned int *, unsigned long *)"
+9135479955,2240,976,123,1,1,256,1,1,16,0.001,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scan(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9135482739,5759,978,1,1,1,1,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"group_offsets(unsigned int, const unsigned int *, unsigned int *, unsigned int *)"
+9135489074,1729,980,123,1,1,256,1,1,16,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"flag_scatter(unsigned int, const unsigned int *, const unsigned int *, const unsigned int *, unsigned int *)"
+9135493714,1025,982,,,,,,,,,,0.000,3.902,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9135505651,5747321,983,31234,1,1,32,1,1,30,0.000,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"block_scores(unsigned int, const unsigned long *, const unsigned int *, const unsigned char *, const unsigned int *, unsigned long *, const unsigned int *, unsigned int)"
+9141253644,247328,985,3907,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9141501644,16672,987,153,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9141518892,12672,989,6,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9141532172,11744,991,1,1,1,256,1,1,26,0.006,0.000,,,,,NVIDIA GeForce RTX 2080 Ti (0),1,,7,"local_topk(const GpuCandidate *, const unsigned long *, const unsigned long *, unsigned int, unsigned int, bool, GpuCandidate *)"
+9141546572,896,994,,,,,,,,,,0.000,267.857,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+9141564396,1024,997,,,,,,,,,,0.000,7.812,Device,Pageable,NVIDIA GeForce RTX 2080 Ti (0),1,,7,[CUDA memcpy Device-to-Host]
+
