@@ -9,3 +9,7 @@ Twelve of 127 planned attempts finished: one intentional configuration rejection
 The separate contract is `GSP-CAP32-F32-NATIVE-TIES-v1`: exact guarded integer inputs represented in FP32, with unspecified equal-score IDs. It is distinct from the primary U64/canonical contract and original-model floating-point reproduction. Native source remains unmodified; no retry or adaptation was performed.
 
 See the [failure report](report.md), [frozen protocol](configs/protocol.json) and [run evidence](runs/20261111-cuda5-native-01/README.md). Preserve this negative result. A compatibility repair must be explicitly identified, separately reviewed and registered; a canonical adaptation remains a separate future experiment after the parent merge workflow.
+
+## Authorized compatibility retry
+
+The original native failure remains preserved. A reviewed one-line stride-cast repair is being rerun as the explicitly patched treatment `stride-int64-promotion-r1`, with new adapter/expected-state modules, effective source hashes and fresh run paths. See [compatibility protocol](configs/compat-r1-protocol.json). The user requires up to three reviewed technical repair/rerun attempts before publication; full correctness still gates timing. No new outcome is claimed yet.

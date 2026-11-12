@@ -41,3 +41,7 @@ Team task owners remain unassigned until agreed. No held-out, original-model FP3
 ## Native baseline update
 
 Precision PR #10 is merged. The [native GPUSparse audit](../experiments/2026-11-11-gpusparse-baseline/README.md), measured at `b953e0874523c2aec8a320377f8aaace6fe1d4d7`, stopped on its one-document chunked fixture with a Triton constexpr conversion error. Ten trivial fixture configurations passed; real-data correctness and all timing remain unexecuted. Preserve this failure before a separately identified compatibility repair or canonical adaptation. No held-out work has begun.
+
+## Authorized compatibility retry
+
+The original native failure remains preserved. A reviewed one-line stride-cast repair is being rerun as the explicitly patched treatment `stride-int64-promotion-r1`, with new adapter/expected-state modules, effective source hashes and fresh run paths. See [compatibility protocol](../experiments/2026-11-11-gpusparse-baseline/configs/compat-r1-protocol.json). The user requires up to three reviewed technical repair/rerun attempts before publication; full correctness still gates timing. No new outcome is claimed yet.
