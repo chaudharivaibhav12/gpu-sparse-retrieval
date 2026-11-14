@@ -42,3 +42,7 @@ Index size at 1M documents, range 4096: 315,508,373 bytes for postings and looku
 Timing on cuda5 (RTX 4070): pooled median **0.2047 ms** (95% crossed bootstrap 0.2039–0.2082) at 1M documents, k=10, batch 1, 500 calibration queries; all 34,500 timed outputs exact. Set beside the published medians (monolithic 0.88 ms, CSR B16 2.97 ms, B32 3.63 ms) that is 0.23× / 0.069× / 0.056× — **exploratory, different session, not paired**.
 
 Decision: keep as the candidate exact GPU system; a paired rerun with the baselines is needed before any comparative claim. Full result, interpretation and limits: [report.md](report.md).
+
+## Packaging for publication
+
+Run folders follow the team layout on main (applied by `scripts/package_run.py`): raw per-query `.csv`/`.tsv` files over 1 MB are stored as lossless `.gz` (decompress with `gunzip -k` before replaying an analysis script), and full profiler reports, JIT caches and listings too large for Git are kept outside Git. Each manifest's `public_packaging` section lists every original with its SHA-256, size, public path or custody location; the manifest's `artifacts` section is unchanged and still describes the files exactly as each run produced them.

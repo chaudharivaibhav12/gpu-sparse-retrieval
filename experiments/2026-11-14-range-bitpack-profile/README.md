@@ -24,3 +24,7 @@ The paired comparison found the range scorer 4.25× faster than the adapted mono
 - Range scorer GPU time: kernel 1 91%, merge 9%, copies <1%. Inside the kernels: decode+add 55%, local top-k 34%, merge 9%, lookups <1%. Barriers are the largest stall reason; only 49% of decode lanes carry postings; the densest range runs ~4× the mean number of tiles; 1.07 waves.
 
 Details and next optimisation candidates: [report.md](report.md).
+
+## Packaging for publication
+
+Run folders follow the team layout on main (applied by `scripts/package_run.py`): raw per-query `.csv`/`.tsv` files over 1 MB are stored as lossless `.gz` (decompress with `gunzip -k` before replaying an analysis script), and full profiler reports, JIT caches and listings too large for Git are kept outside Git. Each manifest's `public_packaging` section lists every original with its SHA-256, size, public path or custody location; the manifest's `artifacts` section is unchanged and still describes the files exactly as each run produced them.

@@ -36,3 +36,7 @@ Paired ratios, range-bitpack ÷ baseline (geometric mean of 1,500 query/process 
 The range scorer was faster in every one of the 1,500 pairs against every baseline. Vaibhav's 2026-11-12 CSR/monolithic ratios reproduce in this session. This is a complete-system comparison on a shared GPU; see the [report](report.md) for differences between implementations, the other user's GPU jobs during the session, and limits.
 
 Decision: adopt the range-split scorer as the exact GPU reference system; next a kernel breakdown, range-size sweep and k=100/1000, after sharing with the team.
+
+## Packaging for publication
+
+Run folders follow the team layout on main (applied by `scripts/package_run.py`): raw per-query `.csv`/`.tsv` files over 1 MB are stored as lossless `.gz` (decompress with `gunzip -k` before replaying an analysis script), and full profiler reports, JIT caches and listings too large for Git are kept outside Git. Each manifest's `public_packaging` section lists every original with its SHA-256, size, public path or custody location; the manifest's `artifacts` section is unchanged and still describes the files exactly as each run produced them.
