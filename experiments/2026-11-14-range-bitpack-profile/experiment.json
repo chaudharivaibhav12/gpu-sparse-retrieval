@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-14-range-bitpack-profile",
+  "title": "Profiling the range-split scorer and the adapted monolithic baseline",
+  "owner": "Arnav",
+  "branch": "exp/arnav/2026-11-14-range-bitpack-profile",
+  "status": "registered; profiling pending",
+  "parent_experiment": "2026-11-14-range-bitpack-paired (branch exp/arnav/2026-11-14-range-bitpack-paired, not merged)",
+  "parent_source_commit": "b29a8918459cceec702446924c610bc71037bc5d",
+  "question": "Where does the range scorer's time go, and how much of the 4.25x advantage over monolithic is GPU work versus host overhead?",
+  "hypothesis": "Unknown split; the GPU-only ratio will be closer to 1 than the wall ratio if Python/Torch overhead is large.",
+  "motivation": "The paired comparison is complete-system; profiling separates algorithmic GPU time from host overhead and identifies the scorer's dominant phase.",
+  "code_paths": [
+    "src/cuda_range_bitpack.cu",
+    "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/",
+    "experiments/2026-11-14-range-bitpack-profile/code/run_profile.sh",
+    "experiments/2026-11-14-range-bitpack-profile/analysis/analyze_nsys.py",
+    "experiments/2026-11-14-range-bitpack-profile/analysis/analyze_ncu.py",
+    "experiments/2026-11-14-range-bitpack-profile/analysis/decode_utilization.py"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-14-range-bitpack-profile/configs/protocol.json"
+  ],
+  "declared_changes": {
+    "vs_parent": "profilers attached; 25 queries; no source change"
+  },
+  "scoring_contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+  "input_manifest": "results/input-manifest.json, results/derived-sha256.txt",
+  "query_split": "first 25 of the 500 calibration queries",
+  "timing_boundary": "GPU timestamps from Nsight Systems; see protocol",
+  "correctness_rule": "all profiled outputs equal the CPU oracle",
+  "measurement_and_analysis_plan": "configs/protocol.json",
+  "success_rule": "Both traces split cleanly into queries and the ncu exports attribute all instructions.",
+  "failure_rule": "Unsplittable traces or attribution gaps are recorded and fixed in a new run.",
+  "next_if_negative": "n/a (descriptive)",
+  "recording_ids": [
+    "not recorded by the team runtime"
+  ],
+  "runs": []
+}

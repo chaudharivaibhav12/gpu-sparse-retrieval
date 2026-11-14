@@ -1,0 +1,29 @@
+{
+  "experiment_id": "2026-11-14-range-bitpack-profile",
+  "registered": "2026-11-14, before the recorded profiling run (a development pilot on 100K documents and 3 queries was used only to learn the export formats; it is not a result)",
+  "recording": "not recorded by the team runtime; self-recorded manifest; runtime gates satisfied by the same local stand-in as the paired experiment",
+  "parent_experiment": "2026-11-14-range-bitpack-paired (branch exp/arnav/2026-11-14-range-bitpack-paired at b29a891, not merged)",
+  "question": "Where does the range scorer's time go, and how much of its 4.25x paired advantage over the adapted monolithic baseline is GPU work versus host-side (Python/Torch/launch) overhead?",
+  "workload": "cuda5 RTX 4070, CUDA 12.6; 1M documents; first 25 calibration queries; k=10; batch 1; range size 4096; 256 score and merge threads; monolithic BLOCK_PL 512",
+  "sources": "range scorer byte-identical to eef8302; monolithic code byte-identical to the paired experiment's copy (714b8b0); no source changes",
+  "nsight_systems": {
+    "programs": ["range scorer", "adapted monolithic"],
+    "settings": "--trace=cuda --sample=none --cpuctxsw=none; one process each; 3 warm-up + 20 measured rounds over the 25 queries; driver argv as in the paired run except --limit 25",
+    "per_query": "GPU busy = sum of kernel, memcpy and memset durations; GPU span; host time inside the CUDA calls that launched the query's GPU work; per-kernel and per-copy breakdown; medians over the 20 measured rounds",
+    "query_split": "trace cut at the last device-to-host copy of each query (range 1, monolithic 2); group count must equal the driver's row count; warm-up groups (which absorb index upload) are dropped",
+    "primary": "geometric mean over the 25 queries of GPU-busy ratio range / monolithic, with a 10,000-draw query bootstrap (seed 20261115)",
+    "secondary": "unprofiled wall ratio on the same 25 queries from the paired run; non-GPU time = unprofiled wall median - profiled GPU busy median, per implementation"
+  },
+  "nsight_compute": {
+    "program": "range scorer, 1 round over the 25 queries (25 launches of each kernel)",
+    "sections": ["SpeedOfLight", "LaunchStats", "Occupancy", "WarpStateStats", "SchedulerStats", "SourceCounters", "MemoryWorkloadAnalysis", "InstructionStats", "ComputeWorkloadAnalysis"],
+    "lock": "private TMPDIR because /tmp/nsight-compute-lock belongs to another user; therefore no serialisation with other users' Nsight Compute sessions beyond the idle check",
+    "phase_split": "warp-state samples per SASS instruction mapped to phases (setup, term lookup, zeroing + first barrier, decode/add incl. prefix sums and shared atomics, local top-k, merge) by CUDA source line, or for inlined library code by file and opcode (SHFL.UP = prefix sum, SHFL.BFLY = top-k)",
+    "kernel_metrics": "duration share (base clocks), achieved/theoretical occupancy, threads per warp instruction, branch uniformity, SM/memory throughput, warp stall reasons incl. barrier, waves per SM",
+    "limits": "clocks locked to base and caches flushed per replay; use shares, not absolute times"
+  },
+  "analytic": "decode_utilization.py computes from the index the useful-lane fraction of decode tiles and tiles per range (Nsight counts idle lanes executing zero-work tiles as active)",
+  "correctness": "every saved top-10 of every profiled process compared with the CPU oracle (results/2026-11-11-cuda-bound-precision/inputs/cpu-top10-500.tsv, first 25 queries); monolithic post-timing validation must succeed",
+  "gpu_check": "idle check before each profiled process (poll 30 s, abort after 30 min); 2-second GPU process sampler for the whole run, other users' home paths redacted as written",
+  "launch": "nohup on cuda5"
+}
