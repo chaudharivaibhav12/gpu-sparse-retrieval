@@ -1,0 +1,22 @@
+{
+  "variant": 3,
+  "change": "Index stores bit-packed in-range positions instead of gaps (file version GSPRBP02, encoding flag); kernel 1 scores the work list with no prefix sum and no per-tile barrier.",
+  "justification_from_profile": "20261114-cuda5-profile-01: barriers were the largest stall reason in kernel 1 (4.6 cycles per issued instruction, 28% of stall cycles); decode needed one barrier per tile for the block-wide prefix sum.",
+  "behaviour_deltas_vs_variant_2": [
+    "Index size at 1M documents, range 4096: 315,508,373 -> 362,880,161 posting bytes (2.658 -> 3.057 bytes per posting, +15.0%); mean packed value 8.78 -> 11.98 bits. At 100K: 33,557,837 -> 37,586,373.",
+    "The per-block last-position array of variant 2 is removed.",
+    "Kernel 1 barriers: two at start, one after scoring, one in selection; none inside the scoring loop.",
+    "The scorer refuses gap-encoded (GSPRBP01) indexes; GSPRBP01 files remain valid for version 1."
+  ],
+  "review_before_running": [
+    "Builder: width is taken from the largest position in the block; positions are packed in ascending document order so the round-trip check and the multiplicity scan (equal consecutive positions) stay valid.",
+    "Loader accepts GSPRBP01 (gaps) and GSPRBP02 (positions only, reserved word must be 0); the SHA-256 trailer covers the extra header words.",
+    "Kernel: lanes touch disjoint work-list entries; repeated (term, document) postings hit the same score slot and are handled by the shared atomic add.",
+    "Round-trip verification now also rejects positions that go backwards."
+  ],
+  "findings": [
+    {"id": 1, "issue": "The version-1 driver at this commit does not check the encoding flag and would misread a position-encoded file as gaps.", "handling": "Version 1 is not modified (its measured source stays byte-identical). For comparisons build version 1 from commit eef8302, whose loader rejects GSPRBP02, and keep position-encoded files under the -pos name."}
+  ],
+  "checks": "Fixtures with --encoding positions (216 scorer runs, 9 rejections including the gap-index refusal); version-1 fixtures still pass on gap files; 100K/1M x 500 queries x k=10/1000 with zero mismatches.",
+  "validation_limits": ["Position values are trusted to be inside the range after the builder's round-trip check and the file SHA-256; the kernel does not bounds-check them."]
+}

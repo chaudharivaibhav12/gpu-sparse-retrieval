@@ -124,16 +124,19 @@ def expected_ranking(ids, docs, weights):
     return rows
 
 
-def decode_rbp(path, gsp_path, ids, docs, vocab, range_size, coverage):
+def decode_rbp(path, gsp_path, ids, docs, vocab, range_size, coverage, encoding):
     """Parse the RBP file with struct only and compare every posting."""
     blob = path.read_bytes()
     assert hashlib.sha256(blob[:-32]).digest() == blob[-32:], "trailing SHA-256"
-    assert blob[:8] == b"GSPRBP01"
+    assert blob[:8] == (b"GSPRBP01" if encoding == "gaps" else b"GSPRBP02")
     n, v, w, r = struct.unpack_from("<4I", blob, 8)
     blocks, nnz, words, total_bits = struct.unpack_from("<4Q", blob, 24)
     at = 56
     assert blob[at:at + 32] == hashlib.sha256(gsp_path.read_bytes()).digest(), "source SHA-256"
     at += 32
+    if encoding != "gaps":
+        assert struct.unpack_from("<2I", blob, at) == (1, 0)
+        at += 8
 
     def take(fmt, count):
         nonlocal at
@@ -160,7 +163,8 @@ def decode_rbp(path, gsp_path, ids, docs, vocab, range_size, coverage):
             doc = lookup_range[b] * w
             for j in range(counts[b]):
                 bit = bit_start[b] + j * widths[b]
-                doc += (packed >> bit) & ((1 << widths[b]) - 1)
+                value = (packed >> bit) & ((1 << widths[b]) - 1)
+                doc = doc + value if encoding == "gaps" else lookup_range[b] * w + value
                 actual.append((doc, impacts[value_start[b] + j]))
                 coverage["straddle"] += bit // 32 != (bit + widths[b] - 1) // 32
             assert lookup_range[b] * w <= actual[-counts[b]][0] and doc < min(n, (lookup_range[b] + 1) * w)
@@ -191,6 +195,7 @@ def main():
     parser.add_argument("--output", type=Path, help="new directory for the summary and fixture files")
     parser.add_argument("--gpu", default="0")
     parser.add_argument("--max-k", type=int, default=128, help="largest k the scorer supports")
+    parser.add_argument("--encoding", default="gaps", choices=["gaps", "positions"])
     args = parser.parse_args()
     tool, scorer = Path(args.tool).resolve(), Path(args.scorer).resolve()
     depths = DEPTHS + ([DEEP] if args.max_k >= DEEP[0] else [])
@@ -219,9 +224,9 @@ def main():
                                      "max_score": max((rows[0][1] for rows in expected.values() if rows), default=0)}
         for w in RANGE_SIZES:
             rbp = root / ("%s-w%d.rbp" % (name, w))
-            run([tool, "build", gsp, rbp, w])
+            run([tool, "build", gsp, rbp, w] + ([args.encoding] if args.encoding != "gaps" else []))
             run([tool, "verify", gsp, rbp])
-            decode_rbp(rbp, gsp, ids, docs, vocab, w, coverage)
+            decode_rbp(rbp, gsp, ids, docs, vocab, w, coverage, args.encoding)
             summary["index_configurations"] += 1
             for k, threads, merge_threads in depths:
                 stem = root / ("%s-w%d-k%d-t%d-m%d" % (name, w, k, threads, merge_threads))
@@ -277,6 +282,11 @@ def main():
     blob[len(blob) // 2] ^= 1
     corrupt.write_bytes(bytes(blob))
     reject("SHA-256 mismatch", p1=corrupt, p2=good_queries)
+    if args.encoding != "gaps":
+        # A scorer built for positions must refuse a gap-encoded index.
+        gaps_index = root / "big-w64-gaps.rbp"
+        run([tool, "build", gsp, gaps_index, 64])
+        reject("position-encoded index", p1=gaps_index, p2=good_queries)
     run([tool, "build", gsp, rbp, 64], expect_failure="Refusing to overwrite")
     summary["expected_rejections"] += 1
 

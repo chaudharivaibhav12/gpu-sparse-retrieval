@@ -7,6 +7,10 @@
 // block's width, with uint8 impacts kept in the same term-major order. Blocks
 // are stored term-major and range-ascending, so a block's ID is its position
 // in lookup_range and no separate lookup_block array is stored.
+//
+// Encoding 0 (file magic GSPRBP01) packs gaps. Encoding 1 (GSPRBP02) packs
+// each posting's in-range position directly, at the width of the block's
+// largest position; it needs no prefix sum to decode.
 #pragma once
 #include <array>
 
@@ -89,9 +93,11 @@ inline array<uint8_t,32> sha_file(const string& path) {
 
 constexpr uint32_t RBP_NONE=UINT32_MAX;
 constexpr uint32_t RBP_MAX_RANGE=32768;
+constexpr uint32_t RBP_GAPS=0,RBP_POSITIONS=1;
 
 struct RangeIndex {
     uint32_t docs=0,vocab=0,range_size=0,ranges=0;
+    uint32_t encoding=RBP_GAPS;
     uint64_t total_bits=0;
     vector<uint64_t> ids;                // original numeric passage IDs, internal order
     vector<uint32_t> lookup_first;       // vocab+1 entries into the block arrays
@@ -99,8 +105,8 @@ struct RangeIndex {
     vector<uint64_t> block_bit_start;    // per block: first bit in encoded
     vector<uint32_t> block_value_start;  // per block: first entry in impacts
     vector<uint16_t> block_count;        // per block: postings
-    vector<uint8_t> block_width;         // per block: bits per gap, at least 1
-    vector<uint32_t> encoded;            // packed gaps plus one zero padding word
+    vector<uint8_t> block_width;         // per block: bits per packed value, at least 1
+    vector<uint32_t> encoded;            // packed gaps or positions plus one zero padding word
     vector<uint8_t> impacts;             // term-major, same order as the gaps
     array<uint8_t,32> source_sha{},file_sha{};
     size_t blocks() const { return lookup_range.size(); }
@@ -121,11 +127,12 @@ RBP_HD inline uint32_t rbp_extract(const uint32_t* encoded,uint64_t bit,uint32_t
     return width==32 ? value : value&((1u<<width)-1);
 }
 
-inline RangeIndex rbp_build(const Index& x,uint32_t range_size) {
+inline RangeIndex rbp_build(const Index& x,uint32_t range_size,uint32_t encoding=RBP_GAPS) {
     require(range_size>=1&&range_size<=RBP_MAX_RANGE,"Range size must be 1..32768");
+    require(encoding<=RBP_POSITIONS,"Unknown encoding");
     require(x.ids.size()<=UINT32_MAX&&x.terms.size()<=UINT32_MAX,"Index too large for 32-bit posting positions");
     RangeIndex r;
-    r.docs=uint32_t(x.ids.size());r.vocab=uint32_t(x.vocab.size());r.range_size=range_size;
+    r.docs=uint32_t(x.ids.size());r.vocab=uint32_t(x.vocab.size());r.range_size=range_size;r.encoding=encoding;
     r.ranges=uint32_t((uint64_t(r.docs)+range_size-1)/range_size);
     r.ids=x.ids;
     const uint64_t nnz=x.terms.size();
@@ -147,9 +154,11 @@ inline RangeIndex rbp_build(const Index& x,uint32_t range_size) {
         r.lookup_first[t]=uint32_t(r.blocks());
         for (uint64_t i=start[t];i<start[t+1];) {
             const uint32_t range=term_docs[i]/range_size;
+            // max_gap is the largest packed value: a gap, or a position.
             uint64_t end=i;uint32_t previous=range*range_size,max_gap=0;
             for (;end<start[t+1]&&term_docs[end]/range_size==range;++end) {
-                max_gap=max(max_gap,term_docs[end]-previous);previous=term_docs[end];
+                max_gap=max(max_gap,term_docs[end]-previous);
+                if (encoding==RBP_GAPS) previous=term_docs[end];
             }
             require(end-i<=UINT16_MAX,"Block posting count exceeds uint16");
             uint8_t width=1;
@@ -169,7 +178,7 @@ inline RangeIndex rbp_build(const Index& x,uint32_t range_size) {
         const uint32_t width=r.block_width[b];
         for (uint32_t j=0;j<r.block_count[b];++j) {
             const uint32_t doc=term_docs[size_t(r.block_value_start[b])+j],gap=doc-previous;
-            previous=doc;
+            if (encoding==RBP_GAPS) previous=doc;
             const uint64_t word=bit>>5;const uint32_t shift=uint32_t(bit&31);
             r.encoded[word]|=gap<<shift;
             if (shift+width>32) r.encoded[word+1]|=gap>>(32-shift);
@@ -190,8 +199,9 @@ inline void rbp_save(RangeIndex& r,const string& path) {
     const auto emit_vec=[&](const auto& v) { if (!v.empty()) emit(v.data(),v.size()*sizeof(v[0])); };
     const uint32_t head32[4]={r.docs,r.vocab,r.range_size,r.ranges};
     const uint64_t head64[4]={r.blocks(),r.impacts.size(),r.encoded.size(),r.total_bits};
-    emit("GSPRBP01",8);emit(head32,sizeof head32);emit(head64,sizeof head64);
+    emit(r.encoding==RBP_GAPS ? "GSPRBP01" : "GSPRBP02",8);emit(head32,sizeof head32);emit(head64,sizeof head64);
     emit(r.source_sha.data(),32);
+    if (r.encoding!=RBP_GAPS) { const uint32_t extra[2]={r.encoding,0};emit(extra,sizeof extra); }
     emit_vec(r.ids);emit_vec(r.lookup_first);emit_vec(r.lookup_range);emit_vec(r.block_bit_start);
     emit_vec(r.block_value_start);emit_vec(r.block_count);emit_vec(r.block_width);emit_vec(r.encoded);emit_vec(r.impacts);
     r.file_sha=sha.finish();
@@ -214,10 +224,13 @@ inline RangeIndex rbp_load(const string& path) {
     size_t at=0;const size_t limit=size-32;
     const auto take=[&](void* target,size_t count) { require(count<=limit-at,"Truncated range index");if (count) memcpy(target,bytes.data()+at,count);at+=count; };
     const auto take_vec=[&](auto& v,uint64_t count) { require(count<=limit/sizeof(v[0]),"Bad range index count");v.resize(size_t(count));take(v.data(),v.size()*sizeof(v[0])); };
-    char magic[8];take(magic,8);require(memcmp(magic,"GSPRBP01",8)==0,"Bad range index magic");
+    char magic[8];take(magic,8);
+    const bool version2=memcmp(magic,"GSPRBP02",8)==0;
+    require(version2 || memcmp(magic,"GSPRBP01",8)==0,"Bad range index magic");
     uint32_t head32[4];uint64_t head64[4];take(head32,sizeof head32);take(head64,sizeof head64);
     r.docs=head32[0];r.vocab=head32[1];r.range_size=head32[2];r.ranges=head32[3];r.total_bits=head64[3];
     take(r.source_sha.data(),32);
+    if (version2) { uint32_t extra[2];take(extra,sizeof extra);r.encoding=extra[0];require(r.encoding==RBP_POSITIONS&&extra[1]==0,"Unsupported range index encoding"); }
     const uint64_t blocks=head64[0],nnz=head64[1],words=head64[2];
     take_vec(r.ids,r.docs);take_vec(r.lookup_first,uint64_t(r.vocab)+1);take_vec(r.lookup_range,blocks);
     take_vec(r.block_bit_start,blocks);take_vec(r.block_value_start,blocks);take_vec(r.block_count,blocks);
@@ -246,7 +259,9 @@ inline uint32_t rbp_max_multiplicity(const RangeIndex& r) {
     for (size_t b=0;b<r.blocks();++b) {
         uint32_t run=1;
         for (uint32_t j=1;j<r.block_count[b];++j) {
-            const bool repeat=rbp_extract(r.encoded.data(),r.block_bit_start[b]+uint64_t(j)*r.block_width[b],r.block_width[b])==0;
+            const uint64_t bit=r.block_bit_start[b]+uint64_t(j)*r.block_width[b];
+            const uint32_t value=rbp_extract(r.encoded.data(),bit,r.block_width[b]);
+            const bool repeat=r.encoding==RBP_GAPS ? value==0 : value==rbp_extract(r.encoded.data(),bit-r.block_width[b],r.block_width[b]);
             run=repeat ? run+1 : 1;longest=max(longest,run);
         }
     }
@@ -265,8 +280,10 @@ inline void rbp_verify_roundtrip(const Index& x,const RangeIndex& r) {
         const uint64_t last=min(uint64_t(r.docs),first+r.range_size);
         uint64_t doc=first;
         for (uint32_t j=0;j<r.block_count[b];++j) {
-            doc+=rbp_extract(r.encoded.data(),r.block_bit_start[b]+uint64_t(j)*r.block_width[b],r.block_width[b]);
-            require(doc<last,"Decoded document leaves its range");
+            const uint32_t value=rbp_extract(r.encoded.data(),r.block_bit_start[b]+uint64_t(j)*r.block_width[b],r.block_width[b]);
+            const uint64_t before=doc;
+            doc=r.encoding==RBP_GAPS ? doc+value : first+value;
+            require(doc<last&&(j==0||doc>=before),"Decoded document leaves its range or goes backwards");
             docs[size_t(r.block_value_start[b])+j]=uint32_t(doc);++offsets[doc+1];
         }
     }

@@ -1,10 +1,12 @@
-// Range-split bit-packed exhaustive scorer, version 2 (variant 2).
+// Range-split bit-packed exhaustive scorer, version 2 (variant 3).
 // Variant 1 replaces version 1's k barrier-separated selection rounds: each
 // thread sorts its own score slots, each warp selects its best with register
 // shuffles, and after one barrier every candidate ranks itself against the
 // other warps' lists and writes its final position. k is supported to 1000.
 // Variant 2 decodes one combined work list per range: lanes index into the
 // concatenation of all the query's blocks, so every decode tile is full.
+// Variant 3 reads a position-encoded index (GSPRBP02): each lane extracts its
+// posting's in-range position directly, with no prefix sum and no barrier.
 #define GSP_NO_MAIN
 #include "cpu_pilot.cpp"
 #include "cuda_topk.cuh"
@@ -27,8 +29,6 @@ struct RbpView {
     // Per range: tie_rank[doc] is the rank of the document's original ID among
     // the range's documents (0 = smallest); rank_slot is its inverse.
     const uint16_t* tie_rank;const uint16_t* rank_slot;
-    // Per block: in-range position of its last posting (the sum of its gaps).
-    const uint16_t* block_last;
     uint32_t docs,range_size;
 };
 
@@ -73,12 +73,11 @@ __global__ void range_scores(RbpView v,const QueryTerm* query,uint32_t terms,uin
     // Dynamic shared memory: warps*list_cap selection keys, then the scores.
     extern __shared__ uint64_t dynamic_shared[];
     // Per query term in this range: its block's metadata (count 0 if absent),
-    // and the running totals of counts and of last positions before it.
+    // and the number of work-list postings before it.
     __shared__ uint64_t term_bit[RBP_MAX_TERMS];
-    __shared__ uint32_t term_count[RBP_MAX_TERMS],term_last[RBP_MAX_TERMS],term_value[RBP_MAX_TERMS];
+    __shared__ uint32_t term_count[RBP_MAX_TERMS],term_value[RBP_MAX_TERMS];
     __shared__ uint32_t term_width[RBP_MAX_TERMS],term_weight[RBP_MAX_TERMS];
-    __shared__ uint32_t count_start[RBP_MAX_TERMS+1],gap_start[RBP_MAX_TERMS];
-    __shared__ uint32_t warp_total[2][RBP_MAX_WARPS];
+    __shared__ uint32_t count_start[RBP_MAX_TERMS+1];
     __shared__ uint32_t warp_length[RBP_MAX_WARPS];
     const uint32_t thread=threadIdx.x,threads=blockDim.x,lane=thread&31,warp=thread>>5,warps=threads>>5;
     uint64_t* lists=dynamic_shared;
@@ -99,7 +98,6 @@ __global__ void range_scores(RbpView v,const QueryTerm* query,uint32_t terms,uin
         }
         const bool present=lo<end && v.lookup_range[lo]==range;
         term_count[i]=present ? v.count[lo] : 0;
-        term_last[i]=present ? v.block_last[lo] : 0;
         term_bit[i]=present ? v.bit_start[lo] : 0;
         term_value[i]=present ? v.value_start[lo] : 0;
         term_width[i]=present ? v.width[lo] : 1;
@@ -108,50 +106,29 @@ __global__ void range_scores(RbpView v,const QueryTerm* query,uint32_t terms,uin
     // 2. Every document in the range starts at zero and stays eligible.
     for (uint32_t s=thread;s<range_docs;s+=threads) scores[s]=0;
     __syncthreads();
-    // Work-list offsets: postings and summed last positions before each term.
+    // Work-list offsets: postings before each term.
     for (uint32_t i=thread;i<=terms;i+=threads) {
-        uint32_t postings=0,positions=0;
-        for (uint32_t earlier=0;earlier<i;++earlier) { postings+=term_count[earlier];positions+=term_last[earlier]; }
+        uint32_t postings=0;
+        for (uint32_t earlier=0;earlier<i;++earlier) postings+=term_count[earlier];
         count_start[i]=postings;
-        if (i<terms) gap_start[i]=positions;
     }
     __syncthreads();
 
-    // 3. Decode the combined work list a full tile at a time. The inclusive
-    //    prefix sum runs across block boundaries; because a block's gaps sum
-    //    to its last position, subtracting the summed last positions of the
-    //    earlier blocks leaves the in-range position.
+    // 3. Score the combined work list. Each lane takes postings g = thread,
+    //    thread + threads, ...; positions are stored directly, so lanes never
+    //    wait for each other.
     const uint32_t postings=count_start[terms];
-    uint32_t parity=0,carry=0;
-    for (uint32_t base=0;base<postings;base+=threads) {
-        const uint32_t g=base+thread;
-        const bool live=g<postings;
-        uint32_t i=0,j=0,prefix=0;
-        if (live) {
-            // Last term whose work-list start is at or before g; it is never
-            // an absent term because such a term's range of g is empty.
-            uint32_t hi=terms;
-            while (hi-i>1) {
-                const uint32_t mid=i+(hi-i)/2;
-                if (count_start[mid]<=g) i=mid; else hi=mid;
-            }
-            j=g-count_start[i];
-            prefix=rbp_extract(v.encoded,term_bit[i]+uint64_t(j)*term_width[i],term_width[i]);
+    for (uint32_t g=thread;g<postings;g+=threads) {
+        // Last term whose work-list start is at or before g; it is never an
+        // absent term because such a term's range of g is empty.
+        uint32_t i=0,hi=terms;
+        while (hi-i>1) {
+            const uint32_t mid=i+(hi-i)/2;
+            if (count_start[mid]<=g) i=mid; else hi=mid;
         }
-        for (uint32_t offset=1;offset<32;offset<<=1) {
-            const uint32_t below=__shfl_up_sync(0xffffffffu,prefix,offset);
-            if (lane>=offset) prefix+=below;
-        }
-        if (lane==31) warp_total[parity][warp]=prefix;
-        __syncthreads();
-        uint32_t before=0,total=0;
-        for (uint32_t w=0;w<warps;++w) {
-            const uint32_t sum=warp_total[parity][w];
-            total+=sum;
-            if (w<warp) before+=sum;
-        }
-        if (live) atomicAdd(&scores[carry+before+prefix-gap_start[i]],term_weight[i]*uint32_t(v.impacts[term_value[i]+j]));
-        carry+=total;parity^=1;
+        const uint32_t j=g-count_start[i];
+        const uint32_t position=rbp_extract(v.encoded,term_bit[i]+uint64_t(j)*term_width[i],term_width[i]);
+        atomicAdd(&scores[position],term_weight[i]*uint32_t(v.impacts[term_value[i]+j]));
     }
     __syncthreads();
 
@@ -267,6 +244,7 @@ int main(int argc,char** argv) {
         require(k<=RBP_MAX_K&&verify<=1&&rounds>0&&valid_threads(threads)&&valid_threads(merge_threads),"Unsupported setting");
         require(!verify || gsp_path!="-","VERIFY=1 needs the source GSP index");
         const auto index=rbp_load(argv[1]);auto queries=read_queries(argv[2]);
+        require(index.encoding==RBP_POSITIONS,"This scorer needs a position-encoded index (build with 'positions')");
         const uint32_t N=index.docs,R=index.ranges,W=index.range_size;
         const uint32_t count=uint32_t(min(size_t(limit),queries.size())),wanted=min(k,N);
         require(unordered_set<uint64_t>(index.ids.begin(),index.ids.end()).size()==N,"Duplicate passage ID");
@@ -305,39 +283,31 @@ int main(int argc,char** argv) {
                 for (uint32_t rank=0;rank<n;++rank) { tie_rank_host[first+order[rank]]=uint16_t(rank);rank_slot_host[first+rank]=uint16_t(order[rank]); }
             }
         }
-        // Last in-range position of every block: the sum of its gaps.
-        vector<uint16_t> block_last_host(index.blocks());
-        for (size_t b=0;b<index.blocks();++b) {
-            uint32_t position=0;
-            for (uint32_t j=0;j<index.block_count[b];++j) position+=rbp_extract(index.encoded.data(),index.block_bit_start[b]+uint64_t(j)*index.block_width[b],index.block_width[b]);
-            require(position<W,"Block position outside its range");
-            block_last_host[b]=uint16_t(position);
-        }
         cuda_checked(cudaSetDevice(gpu));cudaDeviceProp properties{};cuda_checked(cudaGetDeviceProperties(&properties,gpu));
         const size_t shared_bytes=size_t(warps)*list_cap*8+size_t(W)*4;
         require(cudaFuncSetAttribute(range_scores,cudaFuncAttributeMaxDynamicSharedMemorySize,int(shared_bytes))==cudaSuccess,
                 "Range size and k need more shared memory than this GPU allows per thread block");
         GpuArray<uint32_t> lookup_first(index.lookup_first.size()),lookup_range(index.blocks()),value_start(index.blocks()),encoded(index.encoded.size());
         GpuArray<uint64_t> bit_start(index.blocks()),ids(N);
-        GpuArray<uint16_t> block_count(index.blocks()),tie_rank(N),rank_slot(N),heads(R),block_last(index.blocks());
+        GpuArray<uint16_t> block_count(index.blocks()),tie_rank(N),rank_slot(N),heads(R);
         GpuArray<uint8_t> block_width(index.blocks()),impacts(index.impacts.size());
         GpuArray<QueryTerm> query(RBP_MAX_TERMS);
         GpuArray<GpuCandidate> candidates(size_t(R)*k),scratch(size_t(merge_warps)*k),merged(k);
         lookup_first.upload(index.lookup_first);lookup_range.upload(index.lookup_range);value_start.upload(index.block_value_start);
         encoded.upload(index.encoded);bit_start.upload(index.block_bit_start);ids.upload(index.ids);
         block_count.upload(index.block_count);block_width.upload(index.block_width);impacts.upload(index.impacts);
-        tie_rank.upload(tie_rank_host);rank_slot.upload(rank_slot_host);block_last.upload(block_last_host);
-        const RbpView view{lookup_first.ptr,lookup_range.ptr,bit_start.ptr,value_start.ptr,block_count.ptr,block_width.ptr,encoded.ptr,impacts.ptr,ids.ptr,tie_rank.ptr,rank_slot.ptr,block_last.ptr,N,W};
-        const uint64_t allocation=index.posting_bytes()+ids.count*8+(tie_rank.count+rank_slot.count+heads.count+block_last.count)*2+query.count*sizeof(QueryTerm)+(candidates.count+scratch.count+merged.count)*sizeof(GpuCandidate);
+        tie_rank.upload(tie_rank_host);rank_slot.upload(rank_slot_host);
+        const RbpView view{lookup_first.ptr,lookup_range.ptr,bit_start.ptr,value_start.ptr,block_count.ptr,block_width.ptr,encoded.ptr,impacts.ptr,ids.ptr,tie_rank.ptr,rank_slot.ptr,N,W};
+        const uint64_t allocation=index.posting_bytes()+ids.count*8+(tie_rank.count+rank_slot.count+heads.count)*2+query.count*sizeof(QueryTerm)+(candidates.count+scratch.count+merged.count)*sizeof(GpuCandidate);
         string cpu_affinity="unknown",status_line;ifstream status("/proc/self/status");
         while (getline(status,status_line)) if (status_line.rfind("Cpus_allowed_list:",0)==0) { istringstream affinity(status_line.substr(18));affinity>>cpu_affinity; }
         research_gate("cuda-range-v2",N,count,k,gpu,argv[1],argv[2],
-            ",\"variant\":2,\"range_size\":"+to_string(W)+",\"ranges\":"+to_string(R)+",\"blocks\":"+to_string(index.blocks())+",\"score_threads\":"+to_string(threads)+",\"merge_threads\":"+to_string(merge_threads)+",\"max_supported_k\":"+to_string(RBP_MAX_K)+",\"max_query_terms\":"+to_string(max_terms)+",\"max_supported_terms\":"+to_string(RBP_MAX_TERMS)+",\"max_term_document_multiplicity\":"+to_string(multiplicity)+",\"slots_per_thread\":"+to_string(slots)+",\"warp_list_capacity\":"+to_string(list_cap)+",\"shared_bytes\":"+to_string(shared_bytes)+",\"index_posting_bytes\":"+to_string(index.posting_bytes())+",\"tie_rank_bytes\":"+to_string((tie_rank.count+rank_slot.count)*2)+",\"block_last_bytes\":"+to_string(block_last.count*2)+",\"verify_scores\":"+to_string(verify)+",\"warmup_rounds\":"+to_string(warmups)+",\"repeats\":"+to_string(rounds)+",\"cpu_affinity\":"+research_quote(cpu_affinity)+",\"index_sha256\":"+research_quote(sha_hex(index.file_sha))+",\"source_gsp_sha256\":"+research_quote(sha_hex(index.source_sha)),
-            ",\"layout\":\"range-split-bitpacked-gaps-term-major\",\"schedule\":\"exhaustive-all-ranges\",\"decode\":\"combined-work-list-full-tiles;cross-block-prefix-sum-minus-summed-last-positions\",\"accumulator\":\"uint32-shared-gated-below-2^32-1-widened-to-uint64\",\"selection\":\"thread-sorted-slots;warp-shuffle-select;one-barrier-rank-scatter;separate-merge-kernel-same-pattern\",\"tie_keys\":\"per-range-original-id-rank-uint16\",\"query_transfer\":\"sparse-term-weight-pairs\",\"result_transfer\":\"topk-only\"");
+            ",\"variant\":3,\"range_size\":"+to_string(W)+",\"ranges\":"+to_string(R)+",\"blocks\":"+to_string(index.blocks())+",\"score_threads\":"+to_string(threads)+",\"merge_threads\":"+to_string(merge_threads)+",\"max_supported_k\":"+to_string(RBP_MAX_K)+",\"max_query_terms\":"+to_string(max_terms)+",\"max_supported_terms\":"+to_string(RBP_MAX_TERMS)+",\"max_term_document_multiplicity\":"+to_string(multiplicity)+",\"slots_per_thread\":"+to_string(slots)+",\"warp_list_capacity\":"+to_string(list_cap)+",\"shared_bytes\":"+to_string(shared_bytes)+",\"index_posting_bytes\":"+to_string(index.posting_bytes())+",\"tie_rank_bytes\":"+to_string((tie_rank.count+rank_slot.count)*2)+",\"verify_scores\":"+to_string(verify)+",\"warmup_rounds\":"+to_string(warmups)+",\"repeats\":"+to_string(rounds)+",\"cpu_affinity\":"+research_quote(cpu_affinity)+",\"index_sha256\":"+research_quote(sha_hex(index.file_sha))+",\"source_gsp_sha256\":"+research_quote(sha_hex(index.source_sha)),
+            ",\"layout\":\"range-split-bitpacked-positions-term-major\",\"schedule\":\"exhaustive-all-ranges\",\"decode\":\"combined-work-list;direct-positions;no-decode-barriers\",\"accumulator\":\"uint32-shared-gated-below-2^32-1-widened-to-uint64\",\"selection\":\"thread-sorted-slots;warp-shuffle-select;one-barrier-rank-scatter;separate-merge-kernel-same-pattern\",\"tie_keys\":\"per-range-original-id-rank-uint16\",\"query_transfer\":\"sparse-term-weight-pairs\",\"result_transfer\":\"topk-only\"");
         require(!filesystem::exists(argv[3])&&!filesystem::exists(argv[4]),"Refusing to overwrite results");
         ofstream csv(argv[3]),top(argv[4]);require(bool(csv)&&bool(top),"Cannot create result files");
         cout<<"GPU "<<properties.name<<" CC "<<properties.major<<'.'<<properties.minor<<" docs="<<N<<" range_size="<<W<<" ranges="<<R
-            <<" allocation_bytes="<<allocation<<" shared_bytes="<<shared_bytes<<" index_sha256="<<sha_hex(index.file_sha)<<" control=range-v2-variant-2\n";
+            <<" allocation_bytes="<<allocation<<" shared_bytes="<<shared_bytes<<" index_sha256="<<sha_hex(index.file_sha)<<" control=range-v2-variant-3\n";
         csv<<"phase,round,query_id,docs,k,query_wall_ms,gpu_span_ms,ordered_id_mismatches,result_score_mismatches,query_terms,range_size,ranges,score_threads,merge_threads,device_allocation_bytes,index_posting_bytes,result_transfer_bytes,query_transfer_bytes\n";
         top<<"phase\tround\tquery_id\trank\toriginal_id\tscore\n";
         vector<QueryTerm> sparse(RBP_MAX_TERMS);vector<GpuCandidate> winners(wanted);

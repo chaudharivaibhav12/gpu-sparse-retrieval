@@ -1,5 +1,5 @@
 // Offline builder and checker for the range-split bit-packed index.
-//   range_bitpack_tool build GSP OUTPUT RANGE_SIZE
+//   range_bitpack_tool build GSP OUTPUT RANGE_SIZE [gaps|positions]
 //   range_bitpack_tool verify GSP RBP
 #define GSP_NO_MAIN
 #include "cpu_pilot.cpp"
@@ -11,7 +11,7 @@ static void report(const Index& x,const RangeIndex& r) {
     const auto per=[&](uint64_t bytes) { return nnz ? double(bytes)/double(nnz) : 0.0; };
     uint64_t histogram[17]{};
     for (uint8_t w:r.block_width) ++histogram[w];
-    cout<<"RBP docs="<<r.docs<<" vocab="<<r.vocab<<" range_size="<<r.range_size<<" ranges="<<r.ranges
+    cout<<"RBP docs="<<r.docs<<" vocab="<<r.vocab<<" encoding="<<(r.encoding==RBP_GAPS ? "gaps" : "positions")<<" range_size="<<r.range_size<<" ranges="<<r.ranges
         <<" blocks="<<r.blocks()<<" postings="<<nnz<<" total_bits="<<r.total_bits<<'\n';
     cout<<"RBP_BYTES lookup_first="<<r.lookup_first.size()*4<<" lookup_range="<<r.lookup_range.size()*4
         <<" block_bit_start="<<r.block_bit_start.size()*8<<" block_value_start="<<r.block_value_start.size()*4
@@ -19,7 +19,7 @@ static void report(const Index& x,const RangeIndex& r) {
         <<" encoded="<<r.encoded.size()*4<<" impacts="<<r.impacts.size()<<" original_ids="<<r.ids.size()*8<<'\n';
     cout<<"RBP_SIZE posting_bytes="<<r.posting_bytes()<<" bytes_per_posting="<<per(r.posting_bytes())
         <<" csr_posting_bytes="<<csr<<" csr_bytes_per_posting="<<per(csr)
-        <<" mean_gap_bits="<<(nnz ? double(r.total_bits)/double(nnz) : 0.0)<<'\n';
+        <<" mean_value_bits="<<(nnz ? double(r.total_bits)/double(nnz) : 0.0)<<'\n';
     cout<<"RBP_WIDTH_BLOCKS";
     for (int w=1;w<=16;++w) if (histogram[w]) cout<<' '<<w<<':'<<histogram[w];
     cout<<'\n';
@@ -28,15 +28,17 @@ static void report(const Index& x,const RangeIndex& r) {
 
 int main(int argc,char** argv) {
     try {
-        require(argc>=2,"Usage: range_bitpack_tool build GSP OUTPUT RANGE_SIZE | verify GSP RBP");
+        require(argc>=2,"Usage: range_bitpack_tool build GSP OUTPUT RANGE_SIZE [gaps|positions] | verify GSP RBP");
         const string mode=argv[1];
         if (mode=="build") {
-            require(argc==5,"build needs GSP OUTPUT RANGE_SIZE");
+            require(argc==5||argc==6,"build needs GSP OUTPUT RANGE_SIZE [gaps|positions]");
+            const string mode_name=argc==6 ? argv[5] : "gaps";
+            require(mode_name=="gaps"||mode_name=="positions","Encoding must be gaps or positions");
             const string text=argv[4];size_t used=0;const auto range=stoull(text,&used);
             require(!text.empty()&&text[0]!='-'&&used==text.size()&&range<=RBP_MAX_RANGE,"Invalid range size");
             require(!filesystem::exists(argv[3]),"Refusing to overwrite index");
             const auto x=load(argv[2]);
-            auto r=rbp_build(x,uint32_t(range));
+            auto r=rbp_build(x,uint32_t(range),mode_name=="gaps" ? RBP_GAPS : RBP_POSITIONS);
             r.source_sha=sha_file(argv[2]);
             rbp_verify_roundtrip(x,r);
             rbp_save(r,argv[3]);
