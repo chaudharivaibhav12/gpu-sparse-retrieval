@@ -124,19 +124,43 @@ def expected_ranking(ids, docs, weights):
     return rows
 
 
-def decode_rbp(path, gsp_path, ids, docs, vocab, range_size, coverage, encoding):
+def capped_ranges(docs, range_size, cap):
+    """Independent copy of the builder's greedy rule."""
+    starts, begin, load = [0], 0, 0
+    for d, doc in enumerate(docs):
+        if d > begin and (d - begin == range_size or load + len(doc) > cap):
+            starts.append(d)
+            begin, load = d, 0
+        load += len(doc)
+    if docs:
+        starts.append(len(docs))
+    return starts
+
+
+def decode_rbp(path, gsp_path, ids, docs, vocab, range_size, coverage, encoding, cap):
     """Parse the RBP file with struct only and compare every posting."""
     blob = path.read_bytes()
     assert hashlib.sha256(blob[:-32]).digest() == blob[-32:], "trailing SHA-256"
-    assert blob[:8] == (b"GSPRBP01" if encoding == "gaps" else b"GSPRBP02")
+    version2 = encoding != "gaps" or cap
+    assert blob[:8] == (b"GSPRBP02" if version2 else b"GSPRBP01")
     n, v, w, r = struct.unpack_from("<4I", blob, 8)
     blocks, nnz, words, total_bits = struct.unpack_from("<4Q", blob, 24)
     at = 56
     assert blob[at:at + 32] == hashlib.sha256(gsp_path.read_bytes()).digest(), "source SHA-256"
     at += 32
-    if encoding != "gaps":
-        assert struct.unpack_from("<2I", blob, at) == (1, 0)
+    if version2:
+        assert struct.unpack_from("<2I", blob, at) == (0 if encoding == "gaps" else 1, 1 if cap else 0)
         at += 8
+    if cap:
+        assert struct.unpack_from("<I", blob, at)[0] == cap
+        starts = list(struct.unpack_from("<%dI" % (r + 1), blob, at + 4))
+        at += 4 + 4 * (r + 1)
+        assert starts == capped_ranges(docs, range_size, cap), "range boundaries"
+        coverage["narrow_ranges"] += sum(b - a < w for a, b in zip(starts, starts[1:-1]))
+    else:
+        starts = list(range(0, n, w)) + ([n] if n else [0])
+        if not n:
+            starts = [0]
 
     def take(fmt, count):
         nonlocal at
@@ -144,7 +168,7 @@ def decode_rbp(path, gsp_path, ids, docs, vocab, range_size, coverage, encoding)
         at += count * struct.calcsize(fmt)
         return values
 
-    assert (n, v, w, r) == (len(ids), vocab, range_size, (len(ids) + range_size - 1) // range_size)
+    assert (n, v, w) == (len(ids), vocab, range_size) and r == len(starts) - 1
     assert take("Q", n) == tuple(ids)
     lookup_first, lookup_range = take("I", v + 1), take("I", blocks)
     bit_start, value_start = take("Q", blocks), take("I", blocks)
@@ -160,14 +184,14 @@ def decode_rbp(path, gsp_path, ids, docs, vocab, range_size, coverage, encoding)
     for term in range(v):
         actual = []
         for b in range(lookup_first[term], lookup_first[term + 1]):
-            doc = lookup_range[b] * w
+            doc = starts[lookup_range[b]]
             for j in range(counts[b]):
                 bit = bit_start[b] + j * widths[b]
                 value = (packed >> bit) & ((1 << widths[b]) - 1)
-                doc = doc + value if encoding == "gaps" else lookup_range[b] * w + value
+                doc = doc + value if encoding == "gaps" else starts[lookup_range[b]] + value
                 actual.append((doc, impacts[value_start[b] + j]))
                 coverage["straddle"] += bit // 32 != (bit + widths[b] - 1) // 32
-            assert lookup_range[b] * w <= actual[-counts[b]][0] and doc < min(n, (lookup_range[b] + 1) * w)
+            assert starts[lookup_range[b]] <= actual[-counts[b]][0] and doc < starts[lookup_range[b] + 1]
             coverage["one_value_blocks"] += counts[b] == 1
             coverage["multi_tile_blocks"] += counts[b] > 32
             coverage["max_width"][w] = max(coverage["max_width"].get(w, 0), widths[b])
@@ -197,6 +221,7 @@ def main():
     parser.add_argument("--max-k", type=int, default=128, help="largest k the scorer supports")
     parser.add_argument("--encoding", default="gaps", choices=["gaps", "positions"])
     parser.add_argument("--single-kernel", action="store_true", help="merge threads must equal score threads")
+    parser.add_argument("--postings-cap", type=int, default=0, help="builder postings cap (0 = uniform ranges)")
     args = parser.parse_args()
     tool, scorer = Path(args.tool).resolve(), Path(args.scorer).resolve()
     depths = DEPTHS + ([DEEP] if args.max_k >= DEEP[0] else [])
@@ -208,7 +233,8 @@ def main():
         holder = tempfile.TemporaryDirectory(prefix="range-bitpack-fixture-")
         root = Path(holder.name)
     rng = random.Random(20261114)
-    coverage = {"straddle": 0, "one_value_blocks": 0, "multi_tile_blocks": 0, "empty_terms": 0, "max_width": {}}
+    coverage = {"straddle": 0, "one_value_blocks": 0, "multi_tile_blocks": 0, "empty_terms": 0, "max_width": {}, "narrow_ranges": 0}
+    extra_build = ([args.encoding] if args.encoding != "gaps" or args.postings_cap else []) + ([args.postings_cap] if args.postings_cap else [])
     summary = {"index_configurations": 0, "scorer_runs": 0, "query_checks": 0, "tied_boundary_checks": 0,
                "expected_rejections": 0, "fixtures": {}}
 
@@ -225,9 +251,9 @@ def main():
                                      "max_score": max((rows[0][1] for rows in expected.values() if rows), default=0)}
         for w in RANGE_SIZES:
             rbp = root / ("%s-w%d.rbp" % (name, w))
-            run([tool, "build", gsp, rbp, w] + ([args.encoding] if args.encoding != "gaps" else []))
+            run([tool, "build", gsp, rbp, w] + extra_build)
             run([tool, "verify", gsp, rbp])
-            decode_rbp(rbp, gsp, ids, docs, vocab, w, coverage, args.encoding)
+            decode_rbp(rbp, gsp, ids, docs, vocab, w, coverage, args.encoding, args.postings_cap)
             summary["index_configurations"] += 1
             for k, threads, merge_threads in depths:
                 stem = root / ("%s-w%d-k%d-t%d-m%d" % (name, w, k, threads, merge_threads))
@@ -294,12 +320,17 @@ def main():
         gaps_index = root / "big-w64-gaps.rbp"
         run([tool, "build", gsp, gaps_index, 64])
         reject("position-encoded index", p1=gaps_index, p2=good_queries)
-    run([tool, "build", gsp, rbp, 64], expect_failure="Refusing to overwrite")
+    run([tool, "build", gsp, rbp, 64] + extra_build, expect_failure="Refusing to overwrite")
     summary["expected_rejections"] += 1
 
-    assert coverage["straddle"] > 0 and coverage["one_value_blocks"] > 0 and coverage["multi_tile_blocks"] > 0
+    assert coverage["straddle"] > 0 and coverage["one_value_blocks"] > 0
+    # A small postings cap leaves no block longer than a warp, so this applies to uniform ranges only.
+    assert args.postings_cap or coverage["multi_tile_blocks"] > 0
     assert coverage["empty_terms"] > 0 and summary["tied_boundary_checks"] > 0
-    assert coverage["max_width"][4096] == 12 and coverage["max_width"][64] == 6 and coverage["max_width"][1] == 1
+    if args.postings_cap:
+        assert coverage["narrow_ranges"] > 0, "the cap never narrowed a range"
+    else:
+        assert coverage["max_width"][4096] == 12 and coverage["max_width"][64] == 6 and coverage["max_width"][1] == 1
     assert summary["fixtures"]["big"]["max_score"] == 128 * 32 * 255
     summary["coverage"] = coverage
     summary["range_sizes"] = RANGE_SIZES

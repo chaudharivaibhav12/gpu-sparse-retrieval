@@ -1,4 +1,4 @@
-// Range-split bit-packed exhaustive scorer, version 2 (variant 4).
+// Range-split bit-packed exhaustive scorer, version 2 (variant 5).
 // Variant 1 replaces version 1's k barrier-separated selection rounds: each
 // thread sorts its own score slots, each warp selects its best with register
 // shuffles, and after one barrier every candidate ranks itself against the
@@ -9,6 +9,8 @@
 // posting's in-range position directly, with no prefix sum and no barrier.
 // Variant 4 has one kernel: the query arrives as a kernel argument, and the
 // last range block to finish merges all ranges' lists ("last block finishes").
+// Variant 5 takes range boundaries from the index, so ranges may be narrower
+// where postings are dense (builder postings cap) and the range count tunable.
 #define GSP_NO_MAIN
 #include "cpu_pilot.cpp"
 #include "cuda_topk.cuh"
@@ -34,6 +36,8 @@ struct RbpView {
     // Per range: tie_rank[doc] is the rank of the document's original ID among
     // the range's documents (0 = smallest); rank_slot is its inverse.
     const uint16_t* tie_rank;const uint16_t* rank_slot;
+    // ranges+1 document boundaries; range_size is the widest range.
+    const uint32_t* range_start;
     uint32_t docs,range_size;
 };
 
@@ -135,9 +139,8 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
     uint64_t* lists=dynamic_shared;
     uint32_t* scores=reinterpret_cast<uint32_t*>(dynamic_shared+size_t(warps)*list_cap);
     const uint32_t range=blockIdx.x;
-    const uint64_t first=uint64_t(range)*v.range_size;
-    const uint64_t remaining=uint64_t(v.docs)-first;
-    const uint32_t range_docs=remaining<v.range_size ? uint32_t(remaining) : v.range_size;
+    const uint64_t first=v.range_start[range];
+    const uint32_t range_docs=v.range_start[range+1]-v.range_start[range];
 
     // 1. Find each query term's block in this range and load its metadata.
     for (uint32_t i=thread;i<terms;i+=threads) {
@@ -296,8 +299,9 @@ int main(int argc,char** argv) {
         vector<uint16_t> tie_rank_host(N),rank_slot_host(N);
         {
             vector<uint32_t> order;
-            for (uint64_t first=0;first<N;first+=W) {
-                const uint32_t n=uint32_t(min(uint64_t(W),uint64_t(N)-first));
+            for (uint32_t range=0;range<R;++range) {
+                const uint64_t first=index.range_start[range];
+                const uint32_t n=index.range_start[range+1]-index.range_start[range];
                 order.resize(n);iota(order.begin(),order.end(),0);
                 sort(order.begin(),order.end(),[&](uint32_t a,uint32_t b) { return index.ids[first+a]<index.ids[first+b]; });
                 for (uint32_t rank=0;rank<n;++rank) { tie_rank_host[first+order[rank]]=uint16_t(rank);rank_slot_host[first+rank]=uint16_t(order[rank]); }
@@ -310,24 +314,24 @@ int main(int argc,char** argv) {
         GpuArray<uint32_t> lookup_first(index.lookup_first.size()),lookup_range(index.blocks()),value_start(index.blocks()),encoded(index.encoded.size());
         GpuArray<uint64_t> bit_start(index.blocks()),ids(N);
         GpuArray<uint16_t> block_count(index.blocks()),tie_rank(N),rank_slot(N),heads(R);
-        GpuArray<uint32_t> finished(1);cuda_checked(cudaMemset(finished.ptr,0,4));
+        GpuArray<uint32_t> finished(1),range_start(index.range_start.size());range_start.upload(index.range_start);cuda_checked(cudaMemset(finished.ptr,0,4));
         GpuArray<uint8_t> block_width(index.blocks()),impacts(index.impacts.size());
         GpuArray<GpuCandidate> candidates(size_t(R)*k),scratch(size_t(warps)*k),merged(k);
         lookup_first.upload(index.lookup_first);lookup_range.upload(index.lookup_range);value_start.upload(index.block_value_start);
         encoded.upload(index.encoded);bit_start.upload(index.block_bit_start);ids.upload(index.ids);
         block_count.upload(index.block_count);block_width.upload(index.block_width);impacts.upload(index.impacts);
         tie_rank.upload(tie_rank_host);rank_slot.upload(rank_slot_host);
-        const RbpView view{lookup_first.ptr,lookup_range.ptr,bit_start.ptr,value_start.ptr,block_count.ptr,block_width.ptr,encoded.ptr,impacts.ptr,ids.ptr,tie_rank.ptr,rank_slot.ptr,N,W};
-        const uint64_t allocation=index.posting_bytes()+ids.count*8+(tie_rank.count+rank_slot.count+heads.count)*2+finished.count*4+(candidates.count+scratch.count+merged.count)*sizeof(GpuCandidate);
+        const RbpView view{lookup_first.ptr,lookup_range.ptr,bit_start.ptr,value_start.ptr,block_count.ptr,block_width.ptr,encoded.ptr,impacts.ptr,ids.ptr,tie_rank.ptr,rank_slot.ptr,range_start.ptr,N,W};
+        const uint64_t allocation=index.posting_bytes()+ids.count*8+(tie_rank.count+rank_slot.count+heads.count)*2+(finished.count+range_start.count)*4+(candidates.count+scratch.count+merged.count)*sizeof(GpuCandidate);
         string cpu_affinity="unknown",status_line;ifstream status("/proc/self/status");
         while (getline(status,status_line)) if (status_line.rfind("Cpus_allowed_list:",0)==0) { istringstream affinity(status_line.substr(18));affinity>>cpu_affinity; }
         research_gate("cuda-range-v2",N,count,k,gpu,argv[1],argv[2],
-            ",\"variant\":4,\"range_size\":"+to_string(W)+",\"ranges\":"+to_string(R)+",\"blocks\":"+to_string(index.blocks())+",\"score_threads\":"+to_string(threads)+",\"merge_threads\":"+to_string(merge_threads)+",\"max_supported_k\":"+to_string(RBP_MAX_K)+",\"max_query_terms\":"+to_string(max_terms)+",\"max_supported_terms\":"+to_string(RBP_MAX_TERMS)+",\"max_term_document_multiplicity\":"+to_string(multiplicity)+",\"slots_per_thread\":"+to_string(slots)+",\"warp_list_capacity\":"+to_string(list_cap)+",\"shared_bytes\":"+to_string(shared_bytes)+",\"index_posting_bytes\":"+to_string(index.posting_bytes())+",\"tie_rank_bytes\":"+to_string((tie_rank.count+rank_slot.count)*2)+",\"verify_scores\":"+to_string(verify)+",\"warmup_rounds\":"+to_string(warmups)+",\"repeats\":"+to_string(rounds)+",\"cpu_affinity\":"+research_quote(cpu_affinity)+",\"index_sha256\":"+research_quote(sha_hex(index.file_sha))+",\"source_gsp_sha256\":"+research_quote(sha_hex(index.source_sha)),
-            ",\"layout\":\"range-split-bitpacked-positions-term-major\",\"schedule\":\"exhaustive-all-ranges\",\"decode\":\"combined-work-list;direct-positions;no-decode-barriers\",\"accumulator\":\"uint32-shared-gated-below-2^32-1-widened-to-uint64\",\"selection\":\"thread-sorted-slots;warp-shuffle-select;one-barrier-rank-scatter;merge-in-last-finishing-block-threadfence-atomic-ticket\",\"tie_keys\":\"per-range-original-id-rank-uint16\",\"query_transfer\":\"kernel-argument-by-value\",\"result_transfer\":\"topk-only\"");
+            ",\"variant\":5,\"range_size\":"+to_string(W)+",\"postings_cap\":"+to_string(index.postings_cap)+",\"ranges\":"+to_string(R)+",\"blocks\":"+to_string(index.blocks())+",\"score_threads\":"+to_string(threads)+",\"merge_threads\":"+to_string(merge_threads)+",\"max_supported_k\":"+to_string(RBP_MAX_K)+",\"max_query_terms\":"+to_string(max_terms)+",\"max_supported_terms\":"+to_string(RBP_MAX_TERMS)+",\"max_term_document_multiplicity\":"+to_string(multiplicity)+",\"slots_per_thread\":"+to_string(slots)+",\"warp_list_capacity\":"+to_string(list_cap)+",\"shared_bytes\":"+to_string(shared_bytes)+",\"index_posting_bytes\":"+to_string(index.posting_bytes())+",\"tie_rank_bytes\":"+to_string((tie_rank.count+rank_slot.count)*2)+",\"verify_scores\":"+to_string(verify)+",\"warmup_rounds\":"+to_string(warmups)+",\"repeats\":"+to_string(rounds)+",\"cpu_affinity\":"+research_quote(cpu_affinity)+",\"index_sha256\":"+research_quote(sha_hex(index.file_sha))+",\"source_gsp_sha256\":"+research_quote(sha_hex(index.source_sha)),
+            ",\"layout\":\"range-split-bitpacked-positions-term-major\",\"schedule\":\"exhaustive-all-ranges\",\"ranges\":\"boundaries-from-index;uniform-or-postings-capped\",\"decode\":\"combined-work-list;direct-positions;no-decode-barriers\",\"accumulator\":\"uint32-shared-gated-below-2^32-1-widened-to-uint64\",\"selection\":\"thread-sorted-slots;warp-shuffle-select;one-barrier-rank-scatter;merge-in-last-finishing-block-threadfence-atomic-ticket\",\"tie_keys\":\"per-range-original-id-rank-uint16\",\"query_transfer\":\"kernel-argument-by-value\",\"result_transfer\":\"topk-only\"");
         require(!filesystem::exists(argv[3])&&!filesystem::exists(argv[4]),"Refusing to overwrite results");
         ofstream csv(argv[3]),top(argv[4]);require(bool(csv)&&bool(top),"Cannot create result files");
-        cout<<"GPU "<<properties.name<<" CC "<<properties.major<<'.'<<properties.minor<<" docs="<<N<<" range_size="<<W<<" ranges="<<R
-            <<" allocation_bytes="<<allocation<<" shared_bytes="<<shared_bytes<<" index_sha256="<<sha_hex(index.file_sha)<<" control=range-v2-variant-4\n";
+        cout<<"GPU "<<properties.name<<" CC "<<properties.major<<'.'<<properties.minor<<" docs="<<N<<" range_size="<<W<<" ranges="<<R<<" postings_cap="<<index.postings_cap
+            <<" allocation_bytes="<<allocation<<" shared_bytes="<<shared_bytes<<" index_sha256="<<sha_hex(index.file_sha)<<" control=range-v2-variant-5\n";
         csv<<"phase,round,query_id,docs,k,query_wall_ms,gpu_span_ms,ordered_id_mismatches,result_score_mismatches,query_terms,range_size,ranges,score_threads,merge_threads,device_allocation_bytes,index_posting_bytes,result_transfer_bytes,query_transfer_bytes\n";
         top<<"phase\tround\tquery_id\trank\toriginal_id\tscore\n";
         QueryArgs args{};vector<GpuCandidate> winners(wanted);

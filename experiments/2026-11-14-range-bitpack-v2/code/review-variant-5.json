@@ -1,0 +1,23 @@
+{
+  "variant": 5,
+  "change": "Range boundaries come from the index. The builder takes RANGE_SIZE (widest range, any value 1..32768) and an optional POSTINGS_CAP; with a cap, a range also closes before its total postings would exceed it. The kernel reads range_start instead of computing range*W.",
+  "justification_from_profile": "20261114-cuda5-profile-01: the busiest range ran a median 185 decode tiles per query against a mean of 47, and 245 ranges needed 1.07 waves of about 230 resident blocks.",
+  "behaviour_deltas_vs_variant_4": [
+    "Uniform indexes (cap 0) are byte-identical to variant 3/4 files and produce the same ranges; the kernel reads two boundary words per block instead of multiplying.",
+    "Capped indexes use file version GSPRBP02 with flag 1, the cap and ranges+1 boundaries (4 bytes each); block widths follow each range's own extent.",
+    "The builder report prints range count, narrowest/widest range and largest/mean postings per range for wave planning.",
+    "Per-range original-ID ranks are built from the stored boundaries."
+  ],
+  "review_before_running": [
+    "Greedy rule: a range takes at least one document, so a single document above the cap forms its own range; widths never exceed RANGE_SIZE; boundaries start at 0 and end at the document count.",
+    "Blocks are grouped by a document-to-range table, so positions/gaps are relative to the stored range start in builder, round-trip check, Python decoder and kernel alike.",
+    "Loader: uniform files rebuild the same boundaries and keep the old range-count check; capped files must have strictly increasing boundaries of width <= RANGE_SIZE.",
+    "Shared score memory is still sized by RANGE_SIZE, the widest range."
+  ],
+  "findings": [
+    {"id": 1, "issue": "A fixture coverage assertion (some block longer than one warp) cannot hold under a 40-posting cap.", "fix": "The assertion now applies to uniform ranges; capped runs assert that at least one range was narrowed. No scorer or builder change."},
+    {"id": 2, "issue": "The cap balances total postings per range, a query-independent proxy. At 1M the uniform ranges already differ by only 1.31x in total postings (max 636,134, mean 484,488), while the profile's 4x imbalance is in a query's own postings.", "handling": "Recorded as a limit; whether the cap helps is an empirical question for the sweep."}
+  ],
+  "checks": "Fixtures uniform and with --postings-cap 40 (independent Python copy of the greedy rule checks stored boundaries); version-1 fixtures still pass; 100K/1M x 500 queries x k=10/1000 on a cap-400,000 index (302 ranges at 1M, narrowest 938 documents) with zero mismatches.",
+  "validation_limits": ["Real-data checks of the capped layout use one cap value; other caps are covered by fixtures only until the sweep's own correctness runs."]
+}
