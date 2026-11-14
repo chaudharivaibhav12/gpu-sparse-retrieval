@@ -43,3 +43,7 @@ Each run's `analysis/dev-glance.txt` is a single-process development reading on 
 ## Findings and decision
 
 All builds exact on cuda5. At k=10 and W=4096, V2-5 is 0.805× version 1 [0.792, 0.818] and 0.188× monolithic; storing positions (V2-3) gives the largest step (0.732×), V2-1/V2-2 alone are slower at k=10. A postings cap adds −7%. At k=100, V2-5 is 0.150× version 1 and 0.304× monolithic. At k=1000, V2-5 takes 1.49 ms. The range-size sweep is monotone: W=1024 gives 0.108 ms, 0.533× version 1 [0.527, 0.540], at +18% index size. Decision: adopt V2-5; extend the sweep below 1024 and freeze W before held-out evaluation. Details, limits: [report.md](report.md).
+
+## Packaging for publication
+
+Run folders follow the team layout on main (applied by `scripts/package_run.py`): raw per-query `.csv`/`.tsv` files over 1 MB are stored as lossless `.gz` (decompress with `gunzip -k` before replaying an analysis script), and full profiler reports, JIT caches and listings too large for Git are kept outside Git. Each manifest's `public_packaging` section lists every original with its SHA-256, size, public path or custody location; the manifest's `artifacts` section is unchanged and still describes the files exactly as each run produced them.
