@@ -12,7 +12,11 @@
     "rule": "any mismatch or failure stops before timing and is reported"
   },
   "timing_common": {
-    "documents": 1000000, "batch_size": 1, "processes_per_implementation": 3, "warmup_rounds": 3, "measured_rounds": 20,
+    "documents": 1000000,
+    "batch_size": 1,
+    "processes_per_implementation": 3,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
     "order": "rotating: in round p implementation (i + offset_p) mod n runs i-th, offsets 0, ceil(n/3), ceil(2n/3)",
     "boundary_range": "host build of the query, query transfer (H2D copy for v1..v2-3, kernel argument for v2-4/v2-5), all kernels, top-k D2H, event synchronisation; index/rank setup excluded",
     "boundary_monolithic": "as in the 2026-11-14 paired experiment",
@@ -24,13 +28,38 @@
   "runs": {
     "2a_k10": {
       "spec": "configs/timing-k10.tsv",
-      "implementations": ["v1", "v2-1", "v2-2", "v2-3", "v2-4", "v2-5", "v2-5cap (v2-5 on cap 400,000)", "mono"],
+      "implementations": [
+        "v1",
+        "v2-1",
+        "v2-2",
+        "v2-3",
+        "v2-4",
+        "v2-5",
+        "v2-5cap (v2-5 on cap 400,000)",
+        "mono"
+      ],
       "contrasts": "each variant / v1; each range implementation / mono; incremental steps v2-1/v1, v2-2/v2-1, v2-3/v2-2, v2-4/v2-3, v2-5/v2-4, v2-5cap/v2-5"
     },
     "best_variant_rule": "the variant among v2-1..v2-5 (uniform ranges) with the lowest geometric-mean ratio to v1 at k=10; if two intervals overlap, still the lower point estimate, and the overlap is reported",
     "cap_helped_rule": "the cap helped if the upper end of the v2-5cap / v2-5 interval is below 1",
-    "2b_k100": {"implementations": ["v1", "best", "mono"], "contrasts": ["best / v1", "best / mono", "v1 / mono"]},
-    "2c_k1000": {"implementations": ["best"], "note": "v1 and monolithic support k <= 128, so k=1000 is a single-implementation descriptive result"},
+    "2b_k100": {
+      "implementations": [
+        "v1",
+        "best",
+        "mono"
+      ],
+      "contrasts": [
+        "best / v1",
+        "best / mono",
+        "v1 / mono"
+      ]
+    },
+    "2c_k1000": {
+      "implementations": [
+        "best"
+      ],
+      "note": "v1 and monolithic support k <= 128, so k=1000 is a single-implementation descriptive result"
+    },
     "3_sweep_k10": {
       "implementations": "best at uniform range sizes W = 1024, 2048, 4096, 8192, 16384 (+ best on the cap-400,000 index at W=4096 if the cap helped), and v1 at W=4096",
       "indexes": "built with the best variant's own range_bitpack_tool from hash-1000000.gsp in its encoding",
@@ -39,5 +68,17 @@
     }
   },
   "phase_b_specs": "configs/timing-k100.tsv, timing-k1000.tsv and timing-sweep.tsv are written from the rules above after 2a's analysis and committed before they run",
-  "not_in_this_registration": "held-out queries, batch > 1, other GPUs, pruning"
+  "not_in_this_registration": "held-out queries, batch > 1, other GPUs, pruning",
+  "phase_b_resolution": {
+    "recorded": "2026-11-14 after run 20261114-cuda5-timing-k10-01, before any phase B run",
+    "best_variant": "v2-5 (0.8051 [0.7924, 0.8178] vs v1); v2-4 0.8078 [0.7941, 0.8221] overlaps; v2-5/v2-4 = 0.9966 [0.9890, 1.0104]",
+    "cap_helped": true,
+    "cap_evidence": "v2-5cap / v2-5 = 0.9311 [0.9177, 0.9425]",
+    "specs": [
+      "configs/timing-k100.tsv",
+      "configs/timing-k1000.tsv",
+      "configs/timing-sweep.tsv"
+    ],
+    "sweep_indexes": "hash-1000000-w{1024,2048,8192,16384}-pos.rbp built with build/variants/v2-5/range_bitpack_tool (W=4096 files reused)"
+  }
 }
