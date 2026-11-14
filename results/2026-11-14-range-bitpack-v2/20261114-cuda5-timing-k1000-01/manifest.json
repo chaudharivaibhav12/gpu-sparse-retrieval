@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-14-range-bitpack-v2",
+  "run_id": "20261114-cuda5-timing-k1000-01",
+  "status": "completed-paired-timing",
+  "scope": "cuda5; 1M documents; 500 calibration queries; batch 1; implementations v2-5; 3 processes each in rotating order; 3 warm-up + 20 measured rounds",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "066c7f77657269ec1b25cd09824554f54c984431",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6); Python 3.12.7 torch 2.6.0+cu126 triton 3.2.0 for monolithic",
+    "source_sha256": {
+      "experiments/2026-11-14-range-bitpack-v2/configs/timing-k1000.tsv": "d4de35374c9e3e06de536784294896b4e1c344051aa5ec1284234d41b58790b1",
+      "experiments/2026-11-14-range-bitpack-v2/code/run_timing.sh": "3003eb2d04ee6e159df4b732d4c0f047a0af225610abddceef2bb3b8e6c33382",
+      "experiments/2026-11-14-range-bitpack-v2/analysis/analyze_v2.py": "43d9ff51a4c7d7de0e97e80e31c31d2a9e43cc4f646f711a2d4b1f48fc72b4e4",
+      "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py": "ca43fb45ed74e0fc8d24c14898ac8ae3d32c7ebd3f805b55f6d59db87378d18e",
+      "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/canonical_baseline.py": "dc9035d6a6bd149fbd7c2dd3a0489c2aab3ef0fe8de85687dbe435bfcff5dc64",
+      "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/expected_config.py": "29039a5fb3bdd80d6fafd69452262ca719c3c31a7b1a9248e13b06f82059745b",
+      "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/gsp_input.py": "a58462a957cb6522a5de2d3cc385329bf53864e3e27943a116652416d9ceebd6",
+      "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/prepare_fixture.py": "28b0b92a89fd1c71b767f09957a4204261093a8366e62e9aa59e507d686ad7ee",
+      "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/runtime_gate.py": "6f151ff4f7266b2d8b05bc93dedc5570d13d535286141cad681b9b6919e4c450",
+      "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/u64_monolithic.py": "5d88a452fb4e9f32613b36b3dac6e38ce22028645ef4e0c2b01de36b9eec32d4"
+    },
+    "binary_sha256": {
+      "build/variants/v1/scorer": "843347b7d5a7372af289c960e54923db366dca355790ef359a14fd7c48eda44b",
+      "build/variants/v2-1/scorer": "b744a76f4f6170aaab1e5cc88cf24a638422c8254ea8dcb0a865bb86f185be86",
+      "build/variants/v2-2/scorer": "d72c79b90f45cbe3ab537bc7bbacd26109e4ae2698e4c5a32adb7119563fae08",
+      "build/variants/v2-3/scorer": "37ec2e3d3eb6d7794e5dad085267b4ee1e1faff970761e52b6bc65caa85bfc57",
+      "build/variants/v2-4/scorer": "ffd6eac8c17f726974998479906d1e251da47949824e8982b5056249aabc67c6",
+      "build/variants/v2-5/scorer": "6fc03ad5a9460d734c912f7a0dddf4b1eb49777cb6daf72296cf91c328078890"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "data/derived/hash-1000000.gsp": {
+      "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37",
+      "bytes": 609799364
+    },
+    "data/derived/hash-1000000-w4096-pos.rbp": {
+      "sha256": "67e19c8c6eec751f709b644488c8f4bd13e72a821831a7ca9d65133fc02bed34",
+      "bytes": 370880289
+    },
+    "data/derived/oracle/cpu-top1000-1000000.tsv": {
+      "sha256": "ddb1bb73aeb4a100cadb6c1710a9790d7b473a204e8769f429cd835048bbc716",
+      "bytes": 12181625
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_12.6.r12.6/compiler.35059454_0"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "[timing-r0-v2-5] build/variants/v2-5/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-14-range-bitpack-v2/20261114-cuda5-timing-k1000-01/raw/timing-r0-v2-5.csv results/2026-11-14-range-bitpack-v2/20261114-cuda5-timing-k1000-01/raw/timing-r0-v2-5.tsv 500 1000 0 0 20 3 256 256 -",
+    "[timing-r1-v2-5] build/variants/v2-5/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-14-range-bitpack-v2/20261114-cuda5-timing-k1000-01/raw/timing-r1-v2-5.csv results/2026-11-14-range-bitpack-v2/20261114-cuda5-timing-k1000-01/raw/timing-r1-v2-5.tsv 500 1000 0 0 20 3 256 256 -",
+    "[timing-r2-v2-5] build/variants/v2-5/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-14-range-bitpack-v2/20261114-cuda5-timing-k1000-01/raw/timing-r2-v2-5.csv results/2026-11-14-range-bitpack-v2/20261114-cuda5-timing-k1000-01/raw/timing-r2-v2-5.tsv 500 1000 0 0 20 3 256 256 -"
+  ],
+  "artifacts": {
+    "analysis/compare-timing-r0-v2-5.json": {
+      "sha256": "4e3f54266e60261c4046422b0194110c399aa2905db2718afdd552ecbb97664b",
+      "bytes": 350
+    },
+    "analysis/compare-timing-r1-v2-5.json": {
+      "sha256": "9068434fa6bb2a64ff482fa27ab23db57acaa5152a2f92e4d47483ad8d125b4a",
+      "bytes": 350
+    },
+    "analysis/compare-timing-r2-v2-5.json": {
+      "sha256": "332248444011c8e03e051382111c8cbeceb71011b807bd7a991c8d63b2e4caeb",
+      "bytes": 350
+    },
+    "analysis/paired-statistics.json": {
+      "sha256": "99e7d5bc764753313ad5c32dc6dcf6740dec69b73b83664142da69ab5f3e3566",
+      "bytes": 547
+    },
+    "logs/analyze.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/commands.txt": {
+      "sha256": "daa19778d1fa1e21bde355ef07af08822c212139690c1991efe715c35e096846",
+      "bytes": 975
+    },
+    "logs/environment.txt": {
+      "sha256": "4dacf5c3e88128a21c3486eed1798a195f690c3892868afe5989460f7dc40dce",
+      "bytes": 2665
+    },
+    "logs/gpu-idle-timing-r0-v2-5.txt": {
+      "sha256": "197c96025e5bd581e5ba790081e22b53ff0d7093bd04d3e67ef9400dac461085",
+      "bytes": 75
+    },
+    "logs/gpu-idle-timing-r1-v2-5.txt": {
+      "sha256": "b5f49cc2947914ae55c849fa8e77d91ee2edd9036cb76f674c45ad9ea33550d0",
+      "bytes": 75
+    },
+    "logs/gpu-idle-timing-r2-v2-5.txt": {
+      "sha256": "035fba9cae975f9fd91eda1a12e6e64ff46b1ca683a9de566042e1dddf85c473",
+      "bytes": 75
+    },
+    "logs/gpu-sampler.log": {
+      "sha256": "3462bfc70166b37c7ca9e4568c486e15c24dfca8696d7582dcff1371e19374e4",
+      "bytes": 10180
+    },
+    "logs/index-verify-v2-5.log": {
+      "sha256": "bd584d192b56a89fa4322b17a6d3d5e912910304fbe026a4ac0c6207a4e6570f",
+      "bytes": 901
+    },
+    "logs/order.txt": {
+      "sha256": "94de09dd1f3cff7ff9aa38b18b9a7cd85bb7c609da462aafecba73172f56659e",
+      "bytes": 71
+    },
+    "logs/stages.txt": {
+      "sha256": "1ef690e70f006867051d577f2eb7d58bbe0edd27f78bfe8f1b27dfb07e6fe0e6",
+      "bytes": 241
+    },
+    "logs/timing-r0-v2-5.stderr": {
+      "sha256": "2b6455e2b28523414f4545ffa841f2055b7554082e663dcd8d027b824b3ab8ff",
+      "bytes": 602
+    },
+    "logs/timing-r0-v2-5.stdout": {
+      "sha256": "aa9966e80117ae717a0e2b6fad79a02b235b8422284cefb28e29b4529d2f0f98",
+      "bytes": 316
+    },
+    "logs/timing-r1-v2-5.stderr": {
+      "sha256": "2b6455e2b28523414f4545ffa841f2055b7554082e663dcd8d027b824b3ab8ff",
+      "bytes": 602
+    },
+    "logs/timing-r1-v2-5.stdout": {
+      "sha256": "aa9966e80117ae717a0e2b6fad79a02b235b8422284cefb28e29b4529d2f0f98",
+      "bytes": 316
+    },
+    "logs/timing-r2-v2-5.stderr": {
+      "sha256": "2b6455e2b28523414f4545ffa841f2055b7554082e663dcd8d027b824b3ab8ff",
+      "bytes": 602
+    },
+    "logs/timing-r2-v2-5.stdout": {
+      "sha256": "aa9966e80117ae717a0e2b6fad79a02b235b8422284cefb28e29b4529d2f0f98",
+      "bytes": 316
+    },
+    "raw/runtime/timing-r0-v2-5/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/runtime/timing-r0-v2-5/runtime.json": {
+      "sha256": "8a7283fb4856f584c428bc399dc39b1dc2de27fc516734704e0e21580748a9e9",
+      "bytes": 1545
+    },
+    "raw/runtime/timing-r1-v2-5/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/runtime/timing-r1-v2-5/runtime.json": {
+      "sha256": "8a7283fb4856f584c428bc399dc39b1dc2de27fc516734704e0e21580748a9e9",
+      "bytes": 1545
+    },
+    "raw/runtime/timing-r2-v2-5/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/runtime/timing-r2-v2-5/runtime.json": {
+      "sha256": "8a7283fb4856f584c428bc399dc39b1dc2de27fc516734704e0e21580748a9e9",
+      "bytes": 1545
+    },
+    "raw/timing-r0-v2-5.csv": {
+      "sha256": "dae838a7ff6d97cd608910f3fc1bd11ea575fa49ba208c1f698b450478553fc1",
+      "bytes": 1405994
+    },
+    "raw/timing-r0-v2-5.tsv.xz": {
+      "sha256": "03d8405f9074ebcd60cd299b13e95f0abdfd05d298275dd92489a27963d50c90",
+      "bytes": 62850236
+    },
+    "raw/timing-r1-v2-5.csv": {
+      "sha256": "c4a3165fee8f783e23eba119098aa2c6bff05de54a585ec2f2b883a2fcb57c36",
+      "bytes": 1405993
+    },
+    "raw/timing-r1-v2-5.tsv.xz": {
+      "sha256": "03d8405f9074ebcd60cd299b13e95f0abdfd05d298275dd92489a27963d50c90",
+      "bytes": 62850236
+    },
+    "raw/timing-r2-v2-5.csv": {
+      "sha256": "f56f26d9eaeecd5aa9d4faa1e5c10e35cec319f0ff6a6497cd2c1030ccb0d77a",
+      "bytes": 1405909
+    },
+    "raw/timing-r2-v2-5.tsv.xz": {
+      "sha256": "03d8405f9074ebcd60cd299b13e95f0abdfd05d298275dd92489a27963d50c90",
+      "bytes": 62850236
+    },
+    "raw/topk-sha256.txt": {
+      "sha256": "3a5c01206f6df565cd64e72f8a4cc7e332fc36fb21eb1e2078486ca09e6e41ec",
+      "bytes": 468
+    },
+    "spec.tsv": {
+      "sha256": "d4de35374c9e3e06de536784294896b4e1c344051aa5ec1284234d41b58790b1",
+      "bytes": 122
+    }
+  }
+}

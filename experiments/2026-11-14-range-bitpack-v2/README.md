@@ -4,7 +4,7 @@ Owner: Arnav. Branch `exp/arnav/2026-11-14-range-bitpack-v2`, parent experiment 
 
 ## Question
 
-Which of five changes, each motivated by profile run `20261114-cuda5-profile-01`, reduce the range scorer's batch-1 latency while keeping exact results? **Status: all five variants are implemented, reviewed and pass correctness on the laptop. Nothing is timed yet; no protocol is registered.**
+Which of five changes, each motivated by profile run `20261114-cuda5-profile-01`, reduce the range scorer's batch-1 latency while keeping exact results? **Status: complete on calibration queries. See [report.md](report.md).**
 
 ## Variants (cumulative, one commit each)
 
@@ -35,6 +35,11 @@ Each: fixture suite with k to 1000, then 100K and 1M documents, all 500 calibrat
 
 Each run's `analysis/dev-glance.txt` is a single-process development reading on the laptop and is **not a timing result**.
 
+## cuda5 runs (CUDA 12.6)
+
+- [gate](runs/20261114-cuda5-gate-01/README.md) · [sweep pre-check](runs/20261114-cuda5-sweep-precheck-01/README.md) · [k=10](runs/20261114-cuda5-timing-k10-01/README.md) · [k=100](runs/20261114-cuda5-timing-k100-01/README.md) · [k=1000](runs/20261114-cuda5-timing-k1000-01/README.md) · [range-size sweep](runs/20261114-cuda5-timing-sweep-01/README.md)
+- Protocol registered before timing: [configs/protocol.json](configs/protocol.json) (phase B resolved from its rules before running).
+
 ## Findings and decision
 
-Pending the cuda5 correctness runs and a registered timing comparison.
+All builds exact on cuda5. At k=10 and W=4096, V2-5 is 0.805× version 1 [0.792, 0.818] and 0.188× monolithic; storing positions (V2-3) gives the largest step (0.732×), V2-1/V2-2 alone are slower at k=10. A postings cap adds −7%. At k=100, V2-5 is 0.150× version 1 and 0.304× monolithic. At k=1000, V2-5 takes 1.49 ms. The range-size sweep is monotone: W=1024 gives 0.108 ms, 0.533× version 1 [0.527, 0.540], at +18% index size. Decision: adopt V2-5; extend the sweep below 1024 and freeze W before held-out evaluation. Details, limits: [report.md](report.md).
