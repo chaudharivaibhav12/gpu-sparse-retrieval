@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-13-range-bitpack",
+  "run_id": "20261113-cuda5-timing-01",
+  "status": "completed-timing",
+  "scope": "1M documents, 500 calibration queries, k=10, batch 1, 3 processes, 3 warm-up + 20 measured rounds, range 4096",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "eef83028870f983d46f4366dce2322b1264f7ccb",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17; g++ -O3 -Wall -Wextra -Wpedantic -std=c++17",
+    "source_sha256": {
+      "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+      "src/range_bitpack.h": "93cbb4f1f4c4a4cfa52bbcdb653de8b1e0bc407fdbd55758a859e6cada46051b",
+      "src/range_bitpack_tool.cpp": "c26eb393f439853fa50a96fa8767c76a2cc7e9415efe7aa08f738f30fc44c121",
+      "src/cuda_range_bitpack.cu": "02c57bb8c61e8f057f5879c0b78f16a3f96018f15680b41403c4d0ffab07b70b",
+      "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+      "src/research_runtime.h": "29c8642d8e131c6d7a41ee557e90c56b8dc5c7403cb18f17afb68d4435ec292a",
+      "tests/check_range_bitpack.py": "c4d21bb70520e7438ff77452d544b5cd284d619b8dfd31a04d6bafb00f195137",
+      "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py": "ca43fb45ed74e0fc8d24c14898ac8ae3d32c7ebd3f805b55f6d59db87378d18e",
+      "scripts/run_range_bitpack.sh": "7e03db980f68f2a05d6c397cee3a95bef173711928e437aadf85a7c12d5e43d9",
+      "experiments/2026-11-13-range-bitpack/analysis/analyze.py": "d2b9d49f779ac5dae23cc9ce2a54dd23fd7d0d548528d520a7e1755f6a025c61"
+    },
+    "binary_sha256": {
+      "build/cpu_pilot": "74af557aebddb34c37544301915568316acc8cc86ef4b772c41f7c3b8768b24e",
+      "build/range_bitpack_tool": "7b21f0d7311836908b7d26ebe72a0d0be4839c2b76eb8639b15052eefa488737",
+      "build/cuda_range_bitpack": "78bd5f8ecf52fa8df03c1d7d487c2cd9922c37fe3d67547d91668a524f4c454f"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "data/derived/hash-100000.gsp": {
+      "sha256": "ee7ffdb9c527f3e486fe560426e27f4f02d2a61b42b8f138eaf7671a8aeb73ab",
+      "bytes": 61314734
+    },
+    "data/derived/hash-100000-w4096.rbp": {
+      "sha256": "9baa3848e6b1dc9604d81dba3fdbb0cfe28695cd0e5007a5e9a51b4802507dad",
+      "bytes": 34357957
+    },
+    "data/derived/hash-1000000.gsp": {
+      "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37",
+      "bytes": 609799364
+    },
+    "data/derived/hash-1000000-w4096.rbp": {
+      "sha256": "cbc259e459186884059ebe30269a17a92e7b69515b0bc6577158ba2f353ce990",
+      "bytes": 323508493
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_12.6.r12.6/compiler.35059454_0"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "g++ -O3 -Wall -Wextra -Wpedantic -std=c++17 src/cpu_pilot.cpp -o build/cpu_pilot",
+    "g++ -O3 -Wall -Wextra -Wpedantic -std=c++17 src/range_bitpack_tool.cpp -o build/range_bitpack_tool",
+    "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 src/cuda_range_bitpack.cu -o build/cuda_range_bitpack",
+    "./build/range_bitpack_tool verify data/derived/hash-100000.gsp data/derived/hash-100000-w4096.rbp",
+    "./build/range_bitpack_tool verify data/derived/hash-1000000.gsp data/derived/hash-1000000-w4096.rbp",
+    "./build/cpu_pilot score data/derived/hash-1000000.gsp data/derived/calibration-500.tsv results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/raw/cpu-top10-1000000.tsv 10 500",
+    "./build/cuda_range_bitpack data/derived/hash-1000000-w4096.rbp data/derived/calibration-500.tsv results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/raw/timing-r0-range-bitpack-w4096.csv results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/raw/timing-r0-range-bitpack-w4096.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/raw/cpu-top10-1000000.tsv results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/raw/timing-r0-range-bitpack-w4096.tsv --queries 500 --k 10 --groups-per-query 23 --output results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/analysis/compare-timing-r0.json",
+    "./build/cuda_range_bitpack data/derived/hash-1000000-w4096.rbp data/derived/calibration-500.tsv results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/raw/timing-r1-range-bitpack-w4096.csv results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/raw/timing-r1-range-bitpack-w4096.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/raw/cpu-top10-1000000.tsv results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/raw/timing-r1-range-bitpack-w4096.tsv --queries 500 --k 10 --groups-per-query 23 --output results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/analysis/compare-timing-r1.json",
+    "./build/cuda_range_bitpack data/derived/hash-1000000-w4096.rbp data/derived/calibration-500.tsv results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/raw/timing-r2-range-bitpack-w4096.csv results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/raw/timing-r2-range-bitpack-w4096.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/raw/cpu-top10-1000000.tsv results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/raw/timing-r2-range-bitpack-w4096.tsv --queries 500 --k 10 --groups-per-query 23 --output results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/analysis/compare-timing-r2.json",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/analyze.py results/2026-11-13-range-bitpack/20261113-cuda5-timing-01 --variant range-bitpack-w4096 --output results/2026-11-13-range-bitpack/20261113-cuda5-timing-01/analysis/statistics.json"
+  ],
+  "artifacts": {
+    "analysis/compare-timing-r0.json": {
+      "sha256": "f8ab8e7c4ead79985fcb9a05dd9746e3b039fb2d568ade1bdfa839840dc27e17",
+      "bytes": 392
+    },
+    "analysis/compare-timing-r1.json": {
+      "sha256": "0ab26cf108c731c51bd41ff2d6c25af3b0ccdce6a9dadf26be46b3cb52b9e9aa",
+      "bytes": 392
+    },
+    "analysis/compare-timing-r2.json": {
+      "sha256": "ce8d52dcfb3dcab34bce2abbe720d2310fa1a2fa1af5dbfa0a9073545c7ce233",
+      "bytes": 392
+    },
+    "analysis/statistics.json": {
+      "sha256": "ea914d7a53d45e764b4522422bbfeb186fff5b8d672fba46c0edc417b41eb628",
+      "bytes": 1704
+    },
+    "logs/analyze.log": {
+      "sha256": "fed615a695a9bbb92dc10fdef72eb85ba435312d4b1a4e918f59455f5d3b3bd8",
+      "bytes": 1536
+    },
+    "logs/commands.txt": {
+      "sha256": "abaf4b362bf9e84fb70a2801aa0befdc1b8dcca183aef02aaf22a4e77ef35d94",
+      "bytes": 3015
+    },
+    "logs/cpu-score-1000000.log": {
+      "sha256": "920f7627d0c9f93fdb0982ed9d13c930576bf6561754e62e7804a63c953f1e84",
+      "bytes": 24
+    },
+    "logs/gpu-after.txt": {
+      "sha256": "07207f634491905f2f88ba3031d0d46ac93c3a5dff856440239f4dfcda2c80c4",
+      "bytes": 1689
+    },
+    "logs/gpu-before-process-0.txt": {
+      "sha256": "0ee1279a778ef1d74be752c3eff11bcd89acf66f858013bf9cecdda4d1c8e51e",
+      "bytes": 36
+    },
+    "logs/gpu-before-process-1.txt": {
+      "sha256": "5b95c7c5f1ebeb44de459583498627825598b327ed1f281be6198a74ac9396b5",
+      "bytes": 36
+    },
+    "logs/gpu-before-process-2.txt": {
+      "sha256": "4ee392c448882b171cafacb10d3a28a10c2047f7a5a1a32735ad3d368c3a2863",
+      "bytes": 36
+    },
+    "logs/gpu-before.txt": {
+      "sha256": "fe8460e53a5781520bb6555e266e98c6a273ef6376863850a002b489c25ba1db",
+      "bytes": 1716
+    },
+    "logs/index-verify-100000.log": {
+      "sha256": "a7e95ea34d7a87477628023bb694859ca81fc4e9d5d9c2787951509d3867aa8d",
+      "bytes": 752
+    },
+    "logs/index-verify-1000000.log": {
+      "sha256": "f0985c88ff6e7def267524f0d1480c124e0716e7d838e58551104b1441898489",
+      "bytes": 777
+    },
+    "logs/nvcc.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/cpu-top10-1000000.tsv": {
+      "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860",
+      "bytes": 116302
+    },
+    "raw/timing-r0-range-bitpack-w4096.csv": {
+      "sha256": "b2ba2d280a2fd3cff3d4e7d3d9c2e627050ec63fa71fdc0455de9872c503420e",
+      "bytes": 1370165
+    },
+    "raw/timing-r0-range-bitpack-w4096.log": {
+      "sha256": "34ec1a608b56063c2c7d5f500f0be238ab78257e15f6b1bad8bab59a707c3c7a",
+      "bytes": 893
+    },
+    "raw/timing-r0-range-bitpack-w4096.tsv": {
+      "sha256": "1a4a3b2c7af1899af6dd0cec149a0ed85d56b1567b0e0a83c8f80f387e5bb6e1",
+      "bytes": 3959254
+    },
+    "raw/timing-r1-range-bitpack-w4096.csv": {
+      "sha256": "e4286507c971022394f1e0eab8feafcaafd3bf347357deb79312415922c2b754",
+      "bytes": 1370049
+    },
+    "raw/timing-r1-range-bitpack-w4096.log": {
+      "sha256": "34ec1a608b56063c2c7d5f500f0be238ab78257e15f6b1bad8bab59a707c3c7a",
+      "bytes": 893
+    },
+    "raw/timing-r1-range-bitpack-w4096.tsv": {
+      "sha256": "1a4a3b2c7af1899af6dd0cec149a0ed85d56b1567b0e0a83c8f80f387e5bb6e1",
+      "bytes": 3959254
+    },
+    "raw/timing-r2-range-bitpack-w4096.csv": {
+      "sha256": "e9b1bedda723d24ffb72ddd5a004065470343db79a351ada466f2fe3a89ab5f5",
+      "bytes": 1370135
+    },
+    "raw/timing-r2-range-bitpack-w4096.log": {
+      "sha256": "34ec1a608b56063c2c7d5f500f0be238ab78257e15f6b1bad8bab59a707c3c7a",
+      "bytes": 893
+    },
+    "raw/timing-r2-range-bitpack-w4096.tsv": {
+      "sha256": "1a4a3b2c7af1899af6dd0cec149a0ed85d56b1567b0e0a83c8f80f387e5bb6e1",
+      "bytes": 3959254
+    }
+  }
+}

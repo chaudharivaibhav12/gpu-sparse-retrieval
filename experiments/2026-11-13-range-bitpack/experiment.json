@@ -4,7 +4,7 @@
   "title": "Range-split bit-packed exhaustive GPU scorer (Version A)",
   "owner": "Arnav",
   "branch": "exp/arnav/2026-11-13-range-bitpack",
-  "status": "correctness-passed-local; cuda5 correctness and timing pending",
+  "status": "completed-calibration-timing; paired baseline comparison pending",
   "parent_experiment": null,
   "parent_source_commit": "430b4dc19115b6d9cabc1bed13c68969a32914aa",
   "question": "What is the batch-1 latency and index size of an exhaustive exact scorer over a range-split, bit-packed inverted index?",
@@ -20,9 +20,12 @@
     "scripts/run_range_bitpack.sh",
     "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py",
     "experiments/2026-11-13-range-bitpack/analysis/analyze.py",
-    "experiments/2026-11-13-range-bitpack/code/write_manifest.py"
+    "experiments/2026-11-13-range-bitpack/code/write_manifest.py",
+    "experiments/2026-11-13-range-bitpack/report.md"
   ],
-  "configuration_files": ["experiments/2026-11-13-range-bitpack/configs/protocol.json"],
+  "configuration_files": [
+    "experiments/2026-11-13-range-bitpack/configs/protocol.json"
+  ],
   "declared_changes": {
     "new_index_layout": "term-major blocks per (term, document range); bit-packed in-range gaps; uint8 impacts",
     "new_scorer": "one thread block per range with uint32 shared-memory scores, local top-k, single-block merge",
@@ -38,6 +41,14 @@
   "success_rule": "Correct on all fixtures and all 500 calibration queries at 100K and 1M; timing completes under the registered protocol.",
   "failure_rule": "Any mismatch is a recorded failure and blocks timing. Higher latency than the published baselines is a valid negative result.",
   "next_if_negative": "Use a kernel-time breakdown to decide between layout changes, range-level pruning (Version B) or stopping.",
-  "recording_ids": ["not recorded by the team runtime"],
-  "runs": ["20261113-input-setup-01", "20261113-laptop-correctness-01"]
+  "recording_ids": [
+    "not recorded by the team runtime"
+  ],
+  "runs": [
+    "20261113-input-setup-01",
+    "20261113-laptop-correctness-01",
+    "20261113-cuda5-correctness-01",
+    "20261113-cuda5-timing-01"
+  ],
+  "measured_source_commit": "eef83028870f983d46f4366dce2322b1264f7ccb"
 }

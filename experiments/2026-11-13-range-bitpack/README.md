@@ -30,6 +30,8 @@ The scoring contract `GSP-CAP32-U64-NUMERIC-TIES-v1`, inputs and calibration spl
 
 - [20261113-input-setup-01](runs/20261113-input-setup-01/README.md) — input copies, hashes and pipeline rebuild check.
 - [20261113-laptop-correctness-01](runs/20261113-laptop-correctness-01/README.md) — fixtures and real-data correctness on the laptop: passed.
+- [20261113-cuda5-correctness-01](runs/20261113-cuda5-correctness-01/README.md) — same suite on cuda5 with CUDA 12.6: passed.
+- [20261113-cuda5-timing-01](runs/20261113-cuda5-timing-01/README.md) — registered timing: completed, all outputs exact.
 
 ## Findings and decision
 
@@ -37,4 +39,6 @@ Correctness so far (laptop, RTX 4070 Laptop, CUDA 13.3): 36 index configurations
 
 Index size at 1M documents, range 4096: 315,508,373 bytes for postings and lookup (2.66 bytes per posting) against 601,497,933 bytes (5.07) for the CSR arrays; gaps average 8.78 bits. Original IDs add 8,000,000 bytes in both layouts.
 
-Timing, interpretation and decision: pending.
+Timing on cuda5 (RTX 4070): pooled median **0.2047 ms** (95% crossed bootstrap 0.2039–0.2082) at 1M documents, k=10, batch 1, 500 calibration queries; all 34,500 timed outputs exact. Set beside the published medians (monolithic 0.88 ms, CSR B16 2.97 ms, B32 3.63 ms) that is 0.23× / 0.069× / 0.056× — **exploratory, different session, not paired**.
+
+Decision: keep as the candidate exact GPU system; a paired rerun with the baselines is needed before any comparative claim. Full result, interpretation and limits: [report.md](report.md).
