@@ -1,0 +1,22 @@
+{
+  "iteration": 1,
+  "date": "2026-11-14",
+  "scope": ["code/run_paired.sh", "analysis/analyze_paired.py"],
+  "unchanged_code": "code/gpusparse-u64/*.py and code/gpusparse-u64-analysis/*.py are byte-identical copies from the 2026-11-12 context bundle (SHA-256 equal to its manifest code_hashes); no scorer source is modified by this experiment",
+  "checked_without_finding": [
+    "Every program's arguments match the parent study's argv shapes (CSR: LIMIT K GPU VERIFY B MODE ROUNDS WARMUPS PRECISION; monolithic flags; range scorer order).",
+    "Each runtime directory is fresh, so the Python gate's 'runtime.json must not exist' assertion holds; 'continue' is present before launch, so both C++ and Python gates proceed and keep their snapshot.",
+    "Failures inside the timing case statement propagate to fail() because the case is the left side of an || list.",
+    "The rotation offsets 0/2/4 place every implementation in three different slots.",
+    "analyze_paired.py reproduces planted ratios exactly on synthetic data (0.2/0.9 = 0.2222 etc.) and uses the parent's resampling order (processes, then queries) and per-draw mean.",
+    "No command deletes or overwrites existing files; the run folder must not exist."
+  ],
+  "findings": [
+    {"id": 1, "issue": "The two source-identity git diff checks exited silently under set -e.", "fix": "Each now prints which source set differs."}
+  ],
+  "validation_limits": [
+    "The gate stand-in approves automatically; unlike the team runner it does not compare runtime.json with a registered spec, so the parent's intentional wrong-pack-threads rejection is not repeated.",
+    "Monolithic fixtures run only at BLOCK_PL=512 (the timed setting).",
+    "CSR fixtures are not rerun; the driver source is unchanged from merged main where they passed."
+  ]
+}
