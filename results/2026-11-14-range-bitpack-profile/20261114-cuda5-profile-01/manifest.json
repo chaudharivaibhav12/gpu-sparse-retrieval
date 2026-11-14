@@ -1,0 +1,348 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-14-range-bitpack-profile",
+  "run_id": "20261114-cuda5-profile-01",
+  "status": "completed-profiling",
+  "scope": "cuda5 RTX 4070; 1M documents; first 25 calibration queries; k=10; W=4096; Nsight Systems (range, monolithic: 3 warm-up + 20 rounds) and Nsight Compute (range kernels, 1 round)",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "890289286256f5d24c5c45a0a296f244b47c3278",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6); Python 3.12.7 torch 2.6.0+cu126 triton 3.2.0",
+    "source_sha256": {
+      "src/cuda_range_bitpack.cu": "02c57bb8c61e8f057f5879c0b78f16a3f96018f15680b41403c4d0ffab07b70b",
+      "src/range_bitpack.h": "93cbb4f1f4c4a4cfa52bbcdb653de8b1e0bc407fdbd55758a859e6cada46051b",
+      "src/range_bitpack_tool.cpp": "c26eb393f439853fa50a96fa8767c76a2cc7e9415efe7aa08f738f30fc44c121",
+      "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+      "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+      "src/research_runtime.h": "29c8642d8e131c6d7a41ee557e90c56b8dc5c7403cb18f17afb68d4435ec292a",
+      "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/canonical_baseline.py": "dc9035d6a6bd149fbd7c2dd3a0489c2aab3ef0fe8de85687dbe435bfcff5dc64",
+      "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/expected_config.py": "29039a5fb3bdd80d6fafd69452262ca719c3c31a7b1a9248e13b06f82059745b",
+      "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/gsp_input.py": "a58462a957cb6522a5de2d3cc385329bf53864e3e27943a116652416d9ceebd6",
+      "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/prepare_fixture.py": "28b0b92a89fd1c71b767f09957a4204261093a8366e62e9aa59e507d686ad7ee",
+      "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/runtime_gate.py": "6f151ff4f7266b2d8b05bc93dedc5570d13d535286141cad681b9b6919e4c450",
+      "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/u64_monolithic.py": "5d88a452fb4e9f32613b36b3dac6e38ce22028645ef4e0c2b01de36b9eec32d4",
+      "experiments/2026-11-14-range-bitpack-profile/analysis/analyze_ncu.py": "981ea2c1f7420c213b8b256ed323f7d647d91dcbc650c9380d540c756258a4a8",
+      "experiments/2026-11-14-range-bitpack-profile/analysis/analyze_nsys.py": "6764ae956e0518d1e73dbccb5e605ea1a79bc95e14b229e85131231b7f6516cf",
+      "experiments/2026-11-14-range-bitpack-profile/analysis/decode_utilization.py": "2670ac2a172ae914335ba8ac27aab7110c54cd06cdb1f5dfc328c9bec239ec31",
+      "experiments/2026-11-14-range-bitpack-profile/code/run_profile.sh": "934250055284a5398f5ba544f2abc36a87f679b5f4ac61fa04c0fbf96cff6c14",
+      "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py": "ca43fb45ed74e0fc8d24c14898ac8ae3d32c7ebd3f805b55f6d59db87378d18e"
+    },
+    "binary_sha256": {
+      "build/cuda_range_bitpack": "7c5324de7e5fd539931c5963c5fe62d1825b939782ca5ab98eb91e5b2ff51950",
+      "build/range_bitpack_tool": "7b21f0d7311836908b7d26ebe72a0d0be4839c2b76eb8639b15052eefa488737"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "data/derived/hash-1000000.gsp": {
+      "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37",
+      "bytes": 609799364
+    },
+    "data/derived/hash-1000000-w4096.rbp": {
+      "sha256": "cbc259e459186884059ebe30269a17a92e7b69515b0bc6577158ba2f353ce990",
+      "bytes": 323508493
+    },
+    "results/2026-11-11-cuda-bound-precision/inputs/cpu-top10-500.tsv": {
+      "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860",
+      "bytes": 116302
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_12.6.r12.6/compiler.35059454_0"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 src/cuda_range_bitpack.cu -o build/cuda_range_bitpack",
+    "./build/range_bitpack_tool verify data/derived/hash-1000000.gsp data/derived/hash-1000000-w4096.rbp",
+    "[nsys-range] nsys profile -o results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-range --trace=cuda --sample=none --cpuctxsw=none ./build/cuda_range_bitpack data/derived/hash-1000000-w4096.rbp data/derived/calibration-500.tsv results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-range.csv results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-range.tsv 25 10 0 0 20 3 256 256 -",
+    "[nsys-mono] nsys profile -o results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-mono --trace=cuda --sample=none --cpuctxsw=none /scratch/ag11163/gpusparse-env/venv/bin/python experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/canonical_baseline.py --variant monolithic --index data/derived/hash-1000000.gsp --queries data/derived/calibration-500.tsv --reference results/2026-11-11-cuda-bound-precision/inputs/cpu-top10-500.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-mono.csv --top results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-mono.tsv --validation results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-mono-validation.json --jit-manifest results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-mono-jit.json --limit 25 --k 10 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[ncu-range] ncu -o results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/ncu-range --kernel-name regex:range_scores|merge_candidates --launch-count 50 --section SpeedOfLight --section LaunchStats --section Occupancy --section WarpStateStats --section SchedulerStats --section SourceCounters --section MemoryWorkloadAnalysis --section InstructionStats --section ComputeWorkloadAnalysis --import-source yes ./build/cuda_range_bitpack data/derived/hash-1000000-w4096.rbp data/derived/calibration-500.tsv results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/ncu-range.csv results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/ncu-range.tsv 25 10 0 0 1 0 256 256 -",
+    "nsys export --type sqlite -o results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-range.sqlite results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-range.nsys-rep",
+    "nsys export --type sqlite -o results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-mono.sqlite results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-mono.nsys-rep",
+    "ncu exports: raw, details, source sass, source cuda,sass",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py results/2026-11-11-cuda-bound-precision/inputs/cpu-top10-500.tsv results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-range.tsv --queries 25 --k 10 --groups-per-query 23 --output results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/analysis/compare-nsys-range.json",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py results/2026-11-11-cuda-bound-precision/inputs/cpu-top10-500.tsv results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-mono.tsv --queries 25 --k 10 --groups-per-query 23 --output results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/analysis/compare-nsys-mono.json",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py results/2026-11-11-cuda-bound-precision/inputs/cpu-top10-500.tsv results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/ncu-range.tsv --queries 25 --k 10 --groups-per-query 1 --output results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/analysis/compare-ncu-range.json",
+    "python3 experiments/2026-11-14-range-bitpack-profile/analysis/analyze_nsys.py --range-sqlite results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-range.sqlite --range-csv results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-range.csv --mono-sqlite results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-mono.sqlite --mono-csv results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/nsys-mono.csv --paired-run results/2026-11-14-range-bitpack-paired/20261114-cuda5-paired-01 --output results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/analysis/nsys-summary.json --table results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/analysis/nsys-per-query.csv",
+    "python3 experiments/2026-11-14-range-bitpack-profile/analysis/analyze_ncu.py --raw results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/ncu-range-raw.csv --sass results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/ncu-range-sass.csv --map results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/raw/ncu-range-cuda-sass.csv --source src/cuda_range_bitpack.cu --output results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/analysis/ncu-summary.json",
+    "python3 experiments/2026-11-14-range-bitpack-profile/analysis/decode_utilization.py data/derived/hash-1000000-w4096.rbp data/derived/calibration-500.tsv --limit 25 --threads 256 --output results/2026-11-14-range-bitpack-profile/20261114-cuda5-profile-01/analysis/decode-utilization.json"
+  ],
+  "artifacts": {
+    "analysis/compare-ncu-range.json": {
+      "sha256": "db5e2b0086cdeb341eec8a79cf37f99071477d4cd30aa25959a4d9175c46db64",
+      "bytes": 355
+    },
+    "analysis/compare-nsys-mono.json": {
+      "sha256": "957d8341195d6dac95bd914c50808c0c030970dd15a35d4e70b70af4194313d9",
+      "bytes": 357
+    },
+    "analysis/compare-nsys-range.json": {
+      "sha256": "219fb4e6ed491e29ef9b269fcbccfdd78b41ac8b4a54c7b26fe19704163de810",
+      "bytes": 358
+    },
+    "analysis/decode-utilization.json": {
+      "sha256": "5090e44a5a0a916e3236e5cc08bf694d17acefc159044356d578df64ddc7d992",
+      "bytes": 8621
+    },
+    "analysis/ncu-summary.json": {
+      "sha256": "b18a1cc503fb951542ee1c1f0235f6f4145450b81ded1da02a2111b68933da76",
+      "bytes": 4890
+    },
+    "analysis/nsys-per-query.csv": {
+      "sha256": "13c7a20c4884c5736bf7d39ddd95971d28b42574848c6283cf1d78e73234e9ed",
+      "bytes": 3609
+    },
+    "analysis/nsys-summary.json": {
+      "sha256": "eab3430969e3a1d83fa6b4698944615b0654481f1f50932fd9508028f310e4ac",
+      "bytes": 2698
+    },
+    "logs/analyze-ncu.log": {
+      "sha256": "e723b046c6aeb704574e79a0a2edfa9a7c28ba3a3239b5de5e019889ba5eaf57",
+      "bytes": 4001
+    },
+    "logs/analyze-nsys.log": {
+      "sha256": "1e7cd3f746dd8e0aa26d7539951efcdf1b8269eb4e146896489b266ee866ffcc",
+      "bytes": 432
+    },
+    "logs/binary-sha256.txt": {
+      "sha256": "30d0c682fef46af150c2d35d086e43ebeded8e78c116532155afd437b69444f9",
+      "bytes": 182
+    },
+    "logs/commands.txt": {
+      "sha256": "cc86a5947049e88b1e16e0b9fce1e0e5eb13a348fc749b133a9d4f2289c2ff28",
+      "bytes": 5484
+    },
+    "logs/decode-utilization.log": {
+      "sha256": "1e99a32ceba800cb554f4b2360937e0bb53b79c9f0698aed5ef3022cb9edc1da",
+      "bytes": 277
+    },
+    "logs/environment.txt": {
+      "sha256": "cf83ef31b3409cda0d88f3a1fc31bbb8f179e1ac7450ad71868d5df063467b23",
+      "bytes": 2154
+    },
+    "logs/gpu-idle-ncu-range.txt": {
+      "sha256": "5f694f24f80aee7de4d403896c852ef7e287f8cc23f18a3266e0e25a0cc288dd",
+      "bytes": 74
+    },
+    "logs/gpu-idle-nsys-mono.txt": {
+      "sha256": "eb78922df2f281da073daa44a347911d443e76abec4555c6e013627ed39f68e8",
+      "bytes": 74
+    },
+    "logs/gpu-idle-nsys-range.txt": {
+      "sha256": "2e05828e6e1273714eaeee919d484b96ed06a651fedf8a9bae00b6052887dbd3",
+      "bytes": 75
+    },
+    "logs/gpu-sampler.log": {
+      "sha256": "17ecfe45232d9ffe7a9fca6c3fb26bce60dcf276700302d4360b5348c11b0eab",
+      "bytes": 5087
+    },
+    "logs/index-verify.log": {
+      "sha256": "f0985c88ff6e7def267524f0d1480c124e0716e7d838e58551104b1441898489",
+      "bytes": 777
+    },
+    "logs/ncu-range.stderr": {
+      "sha256": "ef2927084153bfa22c2805c0cb0490a221a7ca68629851e6153bbefb5162db38",
+      "bytes": 26
+    },
+    "logs/ncu-range.stdout": {
+      "sha256": "cda2d85aa75c9ba638cb7ac0c7e2f190be0c40974a098cff162ee75991cab4c0",
+      "bytes": 3930
+    },
+    "logs/nsys-mono.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/nsys-mono.stdout": {
+      "sha256": "9bb200de9bd5e5ed4d88bd0b8440678eece25c21fa50b03fdeb2845cafcba0b5",
+      "bytes": 1277
+    },
+    "logs/nsys-range.stderr": {
+      "sha256": "2b6455e2b28523414f4545ffa841f2055b7554082e663dcd8d027b824b3ab8ff",
+      "bytes": 602
+    },
+    "logs/nsys-range.stdout": {
+      "sha256": "b940ac8ff97a1f06dd93d79f3d6420192f5b269f7a2fd54d24ee3ba657b45923",
+      "bytes": 968
+    },
+    "logs/pip-freeze.txt": {
+      "sha256": "9a69a03a9fa916851415d71e65f17329f1405a8406182e8edca336fd10fd4ee5",
+      "bytes": 599
+    },
+    "logs/stages.txt": {
+      "sha256": "a235500e699d3bc216aa99318d2994cb9e5176b2bb1c79294cbdd8e7e33df42c",
+      "bytes": 330
+    },
+    "raw/ncu-range-cuda-sass.csv": {
+      "sha256": "8668c710cf5c541db5d135ca1219947d4386ce983af4ae91ef5dededc7b5f6f6",
+      "bytes": 33890661
+    },
+    "raw/ncu-range-details.csv": {
+      "sha256": "97397104fc71745da1c9c23b8c92e7fcfb5e1ac69834aa629b0d19f620559b39",
+      "bytes": 1035742
+    },
+    "raw/ncu-range-raw.csv": {
+      "sha256": "701fa403a6773fc5d393fba0ba264e56dcd7d6c4028c2d14703c064cd9ec14bd",
+      "bytes": 361409
+    },
+    "raw/ncu-range-sass.csv": {
+      "sha256": "573d0861b3bd2d8411fe158a75c772f727c3a82d6bc45777b7650bdafbfd74ee",
+      "bytes": 23395138
+    },
+    "raw/ncu-range.csv": {
+      "sha256": "1b106e33503c79ed9ac6fc93419fcf04e64f921970cbcf8d58df3bc584812d78",
+      "bytes": 3165
+    },
+    "raw/ncu-range.ncu-rep": {
+      "sha256": "061620d8e08dc716bd5cd00610b526407982dd3a1f0743e34fcea91898cb61ac",
+      "bytes": 16033969
+    },
+    "raw/ncu-range.tsv": {
+      "sha256": "fb6f88dbf1a30935275eed1845b872ed3fe860e9a988fe618351443f153334dc",
+      "bytes": 8511
+    },
+    "raw/nsys-mono-jit.json": {
+      "sha256": "58bba9ccba028684faef4e7850b76c4819c5a808b6901d12542c49560d6eea4e",
+      "bytes": 9059
+    },
+    "raw/nsys-mono-validation.json": {
+      "sha256": "f746ab8172847fcba286a18c9166f8c2dc14bb7583d431c7350239f5ff53b697",
+      "bytes": 684
+    },
+    "raw/nsys-mono.csv": {
+      "sha256": "f00555cf1ddfd8c9d4523f284200e772034c0a16c45436d1b9d9f1b672285440",
+      "bytes": 57590
+    },
+    "raw/nsys-mono.nsys-rep": {
+      "sha256": "618a4bed80cf701c7d780e90dd6154da9465109b200690b9eb0a9f29b5ad5c15",
+      "bytes": 1111516
+    },
+    "raw/nsys-mono.sqlite": {
+      "sha256": "d3bc915e399dd6f5492dac6f760ee4dfbd9ad7c4f1ece144d94a8b6123f8d355",
+      "bytes": 3018752
+    },
+    "raw/nsys-mono.tsv": {
+      "sha256": "5e7b15ec30366b856dbe693c6f3ea38979d6da7e68181d4ff51b7daf8ad5b348",
+      "bytes": 298602
+    },
+    "raw/nsys-range.csv": {
+      "sha256": "e7712a8911bca2c7f498b701022607335dbc695b90575f9a68f873147c9e5700",
+      "bytes": 68530
+    },
+    "raw/nsys-range.nsys-rep": {
+      "sha256": "8d529bc873392f657f4c6d27ae6a9a3f890687bfbe1a4eb6bc1e88fc2df5d657",
+      "bytes": 235833
+    },
+    "raw/nsys-range.sqlite": {
+      "sha256": "ff243b94c44a1665e023871c0882f3b3ed05f034544fe7b01ad892806e318589",
+      "bytes": 880640
+    },
+    "raw/nsys-range.tsv": {
+      "sha256": "280765a471950bfb26d28f24d5241ac45ec42f04f46dfcd654de43caf8388323",
+      "bytes": 195785
+    },
+    "raw/runtime/ncu-range/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/runtime/ncu-range/runtime.json": {
+      "sha256": "0b9428724eb4ae454e7dfe0e5996beb9ba6ea04cbf7a6144d58a334ed656aaa7",
+      "bytes": 1192
+    },
+    "raw/runtime/nsys-mono/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/runtime/nsys-mono/runtime.json": {
+      "sha256": "8af70bc4fa8dfd7fe60fddf77342f5e399548e84be3e865f34e7e7b9679c3c2d",
+      "bytes": 3501
+    },
+    "raw/runtime/nsys-range/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/runtime/nsys-range/runtime.json": {
+      "sha256": "d8992e320edc993bed9019eb524aea2ea03e96b9531bdb053f371de6664ab0bc",
+      "bytes": 1193
+    },
+    "raw/triton-cache/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "raw/triton-cache/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "raw/triton-cache/9Sq70lOWQ4o_pxaGDi48PVeDwHH0WEKWLPDdvGxjSUY/__grp___canonical_keys.json": {
+      "sha256": "0a27639f291c8d172c22b66c772abc7fdbf5768a4b4fbce8aaae298180250a95",
+      "bytes": 1303
+    },
+    "raw/triton-cache/9Sq70lOWQ4o_pxaGDi48PVeDwHH0WEKWLPDdvGxjSUY/_canonical_keys.cubin": {
+      "sha256": "c5d8d139679e905fd545b77f82a7b0a031c24b5bae4de4dc2ef805e02a44c08c",
+      "bytes": 6248
+    },
+    "raw/triton-cache/9Sq70lOWQ4o_pxaGDi48PVeDwHH0WEKWLPDdvGxjSUY/_canonical_keys.json": {
+      "sha256": "12c0403e3841bcce15044ec22d0d48b99eb673c439422e553847840c3ed0c68b",
+      "bytes": 847
+    },
+    "raw/triton-cache/9Sq70lOWQ4o_pxaGDi48PVeDwHH0WEKWLPDdvGxjSUY/_canonical_keys.llir": {
+      "sha256": "9ce3edc4ebef075e208697e96230334fe3291d6d8ed498340a135e2e2d3cf180",
+      "bytes": 4209
+    },
+    "raw/triton-cache/9Sq70lOWQ4o_pxaGDi48PVeDwHH0WEKWLPDdvGxjSUY/_canonical_keys.ptx": {
+      "sha256": "2565fab62030a9cb1a6c384e496c0f3c951babad3850ac2eee32689f5aa331ac",
+      "bytes": 5855
+    },
+    "raw/triton-cache/9Sq70lOWQ4o_pxaGDi48PVeDwHH0WEKWLPDdvGxjSUY/_canonical_keys.ttgir": {
+      "sha256": "9dbb7cba6613787ab03a4b84ac7b135330695da56891e536ffca23a550274198",
+      "bytes": 5798
+    },
+    "raw/triton-cache/9Sq70lOWQ4o_pxaGDi48PVeDwHH0WEKWLPDdvGxjSUY/_canonical_keys.ttir": {
+      "sha256": "b4eae78dedee6e31d55d0973c367cb4e3a03b8344e0d566e663f5b1f6a692916",
+      "bytes": 5257
+    },
+    "raw/triton-cache/ieIeNiFqnBbLXtHm8_wjpRmhKwzlepFy-9PXXXUAZig/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "b855204f17bd4bc0783856802bc95a8ec39b86a7c703c8f8fd151b9c2835dea9",
+      "bytes": 1411
+    },
+    "raw/triton-cache/ieIeNiFqnBbLXtHm8_wjpRmhKwzlepFy-9PXXXUAZig/_fast_scatter_add_kernel.cubin": {
+      "sha256": "4b86c7a7136b7a1bde604be64dbdb30c34e96fbab3a95e6e1b9e9ffc0e62b517",
+      "bytes": 12648
+    },
+    "raw/triton-cache/ieIeNiFqnBbLXtHm8_wjpRmhKwzlepFy-9PXXXUAZig/_fast_scatter_add_kernel.json": {
+      "sha256": "b57ded72d25479a303f56ed6daf9a0ef6e5f7749f16eb063962ff9af13af5835",
+      "bytes": 856
+    },
+    "raw/triton-cache/ieIeNiFqnBbLXtHm8_wjpRmhKwzlepFy-9PXXXUAZig/_fast_scatter_add_kernel.llir": {
+      "sha256": "aea0d21b4db4fcb3bdd2d53786f76f6f1e29ca07a480f0c8a32888e94e6c767b",
+      "bytes": 11197
+    },
+    "raw/triton-cache/ieIeNiFqnBbLXtHm8_wjpRmhKwzlepFy-9PXXXUAZig/_fast_scatter_add_kernel.ptx": {
+      "sha256": "a9ec8e9ae9b0a9b410b337453fa4155a09847d6046aa960c853bb9d3dfcacec2",
+      "bytes": 11490
+    },
+    "raw/triton-cache/ieIeNiFqnBbLXtHm8_wjpRmhKwzlepFy-9PXXXUAZig/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "465e14e3ac842e980ff3b0fddf4dd5b341ae1689a5fcfe222d7ab8fb68e30278",
+      "bytes": 12660
+    },
+    "raw/triton-cache/ieIeNiFqnBbLXtHm8_wjpRmhKwzlepFy-9PXXXUAZig/_fast_scatter_add_kernel.ttir": {
+      "sha256": "939dc302b0b35c1d538631a2d56eb94160306634090ece85c73649477239ceb3",
+      "bytes": 12089
+    },
+    "raw/triton-cache/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "9e188acb207f72cdd2182e914e1fae75058967f5fd64b3f18be7a9f4294b2471",
+      "bytes": 23080
+    }
+  }
+}

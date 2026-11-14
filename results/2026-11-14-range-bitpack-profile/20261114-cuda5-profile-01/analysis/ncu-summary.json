@@ -1,0 +1,120 @@
+{
+  "kernels": {
+    "range_scores": {
+      "launches": 25,
+      "total_duration_ms": 5.955328,
+      "share_of_profiled_kernel_time": 0.9074702555100449,
+      "mean_duration_ms": 0.23821312,
+      "achieved_occupancy_pct": 63.941940684934245,
+      "theoretical_occupancy_pct": 83.33333300000002,
+      "threads_per_warp_instruction": 30.114555087477967,
+      "branch_uniformity_pct": 97.72368615146372,
+      "sm_throughput_pct": 28.321187663129226,
+      "memory_throughput_pct": 27.855208276528188,
+      "cycles_per_issued_instruction": 16.30863013475261,
+      "waves_per_sm": 1.0700000000000003,
+      "registers_per_thread": 38.00000000000001,
+      "stall_cycles_per_issued_instruction": {
+        "barrier": 4.624958483949835,
+        "long_scoreboard": 3.970985616730431,
+        "wait": 2.686728832873017,
+        "not_selected": 1.2719163127444872,
+        "selected": 1.000003261138933,
+        "short_scoreboard": 0.9591453976325066,
+        "math_pipe_throttle": 0.8923637630518418,
+        "branch_resolving": 0.33810795752912354
+      },
+      "barrier_share_of_stall_reasons": 0.28363145125594214
+    },
+    "merge_candidates": {
+      "launches": 25,
+      "total_duration_ms": 0.6072319999999999,
+      "share_of_profiled_kernel_time": 0.09252974448995513,
+      "mean_duration_ms": 0.024289279999999996,
+      "achieved_occupancy_pct": 16.08977242985877,
+      "theoretical_occupancy_pct": 100.00000000000003,
+      "threads_per_warp_instruction": 28.480020025295115,
+      "branch_uniformity_pct": 97.8813579016653,
+      "sm_throughput_pct": 0.49225989291736943,
+      "memory_throughput_pct": 0.5831825893760542,
+      "cycles_per_issued_instruction": 10.82030999299115,
+      "waves_per_sm": 0.0,
+      "registers_per_thread": 33.00000000000001,
+      "stall_cycles_per_issued_instruction": {
+        "barrier": 3.5674167182757177,
+        "wait": 3.3320533810075896,
+        "long_scoreboard": 1.5133435702993254,
+        "selected": 1.0,
+        "branch_resolving": 0.41973132983768985,
+        "short_scoreboard": 0.3990318770552278,
+        "imc_miss": 0.20892514397133227,
+        "no_instruction": 0.13344158247259696
+      },
+      "barrier_share_of_stall_reasons": 0.32960349625423924
+    }
+  },
+  "phases": {
+    "range_scores/decode_add": {
+      "share_of_kernel_samples": 0.6063546033737167,
+      "share_of_both_kernels": 0.5502487668532386,
+      "active_threads_per_warp_instruction": 31.64396123803538,
+      "barrier_share_of_phase_samples": 0.19530386589940277,
+      "samples": 367366,
+      "instructions": 714200332
+    },
+    "range_scores/local_topk": {
+      "share_of_kernel_samples": 0.3759152279404483,
+      "share_of_both_kernels": 0.3411318879492354,
+      "active_threads_per_warp_instruction": 27.318299456895762,
+      "barrier_share_of_phase_samples": 0.44775018441111386,
+      "samples": 227752,
+      "instructions": 404943996
+    },
+    "range_scores/setup": {
+      "share_of_kernel_samples": 0.005862740567127719,
+      "share_of_both_kernels": 0.0053202626804404966,
+      "active_threads_per_warp_instruction": 31.24390243902439,
+      "barrier_share_of_phase_samples": 0.0,
+      "samples": 3552,
+      "instructions": 5022500
+    },
+    "range_scores/term_lookup": {
+      "share_of_kernel_samples": 0.005265242795365266,
+      "share_of_both_kernels": 0.004778051224832541,
+      "active_threads_per_warp_instruction": 23.871319680619294,
+      "barrier_share_of_phase_samples": 0.0,
+      "samples": 3190,
+      "instructions": 2474038
+    },
+    "range_scores/zero_scores_and_first_barrier": {
+      "share_of_kernel_samples": 0.003776450004951639,
+      "share_of_both_kernels": 0.003427016050914374,
+      "active_threads_per_warp_instruction": 32.0,
+      "barrier_share_of_phase_samples": 0.0,
+      "samples": 2288,
+      "instructions": 6838000
+    },
+    "range_scores/other": {
+      "share_of_kernel_samples": 0.002825735318390387,
+      "share_of_both_kernels": 0.0025642707513834823,
+      "active_threads_per_warp_instruction": 32.0,
+      "barrier_share_of_phase_samples": 0.0,
+      "samples": 1712,
+      "instructions": 26036960
+    },
+    "merge_candidates/merge": {
+      "share_of_kernel_samples": 1.0,
+      "share_of_both_kernels": 0.09252974448995513,
+      "active_threads_per_warp_instruction": 28.48050214556334,
+      "barrier_share_of_phase_samples": 0.3133086876155268,
+      "samples": 2164,
+      "instructions": 1576276
+    }
+  },
+  "attribution": {
+    "method": "warp-state samples per SASS instruction, mapped to phases by CUDA source line (or file/opcode for inlined library code)",
+    "unmapped_instruction_rows": 0,
+    "ambiguous_instruction_rows": 0
+  },
+  "qualification": "Nsight Compute replays each kernel with locked base clocks and flushed caches, so absolute durations differ from normal runs; use shares, not absolute times. Phase shares are sampling estimates."
+}
