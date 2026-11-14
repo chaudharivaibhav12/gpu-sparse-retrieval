@@ -1,27 +1,40 @@
-# EXPERIMENT_ID — TITLE
+# 2026-11-14-range-bitpack-v2 — version 2 of the range-split scorer
 
-Copy this folder to `experiments/<experiment-id>/` on `exp/<owner>/<experiment-id>` and fill `experiment.json`.
+Owner: Arnav. Branch `exp/arnav/2026-11-14-range-bitpack-v2`, parent experiment `2026-11-14-range-bitpack-profile` (branch at `4db5c86`, not merged). Not recorded by the team runtime.
 
-## Question and motivation
+## Question
 
-What does this experiment test, and what decision will the result enable?
+Which of five changes, each motivated by profile run `20261114-cuda5-profile-01`, reduce the range scorer's batch-1 latency while keeping exact results? **Status: all five variants are implemented, reviewed and pass correctness on the laptop. Nothing is timed yet; no protocol is registered.**
 
-## Parent and changes
+## Variants (cumulative, one commit each)
 
-Record the parent experiment/source commit, exact code paths, changed factors, preserved settings, input/split hashes and full scoring contract. Link the complete configuration under `configs/`.
+| Variant | Commit | Change | Profile evidence | Index |
+|---|---|---|---|---|
+| 1 | `4dfafdf` | Local top-k with one barrier (thread-sorted slots, warp shuffle selection, rank-and-scatter); k to 1000 | local top-k 34% of GPU time, 45% of it at barriers | gaps (GSPRBP01) |
+| 2 | `af9e0a4` | Combined work list so decode tiles are full | 49% of decode lanes carried a posting | gaps |
+| 3 | `d9943d0` | Positions instead of gaps; no prefix sums or decode barriers | barriers were the largest stall reason | positions (GSPRBP02) |
+| 4 | `6ed258b` | Merge folded into kernel 1 (last block finishes); query as kernel argument | merge 9%; 4 GPU operations per query | positions |
+| 5 | `223cf4b` | Range boundaries from the index; RANGE_SIZE and POSTINGS_CAP builder parameters | densest range ~4x mean tiles; 1.07 waves | positions, optional cap |
 
-## Plan
+Unchanged in every variant: scoring contract `GSP-CAP32-U64-NUMERIC-TIES-v1` (ties by original numeric ID, zero-score eligibility), the uint32 overflow gate, the 128-term limit. New limits: k <= 1000; ceil(RANGE_SIZE / threads) <= 128; shared memory = warps x min(k, 32 x slots) x 8 + RANGE_SIZE x 4 bytes must fit the device.
 
-State correctness criteria, measurements, timing boundary, repeats/order, analysis procedure, stopping rule, success/failure rules and next action if the outcome is negative.
+Index size at 1M documents, range 4096: gaps 315,508,373 bytes (2.658 B/posting) -> positions 362,880,161 (3.057 B/posting, +15.0%). Variants 1+ also keep 4 bytes per document of per-range original-ID ranks on the device (built at load).
 
 ## Code and review
 
-List shared source paths and experiment-specific drivers/patches under `code/`. For every code iteration, record separate review findings, corrections, checks and limits.
+- Scorer `src/cuda_range_v2.cu` (evolves per commit); index `src/range_bitpack.h`, `src/range_bitpack_tool.cpp`; fixtures `tests/check_range_bitpack.py`.
+- Reviews before running: [1](code/review-variant-1.json), [2](code/review-variant-2.json), [3](code/review-variant-3.json), [4](code/review-variant-4.json), [5](code/review-variant-5.json).
+- [code/check_variant.sh](code/check_variant.sh): correctness gate. [code/build_variants.sh](code/build_variants.sh): builds version 1 and each variant from its own commit.
+- [HANDOFF.md](HANDOFF.md): exact arguments per variant and what remains.
 
-## Runs
+## Runs (laptop RTX 4070 Laptop, CUDA 13.3; correctness only)
 
-Add a relative link to `runs/<run-id>/README.md` for every attempt. That README links to its canonical results folder. Include failures, expected rejections and interrupted attempts.
+Each: fixture suite with k to 1000, then 100K and 1M documents, all 500 calibration queries, k=10 and k=1000, zero mismatches against `cpu_pilot`.
+
+- [variant 1](../../results/2026-11-14-range-bitpack-v2/20261114-laptop-variant1-01/manifest.json) · [variant 2](../../results/2026-11-14-range-bitpack-v2/20261114-laptop-variant2-01/manifest.json) · [variant 3](../../results/2026-11-14-range-bitpack-v2/20261114-laptop-variant3-01/manifest.json) · [variant 4](../../results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/manifest.json) · [variant 5, cap 400,000](../../results/2026-11-14-range-bitpack-v2/20261114-laptop-variant5-01/manifest.json)
+
+Each run's `analysis/dev-glance.txt` is a single-process development reading on the laptop and is **not a timing result**.
 
 ## Findings and decision
 
-Report the result, interpretation, uncertainty, limitations and concrete next action. Link raw evidence and saved analysis. Include registration, run/review or observation IDs from the recording tools.
+Pending the cuda5 correctness runs and a registered timing comparison.

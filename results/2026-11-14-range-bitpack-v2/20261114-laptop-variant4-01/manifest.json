@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-14-range-bitpack-v2",
+  "run_id": "20261114-laptop-variant4-01",
+  "status": "passed-correctness",
+  "scope": "fixtures (k to 1000) plus 100K and 1M documents, all 500 calibration queries, k=10 and k=1000, range 4096-pos",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "6ed258b4c9daf85767951cf0b9fc8ed858794d0a",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17; g++ -O3 -Wall -Wextra -Wpedantic -std=c++17",
+    "source_sha256": {
+      "src/cuda_range_v2.cu": "10201d0d228db8dca8cd595a4d10eb1ef661bb8afd77b5b2639d3726a85f78b7",
+      "src/range_bitpack.h": "10db89ddfbf3782eac237b0b801dec4972bd05be7daac60db004e4ee9db5867d",
+      "src/range_bitpack_tool.cpp": "a57f2d0f4e01635bc7ab95eed92c7fc5640b25feb662f2c5664e9cc853ed45f4",
+      "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+      "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+      "tests/check_range_bitpack.py": "4242e9398602eef43d947d3c62f13f0b2be9a7f49c8d595e915f2105e4fb5335",
+      "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py": "ca43fb45ed74e0fc8d24c14898ac8ae3d32c7ebd3f805b55f6d59db87378d18e",
+      "experiments/2026-11-14-range-bitpack-v2/code/check_variant.sh": "1e4c403b25dce254aa1fc56d5ebdab418595a020ff4be8a10a3b7b238f8e202b"
+    },
+    "binary_sha256": {
+      "build/range_bitpack_tool": "5bbde95ea482e9410b320a1de60d12f3f87c1396099ff193f6cd9e02b2b48459",
+      "build/cuda_range_v2": "bf2b94fb402ad3dd07de207f8db29433d4e580b445a8ac47d231a5120b5d8b33"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "data/derived/hash-100000.gsp": {
+      "sha256": "ee7ffdb9c527f3e486fe560426e27f4f02d2a61b42b8f138eaf7671a8aeb73ab",
+      "bytes": 61314734
+    },
+    "data/derived/hash-100000-w4096-pos.rbp": {
+      "sha256": "b8c6701c55e7fde9ba3eb98ce5b4dad10494a3ddd6dc33d8038c307e827a2e16",
+      "bytes": 38386501
+    },
+    "data/derived/oracle/cpu-top10-100000.tsv": {
+      "sha256": "30d133c9b10af919fcc849a6a3d18d39ee9b142be58d9bb7a62aae0d1017167c",
+      "bytes": 114941
+    },
+    "data/derived/oracle/cpu-top1000-100000.tsv": {
+      "sha256": "ad53792a4e62ef12991918b6f8218894974e1a8fe8716e46b99ee22e9542153a",
+      "bytes": 12061282
+    },
+    "data/derived/hash-1000000.gsp": {
+      "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37",
+      "bytes": 609799364
+    },
+    "data/derived/hash-1000000-w4096-pos.rbp": {
+      "sha256": "67e19c8c6eec751f709b644488c8f4bd13e72a821831a7ca9d65133fc02bed34",
+      "bytes": 370880289
+    },
+    "data/derived/oracle/cpu-top10-1000000.tsv": {
+      "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860",
+      "bytes": 116302
+    },
+    "data/derived/oracle/cpu-top1000-1000000.tsv": {
+      "sha256": "ddb1bb73aeb4a100cadb6c1710a9790d7b473a204e8769f429cd835048bbc716",
+      "bytes": 12181625
+    }
+  },
+  "environment": {
+    "host": "arnavgupta829",
+    "kernel": "Linux 6.6.87.2-microsoft-standard-WSL2",
+    "gpu": "NVIDIA GeForce RTX 4070 Laptop GPU, 617.14, 8188 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_13.3.r13.3/compiler.38244171_0"
+    ],
+    "gxx": [
+      "g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0"
+    ],
+    "python": "Python 3.14.4"
+  },
+  "commands": [
+    "g++ -O3 -Wall -Wextra -Wpedantic -std=c++17 src/cpu_pilot.cpp -o build/cpu_pilot",
+    "g++ -O3 -Wall -Wextra -Wpedantic -std=c++17 src/range_bitpack_tool.cpp -o build/range_bitpack_tool",
+    "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 src/cuda_range_v2.cu -o build/cuda_range_v2",
+    "python3 tests/check_range_bitpack.py build/range_bitpack_tool build/cuda_range_v2 --gpu 0 --max-k 1000 --encoding positions --single-kernel --output results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/fixtures",
+    "./build/range_bitpack_tool verify data/derived/hash-100000.gsp data/derived/hash-100000-w4096-pos.rbp",
+    "./build/cuda_range_v2 data/derived/hash-100000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/real-100000-k10.csv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/real-100000-k10.tsv 500 10 0 0 1 1 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-100000.tsv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/real-100000-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/analysis/compare-100000-k10.json",
+    "./build/cuda_range_v2 data/derived/hash-100000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/real-100000-k1000.csv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/real-100000-k1000.tsv 500 1000 0 0 1 1 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-100000.tsv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/real-100000-k1000.tsv --queries 500 --k 1000 --groups-per-query 2 --output results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/analysis/compare-100000-k1000.json",
+    "./build/range_bitpack_tool verify data/derived/hash-1000000.gsp data/derived/hash-1000000-w4096-pos.rbp",
+    "./build/cuda_range_v2 data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/real-1000000-k10.csv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/real-1000000-k10.tsv 500 10 0 0 1 1 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-1000000.tsv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/real-1000000-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/analysis/compare-1000000-k10.json",
+    "./build/cuda_range_v2 data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/real-1000000-k1000.csv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/real-1000000-k1000.tsv 500 1000 0 0 1 1 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-1000000.tsv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/real-1000000-k1000.tsv --queries 500 --k 1000 --groups-per-query 2 --output results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/analysis/compare-1000000-k1000.json",
+    "./build/cuda_range_v2 data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/glance-1000000-k10.csv results/2026-11-14-range-bitpack-v2/20261114-laptop-variant4-01/raw/glance-1000000-k10.tsv 25 10 0 0 10 3 256 256 -"
+  ],
+  "artifacts": {
+    "analysis/compare-100000-k10.json": {
+      "sha256": "512c73f8e4c658f22be6566e94e8323e8ee763d63164a6f963c0a1ea403c9592",
+      "bytes": 339
+    },
+    "analysis/compare-100000-k1000.json": {
+      "sha256": "6ac7a0827439cc37092115a7b92a112d262497f6d5ad67f2e71248e22c0763c4",
+      "bytes": 347
+    },
+    "analysis/compare-1000000-k10.json": {
+      "sha256": "0668743bbe9e5a44b33aecde7d4664accc8d21b5eb9e981af5f6295a7eed3f7b",
+      "bytes": 341
+    },
+    "analysis/compare-1000000-k1000.json": {
+      "sha256": "1d92f79da0f52dc895f7a6b81208c34d5340c863f74605b27849e6f80ee54254",
+      "bytes": 349
+    },
+    "analysis/dev-glance.txt": {
+      "sha256": "7f9bd9241273d7d3533ddc557e4f33936f844a73d1480e27c3e4597987cf8119",
+      "bytes": 116
+    },
+    "logs/commands.txt": {
+      "sha256": "e2a1cddba9fcbcb0c75ef203fa3e4052b615dc631b31e253f8a39e64c0978758",
+      "bytes": 3608
+    },
+    "logs/fixtures.log": {
+      "sha256": "0e222ee7ae653f804d26ca70785a5a5a6a7bae5ce235d5c029a10915a27f3b16",
+      "bytes": 1244
+    },
+    "logs/gpu-before.txt": {
+      "sha256": "af994076c05fa9de778737d8320ea982b59c63dd7deee8751ad30aa9698b57e5",
+      "bytes": 1689
+    },
+    "logs/index-verify-100000.log": {
+      "sha256": "4c5de8cea13de34e9e6880279faa8c7798c756ccfe8fdfc8e18c25d46e3cc56e",
+      "bytes": 770
+    },
+    "logs/index-verify-1000000.log": {
+      "sha256": "b9c92f70c0ca269a71c987d598b6429cecc750679ae33c532fb0f0dbf38d0b84",
+      "bytes": 796
+    },
+    "logs/nvcc.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/fixtures/summary.json": {
+      "sha256": "5a6449198e919bf12468c62a4435507ae40ffcb1bac2b7e43689cdafae5407f9",
+      "bytes": 1716
+    },
+    "raw/glance-1000000-k10.csv": {
+      "sha256": "eb0cc9f2e72069d0253e72f1bf1141d3d3283e23243c31aa570a682c84ba3e23",
+      "bytes": 38960
+    },
+    "raw/glance-1000000-k10.log": {
+      "sha256": "9c02d97b4d338f7b0aeaa963c173df490972d2d1496715e8d7308101fcbb3fb4",
+      "bytes": 641
+    },
+    "raw/real-100000-k10.csv": {
+      "sha256": "aa259a5e520536fc725fa1ea3e0a3209524bf41d3003aac6d2793b774adb7e9e",
+      "bytes": 115195
+    },
+    "raw/real-100000-k10.log": {
+      "sha256": "b3a85c4050a99a764a15d52218bc09eb4367b12b0fea95ecdd10f3189b073b7f",
+      "bytes": 356
+    },
+    "raw/real-100000-k10.tsv": {
+      "sha256": "303778b63cfd938317d08e74e8a6334d74d6830449d342de6f945cab56320cba",
+      "bytes": 329862
+    },
+    "raw/real-100000-k1000.csv": {
+      "sha256": "e29633018042f2bf47b988feed186da74683fe09d8d8905894c423bdfb08b759",
+      "bytes": 118585
+    },
+    "raw/real-100000-k1000.log": {
+      "sha256": "f71903db7bf0ed825cb91afbff4a6955022ad5a493583087ba0165500abfbe85",
+      "bytes": 358
+    },
+    "raw/real-100000-k1000.tsv.sha256": {
+      "sha256": "efcdbdee1a72f3e50c9b3d23aedb5d56eb29de67c00f6c076771a114f9797401",
+      "bytes": 156
+    },
+    "raw/real-1000000-k10.csv": {
+      "sha256": "07a6ee2520c6e5bf9b178eccaf9c91d2c788aef64a009e74ffcfa3c9b66a67c0",
+      "bytes": 119185
+    },
+    "raw/real-1000000-k10.log": {
+      "sha256": "cf3dadc87a2c6bf9f61dafbc49db467cc3fb16a542ffa7f27ff184d9d8cacda7",
+      "bytes": 360
+    },
+    "raw/real-1000000-k10.tsv": {
+      "sha256": "40c1e955eb864fedcc09f33f580423eceaef3f069b88e9bf68619164c4b93d6e",
+      "bytes": 332584
+    },
+    "raw/real-1000000-k1000.csv": {
+      "sha256": "7d1cb688197cfc431ea70adf234ec9e8d339e849ab1cd25997955c66f2283555",
+      "bytes": 121285
+    },
+    "raw/real-1000000-k1000.log": {
+      "sha256": "b474be0c481dcfcd524eeb309f1f51f7926204db855a02ea0accbc970d6116bb",
+      "bytes": 362
+    },
+    "raw/real-1000000-k1000.tsv.sha256": {
+      "sha256": "747c3cefc405805b552fc0a96292c6efa851ca46f4ae55db87450be070e30c20",
+      "bytes": 157
+    }
+  }
+}

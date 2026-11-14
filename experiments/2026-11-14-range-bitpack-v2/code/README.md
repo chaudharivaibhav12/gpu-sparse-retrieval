@@ -1,3 +1,5 @@
-# Experiment-specific code
+# Experiment code
 
-Place one-off drivers, adapters and external patches here. List shared `src/`, `scripts/` and `tests/` paths in the experiment metadata. The run manifest pins the exact measured source commit. Keep native external source revisions and corrective patches identifiable.
+- `check_variant.sh` correctness gate for the scorer at HEAD.
+- `build_variants.sh` builds version 1 and each variant from its own commit.
+- `review-variant-N.json` separate review before each variant was run.

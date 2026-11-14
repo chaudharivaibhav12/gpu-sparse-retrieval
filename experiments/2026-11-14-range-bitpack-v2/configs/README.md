@@ -1,3 +1,3 @@
-# Resolved settings
+# Settings
 
-Save complete configuration files before executing. Explain every change from the parent configuration. Include inputs/split membership and hashes, algorithm settings, eligibility, ties, seeds and measurement settings. Link the recording-tool registration.
+No timing protocol is registered yet; register one here before any timed run (see ../HANDOFF.md).
