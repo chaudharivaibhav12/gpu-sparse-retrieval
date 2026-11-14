@@ -1,0 +1,44 @@
+{
+  "iteration": 1,
+  "date": "2026-11-13",
+  "scope": ["src/range_bitpack.h", "src/range_bitpack_tool.cpp", "src/cuda_range_bitpack.cu", "tests/check_range_bitpack.py"],
+  "method": "Separate read-through after the first passing fixture run, checking shared-memory races, barrier placement, bounds, integer widths, edge cases and unintended changes to the scoring contract.",
+  "checked_without_finding": [
+    "Shared term_block/term_weight are written before the first barrier and only read after it.",
+    "Decode tiles alternate two warp-total buffers; a buffer is rewritten only after the next tile's barrier, when all readers are done. The same argument covers the two candidate-slot buffers in selection.",
+    "Loop bounds that contain barriers depend only on shared values identical for every thread.",
+    "Each thread reads and retires only the score slots it owns (slot % threads), after the barrier that ends accumulation.",
+    "Positions are in range for any index that passes rbp_load plus the round-trip check; prefix sums stay below the range size.",
+    "Zero-score documents stay eligible; slots past the last document in a partial range are never scanned.",
+    "Ties use original numeric IDs read from the device ID map, never internal positions.",
+    "Query wall time covers sparse query construction, query upload, both kernels, top-k download and event synchronisation; index load/upload, the gate, verification and file writes are outside."
+  ],
+  "findings": [
+    {
+      "id": 1,
+      "issue": "The uint32 overflow gate assumed one posting per (term, document). A repeated pair could exceed weight_sum*255.",
+      "impact": "None on the project data (no repeats), but the gate was not a true bound for arbitrary GSP input.",
+      "fix": "rbp_max_multiplicity scans the index once at start-up; the gate multiplies the bound by it and the value is reported to the runtime gate."
+    },
+    {
+      "id": 2,
+      "issue": "ranges*k was computed in uint32 and could wrap for very small ranges on very large corpora.",
+      "impact": "Not reachable at the registered settings.",
+      "fix": "Explicit require before any allocation."
+    },
+    {
+      "id": 3,
+      "issue": "A range size needing more shared memory than the device allows failed with a generic CUDA error.",
+      "impact": "Diagnostics only.",
+      "fix": "Explicit message at start-up."
+    }
+  ],
+  "checks_after_fixes": "tests/check_range_bitpack.py on RTX 4070 Laptop (CUDA 13.3, sm_89): 36 index configurations, 180 scorer runs, 3640 query checks, 8 expected rejections, all passing.",
+  "validation_limits": [
+    "The overflow gate cannot be triggered under cap-32 weights and the 128-term limit, so its rejection path is covered by inspection only.",
+    "Fixtures use at most 8,292 documents; multi-range behaviour at scale is covered by the real-data comparisons.",
+    "Queries with more than 128 terms are rejected, not scored; the longest calibration query has 95 terms.",
+    "k is limited to 0..128 as in the shared GPU top-k.",
+    "Local development used CUDA 13.3 on sm_89; the CIMS build uses CUDA 12.6 and is checked separately."
+  ]
+}

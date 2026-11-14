@@ -239,6 +239,20 @@ inline RangeIndex rbp_load(const string& path) {
     return r;
 }
 
+// Largest number of postings one term has for a single document. The source
+// data has 1; a repeated (term, document) pair multiplies the score bound.
+inline uint32_t rbp_max_multiplicity(const RangeIndex& r) {
+    uint32_t longest=r.impacts.empty() ? 0 : 1;
+    for (size_t b=0;b<r.blocks();++b) {
+        uint32_t run=1;
+        for (uint32_t j=1;j<r.block_count[b];++j) {
+            const bool repeat=rbp_extract(r.encoded.data(),r.block_bit_start[b]+uint64_t(j)*r.block_width[b],r.block_width[b])==0;
+            run=repeat ? run+1 : 1;longest=max(longest,run);
+        }
+    }
+    return longest;
+}
+
 // Inverts the index back to forward (document-major) postings and compares
 // them with the GSP source, so every gap, width, offset and impact is checked.
 inline void rbp_verify_roundtrip(const Index& x,const RangeIndex& r) {
