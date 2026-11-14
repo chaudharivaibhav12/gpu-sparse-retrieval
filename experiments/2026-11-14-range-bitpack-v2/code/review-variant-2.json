@@ -1,0 +1,19 @@
+{
+  "variant": 2,
+  "change": "Kernel 1 decodes one combined work list per range: lane g maps to (term, posting) by binary search over per-term work-list starts, so tiles are full.",
+  "justification_from_profile": "20261114-cuda5-profile-01: decode+add was 55% of GPU kernel time; only 49% of decode lanes carried a posting (blocks average 191 postings against 256-lane tiles), with one barrier per tile.",
+  "behaviour_deltas_vs_variant_1": [
+    "One prefix sum runs across block boundaries; position = running sum - summed last positions of earlier blocks. Needs a uint16 last-position per block, computed by the driver at load (2 bytes per block on the device, excluded from query time).",
+    "Block metadata is staged in shared memory per query term; one extra barrier at kernel start for the work-list offsets.",
+    "Tiles per range drop from sum(ceil(count/threads)) to ceil(sum(count)/threads)."
+  ],
+  "review_before_running": [
+    "The chosen term is the last one whose start <= g; an absent term has an empty g interval so it is never selected, including leading and trailing absent terms.",
+    "Running sum at posting (i,j) = sum of last positions of earlier blocks + sum of block i's gaps through j, so the subtraction yields the in-range position; the running sum is at most 128*32767 and fits uint32.",
+    "Dead lanes contribute 0 to the prefix sum and never write.",
+    "Offsets are written after the first barrier into arrays not read in that phase, and read only after the second barrier."
+  ],
+  "findings": [],
+  "checks": "Fixtures (216 scorer runs) and 100K/1M x 500 queries x k=10/1000 with zero mismatches; recorded run linked from the experiment README.",
+  "validation_limits": ["Same as variant 1."]
+}
