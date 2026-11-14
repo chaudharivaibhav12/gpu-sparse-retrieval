@@ -1,6 +1,6 @@
 # Range-split bit-packed scorer: calibration result
 
-Measured source `eef830215a…` (see manifests) on branch `exp/arnav/2026-11-13-range-bitpack`, parent main `430b4dc`. Runs are not recorded by the team runtime; each has a self-recorded manifest with source, input, binary and artifact hashes, argv and environment.
+Measured source `eef83028870f983d46f4366dce2322b1264f7ccb` on branch `exp/arnav/2026-11-13-range-bitpack`, parent main `430b4dc`. Runs are not recorded by the team runtime; each has a self-recorded manifest with source, input, binary and artifact hashes, argv and environment.
 
 ## Result
 
