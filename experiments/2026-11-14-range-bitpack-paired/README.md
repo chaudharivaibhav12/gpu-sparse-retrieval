@@ -20,8 +20,19 @@ Correctness first: fixtures for the range scorer and monolithic, 500 real querie
 
 ## Runs
 
-Pending.
+- [20261114-cuda5-paired-01](runs/20261114-cuda5-paired-01/README.md) — completed; all correctness gates and 172,500 timed outputs exact.
 
 ## Findings and decision
 
-Pending.
+Paired ratios, range-bitpack ÷ baseline (geometric mean of 1,500 query/process ratios, 95% crossed bootstrap):
+
+| Baseline | Ratio | 95% interval |
+|---|---:|---|
+| Adapted GPUSparse monolithic PL 512 | 0.2351 | 0.2307–0.2395 |
+| CSR full-byte B16 | 0.0811 | 0.0783–0.0841 |
+| CSR full-byte B32 | 0.0655 | 0.0633–0.0678 |
+| CSR exhaustive B32 | 0.0534 | 0.0523–0.0545 |
+
+The range scorer was faster in every one of the 1,500 pairs against every baseline. Vaibhav's 2026-11-12 CSR/monolithic ratios reproduce in this session. This is a complete-system comparison on a shared GPU; see the [report](report.md) for differences between implementations, the other user's GPU jobs during the session, and limits.
+
+Decision: adopt the range-split scorer as the exact GPU reference system; next a kernel breakdown, range-size sweep and k=100/1000, after sharing with the team.
