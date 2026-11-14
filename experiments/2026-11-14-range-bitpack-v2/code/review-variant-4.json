@@ -1,0 +1,23 @@
+{
+  "variant": 4,
+  "change": "Single kernel: the query (term, weight) list is a by-value kernel argument, and the last range block to finish merges all ranges' lists (threadfence + atomic ticket; counter reset by that block). The merge is the multi-warp pattern from variant 1 run by the block's own threads.",
+  "justification_from_profile": "20261114-cuda5-profile-01: merge kernel 9.3% of GPU kernel time on a single block; four GPU operations per query (2 kernels, 2 copies) with the GPU idle about 17% of each query's span between them.",
+  "behaviour_deltas_vs_variant_3": [
+    "Per query: 1 kernel launch and 1 device-to-host copy (was 2 launches, 1 host-to-device and 1 device-to-host copy).",
+    "Kernel argument grows by a 1,028-byte QueryArgs struct (128 terms).",
+    "The merge uses the scoring kernel's thread count; MERGE_THREADS must equal SCORE_THREADS and is otherwise unused.",
+    "A 4-byte device counter must be 0 before every launch; the driver zeroes it once and the last block re-arms it."
+  ],
+  "review_before_running": [
+    "Ordering: each thread executes __threadfence after its candidate writes; the following barrier means every thread of the block has fenced; only then does thread 0 take the ticket. A block observing ticket == ranges-1 therefore runs after every other block's fenced writes.",
+    "Exactly one block sees the final ticket; is_last is written by thread 0 and read by all threads after a barrier.",
+    "The merge reuses warp_length after all of this block's earlier reads of it (a barrier separates them); heads and scratch are touched only by the merging block.",
+    "The counter is reset after the merge by the same block; launches are sequential on one stream, so the next launch starts from 0."
+  ],
+  "findings": [],
+  "checks": "Fixtures with --encoding positions --single-kernel (216 scorer runs with 1 to 8,292 range blocks, 10 rejections); 100K/1M x 500 queries x k=10/1000 x 2 passes with zero mismatches.",
+  "validation_limits": [
+    "If a launch were aborted mid-kernel the counter would stay non-zero and later launches would not merge; the driver does not detect this beyond its per-result validity and order checks. Not observed.",
+    "Launches must not overlap (one stream, batch 1)."
+  ]
+}

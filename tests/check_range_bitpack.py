@@ -196,6 +196,7 @@ def main():
     parser.add_argument("--gpu", default="0")
     parser.add_argument("--max-k", type=int, default=128, help="largest k the scorer supports")
     parser.add_argument("--encoding", default="gaps", choices=["gaps", "positions"])
+    parser.add_argument("--single-kernel", action="store_true", help="merge threads must equal score threads")
     args = parser.parse_args()
     tool, scorer = Path(args.tool).resolve(), Path(args.scorer).resolve()
     depths = DEPTHS + ([DEEP] if args.max_k >= DEEP[0] else [])
@@ -231,6 +232,8 @@ def main():
             for k, threads, merge_threads in depths:
                 stem = root / ("%s-w%d-k%d-t%d-m%d" % (name, w, k, threads, merge_threads))
                 top = Path(str(stem) + ".tsv")
+                if args.single_kernel:
+                    merge_threads = threads
                 run([scorer, rbp, query_file, str(stem) + ".csv", top, len(queries), k, args.gpu, 1, 1, 1,
                      threads, merge_threads, gsp])
                 summary["scorer_runs"] += 1
@@ -257,6 +260,8 @@ def main():
     too_wide = root / "too-wide.tsv"
     too_wide.write_text("wide129" + "".join("\t%d:1" % t for t in range(129)) + "\n")
     base = [scorer, rbp, None, root / "reject.csv", root / "reject.tsv", 1, 10, args.gpu, 1, 1, 0, 256, 256, gsp]
+    if args.single_kernel:
+        summary["single_kernel"] = True
 
     def reject(message, **changes):
         command = list(base)
@@ -275,6 +280,8 @@ def main():
     duplicate.write_text("dup\t0:1\t0:2\n")
     reject("Bad cap32 query", p2=duplicate)
     reject("Unsupported setting", p2=good_queries, p11=48)
+    if args.single_kernel:
+        reject("MERGE_THREADS must equal SCORE_THREADS", p2=good_queries, p12=512)
     reject("Unsupported setting", p2=good_queries, p6=args.max_k + 1)
     reject("does not belong to this GSP", p2=good_queries, p13=root / "ties.gsp")
     corrupt = root / "corrupt.rbp"
