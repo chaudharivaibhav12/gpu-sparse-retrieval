@@ -1,0 +1,26 @@
+{
+  "variant": 1,
+  "change": "Local top-k with one block-wide barrier (thread-sorted slots, warp shuffle selection, rank-and-scatter) in kernel 1; the separate merge kernel uses the same pattern; k supported to 1000.",
+  "justification_from_profile": "20261114-cuda5-profile-01: local top-k was 34.1% of GPU kernel time with 44.8% of its samples at barriers (one barrier per selection round); merge 9.3% with 31.3% at barriers.",
+  "behaviour_deltas_vs_version_1": [
+    "Selection keys are (score << 16) | (65535 - per-range original-ID rank); ties are decided by a uint16 rank array instead of reading 64-bit IDs. Adds two uint16 device arrays (4 bytes per document), built on the host at start-up and excluded from query time like other index setup.",
+    "Kernel 1 shared memory grows by warps * min(k, 32 * slots per thread) * 8 bytes.",
+    "k limit 128 -> 1000; slots per thread (ceil(range size / threads)) limited to 128.",
+    "Merge kernel needs two device scratch arrays (list heads, warps * k candidates).",
+    "The RBP_TAKEN sentinel is gone; the overflow gate keeps the same bound (< 2^32 - 1)."
+  ],
+  "review_before_running": [
+    "Keys are unique within a range and never 0 (low 16 bits >= 32768 because a range has at most 32768 documents), so 0 safely marks an exhausted lane.",
+    "A thread's contribution to the range top-k is within its own best min(k, slots); a warp's within its best min(k, 32*slots); so the union of warp lists contains the range top-k.",
+    "Rank = own index + number of greater keys in every other warp list is a bijection onto 0..n-1 over the union; exactly the keys with rank < k are written, each to a distinct slot.",
+    "Warp lists are written only by lane 0 during selection and read only after the single barrier; the loop exit (best == 0) is identical for all lanes of a warp.",
+    "Ranges with fewer than k documents write invalid entries for ranks >= document count, so the merge never reads stale candidates.",
+    "Merge: each thread reads and advances only the heads of lists it owns; heads are reset by their owner at kernel start; scratch is written by lane 0 and read after the barrier."
+  ],
+  "findings": [],
+  "checks": "tests/check_range_bitpack.py --max-k 1000: 216 scorer runs, 4368 query checks, 8 rejections; check_variant.sh: 100K and 1M, 500 queries, k=10 and k=1000, zero mismatches (recorded run linked from the experiment README).",
+  "validation_limits": [
+    "Shared memory for large range sizes combined with large k can exceed the device limit; the driver stops with a message.",
+    "k=100 is exercised by fixtures at k=128 and by a development glance only; recorded real-data checks use k=10 and k=1000."
+  ]
+}

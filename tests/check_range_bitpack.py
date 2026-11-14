@@ -16,8 +16,9 @@ import tempfile
 from pathlib import Path
 
 RANGE_SIZES = [1, 3, 64, 4096]
-# (k, score threads, merge threads)
+# (k, score threads, merge threads); the last row is added when --max-k allows it
 DEPTHS = [(1, 32, 32), (10, 256, 256), (128, 256, 1024), (10, 1024, 32), (0, 256, 256)]
+DEEP = (1000, 256, 1024)
 MAX_TERMS = 128
 
 
@@ -189,8 +190,10 @@ def main():
     parser.add_argument("scorer")
     parser.add_argument("--output", type=Path, help="new directory for the summary and fixture files")
     parser.add_argument("--gpu", default="0")
+    parser.add_argument("--max-k", type=int, default=128, help="largest k the scorer supports")
     args = parser.parse_args()
     tool, scorer = Path(args.tool).resolve(), Path(args.scorer).resolve()
+    depths = DEPTHS + ([DEEP] if args.max_k >= DEEP[0] else [])
     holder = None
     if args.output:
         args.output.mkdir(parents=True, exist_ok=False)
@@ -220,7 +223,7 @@ def main():
             run([tool, "verify", gsp, rbp])
             decode_rbp(rbp, gsp, ids, docs, vocab, w, coverage)
             summary["index_configurations"] += 1
-            for k, threads, merge_threads in DEPTHS:
+            for k, threads, merge_threads in depths:
                 stem = root / ("%s-w%d-k%d-t%d-m%d" % (name, w, k, threads, merge_threads))
                 top = Path(str(stem) + ".tsv")
                 run([scorer, rbp, query_file, str(stem) + ".csv", top, len(queries), k, args.gpu, 1, 1, 1,
@@ -267,7 +270,7 @@ def main():
     duplicate.write_text("dup\t0:1\t0:2\n")
     reject("Bad cap32 query", p2=duplicate)
     reject("Unsupported setting", p2=good_queries, p11=48)
-    reject("Unsupported setting", p2=good_queries, p6=129)
+    reject("Unsupported setting", p2=good_queries, p6=args.max_k + 1)
     reject("does not belong to this GSP", p2=good_queries, p13=root / "ties.gsp")
     corrupt = root / "corrupt.rbp"
     blob = bytearray(rbp.read_bytes())
@@ -283,7 +286,7 @@ def main():
     assert summary["fixtures"]["big"]["max_score"] == 128 * 32 * 255
     summary["coverage"] = coverage
     summary["range_sizes"] = RANGE_SIZES
-    summary["depth_thread_settings"] = DEPTHS
+    summary["depth_thread_settings"] = depths
     if args.output:
         (args.output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     print(json.dumps(summary))
