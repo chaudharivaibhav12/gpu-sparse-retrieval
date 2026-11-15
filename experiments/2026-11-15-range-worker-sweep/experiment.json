@@ -4,7 +4,7 @@
   "title": "Exact range scorer: range size and coupled worker sweep",
   "owner": "vaibhav",
   "branch": "exp/vaibhav/2026-11-15-range-worker-sweep",
-  "status": "registered-protocol-source",
+  "status": "complete-valid-negative",
   "parent_experiment": "2026-11-14-range-bitpack-v2",
   "parent_source_commit": "97b9ee5e793f4f266bcb0f3abfa442de1b592d3e",
   "question": "Can range size and coupled score/merge worker counts improve exact complete-query latency while controlling tracked allocation?",
@@ -79,9 +79,34 @@
     "DEC-20261115-ADAPTIVE-SPEED-AUTHORIZED",
     "OBS-20261115-RANGE-SWEEP-PRE-CIMS",
     "OBS-20261115-RANGE-SWEEP-REPAIR1",
-    "OBS-20261115-RANGE-SWEEP-REPAIR2"
+    "OBS-20261115-RANGE-SWEEP-REPAIR2",
+    "OBS-20261115-RANGE-CORRECTNESS-VERIFIED",
+    "OBS-20261115-RANGE-SWEEP-REPAIR3",
+    "OBS-20261115-RANGE-FULL-VALIDATION",
+    "DEC-20261115-RANGE-WORKER-COMPLETE"
   ],
-  "runs": [],
+  "runs": [
+    {
+      "run_id": "20261115-cuda5-01",
+      "status": "technical-failure",
+      "manifest": "../../results/2026-11-15-range-worker-sweep/20261115-cuda5-01/manifest.json"
+    },
+    {
+      "run_id": "20261115-cuda5-02",
+      "status": "technical-failure",
+      "manifest": "../../results/2026-11-15-range-worker-sweep/20261115-cuda5-02/manifest.json"
+    },
+    {
+      "run_id": "20261115-cuda5-03",
+      "status": "correctness-complete-checkpoint-failed",
+      "manifest": "../../results/2026-11-15-range-worker-sweep/20261115-cuda5-03/manifest.json"
+    },
+    {
+      "run_id": "20261115-cuda5-04",
+      "status": "complete",
+      "manifest": "../../results/2026-11-15-range-worker-sweep/20261115-cuda5-04/manifest.json"
+    }
+  ],
   "repair": {
     "attempt": 2,
     "compatibility_treatment": "query-argument-layout-accounting-r2",
@@ -99,5 +124,12 @@
       "fresh_run": "20261115-cuda5-02",
       "delta": "Engineering negative-test outputs now use .top.tsv, distinct from existing query inputs; algorithm, settings, negative guards, timing/selection rules unchanged."
     }
-  ]
+  ],
+  "measured_source_commit": "be2ecb9106424b9ed8f0501ddb9a594dc41f46f0",
+  "successful_correctness_run": "20261115-cuda5-03",
+  "successful_timing_run": "20261115-cuda5-04",
+  "selection": {
+    "retained": "w1024-t256",
+    "confirmation_triggered": false
+  }
 }

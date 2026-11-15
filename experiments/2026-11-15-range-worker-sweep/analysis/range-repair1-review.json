@@ -1,0 +1,12 @@
+{
+  "success": true,
+  "repair_attempt": 1,
+  "compatibility_treatment": "negative-test-distinct-top-path-r1",
+  "cause": "Original driver reused <label>.tsv as negative-query input and expected-absent top output. The scorer rejected129terms as intended; assertion then saw the pre-existing query file. No scoring/overflow/validation bypass observed.",
+  "review": "Use dedicated .top.tsv and assert both paths are fresh and distinct from query. Tested all six negative cases, preserved input bytes, and rejected every pre-existing output. Scoring kernel, settings, actual negative-guard predicates, timing loop and analysis unchanged.",
+  "positive_cases": 6,
+  "existing_output_rejections": 6,
+  "limits": [
+    "CPU harness review only; all six CIMS negatives and complete correctness/performance protocol must now rerun in fresh run02."
+  ]
+}

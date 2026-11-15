@@ -1,0 +1,20 @@
+{
+  "success": true,
+  "repair_attempt": 2,
+  "treatment": "query-argument-layout-accounting-r2",
+  "cause": "Checker hardcoded1032 despite existing C++ static_assert4+8*128=1028. Original synthetic checker tests mirrored that wrong number. First GPU fixture exits0 and its actual transfer counter exposed the mistake.",
+  "review": "Derived1028 using explicit32bit layout and source struct/static_assert. New runtime sizeof(QueryArgs) field and independent expected value enforce layout before compute; existing CSV uses sizeof(args). Kernel and timed-loop byte identity checked. Local replay of actual run02 output now passes30 full canonical groups/scores and all buffer/transfer checks. Deliberately changed1032 CSV rejected.",
+  "fixture_replay": {
+    "success": true,
+    "groups": 30,
+    "returned_scores": 30,
+    "canonical_mismatches": 0,
+    "device_allocation_bytes": 1378,
+    "query_transfer_bytes": 1028,
+    "qualification": "Canonical ordered IDs/scores match independent fixture/CPU oracle; explicit application buffer formulas checked. CPU verification state kept separate from post-run oracle replay; not physical board peak."
+  },
+  "limits": [
+    "No timing ran in failed run02. Full protocol rerun03 required.",
+    "New runtime field/CUDA rebuild still must be checked on CIMS."
+  ]
+}
