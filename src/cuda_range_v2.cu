@@ -255,6 +255,8 @@ struct GpuEvent {
     ~GpuEvent() { cudaEventDestroy(event); }
 };
 
+// Drivers that reuse this kernel define RBP_NO_MAIN before including the file.
+#ifndef RBP_NO_MAIN
 int main(int argc,char** argv) {
     try {
         require(argc==14,"Usage: cuda_range_v2 RBP QUERIES CSV TOP_TSV LIMIT K GPU VERIFY ROUNDS WARMUPS SCORE_THREADS MERGE_THREADS GSP|-");
@@ -383,3 +385,4 @@ int main(int argc,char** argv) {
         cout<<"RANGE_V2_COMPLETE docs="<<N<<" queries="<<count<<" k="<<k<<" range_size="<<W<<" verify="<<verify<<'\n';return 0;
     } catch (const exception& e) { cerr<<"ERROR: "<<e.what()<<'\n';return 1; }
 }
+#endif
