@@ -1,0 +1,79 @@
+{
+  "experiment_id": "2026-11-13-range-bitpack",
+  "registered": "2026-11-13, before any timed run",
+  "recording": "not recorded by the team runtime; self-recorded manifests under results/2026-11-13-range-bitpack/",
+  "parent_source_commit": "430b4dc19115b6d9cabc1bed13c68969a32914aa",
+  "protocol_reference": "experiments/2026-11-12-gpusparse-u64-canonical/configs/protocol.json (context bundle, not on main); its timing reduction is reused, its baselines are not rerun here",
+  "question": "What is the batch-1 latency of an exhaustive exact scorer over a range-split, bit-packed inverted index (Version A), and how large is its index?",
+  "hypothesis": "The scorer returns the canonical top-k for every calibration query. Its latency relative to the published baselines is empirical; no speedup is promised.",
+  "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1: exact uint8 impacts, BMP float32/ceil cap-32 query weights, exact integer products and sums reported as uint64, every passage eligible including score zero, score descending then original numeric passage ID ascending",
+  "implementation": {
+    "index": "src/range_bitpack.h, built by src/range_bitpack_tool.cpp from hash-<N>.gsp",
+    "scorer": "src/cuda_range_bitpack.cu",
+    "range_size": 4096,
+    "score_threads": 256,
+    "merge_threads": 256,
+    "max_query_terms": 128,
+    "max_k": 128,
+    "accumulator": "uint32 in shared memory, widened to uint64 on output; start-up gate requires sum(query weights) * 255 * max term-document multiplicity < 2^32 - 1 for every query",
+    "selection": "per-range local top-k (kernel 1), single-thread-block merge of ranges * k candidates (kernel 2)",
+    "deviations_from_written_spec": [
+      "lookup_block is implicit: blocks are stored term-major and range-ascending, so a block's ID is its position in lookup_range",
+      "the carry between decode tiles is kept per thread from the shared warp totals instead of a shared carry cell, removing two barriers per tile",
+      "the block-wide prefix sum is a warp-shuffle scan plus shared warp totals",
+      "the overflow gate bound is 2^32 - 1 (not 2^32) because the top value marks slots already emitted by local selection",
+      "the gate and all query validation run once before the first query instead of per query inside the timed loop"
+    ]
+  },
+  "inputs": {
+    "queries": "data/derived/calibration-500.tsv sha256 150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+    "gsp_100k": "data/derived/hash-100000.gsp sha256 ee7ffdb9c527f3e486fe560426e27f4f02d2a61b42b8f138eaf7671a8aeb73ab",
+    "gsp_1m": "data/derived/hash-1000000.gsp sha256 a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37",
+    "split": "500 calibration queries only; the 6,480 held-out queries are not read",
+    "setup_evidence": "results/2026-11-13-range-bitpack/20261113-input-setup-01/README.md"
+  },
+  "correctness": {
+    "before_timing": [
+      "tests/check_range_bitpack.py: independent GSP writer, Python oracle and Python RBP decoder; range sizes 1/3/64/4096; k 0/1/10/128; 32/256/1024 threads; empty queries, terms without postings, terms absent from a range, cross-range ties at the cutoff, partial last range, one-value blocks, maximal gaps, word-straddling values, repeated postings, largest supported score; eight guard rejections",
+      "100K and 1M documents, first 25 then all 500 calibration queries, k=10: in-driver comparison with exhaustive CPU scores and an independent file comparison with cpu_pilot score output",
+      "laptop (RTX 4070 Laptop) first, then cuda5"
+    ],
+    "during_timing": "every saved top-k group of every warm-up and measured round is compared with the cpu_pilot oracle after each process",
+    "rule": "zero ordered-ID or score mismatch; any mismatch stops the run and is kept"
+  },
+  "timing": {
+    "host": "cuda5.cims.nyu.edu, NVIDIA GeForce RTX 4070, CUDA 12.6, nvcc -O3 -lineinfo -arch=sm_89 -std=c++17",
+    "variants": ["range-bitpack-w4096"],
+    "baselines_run": "none in this session, by decision of the experiment owner",
+    "documents": 1000000,
+    "queries": 500,
+    "k": 10,
+    "batch_size": 1,
+    "processes": 3,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "process_order": "three consecutive processes of the single variant",
+    "boundary": "host construction of the sparse (term, weight) list, query H2D, kernel 1, kernel 2, top-k D2H and event synchronisation; original IDs are produced on the device, so ID mapping is inside",
+    "excluded": "index build, load and upload; start-up validation and overflow gate; multiplicity scan; file writes; the CPU oracle and comparison",
+    "boundary_differences_from_baselines": [
+      "the CSR drivers upload a dense per-vocabulary weight vector (about 115 KB); this scorer uploads only the query's (term, weight) pairs",
+      "the adapted monolithic path additionally pads the query and packs/decodes selection keys inside its boundary"
+    ],
+    "gpu_check": "record nvidia-smi and compute processes before each process; do not start while another compute process is present",
+    "stopping": "all correctness before timing; no optional stopping; a technical failure is inspected, fixed, reviewed and rerun under a new run ID, at most three attempts"
+  },
+  "analysis": {
+    "script": "experiments/2026-11-13-range-bitpack/analysis/analyze.py",
+    "reduction": "per process, the median wall latency of each query over the 20 measured rounds",
+    "primary": "pooled median of the 1,500 query/process medians",
+    "also_reported": "geometric mean of the 1,500 medians, per-process medians, quantiles, median GPU event span",
+    "uncertainty": "10,000-draw crossed query/process bootstrap 95% intervals, seed 20261113, conditional on this calibration set and session",
+    "exploratory_comparison": {
+      "label": "exploratory, different session, not paired",
+      "reference_values_ms": {"adapted-gpusparse-monolithic-pl512": 0.8831, "csr-full-byte-b16": 2.9742, "csr-full-byte-b32": 3.6336},
+      "source": "pooled descriptive medians of run 20261112-cuda5-01 as published in the 2026-11-12 report",
+      "limits": "no paired ratio, interval or significance; different process session, possibly different GPU load, clocks and cache state"
+    }
+  },
+  "not_in_this_registration": "range-size sweep, k=100/1000, kernel-time breakdown, rerun baselines, held-out queries; each needs its own registration"
+}

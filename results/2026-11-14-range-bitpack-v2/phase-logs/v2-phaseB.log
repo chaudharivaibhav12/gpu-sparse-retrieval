@@ -1,0 +1,65 @@
+PRECHECK_START 2026-11-14T06:09:27Z
+PRECHECK_PASS w1024 RBP_RANGES postings_cap=0 ranges=977 docs_min=576 docs_max=1024 postings_max=166454 postings_mean=121494
+PRECHECK_PASS w2048 RBP_RANGES postings_cap=0 ranges=489 docs_min=576 docs_max=2048 postings_max=328327 postings_mean=242739
+PRECHECK_PASS w8192 RBP_RANGES postings_cap=0 ranges=123 docs_min=576 docs_max=8192 postings_max=1249034 postings_mean=965037
+PRECHECK_PASS w16384 RBP_RANGES postings_cap=0 ranges=62 docs_min=576 docs_max=16384 postings_max=2410752 postings_mean=1.91451e+06
+PRECHECK_DONE
+STAGE timing-r0-v1 2026-11-14T06:15:47Z
+STAGE timing-r0-v2-5 2026-11-14T06:16:32Z
+STAGE timing-r0-mono 2026-11-14T06:17:00Z
+STAGE timing-r1-v2-5 2026-11-14T06:18:02Z
+STAGE timing-r1-mono 2026-11-14T06:18:29Z
+STAGE timing-r1-v1 2026-11-14T06:19:27Z
+STAGE timing-r2-mono 2026-11-14T06:20:13Z
+STAGE timing-r2-v1 2026-11-14T06:21:12Z
+STAGE timing-r2-v2-5 2026-11-14T06:21:58Z
+STAGE timing-complete 2026-11-14T06:22:25Z
+STAGE analysis 2026-11-14T06:22:25Z
+STAGE manifest 2026-11-14T06:22:31Z
+MANIFEST results/2026-11-14-range-bitpack-v2/20261114-cuda5-timing-k100-01/manifest.json artifacts 106
+RUN_COMPLETE results/2026-11-14-range-bitpack-v2/20261114-cuda5-timing-k100-01
+STAGE timing-r0-v2-5 2026-11-14T06:23:12Z
+STAGE timing-r1-v2-5 2026-11-14T06:26:19Z
+STAGE timing-r2-v2-5 2026-11-14T06:29:36Z
+STAGE timing-complete 2026-11-14T06:32:41Z
+STAGE analysis 2026-11-14T06:32:41Z
+STAGE manifest 2026-11-14T06:32:42Z
+MANIFEST results/2026-11-14-range-bitpack-v2/20261114-cuda5-timing-k1000-01/manifest.json artifacts 34
+RUN_COMPLETE results/2026-11-14-range-bitpack-v2/20261114-cuda5-timing-k1000-01
+STAGE timing-r0-v2-5-w1024 2026-11-14T06:36:49Z
+STAGE timing-r0-v2-5-w2048 2026-11-14T06:36:59Z
+STAGE timing-r0-v2-5-w4096 2026-11-14T06:37:08Z
+STAGE timing-r0-v2-5-w8192 2026-11-14T06:37:18Z
+STAGE timing-r0-v2-5-w16384 2026-11-14T06:37:28Z
+STAGE timing-r0-v2-5cap-w4096 2026-11-14T06:37:39Z
+STAGE timing-r0-v1-w4096 2026-11-14T06:37:49Z
+STAGE timing-r1-v2-5-w8192 2026-11-14T06:37:58Z
+STAGE timing-r1-v2-5-w16384 2026-11-14T06:38:08Z
+STAGE timing-r1-v2-5cap-w4096 2026-11-14T06:38:19Z
+STAGE timing-r1-v1-w4096 2026-11-14T06:38:28Z
+STAGE timing-r1-v2-5-w1024 2026-11-14T06:38:37Z
+STAGE timing-r1-v2-5-w2048 2026-11-14T06:38:47Z
+STAGE timing-r1-v2-5-w4096 2026-11-14T06:38:57Z
+STAGE timing-r2-v2-5cap-w4096 2026-11-14T06:39:06Z
+STAGE timing-r2-v1-w4096 2026-11-14T06:39:16Z
+STAGE timing-r2-v2-5-w1024 2026-11-14T06:39:25Z
+STAGE timing-r2-v2-5-w2048 2026-11-14T06:39:34Z
+STAGE timing-r2-v2-5-w4096 2026-11-14T06:39:44Z
+STAGE timing-r2-v2-5-w8192 2026-11-14T06:39:54Z
+STAGE timing-r2-v2-5-w16384 2026-11-14T06:40:04Z
+STAGE timing-complete 2026-11-14T06:40:15Z
+STAGE analysis 2026-11-14T06:40:15Z
+STAGE manifest 2026-11-14T06:40:35Z
+MANIFEST results/2026-11-14-range-bitpack-v2/20261114-cuda5-timing-sweep-01/manifest.json artifacts 184
+RUN_COMPLETE results/2026-11-14-range-bitpack-v2/20261114-cuda5-timing-sweep-01
+name,label,index,k,grid,block,dynamic_shared,registers,limit_blocks,limit_registers,limit_shared_mem,limit_warps,resident_blocks_per_sm,sms,resident_slots,waves
+v2-5-w1024,v2-5,hash-1000000-w1024-pos.rbp,10,977,256,4736,38,24,6,6,6,6,46,276,3.5399
+v2-5-w2048,v2-5,hash-1000000-w2048-pos.rbp,10,489,256,8832,38,24,6,7,6,6,46,276,1.7717
+v2-5-w4096,v2-5,hash-1000000-w4096-pos.rbp,10,245,256,17024,38,24,6,4,6,4,46,184,1.3315
+v2-5-w8192,v2-5,hash-1000000-w8192-pos.rbp,10,123,256,33408,38,24,6,2,6,2,46,92,1.337
+v2-5-w16384,v2-5,hash-1000000-w16384-pos.rbp,10,62,256,66176,38,24,6,1,6,1,46,46,1.3478
+v2-5cap-w4096,v2-5,hash-1000000-w4096-pos-cap400000.rbp,10,302,256,17024,38,24,6,4,6,4,46,184,1.6413
+v1-w4096,v1,hash-1000000-w4096.rbp,10,245,256,16384,38,24,6,5,6,5,46,230,1.0652
+Traceback (most recent call last):
+  File "<stdin>", line 8, in <module>
+ZeroDivisionError: float division by zero

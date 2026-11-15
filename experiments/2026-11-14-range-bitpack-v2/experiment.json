@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-14-range-bitpack-v2",
+  "title": "Version 2 of the range-split scorer: five profile-motivated variants",
+  "owner": "Arnav",
+  "branch": "exp/arnav/2026-11-14-range-bitpack-v2",
+  "status": "completed-calibration-timing",
+  "parent_experiment": "2026-11-14-range-bitpack-profile (branch exp/arnav/2026-11-14-range-bitpack-profile, not merged)",
+  "parent_source_commit": "4db5c861d711ceabf2ab337bc14187aa54a52338",
+  "question": "Which of five profile-motivated changes reduce the range scorer's batch-1 latency while keeping exact results?",
+  "hypothesis": "Each change removes a cost seen in profile run 20261114-cuda5-profile-01; the size of each effect is empirical.",
+  "motivation": "Profile: decode+add 55%, local top-k 34%, merge 9%; barriers the largest stall; 49% useful decode lanes; uneven ranges; 1.07 waves.",
+  "code_paths": [
+    "src/cuda_range_v2.cu",
+    "src/range_bitpack.h",
+    "src/range_bitpack_tool.cpp",
+    "tests/check_range_bitpack.py",
+    "experiments/2026-11-14-range-bitpack-v2/code/check_variant.sh",
+    "experiments/2026-11-14-range-bitpack-v2/code/build_variants.sh",
+    "experiments/2026-11-14-range-bitpack-v2/code/gate_all.sh",
+    "experiments/2026-11-14-range-bitpack-v2/code/run_timing.sh",
+    "experiments/2026-11-14-range-bitpack-v2/code/occupancy.sh",
+    "experiments/2026-11-14-range-bitpack-v2/analysis/analyze_v2.py",
+    "experiments/2026-11-14-range-bitpack-v2/report.md"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-14-range-bitpack-v2/configs/protocol.json",
+    "experiments/2026-11-14-range-bitpack-v2/configs/timing-k10.tsv",
+    "experiments/2026-11-14-range-bitpack-v2/configs/timing-k100.tsv",
+    "experiments/2026-11-14-range-bitpack-v2/configs/timing-k1000.tsv",
+    "experiments/2026-11-14-range-bitpack-v2/configs/timing-sweep.tsv"
+  ],
+  "declared_changes": "see README variant table and code/review-variant-N.json",
+  "scoring_contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+  "input_manifest": "results/input-manifest.json, results/derived-sha256.txt",
+  "query_split": "500 calibration queries; held-out untouched",
+  "timing_boundary": "configs/protocol.json timing_common",
+  "correctness_rule": "zero mismatches against cpu_pilot for fixtures and all 500 calibration queries at 100K and 1M, k=10 and k=1000, before any timing",
+  "measurement_and_analysis_plan": "configs/protocol.json",
+  "success_rule": "see protocol decision rules",
+  "failure_rule": "any oracle mismatch stops before timing",
+  "next_if_negative": "n/a",
+  "recording_ids": [
+    "not recorded by the team runtime"
+  ],
+  "runs": [
+    "20261114-laptop-variant1-01",
+    "20261114-laptop-variant2-01",
+    "20261114-laptop-variant3-01",
+    "20261114-laptop-variant4-01",
+    "20261114-laptop-variant5-01",
+    "20261114-cuda5-gate-01",
+    "20261114-cuda5-sweep-precheck-01",
+    "20261114-cuda5-timing-k10-01",
+    "20261114-cuda5-timing-k100-01",
+    "20261114-cuda5-timing-k1000-01",
+    "20261114-cuda5-timing-sweep-01"
+  ],
+  "variant_commits": {
+    "1": "4dfafdf",
+    "2": "af9e0a4",
+    "3": "d9943d0",
+    "4": "6ed258b",
+    "5": "223cf4b"
+  }
+}

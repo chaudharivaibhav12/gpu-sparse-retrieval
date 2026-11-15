@@ -1,0 +1,105 @@
+{
+  "experiment_id": "2026-11-12-gpusparse-u64-canonical",
+  "parent_experiment": "2026-11-11-gpusparse-baseline",
+  "parent_merge_commit": "430b4dc19115b6d9cabc1bed13c68969a32914aa",
+  "parent_measured_source": "e785ad313f15f2cc26639922f60dc65f10e79b5c",
+  "native_revision": "92bb87b36f10e78ab39c81e9db2412dbb7a3b650",
+  "question": "What is the cost of a clearly adapted GPUSparse monolithic path satisfying the primary scoring/tie contract,relative to the current full-byte CSR pruner?",
+  "hypothesis": "The adapted monolithic path returns identical canonical integer top-k on the declared input domain. Relative end-to-end cost versus full-byte CSR is empirical; no speedup is promised.",
+  "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+  "changes": [
+    "Native per-term traversal retained; actual products and atomic score sums useuint64.",
+    "Original uint64 numeric IDs are sorted once to unique ranks; GPUkey=(score<<32)|(0xffffffff-rank),selected descending withtorch.topk anddecoded by integer shift.",
+    "Batch1,positive requestedk<=128,N<=int32max,conservative255*sumqueryweights<=2^31-1. Guard beforequerycompute; no score/key overflow or truncation.",
+    "Float32 storage of exactuint8 impacts/cap32 query values retained; eachoperand cast touint64 before multiplication. Original native module is a pinned provenance reference,not executed as the adapted scorer.",
+    "Native chunked/compacted andstride-patch settings are inapplicable and removed explicitly. All added/removed expected/behavior fields are declared per registered spec."
+  ],
+  "correctness": {
+    "normal_fixtures": 11,
+    "additional_fixture": "4documents withoriginalIDs0,7,2^63+5,2^64-1 and4097query terms producing score33423361 (>2^24),ties andzero/single-term queries",
+    "requested_k": [
+      1,
+      10,
+      128
+    ],
+    "block_pl": [
+      128,
+      512
+    ],
+    "configurations": 72,
+    "queries_per_fixture": 5,
+    "real_gsp_configurations": 2,
+    "real_csr_configurations": 2,
+    "real_queries": 500,
+    "real_documents": 1000000,
+    "real_k": 10,
+    "intentional_gate_rejection": "Wrong expectedpack_threads128 vs actual256 mustrejectbeforequeryoutputs",
+    "rule": "Zero ordered-original-ID orscore mismatch,invalid/duplicate positions/counts/noninteger outputs. All returned scores independently checked with integer CSR. Scores/ties are canonical,not merely native-score sequence valid.",
+    "cpu_guards": [
+      "k0 andk>128 rejected",
+      "non-power-of-twoBLOCK_PL rejected",
+      "scorebound>2^31-1 rejected",
+      "no unregistered computation",
+      "full uint64 ID ranks andpacking-boundary keys tested"
+    ]
+  },
+  "timing": {
+    "host": "cuda5/RTX4070 initially",
+    "variants": [
+      "gpusparse-u64-mono-pl512",
+      "csr-full-byte-b16",
+      "csr-full-byte-b32"
+    ],
+    "process_order": [
+      [
+        "gpusparse-u64-mono-pl512",
+        "csr-full-byte-b16",
+        "csr-full-byte-b32"
+      ],
+      [
+        "csr-full-byte-b16",
+        "csr-full-byte-b32",
+        "gpusparse-u64-mono-pl512"
+      ],
+      [
+        "csr-full-byte-b32",
+        "gpusparse-u64-mono-pl512",
+        "csr-full-byte-b16"
+      ]
+    ],
+    "processes_per_variant": 3,
+    "processes": 9,
+    "queries": 500,
+    "k": 10,
+    "batch_size": 1,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "primary": "Each full-byte CSR B over alignedGPUSparse512; paired query/process median wall-latency ratios,geometric mean over1500pairs.",
+    "uncertainty": "10000crossed query/process bootstrap draws,seed20261112; conditional calibration.",
+    "boundary": "CPU query construction/padding,queryH2D,complete scoring andall pruning/packing/selection/decoding,resultD2H,original-ID mapping andsynchronization. Canonical adaptation is insidequerytiming.",
+    "excluded": "Index loading/conversion/upload andnumeric-IDrank construction; bound construction/upload; runtimegate; fileI/O; independent CPUvalidation.",
+    "stopping": "All correctness before fixed timing; preserve everyattempt. No optional stopping orheld-out tuning. TargetGPU idle check beforeeachprocess; defer after10minutes ofobserved occupation.",
+    "sensitivity": "128 retained forcorrectness only;512 timing chosen from prior frozen native study. No acrossBLOCK_PL causal ororiginal-native arithmetic/tie speedup claim."
+  },
+  "reference": {
+    "source": "src/cuda_bound_precision.cu andexisting headers unchanged frommergedparent",
+    "block_sizes": [
+      16,
+      32
+    ],
+    "execution_mode": 1,
+    "precision": 0,
+    "seed": "first16identityblocks",
+    "score_threads": 32,
+    "selection_threads": 256,
+    "bound_threads": 256,
+    "compaction_threads": 256,
+    "refinement_threads": 256,
+    "requested_k": 10
+  },
+  "environment": "Parent isolatedPython3.12/torch2.6.0+cu126/triton3.2.0/numpy2.2.6/scipy1.15.3; actual metadata resolved before registration. Rebuild unchanged CSR under CUDA12.6 forsm_89 with exactcompiler/source/binary provenance.",
+  "memory": "Report explicit index/rank/dense-score/key bytes andTorchallocator peaks foradaptedpath,existing exact C++ buffer accounting forCSR. These are separately qualified counters; do not infer common physical peakmemory superiority without a common diagnostic.",
+  "attempts": 86,
+  "qualification": "Adapted system comparison under identical primary score semantics andinputs,not one-factor algorithm ablation ororiginal model FP32 reproduction. No held-out/service-tail claim.",
+  "team_ownership": "Parva/Arnav/report roles unassigned peruser; proposeddivision deferred."
+}

@@ -1,0 +1,48 @@
+{
+  "success": true,
+  "variant": "range-bitpack-w4096",
+  "processes": 3,
+  "queries": 500,
+  "warmup_rounds": 3,
+  "measured_rounds": 20,
+  "pooled_median_of_1500_query_process_medians_ms": 0.204739,
+  "pooled_median_crossed_bootstrap_95_interval": [
+    0.2038725,
+    0.2082225
+  ],
+  "geometric_mean_of_query_process_medians_ms": 0.2077189563572067,
+  "geometric_mean_crossed_bootstrap_95_interval": [
+    0.20353335208950465,
+    0.2120787570036302
+  ],
+  "process_medians_ms": [
+    0.20694875000000001,
+    0.20459349999999998,
+    0.20407775
+  ],
+  "query_process_median_quantiles_ms": {
+    "p05": 0.146598075,
+    "p25": 0.179482,
+    "p75": 0.24492625,
+    "p95": 0.305781225,
+    "max": 0.37920200000000004
+  },
+  "pooled_median_gpu_span_ms": 0.19148,
+  "bootstrap_seed": 20261113,
+  "bootstrap_resamples": 10000,
+  "exploratory_comparison": {
+    "label": "exploratory, different session, not paired",
+    "note": "Ratio of this run's pooled median to the pooled descriptive medians published for run 20261112-cuda5-01. The baselines were not rerun here; no interval or significance is claimed.",
+    "reported_baseline_medians_ms": {
+      "adapted-gpusparse-monolithic-pl512": 0.8831,
+      "csr-full-byte-b16": 2.9742,
+      "csr-full-byte-b32": 3.6336
+    },
+    "range_bitpack_over_reported": {
+      "adapted-gpusparse-monolithic-pl512": 0.2318412410825501,
+      "csr-full-byte-b16": 0.06883834308385448,
+      "csr-full-byte-b32": 0.05634604799647733
+    }
+  },
+  "qualification": "Single implementation, 1M documents, k=10, batch 1, 500 calibration queries, three processes on a shared GPU. Conditional on this calibration set and session; no held-out or paired-baseline claim."
+}

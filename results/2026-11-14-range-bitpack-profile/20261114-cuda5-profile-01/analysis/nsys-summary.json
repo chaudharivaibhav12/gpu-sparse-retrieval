@@ -1,0 +1,81 @@
+{
+  "queries": 25,
+  "measured_rounds_per_query": 20,
+  "definitions": {
+    "gpu_busy": "sum of kernel, memcpy and memset durations per query (Nsight Systems CUPTI timestamps)",
+    "gpu_span": "first GPU operation start to last GPU operation end",
+    "api": "host time in the CUDA API calls that launched the query's GPU operations",
+    "non_gpu": "unprofiled wall median (paired run, same query, 3 processes x 20 rounds) minus profiled GPU busy median"
+  },
+  "range": {
+    "gpu_busy_ms": 0.193251,
+    "gpu_union_ms": 0.193251,
+    "gpu_span_ms": 0.2331875,
+    "api_ms": 0.245693,
+    "profiled_wall_ms": 0.286291,
+    "gpu_ops": 4.0,
+    "kernels": 2.0,
+    "kind_ms": {
+      "kernel": 0.192035,
+      "memcpy_d2h": 0.000896,
+      "memcpy_h2d": 0.00032
+    },
+    "kernel_ms": {
+      "merge_candidates": 0.01696,
+      "range_scores": 0.17509
+    }
+  },
+  "monolithic": {
+    "gpu_busy_ms": 0.518796,
+    "gpu_union_ms": 0.518796,
+    "gpu_span_ms": 0.9785255,
+    "api_ms": 0.360113,
+    "profiled_wall_ms": 1.1698795,
+    "gpu_ops": 34.0,
+    "kernels": 28.0,
+    "kind_ms": {
+      "kernel": 0.515417,
+      "memcpy_d2h": 0.0017915000000000001,
+      "memcpy_h2d": 0.00064,
+      "memset": 0.0009760000000000001
+    },
+    "kernel_ms": {
+      "DeviceScanByKeyInitKernel": 0.0016,
+      "DeviceScanByKeyKernel": 0.004224,
+      "_canonical_keys": 0.010656,
+      "_fast_scatter_add_kernel": 0.351813,
+      "bitonicSortKVInPlace": 0.003328,
+      "computeBlockwiseKthCounts": 0.001312,
+      "computeBlockwiseWithinKCounts": 0.0132155,
+      "fill": 0.0008,
+      "gatherTopK": 0.015649,
+      "radixFindKthValues": 0.0925915,
+      "vectorized_elementwise_kernel": 0.01984
+    }
+  },
+  "gpu_busy_ratio_range_over_mono": {
+    "geometric_mean": 0.3749026788879036,
+    "query_bootstrap_95_interval": [
+      0.3395703137785831,
+      0.4123825903937373
+    ]
+  },
+  "unprofiled_wall_ratio_range_over_mono_same_25_queries": {
+    "geometric_mean": 0.24113193842299274,
+    "query_bootstrap_95_interval": [
+      0.2235464946202002,
+      0.25969542387593925
+    ]
+  },
+  "non_gpu_ratio_range_over_mono": "undefined (non-positive estimate)",
+  "decomposition": {
+    "mono_gpu_share_of_wall": 0.6086555368543785,
+    "range_gpu_share_of_wall": 0.9341370095955301
+  },
+  "bootstrap": {
+    "seed": 20261115,
+    "draws": 10000,
+    "resampled": "queries"
+  },
+  "qualification": "One profiled process per implementation under Nsight Systems; first 25 calibration queries; GPU durations are CUPTI timestamps at normal clocks; host-side wall under tracing is inflated and is not used for ratios. Non-GPU time is an estimate combining an unprofiled session with the profiled GPU times."
+}
