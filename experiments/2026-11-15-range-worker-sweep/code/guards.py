@@ -1,6 +1,12 @@
 """Prepare negative inputs; caller must use a fail-closed gate with no continue file."""
 from pathlib import Path
 
+def output_paths(root,label,query_path):
+ root=Path(root);csv=root/(label+'.csv');top=root/(label+'.top.tsv')
+ assert csv.resolve()!=Path(query_path).resolve() and top.resolve()!=Path(query_path).resolve()
+ assert not csv.exists() and not top.exists(),'Negative-test outputs must be fresh'
+ return csv,top
+
 def prepare(root,parent,fixture_root):
  root=Path(root);root.mkdir(parents=True,exist_ok=False);fixture_root=Path(fixture_root)
  q=root/'too-many-terms.tsv';q.write_text('q'+''.join(' %d:32'%i for i in range(129))+'\n',encoding='utf-8')

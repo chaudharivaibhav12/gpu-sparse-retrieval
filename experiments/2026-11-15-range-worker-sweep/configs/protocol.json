@@ -64,5 +64,13 @@
   },
   "memory": "Full C++ tracked allocation including index, uint64 ID map, uint16 rank maps/heads, boundaries/counter, local candidates/merge scratch/output; dynamic shared bytes separately. Excludes driver/context and hidden kernel-argument/runtime allocation.",
   "runtime_schema": "Explicit guarded arithmetic/contract, vocabulary/nnz, accumulator/output widths, exclusive score limit, resolved maximum conservative score bound and maximum slots; source kernel/timer unchanged.",
-  "question": "Can range size and coupled score/merge worker counts improve exact complete-query latency while controlling tracked allocation?"
+  "question": "Can range size and coupled score/merge worker counts improve exact complete-query latency while controlling tracked allocation?",
+  "repair": {
+    "attempt": 1,
+    "compatibility_treatment": "negative-test-distinct-top-path-r1",
+    "original_source": "d6f3621ded550d0178d2a44790fef97a53b1e244",
+    "original_run": "20261115-cuda5-01",
+    "fresh_run": "20261115-cuda5-02",
+    "delta": "Engineering negative-test outputs now use .top.tsv, distinct from existing query inputs; algorithm, settings, negative guards, timing/selection rules unchanged."
+  }
 }
