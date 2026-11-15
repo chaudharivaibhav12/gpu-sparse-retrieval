@@ -1,0 +1,37 @@
+{
+  "status": "PASS",
+  "review_kind": "Separate pre-CIMS source and preparation-driver review",
+  "files": {
+    "code\\check_import.py": "69804b63a8043d5ed11e5346b3828998674706b39502a119a518d6760c2afe5e",
+    "code\\prepare_inputs.py": "680ef7aed1d050fb6d42297bd0b5c156e1e6b7b7e2abb12d26fe21ef09d514c8"
+  },
+  "reviewed": [
+    "Existing importer semantics: full count preserves original CIFF passage order/IDs; no subset sampling at count=N.",
+    "CIFF deltas/df/unique IDs/terms checked by importer; zero impacts omitted; original uint64 IDs retained.",
+    "Parent source/config loaded. No scoring/selection kernel modifications.",
+    "Exclusive run/output paths, source receipt validation, pinned raw SHA before/after, binary/output SHA, argv/compiler/log preservation.",
+    "No held-out or prepared query reads; imports qualified as uninstrumented observations.",
+    "36GiB default address-space limit and >=4GiB available-host headroom; disk guard; /usr/bin/time peak RSS evidence.",
+    "Only independent importer fixtures run before full import; no benchmark results inferred from fixture success."
+  ],
+  "findings_fixed": [
+    "Create the output-index parent directory before checking its disk space.",
+    "Require the source receipt to include importer/header/test/driver and reject paths outside deployed source."
+  ],
+  "local_checks": [
+    "Python AST/compile for both new scripts.",
+    "Ubuntu g++ -O3 -std=c++17 -pthread build of existing importer.",
+    "Independent full/subset conversion fixture passed, including uint64 max ID, empty rows, zero impacts, exact imported contents/dictionary, immutable existing output and invalid sizes."
+  ],
+  "limits": [
+    "Local Linux compiler/environment differs from CIMS; rebuild and rerun fixture there before the full import.",
+    "No full-data posting validation, GPU memory upload or performance result yet.",
+    "Host memory estimate is conservative engineering planning, not proof of allocator peak; cap and real resource logs retained.",
+    "Existing importer builds in-memory document vectors; a capped allocation failure must be inspected before any repair."
+  ],
+  "source_hashes": {
+    "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+    "src/research_runtime.h": "949757134d97142fa1f5d6e56a79cc61b596d706c0c0ea1577485ca0325d1c59",
+    "tests/check_cpu_pilot.py": "414cec6d3c33ebc5792bfe9cabc795e15af4a4f806e880ba4118820cc1aee361"
+  }
+}
