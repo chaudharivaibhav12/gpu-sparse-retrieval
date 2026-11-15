@@ -3,7 +3,7 @@
   "experiment_id": "2026-11-15-full-collection-baselines",
   "owner": "vaibhav",
   "branch": "exp/vaibhav/2026-11-15-full-collection-baselines",
-  "status": "input-preparation-only; measured comparison not yet registered",
+  "status": "full-index-prepared; independent-validation-and-instrumented-reference-pending",
   "parent_experiment": "2026-11-15-range-worker-sweep",
   "parent_merge_commit": "201be6998bace088900e1b7ccb961bb5277273e4",
   "parent_measured_source_commit": "be2ecb9106424b9ed8f0501ddb9a594dc41f46f0",
@@ -16,10 +16,23 @@
     "query_and_scoring": "Prepared calibration weights, all-document eligibility, exact scores and numeric-ID ties preserved; guarded-U32 range and U64 adaptation remain explicitly distinguished.",
     "measurement": "Future matched full-collection comparison; no retrieval measured by input preparation."
   },
-  "code_paths": ["src/cpu_pilot.cpp", "src/research_runtime.h", "tests/check_cpu_pilot.py", "experiments/2026-11-15-full-collection-baselines/code/"],
-  "configuration_files": ["configs/data-preparation.json", "configs/parent-range-runtime.json"],
+  "code_paths": [
+    "src/cpu_pilot.cpp",
+    "src/research_runtime.h",
+    "tests/check_cpu_pilot.py",
+    "experiments/2026-11-15-full-collection-baselines/code/"
+  ],
+  "configuration_files": [
+    "configs/data-preparation.json",
+    "configs/parent-range-runtime.json"
+  ],
   "query_split": "500 calibration; 6480 held-out untouched",
-  "recording_ids": ["DEC-20261115-FULL-COLLECTION-COMPARISONS", "OBS-20261115-FULL-CIFF-VERIFIED", "OBS-20261115-FULL-METADATA-PRE-CIMS"],
+  "recording_ids": [
+    "DEC-20261115-FULL-COLLECTION-COMPARISONS",
+    "OBS-20261115-FULL-CIFF-VERIFIED",
+    "OBS-20261115-FULL-METADATA-PRE-CIMS",
+    "OBS-20261115-FULL-INPUT-PREPARATION-REVIEW"
+  ],
   "success_rule": "Preparation: pinned input/source checks, independent importer fixture, complete full index and preserved hashes/resource evidence. Comparison: requires a separate fully resolved registered protocol and independent zero-mismatch evidence.",
   "failure_rule": "Preserve logs/partial outputs; inspect before reviewed repair, no untracked benchmark or silent smaller-corpus fallback."
 }

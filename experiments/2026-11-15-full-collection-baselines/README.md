@@ -29,3 +29,14 @@ Candidates are the retained range V2 W1024/T256, the explicitly adapted canonica
 If a method requires chunking, register it as a disclosed treatment and include chunk preparation/transfer/merging costs. Keep unsupported cases visible. No substitute 1M result or extrapolated full-collection speedup is permitted.
 
 Any new/modified iteration needs a separate bug/edge/semantic/improvement review and appropriate checks before CIMS. Technical failures receive up to three reviewed repairs with new run directories; valid slower outcomes are preserved. Optimize temporary selection storage only after the full baseline is established. Remaining optimization choices depend on results. Team/report ownership remains unassigned.
+
+
+## Input preparation result and reference qualification update
+
+Preparation source `45110b00a81770ce8df4f19163a7015864cae622` completed successfully. Full GSP: 8,841,823 passages, 28,679 terms, 1,049,282,186 retained nonzero postings, 5,388,181,537 bytes; SHA-256 `e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac`. Import-only wall duration 583.133 seconds; GNU time maximum RSS 19,346,348KiB. These are preprocessing/resource observations, not retrieval performance. Earlier “no derived index” status above is historical preparation state, superseded by this update.
+
+With exact retained nnz, the B32 CSR core plus bounds alone requires 13,382,823,143 bytes, above the RTX4070 total 12,878,610,432 bytes, before additional buffers/context. Both B16 and B32 fully resident old pruners are therefore unsupported by modeled memory capacity; no actual OOM was induced. Other methods still require real upload/peak checks.
+
+`code/validate_index.py` checks every GSP offset/term/impact, dictionary identity, unique uint64 IDs and strict per-row term order, then independently replays all original CIFF DocRecords. It deliberately does not independently replay all source posting bodies. The importer’s full df/delta assertions and separate fixture checks remain separate evidence.
+
+`code/prepare_reference.py` uses the existing project runtime runner/policy to register a hand-computed native CPU fixture, then the 500-query full-corpus U64 reference. It checks every returned score independently and records run reviews. No GPU retrieval or latency comparison occurs in this stage. The local real runtime gate/CPU fixture passed before CIMS; see `reviews/reference-preflight.json` and `reviews/index-validator.json`. Full-data validation and reference remain pending execution. The private runner/policy are deployment dependencies, not implied to be bundled with this public experiment.
