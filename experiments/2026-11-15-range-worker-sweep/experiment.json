@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-15-range-worker-sweep",
+  "title": "Exact range scorer: range size and coupled worker sweep",
+  "owner": "vaibhav",
+  "branch": "exp/vaibhav/2026-11-15-range-worker-sweep",
+  "status": "complete-valid-negative",
+  "parent_experiment": "2026-11-14-range-bitpack-v2",
+  "parent_source_commit": "97b9ee5e793f4f266bcb0f3abfa442de1b592d3e",
+  "question": "Can range size and coupled score/merge worker counts improve exact complete-query latency while controlling tracked allocation?",
+  "hypothesis": "Smaller work ranges with matched worker count may reduce complete-query latency; metadata and final merge overhead may cancel that gain.",
+  "motivation": "Improve exact retrieval speed while reporting complete tracked resource cost, building on the integrated V2 scorer.",
+  "code_paths": [
+    "src/cuda_range_v2.cu",
+    "src/research_runtime.h",
+    "src/range_bitpack.h",
+    "src/range_bitpack_tool.cpp",
+    "tests/check_range_bitpack.py",
+    "code/",
+    "analysis/"
+  ],
+  "configuration_files": [
+    "configs/protocol.json",
+    "matrix.json"
+  ],
+  "declared_changes": {
+    "range_size": [
+      256,
+      512,
+      1024
+    ],
+    "score_and_merge_threads": [
+      64,
+      128,
+      256
+    ],
+    "runtime": "Accurately mark guarded uint32 arithmetic and report resolved metadata; no scoring kernel or timed-loop change.",
+    "measurement": "Real external runtime gate replaces historical parent stand-in; fresh correctness/complete memory accounting and calibration confirmation."
+  },
+  "scoring_contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "input_manifest": {
+    "gsp_sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37",
+    "queries_sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+    "oracle_sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860",
+    "per_run": "Resolve actual encoded index/build/settings before each real runner release; preserve manifests under results/<experiment-id>/<run-id>."
+  },
+  "query_split": "500 calibration queries only; no held-out queries.",
+  "timing_boundary": "Host query construction, kernel-argument query transfer, complete scoring/local selection/last-block merge, result D2H and synchronization.",
+  "correctness_rule": {
+    "parent_fixture_cases": "All nine inherited cases plus a new odd-score-above2^24/full-uint64-ID case, all nine matrix cells, k10 and VERIFY1; independent Python rankings and three full query rounds.",
+    "empty_queries": "Inherited fixture empty/zero/unknown-term queries remain intact.",
+    "additional_depths": "k0,1,128 on ties fixture in all nine cells; k1000 on smallest-worker/smallest-range and control as stress-only, not measured performance.",
+    "real": "All500 calibration queries, one correctness round per cell, outputs checked against the unchanged hash-bound CPU oracle and returned-score replay. No CPU verification inside timed query measurements.",
+    "runtime": "Host default and bounded acceptance tests plus intentional scalar mismatch; first CUDA wrong score_threads expectation must reject before query outputs."
+  },
+  "measurement_and_analysis_plan": {
+    "processes_per_cell": 3,
+    "queries": 500,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "order": "Natural/magic-square/reverse orders balance the average timing-slot position of every range-size and thread-count factor. Individual cell comparisons remain conditional on three processes and shared-node variation.",
+    "primary": "Geometric mean of paired query/process ratios of20-round medians to same-session W1024/T256 control;10000 crossed process/query bootstrap draws,seed20261115.",
+    "descriptive": "Pooled median,mean and p95 of1500query/process medians;not serving-tail percentile.",
+    "boundary": "Host query construction, kernel-argument query transfer, complete scoring/local selection/last-block merge, result D2H and synchronization.",
+    "excluded": "Index build/load/verification/rank construction/upload; runtime gate; file I/O and independent CPU validation.",
+    "selection": "Eligible candidates require point ratio<=0.98 and conditional95%upper bound<1. Among eligible cells choose minimum point ratio; eligible estimates within2% are tied, prefer lower full tracked allocation, then deterministic label. If none qualify, retain control. Report every cell and memory/Pareto tradeoff; selection intervals are not confirmatory.",
+    "confirmation": "If a noncontrol candidate qualifies, freeze it against control in a fresh calibration session:3processes each,3warmup/20measured rounds, fixed AB/BA/AB order, bootstrap seed20261117. Promote as latency winner only if confirmation95%upper ratio<0.98; otherwise retaincontrol. Confirmation is repeated calibration, not held-out evaluation.",
+    "contention": "Observe target UUID before each process; wait in10minute availability cycles while occupied. One passive observer and per-timing sampler; sampled absence of contention is not exclusivity.",
+    "stopping": "Stop on technical failure and preserve evidence; separate reviewed repairs<=3. Complete fixed matrix even if slower; no outcome-driven retuning.",
+    "contention_policy": {
+      "rule": "Retain every run. A sampled second target-GPU compute context makes that timing process ineligible; retry after idle with a fresh registered tag, at most three replacements. Never reject based on latency. Missing monitor evidence or persistent contention stops the protocol. Absence of sampled contention is not proof of exclusivity.",
+      "max_replacements": 3
+    }
+  },
+  "success_rule": "All exactness/runtime/accounting checks pass; fresh confirmation upper95 ratio<0.98 for promotion.",
+  "failure_rule": "Stop on technical/semantic failure; inspect and separately review each repair, at most3; preserve every attempt.",
+  "next_if_negative": "Retain control; use measured latency/resource tradeoffs to select follow-on optimization.",
+  "recording_ids": [
+    "DEC-20261115-ADAPTIVE-SPEED-AUTHORIZED",
+    "OBS-20261115-RANGE-SWEEP-PRE-CIMS",
+    "OBS-20261115-RANGE-SWEEP-REPAIR1",
+    "OBS-20261115-RANGE-SWEEP-REPAIR2",
+    "OBS-20261115-RANGE-CORRECTNESS-VERIFIED",
+    "OBS-20261115-RANGE-SWEEP-REPAIR3",
+    "OBS-20261115-RANGE-FULL-VALIDATION",
+    "DEC-20261115-RANGE-WORKER-COMPLETE"
+  ],
+  "runs": [
+    {
+      "run_id": "20261115-cuda5-01",
+      "status": "technical-failure",
+      "manifest": "../../results/2026-11-15-range-worker-sweep/20261115-cuda5-01/manifest.json"
+    },
+    {
+      "run_id": "20261115-cuda5-02",
+      "status": "technical-failure",
+      "manifest": "../../results/2026-11-15-range-worker-sweep/20261115-cuda5-02/manifest.json"
+    },
+    {
+      "run_id": "20261115-cuda5-03",
+      "status": "correctness-complete-checkpoint-failed",
+      "manifest": "../../results/2026-11-15-range-worker-sweep/20261115-cuda5-03/manifest.json"
+    },
+    {
+      "run_id": "20261115-cuda5-04",
+      "status": "complete",
+      "manifest": "../../results/2026-11-15-range-worker-sweep/20261115-cuda5-04/manifest.json"
+    }
+  ],
+  "repair": {
+    "attempt": 2,
+    "compatibility_treatment": "query-argument-layout-accounting-r2",
+    "previous_source": "eee8c408db26f612752077fd0c151d31958d8f19",
+    "previous_run": "20261115-cuda5-02",
+    "fresh_run": "20261115-cuda5-03",
+    "delta": "Correct independent query transfer expectation from1032 to1028 derived from4+8*128. Add actual sizeof(QueryArgs) runtime field. No kernel, timed loop or algorithm/selection changes; repair1 retained."
+  },
+  "repair_history": [
+    {
+      "attempt": 1,
+      "compatibility_treatment": "negative-test-distinct-top-path-r1",
+      "original_source": "d6f3621ded550d0178d2a44790fef97a53b1e244",
+      "original_run": "20261115-cuda5-01",
+      "fresh_run": "20261115-cuda5-02",
+      "delta": "Engineering negative-test outputs now use .top.tsv, distinct from existing query inputs; algorithm, settings, negative guards, timing/selection rules unchanged."
+    }
+  ],
+  "measured_source_commit": "be2ecb9106424b9ed8f0501ddb9a594dc41f46f0",
+  "successful_correctness_run": "20261115-cuda5-03",
+  "successful_timing_run": "20261115-cuda5-04",
+  "selection": {
+    "retained": "w1024-t256",
+    "confirmation_triggered": false
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "experiment_id": "2026-11-15-range-worker-sweep",
+  "status": "REVIEWED_FOR_CIMS",
+  "parent_experiment": "2026-11-14-range-bitpack-v2",
+  "parent_merge_commit": "97b9ee5e793f4f266bcb0f3abfa442de1b592d3e",
+  "branch": "exp/vaibhav/2026-11-15-range-worker-sweep",
+  "range_sizes": [
+    256,
+    512,
+    1024
+  ],
+  "score_and_merge_threads": [
+    64,
+    128,
+    256
+  ],
+  "control": {
+    "range_size": 1024,
+    "threads": 256
+  },
+  "planned_workload": {
+    "documents": 1000000,
+    "queries": 500,
+    "split": "calibration",
+    "batch": 1,
+    "k": 10
+  },
+  "planned_repetitions": {
+    "processes": 3,
+    "warmup_rounds": 3,
+    "measured_rounds": 20
+  },
+  "target_gpu": "RTX 4070; verify live identity before execution",
+  "execution_ready": true,
+  "pending": [
+    "Resolve build/environment/input hashes on CIMS and register each complete expected configuration before retrieval; local source review is not GPU validation."
+  ],
+  "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "correctness": {
+    "parent_fixture_cases": "All nine inherited cases plus a new odd-score-above2^24/full-uint64-ID case, all nine matrix cells, k10 and VERIFY1; independent Python rankings and three full query rounds.",
+    "empty_queries": "Inherited fixture empty/zero/unknown-term queries remain intact.",
+    "additional_depths": "k0,1,128 on ties fixture in all nine cells; k1000 on smallest-worker/smallest-range and control as stress-only, not measured performance.",
+    "real": "All500 calibration queries, one correctness round per cell, outputs checked against the unchanged hash-bound CPU oracle and returned-score replay. No CPU verification inside timed query measurements.",
+    "runtime": "Host default and bounded acceptance tests plus intentional scalar mismatch; first CUDA wrong score_threads expectation must reject before query outputs."
+  },
+  "timing": {
+    "processes_per_cell": 3,
+    "queries": 500,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "order": "Natural/magic-square/reverse orders balance the average timing-slot position of every range-size and thread-count factor. Individual cell comparisons remain conditional on three processes and shared-node variation.",
+    "primary": "Geometric mean of paired query/process ratios of20-round medians to same-session W1024/T256 control;10000 crossed process/query bootstrap draws,seed20261115.",
+    "descriptive": "Pooled median,mean and p95 of1500query/process medians;not serving-tail percentile.",
+    "boundary": "Host query construction, kernel-argument query transfer, complete scoring/local selection/last-block merge, result D2H and synchronization.",
+    "excluded": "Index build/load/verification/rank construction/upload; runtime gate; file I/O and independent CPU validation.",
+    "selection": "Eligible candidates require point ratio<=0.98 and conditional95%upper bound<1. Among eligible cells choose minimum point ratio; eligible estimates within2% are tied, prefer lower full tracked allocation, then deterministic label. If none qualify, retain control. Report every cell and memory/Pareto tradeoff; selection intervals are not confirmatory.",
+    "confirmation": "If a noncontrol candidate qualifies, freeze it against control in a fresh calibration session:3processes each,3warmup/20measured rounds, fixed AB/BA/AB order, bootstrap seed20261117. Promote as latency winner only if confirmation95%upper ratio<0.98; otherwise retaincontrol. Confirmation is repeated calibration, not held-out evaluation.",
+    "contention": "Observe target UUID before each process; wait in10minute availability cycles while occupied. One passive observer and per-timing sampler; sampled absence of contention is not exclusivity.",
+    "stopping": "Stop on technical failure and preserve evidence; separate reviewed repairs<=3. Complete fixed matrix even if slower; no outcome-driven retuning.",
+    "contention_policy": {
+      "rule": "Retain every run. A sampled second target-GPU compute context makes that timing process ineligible; retry after idle with a fresh registered tag, at most three replacements. Never reject based on latency. Missing monitor evidence or persistent contention stops the protocol. Absence of sampled contention is not proof of exclusivity.",
+      "max_replacements": 3
+    }
+  },
+  "memory": "Full C++ tracked allocation including index, uint64 ID map, uint16 rank maps/heads, boundaries/counter, local candidates/merge scratch/output; dynamic shared bytes separately. Excludes driver/context and hidden kernel-argument/runtime allocation.",
+  "runtime_schema": "Explicit guarded arithmetic/contract, vocabulary/nnz, accumulator/output widths, exclusive score limit, resolved maximum conservative score bound and maximum slots; source kernel/timer unchanged.",
+  "question": "Can range size and coupled score/merge worker counts improve exact complete-query latency while controlling tracked allocation?",
+  "repair_history": [
+    {
+      "attempt": 1,
+      "compatibility_treatment": "negative-test-distinct-top-path-r1",
+      "original_source": "d6f3621ded550d0178d2a44790fef97a53b1e244",
+      "original_run": "20261115-cuda5-01",
+      "fresh_run": "20261115-cuda5-02",
+      "delta": "Engineering negative-test outputs now use .top.tsv, distinct from existing query inputs; algorithm, settings, negative guards, timing/selection rules unchanged."
+    }
+  ],
+  "repair": {
+    "attempt": 2,
+    "compatibility_treatment": "query-argument-layout-accounting-r2",
+    "previous_source": "eee8c408db26f612752077fd0c151d31958d8f19",
+    "previous_run": "20261115-cuda5-02",
+    "fresh_run": "20261115-cuda5-03",
+    "delta": "Correct independent query transfer expectation from1032 to1028 derived from4+8*128. Add actual sizeof(QueryArgs) runtime field. No kernel, timed loop or algorithm/selection changes; repair1 retained."
+  }
+}

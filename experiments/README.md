@@ -22,3 +22,5 @@ Add new experiments here on their own branches. Merge index rows through pull re
 - [2026-11-11-cuda-bound-precision](2026-11-11-cuda-bound-precision/README.md): complete — canonical full/coarse/selective ablation on Turing/Ada; coarse memory/latency tradeoff and selective negative latency result, with full repeated timings and checked profiles.
 
 - [Native GPUSparse audit](2026-11-11-gpusparse-baseline/README.md): original native compilation failure preserved; explicit compatibility repair completed correctness and repeated calibration timing.
+
+- [2026-11-15-range-worker-sweep](2026-11-15-range-worker-sweep/README.md): complete valid negative result — 119 synthetic / 9 real-data checks and 27 timing processes validated; retain W1024/T256 (~0.108109 ms, 420.90 MiB). Alternatives 1.31–2.94 times slower; retained failed attempts and quota-safe timing continuation; calibration only.

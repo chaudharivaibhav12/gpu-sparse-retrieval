@@ -28,7 +28,9 @@ inline void research_gate(const std::string& mode, size_t docs, size_t queries,
                           unsigned k, int gpu, const std::string& index_path,
                           const std::string& query_path,
                           const std::string& extra_config = "",
-                          const std::string& extra_behavior = "") {
+                          const std::string& extra_behavior = "",
+                          const std::string& arithmetic = "uint64",
+                          const std::string& contract = "GSP-CAP32-U64-NUMERIC-TIES-v1") {
     const char* directory = std::getenv("RESEARCH_RUNTIME_DIR");
     if (!directory) return;
     namespace fs = std::filesystem;
@@ -46,8 +48,9 @@ inline void research_gate(const std::string& mode, size_t docs, size_t queries,
         if (mode == "cpu-offline-pilot")
             out << ",\"block_sizes\":[16,32,64,128],\"depths\":[10,100,1000],\"seed_budgets\":[4,16]";
         out << extra_config << "},\"behavior\":{"
-               "\"contract\":\"GSP-CAP32-U64-NUMERIC-TIES-v1\","
-               "\"arithmetic\":\"uint64\",\"document_impacts\":\"uint8-exact\","
+               "\"contract\":" << research_quote(contract)
+            << ",\"arithmetic\":" << research_quote(arithmetic)
+            << ",\"document_impacts\":\"uint8-exact\","
                "\"query_policy\":\"BMP-f32-ceil-cap32\","
                "\"tie_order\":\"score_desc_original_numeric_id_asc\","
                "\"eligibility\":\"all_documents\"" << extra_behavior << "}}\n";
