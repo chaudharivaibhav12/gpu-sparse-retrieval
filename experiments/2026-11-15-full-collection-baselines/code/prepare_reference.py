@@ -81,6 +81,7 @@ def main():
         index_sha=digest(a.index)
         questions={'title':'Full-collection exact baseline qualification','motivation':'Verify8841823passages and establish CPUreference before matched GPU comparisons.','parent_experiment':'2026-11-15-range-worker-sweep','parent_merge':'201be6998bace088900e1b7ccb961bb5277273e4','source_commit':a.source_commit,'qualification':'New thin execution ledger; public parent snapshot/merge identity is preserved without claiming inherited instrumentation.','artifacts':[ledger.blob(Path(__file__)),ledger.blob(Path(__file__).with_name('validate_index.py')),ledger.blob(a.metadata),ledger.blob(repo/'deployment-receipt.json')]}
         question=ledger.event('question',questions)
+        state('validator_fixture');child('validator-fixture',[sys.executable,Path(__file__).with_name('check_index_validator.py'),repo])
         state('independent_full_index_validation');validation=validate(a.index,a.raw,metadata);write_new(out/'index-validation.json',validation)
         observation=ledger.event('observation',dict(title='Independent full-index validation',motivation='Check full input before reference retrieval.',result=validation,artifacts=[ledger.blob(out/'index-validation.json')]),[question['id']])
         state('build_cpu_reference');compiler=shutil.which('g++');binary=out/'build/cpu_pilot'
