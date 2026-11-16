@@ -1,0 +1,106 @@
+{
+  "experiment_id": "2026-11-15-full-collection-baselines",
+  "status": "Frozen design; actual builds/configs registered with real runner before each query-compute release.",
+  "docs": 8841823,
+  "query_count": 500,
+  "k": 10,
+  "batch_size": 1,
+  "warmup_rounds": 3,
+  "measured_rounds": 20,
+  "process_repetitions": 3,
+  "target_uuid": "GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7",
+  "cpu_affinity": "0",
+  "inputs": {
+    "gsp": {
+      "sha256": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac"
+    },
+    "rbp": {
+      "sha256": "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab"
+    },
+    "queries": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"
+    },
+    "query_split": {
+      "sha256": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+    },
+    "oracle": {
+      "sha256": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed"
+    }
+  },
+  "variants": {
+    "range": "Existing V2, W1024,256 score/merge workers, uniform positions, capacity128.",
+    "mono": "Existing canonical U64 GPUSparse adaptation, upstream92bb87b, BLOCK_PL512, batch1. Not unmodified released GPUSparse.",
+    "csr": "Existing fullbound executable, execution_mode0(exhaustive),B32,32scorethreads,256selection threads. Add only accurate fixed batch_size1 runtime reporting; kernel/timed loop unchanged."
+  },
+  "process_order": [
+    [
+      "range",
+      "mono",
+      "csr"
+    ],
+    [
+      "mono",
+      "csr",
+      "range"
+    ],
+    [
+      "csr",
+      "range",
+      "mono"
+    ]
+  ],
+  "correctness": {
+    "synthetic": "Eight inherited unique-term/doc fixtures (including empty corpus) plus hand-computed uint64-ID case; each implementation k10,1round,0warmups, internalVERIFY1 and independent complete ordered IDs/scores. Duplicate-posting fixture excluded only from shared native-loader domain; full corpus independently proved multiplicity1.",
+    "runtime_rejections": "One intentional, exactly attributed mismatch per adapter before query outputs: range score_threads, mono query_count, CSRbatch_size. No precreated continue file.",
+    "full": "All500calibration queries,1round,0warmups,VERIFY0 to reuse completed exhaustive CPUreference rather than recomputing it in C++ for every process. Every result compared externally to the fixed full CPUoracle; all unique returned query/doc scores independently recomputed with Python integers. Native adapter also retains its own post-run checks. Internal not_checked remains explicit. No timing starts until all three pass.",
+    "domain": "Guarded U32 and literal U64 remain distinct physical labels. Explicit corpus/query/bound/canonical-output certificate required for domain-qualified comparison; original runner BLOCKED record retained. Native float/unspecified tie contract never accepted by this certificate."
+  },
+  "timing_boundary": "Host query construction through complete scoring, selection/merge, original numeric-ID results, D2H and synchronization. Index load/upload, gate, file writes and independent checking excluded and separately recorded. Device-event spans differ and are diagnostics only, never compared as matched GPU spans.",
+  "availability_wait_limit_seconds": 21600,
+  "availability": "Before each process require targetUUID/model/capability, no target compute context and modeled core/application bytes plus1GiB(C++) or1.5GiB(native)free. While occupied wait600seconds between automatic checks; no competing benchmark or repeated model polling.",
+  "monitoring": "One passive one-second per-process sampler on CPU1 when available. Record clocks/power/memory, PID/PGID and foreign contexts. Only timing runs require sampled owned context; very short synthetic runs may end between samples and are not latency evidence. Any sampled foreign context makes timing ineligible, independent of latency; preserve it and retry after idle with fresh registered tag at most3replacements. Missing/error monitor evidence stops. Sampled absence is not exclusive-GPU proof. No independent crash watcher/immediate-failure-detection claim.",
+  "analysis": {
+    "primary": "Geometric paired range/baseline latency ratios over3processes x500queries; each entry is its20-round measured median.",
+    "bootstrap": "10000crossed process/query draws with replacement; multiplicity-weighted Cartesian product and linear quantiles. Conditional on calibration/session.",
+    "bootstrap_seed": 20261116,
+    "control_seeds": {
+      "mono": 20261116,
+      "csr": 20261117
+    },
+    "secondary": "Descriptive mean/median/p95 over query/process medians; p95 is not serving latency tail. Report all cells and intervals; no tuning by observed latencies.",
+    "memory": "C++tracked allocation bytes checked in every row; native Torch allocator/reserved peak since post-setup reset retained. Uniform one-second NVML own-process/board sampled peaks recorded separately, not exact physical peaks and not mixed with tracked/allocator quantities."
+  },
+  "declared_changes": {
+    "corpus": "1M subset to all8841823passages; original passage IDs/order and prepared query weights retained.",
+    "systems": "Matched full-corpus comparison of retained range, canonicalU64adapted monolithic and exhaustive CSR. It is a system comparison, not an isolated codec ablation.",
+    "runtime": "CSR fixed batch1 now explicitly reported before compute. Real project runner for every retrieval run; inherited stand-in is not used.",
+    "validation": "Reuse fully qualified full CPUreference; real GPUcorrectness uses external oracle/true-score replay rather than repeated exhaustive CPU computation inline.",
+    "scoring": "No scoring/selection algorithm change or output-contract relaxation. Domain-limited exact arithmetic equivalence is explicit and evidence-bound.",
+    "input_roles": "Use qualified frozen hashes for every run. canonical_gsp is the actual index for literal backends; add an index role only for the encoded range representation. The runner hashes each actual input before/after compute without reading a duplicate GSP alias twice.",
+    "resource_failure_handling": "Repair2 distinguishes a tightly diagnosed pre-gate contention OOM from technical code failure, with unchanged scoring/runtime inputs/settings and existing bounded fresh resource replacements. No result from a failed attempt enters analysis."
+  },
+  "unsupported": {
+    "full_byte_B16": "Dense plane15848416906bytes alone exceeds4070board12878610432bytes. Unsupported by modeled capacity, not an observedOOM.",
+    "full_byte_B32": "CSRcore5458614690+plane7924208453=13382823143bytes exceedsboard before other allocations. Unsupported by modeled capacity, not observedOOM.",
+    "chunking": "Not performed; any future chunked method must include transfer/preparation/merging costs in a separately registered matched treatment."
+  },
+  "limitations": [
+    "500calibration only;6480held-out queries untouched; no held-out freeze/evaluation.",
+    "No full-collection externalCPU-BMP or unmodified/native-floatGPUSparse speed claim. CanonicalU64adaptation can change cost versus upstream; a guarded canonicalfloat32 alternative is unmeasured.",
+    "Not every precision/pruning variant is included. Only named full-byte resident B16/B32 modes have been ruled out by capacity; coarse/refinement variants need their own full-memory audit.",
+    "Full-source posting bodies not independently replayed: importer assertions, independent import fixtures, full GSP checks and CIFFDocRecord replay have distinct coverage.",
+    "No exact physical VRAM peak, traffic, occupancy or isolated bottleneck proof; profiles, k/batch scaling and secondGPU remain separate.",
+    "Threeprocesses on a sharedGPU; residual clock/cache/contention effects and conditional inference remain.",
+    "Range query_transfer_bytes1028 is logical sizeof(QueryArgs), not measured bus traffic/full argument block; an empty corpus need not transfer it."
+  ],
+  "technical_failures": "Stop and preserve; separately review/fix technical failures for up to3repair attempts with fresh run directories. Do not replay unchanged known-broken code or tune valid slower/null results away.",
+  "publication": "Only after complete protocol plus independent local raw/provenance/statistical validation; existing user standing authorization then permits push/PR/merge.",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "0",
+    "OMP_NUM_THREADS": "1",
+    "CUDA_MODULE_LOADING": "LAZY",
+    "TRITON_CACHE_DIR": "fresh-per-run under scratch results",
+    "CUDA_CACHE_PATH": "fresh-per-run under scratch results"
+  },
+  "resource_oom_rule": "A failed full-input attempt may use the existing at-most3fresh resource replacements only when no runtime report/result output exists, exact recognized CUDA OOM text/failed exit is preserved, sampler has owned and foreign contexts without errors, and sampled board-minus-own usage plus modeled application/core bytes exceeds board capacity. Retain failed run status/review and all raw evidence. This is a contaminated resource attempt, not an isolated OOM/fit or retrieval result. A clean-device OOM, different error, input/config drift or missing monitoring stops for review."
+}

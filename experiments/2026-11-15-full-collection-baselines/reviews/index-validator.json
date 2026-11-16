@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "sha256": "76fecace188e5abfbe1ecc895d43779eeef4d554cabc9c0748b7a84de5596385",
+  "file": "code/validate_index.py",
+  "reviewed": [
+    "Exact uint64 IDs and original order; no float conversion.",
+    "Bounds before mapping; chunked all-offset/term/impact checks; uint64 monotonicity without subtraction underflow.",
+    "Strict per-row term order with empty-row boundaries and cross-chunk pairs; implies no duplicate term/doc pairs.",
+    "Independent full CIFF DocRecord replay and dictionary hash, EOF/truncation guards.",
+    "No query reads, CUDA compute or performance claim; posting-body limitation explicit."
+  ],
+  "finding_fixed": "Report zero maximum term/document multiplicity for an entirely empty posting set.",
+  "checks": "Windows NumPy: hand-built valid GSP and DocRecords at chunk2, uint64 max ID, empty row;9corrupt GSP cases,3malformed DocRecord cases, and all-empty postings passed expected accept/reject rules.",
+  "limits": [
+    "CIMS NumPy/Python environment differs; rerun a small fixture there before full validation.",
+    "Full source posting bodies are not independently replayed; do not claim that coverage.",
+    "Unique-ID check sorts an O(N) NumPy copy; full corpus IDs about71MB before sort workspace."
+  ]
+}

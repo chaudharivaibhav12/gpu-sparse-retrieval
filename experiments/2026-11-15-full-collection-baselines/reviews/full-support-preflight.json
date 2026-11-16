@@ -1,0 +1,46 @@
+{
+  "status": "PASS",
+  "files": {
+    "analyze_full_baselines.py": "1a15006bf08355ed2acd6a771147ad9d1b5feec46843d0af4be683662d02965d",
+    "compare_exact.py": "8e8a228ee450d4fa1f5fcdbe873c0c301f559476fb8af02bc2e81baa22be57b9",
+    "expected_baselines.py": "0e51e8f7d467dc3ae8e044f05bddbe7fd67c4e8fe2c5aef2e8c8b722f28328e8",
+    "run_full_baselines.py": "cdf835331d84d5310d1dc2a7c073b37aee431d621b52ee4b59148aed7491c5e4",
+    "validate_baseline_outputs.py": "42ef40c8cc744bbb28c6113a9e5bb12670c660a135ad6defd502a12c5035210e"
+  },
+  "checks": {
+    "validated_schemas": 3,
+    "malformed_output_cases_rejected": 19,
+    "paired_synthetic_ratios": [
+      0.5,
+      0.25
+    ],
+    "outlier_resistant_20_round_medians": "PASS",
+    "bootstrap_draws_per_contrast": 10000,
+    "independent_nonconstant_bootstrap_replay_draws": 200,
+    "csr_expected_matches_compiled_host_json": "PASS",
+    "monitor_cases": [
+      "clean",
+      "foreign-context",
+      "failed-monitor"
+    ],
+    "duplicate_statistics_round": "rejected"
+  },
+  "reviewed": [
+    "Native/range/CSR raw schemas, exact oracle IDs/scores, every phase/round/query, native internal-original ID map and accounting.",
+    "Independent integer recomputation distinguishes unique query/doc checks from raw score comparisons.",
+    "Actual native-monitor code tested by deterministic subprocess/process-group fixtures.",
+    "Positive/finite timing checks; only query-wall boundary compared.",
+    "Fixed 3x500x20 paired estimator; conditional crossed bootstrap and inverse intervals."
+  ],
+  "findings_fixed": [
+    "A native error-counter loop shadowed the sample key and discarded native measured timings; use a separate counter variable.",
+    "Validate native variant/internal-ID mapping and exact top-group sequence.",
+    "Reject duplicated rounds during analysis even if sample counts match.",
+    "Short synthetic processes can end between monitor samples; require owned-context evidence only for timing, never label synthetic monitoring as latency certification."
+  ],
+  "limits": [
+    "All synthetic metadata in unit tests is engineering evidence, not actual research measurements.",
+    "No local CUDA compiler/GPU execution; target build and real runtime/golden fixtures must pass on CIMS.",
+    "Main controller orchestration/source/archive review and experiment-specific arithmetic certificate reviewed separately."
+  ]
+}

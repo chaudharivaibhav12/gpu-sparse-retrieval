@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "file": "src/cuda_fullbound.cu",
+  "parent_sha256": "e2fa14ea3d76620f539e47bb0bbb0cb29a25a62d3a854b0f33e474fccd34caac",
+  "sha256": "d9b2daacce780f3f1aa7c115eeeb88f42e4c488d3257ad0fffc5ae799a2d3e1a",
+  "change": "Only add truthful fixed batch_size1 to resolved runtime metadata before query compute. No new CLI/default and no scoring/timing change.",
+  "reviewed": [
+    "Exact one-fragment replacement; inverse replacement restores entire original source.",
+    "All kernel/helper definitions before main byte-identical; timed loop unchanged.",
+    "Actual modified C++extra-config expression compiled and JSON-parsed locally with full corpus dimensions."
+  ],
+  "checks": "Local Ubuntu g++ metadata-fragment build/execute passed: batch1, B32, mode0,5selection levels,3warmups/20rounds. This is host-only engineering evidence, not CUDA execution.",
+  "limits": [
+    "CUDA source still must compile on CIMS.",
+    "Actual GPUruntime acceptance/rejection and exact outputs required before performance."
+  ]
+}

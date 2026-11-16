@@ -15,3 +15,5 @@ Use a fresh run ID for each attempt, such as `20261111T140500Z-01`, and retain f
 Copy the manifest shape in [_template/manifest.json](_template/manifest.json), fill it, and list all raw and derived artifacts with SHA-256 hashes. Relative paths in the artifact list are relative to the manifest directory. The private recording system remains the full research record.
 
 Latest: [bound-precision evidence](2026-11-11-cuda-bound-precision/README.md), including directly browsable timing/profiles and lossless indexed fixture bundles.
+
+Latest full-collection evidence: [2026-11-15-full-collection-baselines](2026-11-15-full-collection-baselines/20261116-cuda5-baseline-repair02/README.md), including lossless ranked answers and all preparation/failure provenance.
