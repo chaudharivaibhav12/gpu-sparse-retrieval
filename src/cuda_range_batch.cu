@@ -235,21 +235,25 @@ struct BatchBuffers {
         if (candidates.count) cuda_checked(cudaMemset(candidates.ptr,0xff,candidates.count*sizeof(GpuCandidate)));
         if (scratch.count) cuda_checked(cudaMemset(scratch.ptr,0xff,scratch.count*sizeof(GpuCandidate)));
         if (merged.count) cuda_checked(cudaMemset(merged.ptr,0xff,merged.count*sizeof(GpuCandidate)));
-        cuda_checked(cudaMemset(heads.ptr,0xff,heads.count*2));
+        if (heads.count) cuda_checked(cudaMemset(heads.ptr,0xff,heads.count*2));
         cuda_checked(cudaMemset(queries.ptr,0xff,queries.count*sizeof(QueryArgs)));
     }
 };
 
 int main(int argc,char** argv) {
     try {
-        require(argc==15,"Usage: cuda_range_batch RBP QUERIES CSV TOP_TSV LIMIT K GPU VERIFY ROUNDS WARMUPS THREADS sequential|streams|batched BATCH GSP|-");
+        require(argc==15,"Usage: cuda_range_batch RBP QUERIES CSV TOP_TSV LIMIT K GPU VERIFY(0|1|2) ROUNDS WARMUPS THREADS sequential|streams|batched BATCH GSP|-");
         const auto parse=[](const char* p) { const string s(p);size_t used=0;auto n=stoull(s,&used);require(!s.empty()&&s[0]!='-'&&used==s.size()&&n<=UINT32_MAX,"Invalid unsigned argument");return uint32_t(n); };
         const uint32_t limit=parse(argv[5]),k=parse(argv[6]),gpu=parse(argv[7]),verify=parse(argv[8]),rounds=parse(argv[9]),warmups=parse(argv[10]),threads=parse(argv[11]),batch=parse(argv[13]);
         const string mode=argv[12],gsp_path=argv[14];
         require(mode=="sequential"||mode=="streams"||mode=="batched","MODE must be sequential, streams or batched");
         const bool streams=mode=="streams",batched=mode=="batched";
-        require(k<=RBP_MAX_K&&verify<=1&&rounds>0&&threads>=32&&threads<=32*RBP_MAX_WARPS&&threads%32==0&&batch>=1&&batch<=1024,"Unsupported setting");
-        require(!verify || gsp_path!="-","VERIFY=1 needs the source GSP index");
+        require(k<=RBP_MAX_K&&verify<=2&&rounds>0&&threads>=32&&threads<=32*RBP_MAX_WARPS&&threads%32==0&&batch>=1&&batch<=1024,"Unsupported setting");
+        // VERIFY=1: buffer poisoning, counter check and the in-driver CPU reference.
+        // VERIFY=2: buffer poisoning and counter check only (answers are checked
+        //           outside the driver against the oracle file).
+        const bool reference_check=verify==1;
+        require(!reference_check || gsp_path!="-","VERIFY=1 needs the source GSP index");
         const auto index=rbp_load(argv[1]);auto queries=read_queries(argv[2]);
         require(index.encoding==RBP_POSITIONS,"This scorer needs a position-encoded index (build with 'positions')");
         const uint32_t N=index.docs,R=index.ranges,W=index.range_size;
@@ -317,21 +321,30 @@ int main(int argc,char** argv) {
         const uint64_t slot_device_bytes=batched ? buffers->device_bytes()/batch : slots[0]->device_bytes();
         cuda_checked(cudaMemGetInfo(&free_after,&device_total));
         const uint64_t device_used_delta=free_before>free_after ? free_before-free_after : 0;
+        // Bytes of the device buffers this program allocates itself. Not a
+        // measured peak: the CUDA context and allocator rounding are outside it.
+        const uint64_t tracked_allocation_bytes=shared_device_bytes+(batched ? buffers->device_bytes() : slot_device_bytes*batch);
+        // Runtime marks that differ between the three execution modes.
+        const string execution_marks=batched
+            ? ",\"execution\":\"single-batched-launch;grid-ranges-by-queries;blockIdx.y-selects-query\",\"query_transfer\":\"one-h2d-copy-of-active-query-arguments-per-batch\",\"last_block_detection\":\"per-query-counter-slice;gridDim.x-blocks-per-query\""
+            : streams
+            ? ",\"execution\":\"concurrent-streams;one-launch-and-stream-per-query;all-launched-before-any-collected\",\"query_transfer\":\"kernel-argument-by-value\",\"last_block_detection\":\"one-counter-per-slot;one-launch-in-flight-per-counter\""
+            : ",\"execution\":\"sequential-control;one-launch-per-query;each-collected-before-next-launch\",\"query_transfer\":\"kernel-argument-by-value\",\"last_block_detection\":\"one-counter-per-slot;one-launch-in-flight-per-counter\"";
         string cpu_affinity="unknown",status_line;ifstream status("/proc/self/status");
         while (getline(status,status_line)) if (status_line.rfind("Cpus_allowed_list:",0)==0) { istringstream affinity(status_line.substr(18));affinity>>cpu_affinity; }
         research_gate("cuda-range-batch",N,count,k,gpu,argv[1],argv[2],
-            ",\"variant\":5,\"batch_mode\":"+research_quote(mode)+",\"batch\":"+to_string(batch)+",\"range_size\":"+to_string(W)+",\"postings_cap\":"+to_string(index.postings_cap)+",\"ranges\":"+to_string(R)+",\"blocks\":"+to_string(index.blocks())+",\"score_threads\":"+to_string(threads)+",\"max_supported_k\":"+to_string(RBP_MAX_K)+",\"max_query_terms\":"+to_string(max_terms)+",\"max_supported_terms\":"+to_string(RBP_MAX_TERMS)+",\"max_term_document_multiplicity\":"+to_string(multiplicity)+",\"slots_per_thread\":"+to_string(slots_per_thread)+",\"warp_list_capacity\":"+to_string(list_cap)+",\"shared_bytes\":"+to_string(shared_bytes)+",\"shared_device_bytes\":"+to_string(shared_device_bytes)+",\"slot_device_bytes\":"+to_string(slot_device_bytes)+",\"verify_scores\":"+to_string(verify)+",\"warmup_rounds\":"+to_string(warmups)+",\"repeats\":"+to_string(rounds)+",\"cpu_affinity\":"+research_quote(cpu_affinity)+",\"gpu_uuid\":"+research_quote(uuid.str())+",\"index_sha256\":"+research_quote(sha_hex(index.file_sha))+",\"source_gsp_sha256\":"+research_quote(sha_hex(index.source_sha)),
-            ",\"layout\":\"range-split-bitpacked-positions-term-major\",\"schedule\":\"exhaustive-all-ranges\",\"kernel\":\"cuda_range_v2-variant-5-unchanged\",\"isolation\":\"per-query-slot:candidates,heads,scratch,output,counter,query-arguments,stream,pinned-results,events\",\"batch_formation\":\"consecutive-queries;complete-before-timing;no-wait-time\",\"completion\":\"event-query-polling-from-batch-start\",\"result_transfer\":\"topk-only-async-pinned\"",
+            ",\"variant\":5,\"execution_mode\":"+research_quote(mode)+",\"batch_size\":"+to_string(batch)+",\"range_size\":"+to_string(W)+",\"postings_cap\":"+to_string(index.postings_cap)+",\"ranges\":"+to_string(R)+",\"blocks\":"+to_string(index.blocks())+",\"score_threads\":"+to_string(threads)+",\"max_supported_k\":"+to_string(RBP_MAX_K)+",\"max_query_terms\":"+to_string(max_terms)+",\"max_supported_terms\":"+to_string(RBP_MAX_TERMS)+",\"max_term_document_multiplicity\":"+to_string(multiplicity)+",\"slots_per_thread\":"+to_string(slots_per_thread)+",\"warp_list_capacity\":"+to_string(list_cap)+",\"shared_bytes\":"+to_string(shared_bytes)+",\"shared_device_bytes\":"+to_string(shared_device_bytes)+",\"slot_device_bytes\":"+to_string(slot_device_bytes)+",\"tracked_allocation_bytes\":"+to_string(tracked_allocation_bytes)+",\"verify_scores\":"+to_string(verify)+",\"warmup_rounds\":"+to_string(warmups)+",\"repeats\":"+to_string(rounds)+",\"cpu_affinity\":"+research_quote(cpu_affinity)+",\"gpu_uuid\":"+research_quote(uuid.str())+",\"index_sha256\":"+research_quote(sha_hex(index.file_sha))+",\"source_gsp_sha256\":"+research_quote(sha_hex(index.source_sha)),
+            ",\"layout\":\"range-split-bitpacked-positions-term-major\",\"schedule\":\"exhaustive-all-ranges\",\"kernel\":\"cuda_range_v2-variant-5-unchanged\",\"isolation\":\"per-query-slot:candidates,heads,scratch,output,counter,query-arguments,stream,pinned-results,events\",\"batch_formation\":\"consecutive-queries;complete-before-timing;no-wait-time\",\"completion\":\"event-query-polling-from-batch-start\",\"result_transfer\":\"topk-only-async-pinned\""+execution_marks,
             "uint32-guarded-exact-widened-uint64","GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1");
         require(!filesystem::exists(argv[3])&&!filesystem::exists(argv[4]),"Refusing to overwrite results");
         ofstream csv(argv[3]),top(argv[4]);require(bool(csv)&&bool(top),"Cannot create result files");
         cout<<"GPU "<<properties.name<<" CC "<<properties.major<<'.'<<properties.minor<<" uuid="<<uuid.str()<<" docs="<<N<<" range_size="<<W<<" ranges="<<R
             <<" mode="<<mode<<" batch="<<batch<<" shared_device_bytes="<<shared_device_bytes<<" slot_device_bytes="<<slot_device_bytes
-            <<" device_used_delta_bytes="<<device_used_delta<<" device_total_bytes="<<device_total<<" shared_bytes="<<shared_bytes
+            <<" tracked_allocation_bytes="<<tracked_allocation_bytes<<" device_used_delta_bytes="<<device_used_delta<<" device_total_bytes="<<device_total<<" shared_bytes="<<shared_bytes
             <<" index_sha256="<<sha_hex(index.file_sha)<<" control=range-v2-variant-5-batch-driver\n";
         csv<<"phase,round,batch_index,slot,query_id,docs,k,mode,batch,active,batch_wall_ms,launch_offset_ms,completion_ms,gpu_span_ms,ordered_id_mismatches,result_score_mismatches,query_terms,range_size,ranges,score_threads,shared_device_bytes,slot_device_bytes,device_used_delta_bytes\n";
         top<<"phase\tround\tquery_id\trank\toriginal_id\tscore\n";
-        vector<uint32_t> weights(verify ? index.vocab : 0);vector<uint64_t> reference(verify ? N : 0);
+        vector<uint32_t> weights(reference_check ? index.vocab : 0);vector<uint64_t> reference(reference_check ? N : 0);
         vector<double> launch_ms(batch),completion_ms(batch);vector<char> done(batch);
         for (uint32_t phase=0;phase<2;++phase) for (uint32_t round=0;round<(phase ? rounds : warmups);++round) {
             const string phase_name=phase ? "measured" : "warmup";
@@ -410,6 +423,8 @@ int main(int argc,char** argv) {
                         // The merging block must have re-armed this slot's counter.
                         uint32_t counter=1;cuda_checked(cudaMemcpy(&counter,batched ? buffers->finished.ptr+s : slots[s]->finished.ptr,4,cudaMemcpyDeviceToHost));
                         require(!wanted || counter==0,"Slot counter was not re-armed");
+                    }
+                    if (reference_check) {
                         fill(weights.begin(),weights.end(),0);for (auto p:q.terms) weights[p.first]=p.second;
                         for (uint32_t d=0;d<N;++d) reference[d]=dot(source,d,weights);
                         const auto expected=ranking(source,reference,{},k);
@@ -420,7 +435,7 @@ int main(int argc,char** argv) {
                             score_errors+=c.score!=reference[expected[rank]];
                         }
                     }
-                    const auto check=[&](uint64_t value) { return verify ? to_string(value) : string("not_checked"); };
+                    const auto check=[&](uint64_t value) { return reference_check ? to_string(value) : string("not_checked"); };
                     csv<<phase_name<<','<<round<<','<<batch_index<<','<<s<<','<<q.id<<','<<N<<','<<k<<','<<mode<<','<<batch<<','<<active<<','<<batch_ms<<','<<launch_ms[s]<<','<<completion_ms[s]<<','<<gpu_ms<<','<<check(id_errors)<<','<<check(score_errors)<<','<<q.terms.size()<<','<<W<<','<<R<<','<<threads<<','<<shared_device_bytes<<','<<slot_device_bytes<<','<<device_used_delta<<'\n';
                     for (uint32_t rank=0;rank<wanted;++rank) top<<phase_name<<'\t'<<round<<'\t'<<q.id<<'\t'<<rank+1<<'\t'<<winners[rank].id<<'\t'<<winners[rank].score<<'\n';
                     require(!id_errors&&!score_errors,"Range scorer disagrees with the CPU reference");

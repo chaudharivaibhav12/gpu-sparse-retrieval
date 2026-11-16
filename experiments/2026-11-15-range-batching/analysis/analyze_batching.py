@@ -10,8 +10,14 @@ Per configuration and process, from raw/timing-r<p>-<NAME>.csv:
   (from the start of its batch; no batch-formation wait is included).
 - batch processing time = batch_wall_ms of full batches; partial batches are
   reported separately.
-- memory = shared index bytes, per-query bytes x batch, and the device
-  used-memory delta the driver saw after all allocations.
+- memory, three different quantities that are never mixed:
+  tracked allocation bytes = device buffers the driver allocates itself
+  (shared index + per-query bytes x batch); device_used_delta_bytes = change
+  in the device's used memory across those allocations, read once by the
+  driver; sampled process memory = largest one-second nvidia-smi sample of the
+  driver process, from the gate receipt. None of them is an exact peak.
+- every timing process must have an accepted, timing-eligible gate receipt
+  (raw/timing-r<p>-<NAME>.receipt.json) and a packed-answers receipt.
 
 Contrasts are throughput ratios paired by (process, measured round): the
 geometric mean over all pairs, with a percentile interval from a crossed
@@ -34,7 +40,7 @@ def percentile(sorted_values, p):
     return sorted_values[lo] + (sorted_values[hi] - sorted_values[lo]) * (rank - lo)
 
 
-def load(path, warmups, rounds, batch):
+def load(path, warmups, rounds, batch, development):
     with Path(path).open(newline="") as f:
         rows = list(csv.DictReader(f))
     assert len(rows) == (warmups + rounds) * QUERIES, "%s: %d rows" % (path, len(rows))
@@ -54,9 +60,16 @@ def load(path, warmups, rounds, batch):
         for ms, active in batches.values():
             (full if active == batch else partial).append(ms)
     first = rows[0]
-    memory = dict(shared_device_bytes=int(first["shared_device_bytes"]), per_query_device_bytes=int(first["slot_device_bytes"]),
-                  batch_device_bytes=int(first["slot_device_bytes"]) * batch, device_used_delta_bytes=int(first["device_used_delta_bytes"]))
-    return dict(throughput=throughput, completion=completion, full=full, partial=partial, memory=memory)
+    shared, slot = int(first["shared_device_bytes"]), int(first["slot_device_bytes"])
+    receipt = json.loads(Path(str(path)[:-4] + ".receipt.json").read_text())
+    assert receipt["verdict"] == "accepted" and receipt["exit_code"] == 0, path
+    assert development or receipt["eligible_for_timing"], "%s: not eligible for timing" % path
+    assert receipt["actual"]["config"]["tracked_allocation_bytes"] == shared + slot * batch, path
+    assert Path(str(path)[:-4] + ".answers.json").exists(), path
+    memory = dict(tracked_allocation_bytes=dict(shared_index=shared, per_query=slot, total=shared + slot * batch),
+                  device_used_delta_bytes=int(first["device_used_delta_bytes"]),
+                  sampled_process_max_mib=receipt["sampled_memory"]["own_process_max_mib"])
+    return dict(source_commit=receipt["source_commit"], gpu_uuid=receipt["gpu_uuid"], binary_sha256=receipt["binary_sha256"], throughput=throughput, completion=completion, full=full, partial=partial, memory=memory)
 
 
 def geometric_mean(values):
@@ -82,6 +95,7 @@ def main():
     ap.add_argument("--warmups", type=int, required=True)
     ap.add_argument("--rounds", type=int, required=True)
     ap.add_argument("--output", required=True)
+    ap.add_argument("--development", action="store_true", help="accept receipts that are not timing-eligible; output is not a result")
     a = ap.parse_args()
     spec = []
     for line in (a.run / "spec.tsv").read_text().splitlines():
@@ -90,7 +104,7 @@ def main():
             spec.append(dict(name=parts[1], mode=parts[2], batch=int(parts[3]), k=int(parts[4])))
     data, summary = {}, {}
     for c in spec:
-        procs = [load(a.run / "raw" / ("timing-r%d-%s.csv" % (p, c["name"])), a.warmups, a.rounds, c["batch"]) for p in range(a.processes)]
+        procs = [load(a.run / "raw" / ("timing-r%d-%s.csv" % (p, c["name"])), a.warmups, a.rounds, c["batch"], a.development) for p in range(a.processes)]
         data[c["name"]] = procs
         tput = [x for pr in procs for x in pr["throughput"]]
         comp = sorted(x for pr in procs for x in pr["completion"])
@@ -103,8 +117,11 @@ def main():
             completion_latency_ms=dict(median=percentile(comp, 50), p95=percentile(comp, 95), p99=percentile(comp, 99), max=comp[-1], samples=len(comp)),
             batch_processing_ms=dict(full_batches=len(full), median=percentile(full, 50), p95=percentile(full, 95),
                                      partial_batches=len(partial), partial_median=percentile(partial, 50)),
-            memory=procs[0]["memory"],
-            device_used_delta_bytes_per_process=[pr["memory"]["device_used_delta_bytes"] for pr in procs])
+            tracked_allocation_bytes=procs[0]["memory"]["tracked_allocation_bytes"],
+            device_used_delta_bytes_per_process=[pr["memory"]["device_used_delta_bytes"] for pr in procs],
+            sampled_process_max_mib_per_process=[pr["memory"]["sampled_process_max_mib"] for pr in procs])
+    identity = {(pr["source_commit"], pr["gpu_uuid"], pr["binary_sha256"]) for procs in data.values() for pr in procs}
+    assert len(identity) == 1, "timing processes do not share one source commit, GPU and binary"
     rng = random.Random(SEED)
     by = {(c["mode"], c["batch"], c["k"]): c["name"] for c in spec}
     contrasts = {}
@@ -118,7 +135,9 @@ def main():
             pairs.append(by[(mode, 1, k)])
         for other in pairs:
             contrasts["%s / %s" % (name, other)] = contrast(data[name], data[other], a.processes, a.rounds, rng)
-    result = dict(run=str(a.run), processes=a.processes, warmups=a.warmups, rounds=a.rounds, queries=QUERIES,
+    result = dict(run=str(a.run), processes=a.processes, warmups=a.warmups, rounds=a.rounds, queries=QUERIES, development=a.development,
+                  source_commit=next(iter(identity))[0], gpu_uuid=next(iter(identity))[1], binary_sha256=next(iter(identity))[2],
+                  memory_note="tracked allocation bytes, the driver's device-used delta and the one-second sampled process maximum are different quantities; none is an exact peak",
                   estimator="throughput ratio paired by process and measured round; geometric mean; crossed process/round bootstrap, %d draws, seed %d" % (DRAWS, SEED),
                   note="completion latency is measured from batch start with complete batches; batch-formation wait is not included",
                   configurations=summary, contrasts=contrasts)
