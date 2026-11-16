@@ -4,11 +4,13 @@ Question: on all 8,841,823 passages, which exact implementation provides lower c
 
 This experiment starts from the reviewed range-worker parent, merged in PR #13 at `201be6998bace088900e1b7ccb961bb5277273e4`. That parent retained W1024/T256 after a valid negative optimization study on a **1M subset**. Its latency is not a full-collection result.
 
-## Current status
+## Current status (November16)
 
-Input preparation only. The pinned 6,575,573,728-byte CIFF has been downloaded and SHA-256 verified. Metadata declares 8,841,823 documents, 28,679 terms and 1,049,282,186 source postings. Source-posting count is not retained nonzero nnz; the importer filters zero impacts. Full and subset dictionaries have identical length-prefixed SHA-256 `961934a640347ffd87674ce29d0fd8afb2c851d223be66a865bf34b573e35eea`, allowing reuse of the existing prepared calibration weights without changing term IDs.
+All8,841,823passages, the full packed index and the500-query CPUreference are prepared and preserved. OriginalGPU attempt01 stopped on a query-reader argument-order bug before compilation. Reviewed repair1 (`ed470d8f9be395c84091dc8430411020267a620f`, run`20261116-cuda5-baseline-repair01`) compiled both programs and passed27synthetic checks plus three deliberate runtime rejections. Independent local exhaustive fixture replay confirmed249query groups and1,740returned scores.
 
-No full derived index, full-collection oracle, successful GPU upload or timing result exists yet. No benchmark is authorized by an incomplete draft: resolve actual hashes/configs and register the complete protocol before measured retrieval.
+The first full-range correctness attempt then stopped with CUDAout-of-memory before runtime reporting. During its CPUsetup another process acquired roughly8.6GiB on the sameGPU. Preserved samples show foreign memory pressure incompatible with the modeled3,675,984,612-byte application allocation. This is an observed **contaminated OOM**, not an isolated fit failure or proof that the range scorer is unsupported. No fullGPU correctness or timing result exists yet.
+
+Repair2 changes only strict resource-failure handling: preserve recognized pre-gate OOMs, failed status and sampler evidence; after an idle check use a fresh registered replacement within the existing limit of three. Clean-device OOMs, other errors, config/input drift and missing monitoring still stop. Reviews include actual failure-branch checks and18unsafe-case rejections; all scoring kernels and fixed benchmark settings are unchanged. The completeGPU protocol must rerun from the committed repair source. See`reviews/contention-oom-repair2.json`. Earlier preparation/pending notes below are historical.
 
 ## Preparation
 

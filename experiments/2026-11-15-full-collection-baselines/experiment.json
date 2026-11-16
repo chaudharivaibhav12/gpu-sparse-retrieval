@@ -3,7 +3,7 @@
   "experiment_id": "2026-11-15-full-collection-baselines",
   "owner": "vaibhav",
   "branch": "exp/vaibhav/2026-11-15-full-collection-baselines",
-  "status": "full-input-reference-and-packed-index-complete; reviewed GPU protocol prepared, not yet executed",
+  "status": "Repair2 reviewed after preserved shared-GPU pre-gate OOM; full GPU outcomes pending",
   "parent_experiment": "2026-11-15-range-worker-sweep",
   "parent_merge_commit": "201be6998bace088900e1b7ccb961bb5277273e4",
   "parent_measured_source_commit": "be2ecb9106424b9ed8f0501ddb9a594dc41f46f0",
@@ -44,5 +44,15 @@
     "OBS-20261115-FULL-INPUT-PREPARATION-REVIEW"
   ],
   "success_rule": "Preparation: pinned input/source checks, independent importer fixture, complete full index and preserved hashes/resource evidence. Comparison: requires a separate fully resolved registered protocol and independent zero-mismatch evidence.",
-  "failure_rule": "Preserve logs/partial outputs; inspect before reviewed repair, no untracked benchmark or silent smaller-corpus fallback."
+  "failure_rule": "Preserve logs/partial outputs; inspect before reviewed repair, no untracked benchmark or silent smaller-corpus fallback.",
+  "latest_repair": {
+    "attempt": 2,
+    "maximum": 3,
+    "compatibility_id": "full-baselines-contended-pre-gate-oom-v1",
+    "treatment_id": "repair2-contaminated-oom-resource-recovery",
+    "previous_source_commit": "ed470d8f9be395c84091dc8430411020267a620f",
+    "previous_run_id": "20261116-cuda5-baseline-repair01",
+    "scoring_change": false,
+    "review": "reviews/contention-oom-repair2.json"
+  }
 }
