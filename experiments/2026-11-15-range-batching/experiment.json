@@ -4,7 +4,7 @@
   "title": "Batching and concurrent queries on the range scorer",
   "owner": "parva",
   "branch": "exp/parva/2026-11-15-range-batching",
-  "status": "step-1-passed-correctness",
+  "status": "steps-1-and-3-passed-correctness",
   "parent_experiment": "2026-11-14-range-bitpack-v2",
   "parent_source_commit": "201be69",
   "question": "How do throughput, per-query completion latency and peak GPU memory change when the reviewed range scorer serves several queries at once?",
@@ -13,9 +13,13 @@
   "code_paths": [
     "src/cuda_range_batch.cu",
     "src/cuda_range_v2.cu",
-    "experiments/2026-11-15-range-batching/code/check_isolation.sh"
+    "experiments/2026-11-15-range-batching/code/check_isolation.sh",
+    "experiments/2026-11-15-range-batching/code/check_batched.sh",
+    "tests/check_batched_kernel_sync.py"
   ],
-  "configuration_files": [],
+  "configuration_files": [
+    "experiments/2026-11-15-range-batching/configs/protocol.json (draft)"
+  ],
   "declared_changes": {
     "driver": "per-query slots; sequential and streams modes",
     "kernel": "unchanged",
@@ -33,6 +37,7 @@
   "recording_ids": [],
   "runs": [
     "20261115-cuda2-iso-01",
+    "20261115-cuda2-batched-01",
     "dev-cuda2-iso-01"
   ]
 }
