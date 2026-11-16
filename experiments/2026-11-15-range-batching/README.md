@@ -1,6 +1,6 @@
 # 2026-11-15-range-batching — Batching and concurrent queries on the range scorer
 
-Status: step 1 (per-query isolation) written, not yet built or run.
+Status: step 1 (per-query isolation) passed correctness on RTX 2080 Ti. Steps 2-4 not started.
 
 ## Question and motivation
 
@@ -28,12 +28,15 @@ Reported separately: throughput, individual completion latency, peak GPU memory,
 
 - `src/cuda_range_batch.cu`, `src/cuda_range_v2.cu` (guard only), `code/check_isolation.sh`.
 - Review of the parent scorer at `e64e3d5` found the last-block counter assumes one launch at a time per counter; the slot design gives each launch its own counter.
-- Review of this step: pending (code not yet compiled).
+- Review of this step (author self-review; independent review still needed): the driver builds without warnings for sm_75 and sm_89 and the single-query scorer still builds with the guard. Limits: completion is stamped by polling events on one host thread; in `streams` mode all launches share one process and context; batch-formation wait is not modelled; isolation is shown by test, not proved.
 
 ## Runs
 
-None yet.
+- [20261115-cuda2-iso-01](runs/20261115-cuda2-iso-01/README.md): passed, 32 configurations.
+- [dev-cuda2-iso-01](runs/dev-cuda2-iso-01/README.md): development attempt, out of GPU memory held by other users.
 
 ## Findings and decision
 
-None yet.
+Step 1: with one slot per query, the unchanged kernel returns the exact ordered top-k for every calibration query when up to 32 queries are in flight at once (100K and 1M passages, k=10 and k=1000). No shared mutable state remains between concurrent launches in this driver. This is a correctness result on one GPU model; it says nothing yet about throughput or latency.
+
+Next: register the timing protocol for step 2, then time `sequential` against `streams` on an otherwise idle GPU.
