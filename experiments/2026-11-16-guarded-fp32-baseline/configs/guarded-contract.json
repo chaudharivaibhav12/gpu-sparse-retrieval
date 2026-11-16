@@ -1,0 +1,12 @@
+{
+  "behavior": {
+    "contract": "GSP-CAP32-F32GUARDED-NUMERIC-TIES-v1",
+    "arithmetic": "float32-guarded-exact-integer-sums",
+    "document_impacts": "uint8-exact",
+    "query_policy": "BMP-f32-ceil-cap32",
+    "tie_order": "score_desc_original_numeric_id_asc",
+    "eligibility": "all_documents"
+  },
+  "preconditions": "Only exact nonnegative uint8 impacts, unique cap32 integer query terms and <=128terms, with unique document terms (multiplicity1). Reject all-file unsupported queries before index upload/retrieval. Prove conservative255*sumweights<2^24 so every product/partial sum is an exactly representable integer under FP32 addition/multiplication. Preserve canonical original numeric-ID ties with the disclosed packed selector and widen returned integer scores toint64. Actual FP32 physical labels, original source hashes, runtime gate, full same-build correctness and bounded domain-qualified comparison are mandatory. Native unspecified ties/arbitrary floating weights are not accepted.",
+  "primary_policy_unchanged": true
+}

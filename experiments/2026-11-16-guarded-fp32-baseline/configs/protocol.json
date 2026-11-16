@@ -1,0 +1,120 @@
+{
+  "experiment_id": "2026-11-16-guarded-fp32-baseline",
+  "status": "Frozen design pending final review, committed source and actual target build/config registration.",
+  "docs": 8841823,
+  "query_count": 500,
+  "k": 10,
+  "batch_size": 1,
+  "warmup_rounds": 3,
+  "measured_rounds": 20,
+  "process_repetitions": 3,
+  "target_uuid": "GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7",
+  "cpu_affinity": "0",
+  "inputs": {
+    "gsp": {
+      "sha256": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac"
+    },
+    "rbp": {
+      "sha256": "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab"
+    },
+    "queries": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"
+    },
+    "query_split": {
+      "sha256": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+    },
+    "oracle": {
+      "sha256": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed"
+    }
+  },
+  "variants": {
+    "range": "Existing V2, W1024,256 score/merge workers, uniform positions, capacity128.",
+    "mono": "Existing canonical U64 GPUSparse adaptation, upstream92bb87b, BLOCK_PL512, batch1. Not unmodified released GPUSparse.",
+    "f32": "Original pinned _fast_scatter_add_kernel, blockPL512, FP32 products/atomic sums/dense scores. Same parent canonical key-selector module/torch.topk; float-load conversion differs. All-file unique cap32 integer <=128term guard, multiplicity1 and conservative score<2^24 before upload/retrieval."
+  },
+  "process_order": [
+    [
+      "range",
+      "mono",
+      "f32"
+    ],
+    [
+      "mono",
+      "f32",
+      "range"
+    ],
+    [
+      "f32",
+      "range",
+      "mono"
+    ]
+  ],
+  "correctness": {
+    "synthetic": "Eight inherited unique-term/doc fixtures (including empty corpus) plus hand-computed uint64-ID case; each implementation k10,1round,0warmups, internalVERIFY1 and independent complete ordered IDs/scores. Duplicate-posting fixture excluded only from shared native-loader domain; full corpus independently proved multiplicity1.",
+    "runtime_rejections": "Actual range.score_threads, U64.query_count and FP32.floating_score_limit_exclusive mismatches rejected before outputs; exact resolved fields/runtime_delta checked.",
+    "full": "All500calibration queries,1round,0warmups,VERIFY0 to reuse completed exhaustive CPUreference rather than recomputing it in C++ for every process. Every result compared externally to the fixed full CPUoracle; all unique returned query/doc scores independently recomputed with Python integers. Native adapter also retains its own post-run checks. Internal not_checked remains explicit. No timing starts until all three pass.",
+    "domain": "Distinct physical U32/U64/guardedFP32 labels. Require full unique uint8 index, unique cap32 queries, exact bound180540<2^24, preserved CPUoracle, same-build500query correctness and actual native-source binding. Original BLOCKED comparisons preserved. Native unspecified ties/arbitrary floats never qualify."
+  },
+  "timing_boundary": "Host query construction through complete scoring, selection/merge, original numeric-ID results, D2H and synchronization. Index load/upload, gate, file writes and independent checking excluded and separately recorded. Device-event spans differ and are diagnostics only, never compared as matched GPU spans.",
+  "availability_wait_limit_seconds": 21600,
+  "availability": "Before each process require targetUUID/model/capability, no target compute context and modeled core/application bytes plus1GiB(C++) or1.5GiB(native)free. While occupied wait600seconds between automatic checks; no competing benchmark or repeated model polling.",
+  "monitoring": "One passive one-second per-process sampler on CPU1 when available. Record clocks/power/memory, PID/PGID and foreign contexts. Only timing runs require sampled owned context; very short synthetic runs may end between samples and are not latency evidence. Any sampled foreign context makes timing ineligible, independent of latency; preserve it and retry after idle with fresh registered tag at most3replacements. Missing/error monitor evidence stops. Sampled absence is not exclusive-GPU proof. No independent crash watcher/immediate-failure-detection claim.",
+  "analysis": {
+    "primary": "FP32/U64 paired geometric latency ratio over3processes x500queries using20-round medians; accept valid null/slower result.",
+    "bootstrap": "10000crossed process/query draws with replacement; multiplicity-weighted Cartesian product and linear quantiles. Conditional on calibration/session.",
+    "bootstrap_seed": 2026111603,
+    "control_seeds": {
+      "range_over_u64": 2026111603,
+      "range_over_fp32": 2026111604,
+      "fp32_over_u64": 2026111605
+    },
+    "secondary": "Range/U64 and range/FP32 paired ratios; descriptive medians/means/p95 ofquery-process medians, not serving tail.",
+    "memory": "C++tracked allocation bytes checked in every row; native Torch allocator/reserved peak since post-setup reset retained. Uniform one-second NVML own-process/board sampled peaks recorded separately, not exact physical peaks and not mixed with tracked/allocator quantities.",
+    "attribution": "Treatment includes arithmetic, dense-score width8to4bytes and corresponding selector conversion; not an isolated atomic-instruction ablation."
+  },
+  "declared_changes": {
+    "parent": "FullbaselinePR16/sourcef10c7e7 merged74dd5d3; fresh branch/source before measurements.",
+    "systems": "ReplaceCSRwith guardedcanonicalFP32. Repeat range/U64controls freshly; no cross-session substitution.",
+    "arithmetic": "New explicit guardedFP32physical contract; canonical outputs coincide only on proved integer domain.",
+    "native_scoring": "Call original pinned scoring kernel directly and bind its inputSHA before/after. Reuse exact parentselector module.",
+    "resources": "FP32dense4Nbytes versusU64dense8N; sharedCSC/packedkeys unchanged; actual allocations/peaks recorded.",
+    "metadata": "Guardlimit/querydtype/native-reuse/selectorhash reported; primaryU64policy unchanged and only new additionalcontract appended.",
+    "analysis": "FP32/U64primary plus2range contrasts; fixed3rotatedprocesses,3warm20measuredrounds,10000crosseddraws.",
+    "invariants": "Same8841823passages,500calibration queries/IDs/weights/ties,GPU,k10,batch1,CPU0 andwallboundary. No heldout/chunking.",
+    "review": "Local CPUguard/actualcfgAST checks, controller/certificate/stats review and genuine target gates beforetiming."
+  },
+  "unsupported": {
+    "full_byte_B16": "Dense plane15848416906bytes alone exceeds4070board12878610432bytes. Unsupported by modeled capacity, not an observedOOM.",
+    "full_byte_B32": "CSRcore5458614690+plane7924208453=13382823143bytes exceedsboard before other allocations. Unsupported by modeled capacity, not observedOOM.",
+    "chunking": "Not performed; any future chunked method must include transfer/preparation/merging costs in a separately registered matched treatment."
+  },
+  "limitations": [
+    "Quantized integer-domain only; not original rawmodel float-valued embedding equivalence.",
+    "Original pinnedFP32scorer plus guard/canonicalselector is a labelled adaptation, not unmodified whole system.",
+    "500calibration/oneGPU/session;6480heldout untouched.",
+    "Sampled peaks are not exactphysical peaks; allocator/tracked scopes differ.",
+    "No new profiler/k/batch/secondGPU/fullCPU-BMPstudy.",
+    "Resident wall excludes indexsetup/load/upload,fileIO,validation; no chunking."
+  ],
+  "technical_failures": "Stop and preserve; separately review/fix technical failures for up to3repair attempts with fresh run directories. Do not replay unchanged known-broken code or tune valid slower/null results away.",
+  "publication": "Only after complete protocol plus independent local raw/provenance/statistical validation; existing user standing authorization then permits push/PR/merge.",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "0",
+    "OMP_NUM_THREADS": "1",
+    "CUDA_MODULE_LOADING": "LAZY",
+    "TRITON_CACHE_DIR": "fresh-per-run under scratch results",
+    "CUDA_CACHE_PATH": "fresh-per-run under scratch results"
+  },
+  "resource_oom_rule": "A failed full-input attempt may use the existing at-most3fresh resource replacements only when no runtime report/result output exists, exact recognized CUDA OOM text/failed exit is preserved, sampler has owned and foreign contexts without errors, and sampled board-minus-own usage plus modeled application/core bytes exceeds board capacity. Retain failed run status/review and all raw evidence. This is a contaminated resource attempt, not an isolated OOM/fit or retrieval result. A clean-device OOM, different error, input/config drift or missing monitoring stops for review.",
+  "parent_experiment": "2026-11-15-full-collection-baselines",
+  "parent_measured_source": "f10c7e7654269e670a0e7f0c678db497d4bc5ee0",
+  "parent_merge": "74dd5d303f0cf5690a10f2060f6da536726705dc",
+  "memory_feasibility": {
+    "board_bytes": 12878610432,
+    "range_tracked_bytes": 3675984612,
+    "u64_native_core_bytes": 8571438096,
+    "fp32_native_core_bytes": 8536070804,
+    "qualification": "Core estimates exclude context/allocator/librarytransients. Actual upload/correctness required; contentionguard does not reserveGPU."
+  },
+  "next_if_complete": "Independently replay all raw/provenance/statistics and inspect actual generatedFP32atomic code before publishing. Select fourth adaptive study from result."
+}

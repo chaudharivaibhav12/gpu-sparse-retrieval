@@ -1,0 +1,24 @@
+{
+  "experiment_id": "2026-11-16-guarded-fp32-baseline",
+  "owner": "vaibhav",
+  "branch": "exp/vaibhav/2026-11-16-guarded-fp32-baseline",
+  "parent_experiment": "2026-11-15-full-collection-baselines",
+  "parent_merge": "74dd5d303f0cf5690a10f2060f6da536726705dc",
+  "parent_measured_source": "f10c7e7654269e670a0e7f0c678db497d4bc5ee0",
+  "status": "Source/preflight reviewed; exact commit andtargetactualbuild/configregistration required; noGPUresults.",
+  "question": "Does exact guardedFP32scoring change full-collection GPUSparse arithmetic baseline cost?",
+  "hypothesis": "Bounded integer inputs permit equalFP32answers; performance may improve, remain similar orworsen.",
+  "protocol": "configs/protocol.json",
+  "code": [
+    "code/run_fp32_study.py",
+    "code/fp32/canonical_baseline.py",
+    "code/fp32/fp32_monolithic.py",
+    "code/guarded_domain.py",
+    "code/compare_exact.py",
+    "code/analyze_full_baselines.py"
+  ],
+  "success_rule": "All independent/gate/fullcorrectness checks before complete9process timing; preservealloutcomes.",
+  "failure_rule": "Inspect/review technicalfailures before <=3repairs; freshdirs. Valid null/slower not retuned.",
+  "recording_dependency": "Existing private runner/policy hashed atdeployment; no stand-in gate.",
+  "review": "review.json"
+}
