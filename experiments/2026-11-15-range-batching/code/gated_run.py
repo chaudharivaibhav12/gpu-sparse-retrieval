@@ -16,14 +16,14 @@ without any CUDA code, starts the driver with RESEARCH_RUNTIME_DIR set, and
 compares the driver's runtime.json with the expectation before any query is
 computed. Equal: the driver is released. Different: it is rejected and must
 exit without writing results. While the driver runs, nvidia-smi is sampled
-once per second for the processes on the target GPU.
+every 0.25 s for the processes on the target GPU.
 
 The --launch-* options start the driver with a setting that differs from the
 expectation. They exist only for the deliberate-rejection checks.
 
 The receipt records expectation, actual report, differences, verdict, exit
 code, source commit, binary hash, GPU UUID and the memory samples. Sampled
-memory is a one-second maximum, not an exact peak. A run is `eligible` for
+memory is the maximum over 0.25-second samples, not an exact peak. A run is `eligible` for
 timing only if it was accepted, exited 0, its own process was sampled, no
 other process was sampled on the GPU and the sampler had no errors; seeing no
 other process in the samples does not prove the GPU was exclusive.
@@ -35,6 +35,7 @@ ROOT = Path(__file__).resolve().parents[3]
 QUERY_ARGUMENT_BYTES = 4 + 128 * 8
 CANDIDATE_BYTES = 24
 GATE_SECONDS = 600
+SAMPLE_SECONDS = 0.25
 
 
 def parser_module():
@@ -108,7 +109,7 @@ def differences(expected, actual):
 
 
 class Sampler(threading.Thread):
-    """One nvidia-smi query per second for the compute processes on one GPU."""
+    """One nvidia-smi query every SAMPLE_SECONDS for the compute processes on one GPU."""
 
     def __init__(self, uuid, pid, cpu):
         super().__init__(daemon=True)
@@ -140,7 +141,7 @@ class Sampler(threading.Thread):
             except Exception as error:  # preserved; makes the run ineligible
                 self.errors += 1
                 self.lines.append("%s ERROR %r" % (now(), error))
-            self.stop.wait(max(0.0, 1.0 - (time.monotonic() - began)))
+            self.stop.wait(max(0.0, SAMPLE_SECONDS - (time.monotonic() - began)))
 
 
 def run(a):
@@ -185,10 +186,10 @@ def run(a):
         gpu_uuid=a.gpu_uuid, argv=command, environment={k: env[k] for k in ("CUDA_VISIBLE_DEVICES", "OMP_NUM_THREADS")},
         expected=expected, actual=actual, differences=diff, verdict=verdict, exit_code=process.returncode,
         outputs_present=outputs,
-        sampled_memory=dict(interval_seconds=1, samples=sampler.samples, own_process_samples=sampler.own_samples,
+        sampled_memory=dict(interval_seconds=SAMPLE_SECONDS, samples=sampler.samples, own_process_samples=sampler.own_samples,
                             own_process_max_mib=sampler.own_max, other_process_samples=sampler.foreign_samples,
                             other_process_max_mib=sampler.foreign_max, errors=sampler.errors,
-                            note="one-second nvidia-smi maxima; not an exact peak"),
+                            note="maxima over periodic nvidia-smi samples; not an exact peak"),
         eligible_for_timing=eligible)
     receipt_path.write_text(json.dumps(receipt, indent=2) + "\n")
     print("GATE %s exit=%s own_max_mib=%d other_samples=%d eligible=%s" % (

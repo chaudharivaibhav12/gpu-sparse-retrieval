@@ -40,7 +40,7 @@
     "order": "rotating across the three processes: in process p configuration (i + offset_p) mod n runs i-th, offsets 0, ceil(n/3), ceil(2n/3)",
     "batch_formation": "consecutive queries in file order; the last batch may be partial; batches are complete before timing starts, so no wait-to-form time is included or modelled",
     "boundary": "per batch, wall clock: host build of query arguments, query transfer (kernel argument for sequential/streams, one H2D copy for batched), all kernels, top-k D2H to pinned memory, event completion. Excluded: index load/upload, tie-rank and buffer setup, runtime gate, file output, correctness checking. Device event spans are diagnostics only.",
-    "gpu_check": "before each process: no other compute process on the target GPU (poll 60 s, abort after 60 min). During each process: one nvidia-smi sample per second of the processes on the target GPU. A timing process during which another process was sampled, or whose sampler failed, is ineligible: it is kept under raw/ineligible/ and replaced, at most 3 replacements per run. No sampled foreign process is not proof of an exclusive GPU.",
+    "gpu_check": "before each process: no other compute process on the target GPU (poll 60 s, abort after 60 min). During each process: one nvidia-smi sample every 0.25 s of the processes on the target GPU. A timing process during which another process was sampled, or whose sampler failed, is ineligible: it is kept under raw/ineligible/ and replaced, at most 3 replacements per run. No sampled foreign process is not proof of an exclusive GPU.",
     "correctness_during_timing": "every saved top-k of every timing process compared with the CPU oracle",
     "cpu": "driver pinned to CPU 0; gate and sampler pinned to CPU 1",
     "identity": "source commit, binary SHA-256 and GPU UUID in every receipt; index and query SHA-256 in the manifest; the analysis refuses mixed identities",
@@ -55,7 +55,7 @@
     "memory": {
       "tracked_allocation_bytes": "device buffers the driver allocates itself: shared index + per-query bytes x batch; checked against the independent expectation at the gate; excludes the CUDA context and allocator rounding",
       "device_used_delta_bytes": "change in device used memory across the driver's allocations, read once by the driver",
-      "sampled_process_memory_mib": "largest one-second nvidia-smi sample of the driver process; a sampled maximum, not an exact peak",
+      "sampled_process_memory_mib": "largest 0.25-second nvidia-smi sample of the driver process (a timing process at 1M lasts only a few seconds on the GPU); a sampled maximum, not an exact peak",
       "rule": "reported separately from each other and from time; never mixed or called peak without the qualifier"
     }
   },

@@ -14,7 +14,7 @@ Per configuration and process, from raw/timing-r<p>-<NAME>.csv:
   tracked allocation bytes = device buffers the driver allocates itself
   (shared index + per-query bytes x batch); device_used_delta_bytes = change
   in the device's used memory across those allocations, read once by the
-  driver; sampled process memory = largest one-second nvidia-smi sample of the
+  driver; sampled process memory = largest 0.25-second nvidia-smi sample of the
   driver process, from the gate receipt. None of them is an exact peak.
 - every timing process must have an accepted, timing-eligible gate receipt
   (raw/timing-r<p>-<NAME>.receipt.json) and a packed-answers receipt.
@@ -137,7 +137,7 @@ def main():
             contrasts["%s / %s" % (name, other)] = contrast(data[name], data[other], a.processes, a.rounds, rng)
     result = dict(run=str(a.run), processes=a.processes, warmups=a.warmups, rounds=a.rounds, queries=QUERIES, development=a.development,
                   source_commit=next(iter(identity))[0], gpu_uuid=next(iter(identity))[1], binary_sha256=next(iter(identity))[2],
-                  memory_note="tracked allocation bytes, the driver's device-used delta and the one-second sampled process maximum are different quantities; none is an exact peak",
+                  memory_note="tracked allocation bytes, the driver's device-used delta and the sampled process maximum are different quantities; none is an exact peak",
                   estimator="throughput ratio paired by process and measured round; geometric mean; crossed process/round bootstrap, %d draws, seed %d" % (DRAWS, SEED),
                   note="completion latency is measured from batch start with complete batches; batch-formation wait is not included",
                   configurations=summary, contrasts=contrasts)

@@ -131,9 +131,9 @@ for name in "${NAMES[@]}"; do
 done
 # Batch 7 leaves a partial last batch of 3 queries.
 for mode in $MODES; do for k in $DEPTHS; do
-    out=$RUN/raw/correct-$mode-b7-k$k
-    wait_idle "correct-$mode-b7-k$k"
-    gated "$out" "$mode" 7 "$k" 2 1 1 || fail "correct-$mode-b7-k$k"
+    out=$RUN/raw/correct-partial-$mode-k$k
+    wait_idle "correct-partial-$mode-k$k"
+    gated "$out" "$mode" 7 "$k" 2 1 1 || fail "correct-partial-$mode-k$k"
     checked "$out" "$k" 2
 done; done
 stage correctness-passed
