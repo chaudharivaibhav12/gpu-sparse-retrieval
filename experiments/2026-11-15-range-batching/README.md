@@ -28,6 +28,7 @@ Reported separately: throughput, individual completion latency, peak GPU memory,
 
 - `src/cuda_range_batch.cu`, `src/cuda_range_v2.cu` (guard only), `code/check_isolation.sh`, `code/check_batched.sh`, `tests/check_batched_kernel_sync.py`.
 - Review of the parent scorer at `e64e3d5` found the last-block counter assumes one launch at a time per counter; the slot design gives each launch its own counter.
+- Timing tooling: `code/run_timing.sh` (rotating order, idle-GPU wait, oracle comparison of every process), `analysis/analyze_batching.py`, `configs/timing-1m.tsv` (24 configurations). A development smoke test (`dev-smoke-01`: 4 configurations, 2 processes, 1 warm-up + 3 rounds, GPU shared with another job) ran end to end; its numbers are not results.
 - Review of this step (author self-review; independent review still needed): the driver builds without warnings for sm_75 and sm_89 and the single-query scorer still builds with the guard. Limits: completion is stamped by polling events on one host thread; in `streams` mode all launches share one process and context; batch-formation wait is not modelled; isolation is shown by test, not proved.
 
 ## Runs
