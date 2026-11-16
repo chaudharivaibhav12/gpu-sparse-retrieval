@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "kind": "Separate repair1 bug/edge/semantic review before CIMS",
+  "source_sha256": "c6c66f2df8b2d3e740a5d2f99565edd4fb2d2d396ba4e801bb6a2efb6c173eeb",
+  "original_source_commit": "047c1c399e3dd5aa4d786143df2d08d27a15e29c",
+  "checks": {
+    "actual_calibration_query_rows": 500,
+    "calibration_membership_weights_order": "Exact independent text parse match",
+    "original_failure_reproduced": true,
+    "actual_call_sites_checked": 3,
+    "fixture_counts_each_call_site": {
+      "random-1": 10,
+      "random-5": 10,
+      "random-193": 10,
+      "random-1025": 10,
+      "ties": 10,
+      "gaps": 10,
+      "big": 11,
+      "empty-index": 10
+    },
+    "empty_corpus_multiplicity_zero": "PASS",
+    "multiplicity_overflow_rejected_each_fixture_call": "PASS",
+    "ast_compile": "PASS"
+  },
+  "reviewed": [
+    "Parent helper signature is queries(path,vocab,limit,multiplicity); three call sites incorrectly reversed the latter arguments.",
+    "Use explicit keyword arguments at every call; retain inherited cap32/domain checks.",
+    "Separate calibration cardinality from packed-source identity failure messages.",
+    "No changes to frozen input identities, scoring/ties, kernels, runtime marks, process order, warmups/repeats or timing boundaries.",
+    "Fresh source commit/root/run required; original preflight failure preserved."
+  ],
+  "limits": [
+    "No local GPU compilation/execution. Mandatory CIMS build, fixtures, runtime rejection and full reference validation precede timing.",
+    "These are focused execution checks of actual query-reader call expressions, not full orchestration execution."
+  ]
+}

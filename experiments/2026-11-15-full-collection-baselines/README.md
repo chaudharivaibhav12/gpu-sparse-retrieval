@@ -65,3 +65,10 @@ All small preparation/reference/index evidence has been transferred locally and 
 
 
 Pre-CIMS review iteration2 binds each registered run to the already qualified input hashes, so a changed file cannot become a newly accepted default while generating a plan. It also removes duplicate GSP input aliases: `canonical_gsp` covers the actual literal-backend index; the range backend adds its encoded `index`. The runner still hashes each actual file before and after execution. All support/certificate/statistical checks were rerun and passed. See `reviews/full-controller-preflight-v2.json` and `full-support-preflight-v2.json`. This improvement was made before any GPUmeasurement from the new protocol.
+
+
+## GPU attempt01 stopped; reviewed repair1
+
+Source `047c1c399e3dd5aa4d786143df2d08d27a15e29c`, run `20261115-cuda5-baseline01`, stopped during input preflight before compilation or any GPU retrieval. The inherited reader signature is `queries(path,vocab,limit,multiplicity)`; three driver call sites reversed the last two positional arguments. The full path loaded one query instead of500, and the guard stopped execution. No GPU performance result exists from this attempt. Original status/logs/source and thin ledger are preserved, including controller-stop observation `OBSERVATION-5d6e21299c5f`.
+
+Repair1 (`full-baselines-query-keywords-v1`, treatment `repair1-query-reader-keyword-binding`) uses explicit keywords at all three call sites and separates query-count/source-binding diagnostics. Independent text parsing confirms all500original calibration rows, weights and order; focused checks execute actual call expressions across all eight inherited unique-document fixtures, including zero multiplicity and overflow rejection. See `reviews/query-reader-repair1.json`. No scorer, input, frozen setting or timing boundary changes. Use fresh run `20261116-cuda5-baseline-repair01` from the committed repair source and rerun the complete correctness/performance protocol. Repair budget:1of3; outcome pending.

@@ -127,8 +127,9 @@ def main():
         re,me=inherited(root);meta=re.rbp_metadata(inputs['rbp']['path']);proof=l.get(inputs['index_validation_ref'])['payload']['result']
         if not proof['success'] or proof['docs']!=8841823 or proof['maximum_term_document_multiplicity']!=1:raise ValueError('missing full validation')
         gsp=dict(docs=proof['docs'],vocab=proof['vocab'],nnz=proof['nnz'],multiplicity=1,sha256=inputs['gsp']['sha256'])
-        qrows=re.queries(inputs['queries']['path'],gsp['vocab'],1,500)
-        if len(qrows)!=500 or meta['source_sha256']!=gsp['sha256']:raise ValueError('input membership/source binding')
+        qrows=re.queries(inputs['queries']['path'],gsp['vocab'],limit=500,multiplicity=1)
+        if len(qrows)!=500:raise ValueError('calibration query count: expected500, got%d'%len(qrows))
+        if meta['source_sha256']!=gsp['sha256']:raise ValueError('packed index source GSP binding')
         question=l.event('question',dict(title='Full8841823-passage matched exact GPU baselines',motivation='Determine full-collection latency/resource ordering rather than extrapolating1M results.',source_commit=a.source_commit,parent_merge=receipt['parent_merge'],artifacts=[l.blob(root/'experiments'/E/'configs/protocol.json'),l.blob(a.inputs),l.blob(root/'deployment-receipt.json')]+[l.blob(p) for p in (root/'experiments'/E/'code').glob('*.py')]),[inputs['oracle']['run'],inputs['index_validation_ref']])
         frozen=l.event('decision',dict(title='Freeze full-calibration comparison protocol before GPU execution',motivation='Fixed operating point, schedule, exactness and resource rules.',protocol=protocol,qualification='Calibration protocol; not a held-out freeze.',refs=[question['id']]),[question['id']])
         status('running','compile-reviewed-CUDA-sources')
@@ -224,11 +225,11 @@ def main():
             if digest(root/name)!=h:raise ValueError('reused index builder source differs')
         full_gm=dict(gsp,path=inputs['gsp']['path']);correctness=[];timings=[]
         for label,g,q,o,r in cases:
-            process('fixture-index-'+label,[tool,'build',g,r,1024,'positions']);gm=re.gsp_metadata(g);gm['path']=str(g);rm=re.rbp_metadata(r);rows=re.queries(q,gm['vocab'],gm['multiplicity'],100000)
+            process('fixture-index-'+label,[tool,'build',g,r,1024,'positions']);gm=re.gsp_metadata(g);gm['path']=str(g);rm=re.rbp_metadata(r);rows=re.queries(q,gm['vocab'],limit=100000,multiplicity=gm['multiplicity'])
             l.event('observation',dict(title='Packed synthetic fixture '+label,motivation='Preserve exact independent input and uninstrumented preparation evidence.',tool=inputs['range_tool'],argv=list(map(str,[tool,'build',g,r,1024,'positions'])),artifacts=[l.blob(p) for p in [g,q,o,r,out/'logs'/('fixture-index-'+label+'.stdout.log'),out/'logs'/('fixture-index-'+label+'.stderr.log')]]),[question['id']])
             for kind in ['range','mono','csr']:stable('fixture-'+label+'-'+kind,kind,r if kind=='range' else g,q,o,gm,rm,rows,'fixture',1,0,1)
         # All three adapters must demonstrate the actual external gate.
-        label,g,q,o,r=cases[1];gm=re.gsp_metadata(g);gm['path']=str(g);rm=re.rbp_metadata(r);rows=re.queries(q,gm['vocab'],gm['multiplicity'],100000)
+        label,g,q,o,r=cases[1];gm=re.gsp_metadata(g);gm['path']=str(g);rm=re.rbp_metadata(r);rows=re.queries(q,gm['vocab'],limit=100000,multiplicity=gm['multiplicity'])
         for kind,field in [('range','score_threads'),('mono','query_count'),('csr','batch_size')]:one('reject-'+kind,kind,r if kind=='range' else g,q,o,gm,rm,rows,'fixture',1,0,1,negative=field)
         for kind in ['range','mono','csr']:
             entry=stable('correctness-'+kind,kind,inputs['rbp']['path'] if kind=='range' else inputs['gsp']['path'],inputs['queries']['path'],inputs['oracle']['path'],full_gm,meta,qrows,'calibration',1,0,0);correctness.append(entry)
