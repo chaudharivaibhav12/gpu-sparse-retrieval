@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "kind": "Separate repair2 resource-control review before CIMS",
+  "source_sha256": "d2b446a2d2cbabd5de50679ee7041b34132cb877be21b83ec9877dcbb21d782c",
+  "original_source_commit": "ed470d8f9be395c84091dc8430411020267a620f",
+  "checks": {
+    "actual_contaminated_pre_gate_oom_recognized": true,
+    "unsafe_cases_rejected": 18,
+    "native_explicit_cuda_oom_signature_checked": true,
+    "ast_compile_import": "PASS",
+    "actual_failure_branch_preserves_and_returns_ineligible": "PASS",
+    "actual_unqualified_branch_stops": "PASS",
+    "actual_stable_loop_fresh_tag_retry": "PASS"
+  },
+  "reviewed": [
+    "Only recognized full-input pre-gate OOM with sampled own/foreign contexts, complete monitoring, no outputs and sampled modeled-capacity pressure can be retried.",
+    "Original run_finished stays failed; classify separately as resource_failed/eligiblefalse with reviewed evidence and a fresh registered replacement. No failed samples enter statistics.",
+    "Existing maximum3fresh resource replacements and idle/memory guards remain. A clean-device OOM, different error, drift or monitor failure stops for review.",
+    "No scorer, kernel, datatype, input hashes, k/batch, warmup/repeat, process order or primary timing changes.",
+    "Entire GPU correctness/performance protocol will rerun from exact committed repair source. No prior full-corpus correctness/performance success is claimed."
+  ],
+  "limits": [
+    "One-second sampled memory/context records are not simultaneous exact peaks and cannot prove exclusive causal attribution. Result is contaminated OOM, not isolated unsupported/OOM.",
+    "No local CUDA device execution; real target gates remain mandatory.",
+    "Foreign processes can start after any idle check. This handles a diagnosed race; it does not reserve the GPU."
+  ]
+}

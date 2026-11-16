@@ -76,7 +76,8 @@
     "runtime": "CSR fixed batch1 now explicitly reported before compute. Real project runner for every retrieval run; inherited stand-in is not used.",
     "validation": "Reuse fully qualified full CPUreference; real GPUcorrectness uses external oracle/true-score replay rather than repeated exhaustive CPU computation inline.",
     "scoring": "No scoring/selection algorithm change or output-contract relaxation. Domain-limited exact arithmetic equivalence is explicit and evidence-bound.",
-    "input_roles": "Use qualified frozen hashes for every run. canonical_gsp is the actual index for literal backends; add an index role only for the encoded range representation. The runner hashes each actual input before/after compute without reading a duplicate GSP alias twice."
+    "input_roles": "Use qualified frozen hashes for every run. canonical_gsp is the actual index for literal backends; add an index role only for the encoded range representation. The runner hashes each actual input before/after compute without reading a duplicate GSP alias twice.",
+    "resource_failure_handling": "Repair2 distinguishes a tightly diagnosed pre-gate contention OOM from technical code failure, with unchanged scoring/runtime inputs/settings and existing bounded fresh resource replacements. No result from a failed attempt enters analysis."
   },
   "unsupported": {
     "full_byte_B16": "Dense plane15848416906bytes alone exceeds4070board12878610432bytes. Unsupported by modeled capacity, not an observedOOM.",
@@ -100,5 +101,6 @@
     "CUDA_MODULE_LOADING": "LAZY",
     "TRITON_CACHE_DIR": "fresh-per-run under scratch results",
     "CUDA_CACHE_PATH": "fresh-per-run under scratch results"
-  }
+  },
+  "resource_oom_rule": "A failed full-input attempt may use the existing at-most3fresh resource replacements only when no runtime report/result output exists, exact recognized CUDA OOM text/failed exit is preserved, sampler has owned and foreign contexts without errors, and sampled board-minus-own usage plus modeled application/core bytes exceeds board capacity. Retain failed run status/review and all raw evidence. This is a contaminated resource attempt, not an isolated OOM/fit or retrieval result. A clean-device OOM, different error, input/config drift or missing monitoring stops for review."
 }

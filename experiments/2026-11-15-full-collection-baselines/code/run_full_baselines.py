@@ -14,6 +14,24 @@ from analyze_full_baselines import analyze
 E='2026-11-15-full-collection-baselines'
 BOUNDARY='Host construction of the implementation query representation through complete scoring/selection/merging, returned original numeric IDs/scores, result transfer and synchronization. Excludes index build/load/upload, runtime gate, file I/O and correctness validation. Device-span diagnostics have implementation-specific event placement and are not compared.'
 
+def retryable_contended_oom(payload,summary,stderr,allocation,total_bytes,outputs_present,label,docs):
+    """Recognize only a failed pre-gate full-input OOM with resource evidence.
+
+    This is a contaminated resource attempt, never an isolated fit/OOM finding.
+    A clean-device OOM or a different failure must stop for separate review.
+    """
+    if label not in ['range','csr','mono'] or docs!=8841823 or outputs_present:return False
+    if payload.get('status')!='SPEC_VIOLATION' or payload.get('runtime') is not None:return False
+    if payload.get('exit_code',0)==0 or payload.get('error')!='Missing runtime report; compute is unverified':return False
+    if not summary.get('external_pids') or summary.get('sampling_errors') or not summary.get('samples') or not summary.get('owned_context_seen'):return False
+    # Subtract our maximum sampled usage conservatively; sampled board/context
+    # values are evidence of interference, not exact simultaneous physical peaks.
+    non_own_estimate=max(0,summary.get('sampled_board_peak_mib',0)-summary.get('sampled_own_peak_mib',0))*1024**2
+    if non_own_estimate+allocation<=total_bytes:return False
+    if label in ['range','csr']:return stderr.strip()=='ERROR: out of memory'
+    last=stderr.strip().splitlines()[-1] if stderr.strip() else ''
+    return last.startswith('torch.OutOfMemoryError: CUDA out of memory.')
+
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--repository',type=Path,required=True);parser.add_argument('--inputs',type=Path,required=True);parser.add_argument('--output',type=Path,required=True);parser.add_argument('--source-commit',required=True);a=parser.parse_args()
     root=a.repository.resolve();out=a.output.resolve();os.chdir(root);sys.path.insert(0,str(root/'scripts'))
@@ -168,7 +186,7 @@ def main():
             if label=='range':items.append(dict(role='index',path=str(index),sha256=rm['file_sha256']))
             if split=='calibration':items.append(dict(role='query_split',path=inputs['query_split']['path'],sha256=inputs['query_split']['sha256']))
             spec=l.plan(dict(title='Full baseline '+tag,question=question['id'],hypothesis='Exact common outputs; empirical full-corpus speed/resource ordering.' if not negative else 'Actual runtime drift is rejected before query computation.',motivation='Frozen full-baseline protocol with independent canonical checks.',owner='vaibhav',expected=cfg,behavior=behavior,split=split,success_rule='Deliberate drift: SPEC_VIOLATION and no query outputs.' if negative else 'Executed accepted real runtime; complete exact canonical outputs and all declared samples.',failure_rule='Preserve failure; inspect and separately review repair<=3. No repeated known-broken code.',next_if_null='Retain valid slower results; no outcome-driven retuning.',timing_boundary='Engineering runtime rejection only; no query compute.' if negative else BOUNDARY,correctness_rule=protocol['correctness'],analysis_plan=protocol['analysis'],inputs=items,build=frozen_builds[label],parent_external_experiment='2026-11-15-range-worker-sweep',declared_changes=protocol['declared_changes'],refs=[frozen['id'],build_event['id']]))
-            required=allocation+(1536 if label=='mono' else 1024)*1024**2;wait_idle(required);status('running',tag,label=label)
+            required=allocation+(1536 if label=='mono' else 1024)*1024**2;available=wait_idle(required);status('running',tag,label=label)
             command=[python,root/'scripts/research.py','run',spec['id'],'--gate-seconds','1800']
             for path in [csvfile,tops]+([native_report,jit] if label=='mono' else []):command+=['--output',path]
             command+=['--command',*argv];env=dict(os.environ,CUDA_VISIBLE_DEVICES='0',OMP_NUM_THREADS='1',CUDA_MODULE_LOADING='LAZY',TRITON_CACHE_DIR=str(out/'jit'/tag),CUDA_CACHE_PATH=str(out/'cuda-cache'/tag))
@@ -191,6 +209,15 @@ def main():
                 if set(current['payload']['runtime_delta'])!={'config.'+negative} or current['payload']['runtime']['config'].get(negative)!=actual_cfg[negative]:raise ValueError('wrong runtime rejection reason or missing actual setting')
                 review_run(current,dict(expected_rejection=True,field=negative),'Runtime mismatch rejected before query outputs.','Continue frozen protocol');completed.append(dict(tag=tag,label=label,run=current['id'],kind='engineering'));checkpoint(tag);return None
             if code or current['payload']['status']!='EXECUTED':
+                errors=[artifact for artifact in current['payload'].get('artifacts',[]) if artifact['name']=='stderr.txt']
+                child_error=(root/errors[0]['blob']).read_text(errors='replace') if len(errors)==1 else ''
+                outputs_present=any(path.exists() for path in [csvfile,tops]+([native_report,jit] if label=='mono' else []))
+                resource=retryable_contended_oom(current['payload'],summary,child_error,allocation,available['total_bytes'],outputs_present,label,gm['docs'])
+                if resource:
+                    entry=dict(tag=tag,label=label,run=current['id'],kind='resource_failed',eligible=False,monitor=summary,classification='Contaminated pre-gate OOM; no isolated memory-fit or performance conclusion.')
+                    path=out/'analysis'/(tag+'-resource-failure.json');write_new(path,dict(**entry,modeled_application_or_core_bytes=allocation,total_device_bytes=available['total_bytes'],outputs_present=outputs_present,decision='Retain failed attempt and retry only after target GPU becomes idle, within3fresh resource replacements.'))
+                    review_run(current,dict(status=current['payload']['status'],monitor=summary,resource_failure=True),'Out of memory before runtime report with sampled foreign context and insufficient modeled remaining capacity. No retrieval completion, exactness, timing or isolated OOM claim.','Wait for idle GPU and use fresh registered resource replacement',[l.blob(path)])
+                    completed.append(entry);checkpoint(tag);return entry
                 review_run(current,dict(status=current['payload']['status'],monitor=summary),'Attempt incomplete; no exactness/performance claim.','Inspect before reviewed repair');checkpoint(tag);raise RuntimeError(tag+' not executed')
             if digest(oracle)!=oracle_sha or digest(query)!=query_sha:raise ValueError('reference/query changed before validation')
             report,latencies=validate(label,csvfile,tops,oracle,gm['path'],rows,actual_cfg,allocation,current['id'],oracle_sha,query_sha,gm['sha256'],native_report if label=='mono' else None)
