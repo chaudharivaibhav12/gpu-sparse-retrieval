@@ -4,6 +4,9 @@ Shared current plan for Vaibhav, Parva and Arnav. Updated November 11, 2026. Sta
 
 ## Goal and score contract
 
+November 16 update: the [full-collection baseline](../experiments/2026-11-15-full-collection-baselines/report.md) completed and passed independent validation. Priorities now are guarded canonical FP32 baseline qualification before broader released-system claims, then an adaptive exact speed experiment such as reduced local selection capacity. Prior 1M tuning remains subset evidence; the 6,480 held-out queries stay reserved. Work/report ownership remains undecided.
+
+
 Build and evaluate an exact GPU sparse retriever that avoids unnecessary scoring work through safe block bounds. Demonstrate correctness, latency, application memory and actual hardware traffic against appropriate controls and released baselines. The project consumes a pre-encoded SPLADE index; model training is outside scope.
 
 A block bound sums query weights times per-term maximum passage impacts. Skip only when its upper bound is strictly below a threshold witnessed by k distinct scored passages; retain equality for canonical ties. Current experiments use uint8 document impacts, BMP float32/ceil cap 32 query weights, uint64 sums, all passages eligible, and score-descending/original-numeric-ID-ascending order. Exactness under this representation does not establish original-model FP32 equivalence.

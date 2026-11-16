@@ -20,6 +20,9 @@ Start with [CONTRIBUTING.md](CONTRIBUTING.md). Every new experiment uses `exp/<o
 
 ## Current state
 
+The [full 8,841,823-passage comparison](experiments/2026-11-15-full-collection-baselines/report.md) is complete: range W1024/T256 median 0.687415 ms, canonical U64 GPUSparse adaptation 6.890346 ms, CSR control 32.374350 ms. Paired ratios are 9.65x/45.56x, scoped to this explicit adaptation and calibration protocol; all outputs/provenance/statistics were independently checked. See [Speed Up Results](Speed%20Up%20Results.md). Earlier results below are historical subset studies. Held-out queries remain untouched.
+
+
 The sequential oracle, canonical GPU top-k, matched CSR block-exhaustive control and exact full-byte pruning are implemented and validated. [Replication and profiling](experiments/2026-11-11-pruning-replication-profile/README.md) on 500 calibration queries and three processes/B found 18.49–24.47% lower latency than the matched unpruned CSR control across RTX 2080 Ti/RTX 4070 and B16/B32.
 
 The [precision ablation](experiments/2026-11-11-cuda-bound-precision/README.md) is complete: all tested outputs remain canonical; coarse bounds halve bound storage but increase latency 21–36%, and selective refinement increases latency 0.8–4.9% relative to full byte. Full byte remains the current CSR latency reference. These are conditional calibration results; the next decisive comparison is contract-aligned released GPUSparse, followed by broader workloads and frozen held-out evaluation.

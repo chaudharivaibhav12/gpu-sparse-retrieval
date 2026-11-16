@@ -24,3 +24,5 @@ Add new experiments here on their own branches. Merge index rows through pull re
 - [Native GPUSparse audit](2026-11-11-gpusparse-baseline/README.md): original native compilation failure preserved; explicit compatibility repair completed correctness and repeated calibration timing.
 
 - [2026-11-15-range-worker-sweep](2026-11-15-range-worker-sweep/README.md): complete valid negative result — 119 synthetic / 9 real-data checks and 27 timing processes validated; retain W1024/T256 (~0.108109 ms, 420.90 MiB). Alternatives 1.31–2.94 times slower; retained failed attempts and quota-safe timing continuation; calibration only.
+
+- [Full-collection matched baselines](2026-11-15-full-collection-baselines/report.md): complete; exact 8,841,823-passage comparison, independently replayed outputs/provenance/statistics. Range median 0.687415 ms; paired ratios 9.65x versus canonical U64 adaptation and 45.56x versus CSR, with explicit scope/limits and preserved failed attempts.

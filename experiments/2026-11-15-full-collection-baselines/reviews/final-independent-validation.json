@@ -1,0 +1,79 @@
+{
+  "status": "PASS",
+  "review_kind": "Independent local raw/provenance/statistical review after CIMS completion",
+  "measured_source_commit": "f10c7e7654269e670a0e7f0c678db497d4bc5ee0",
+  "checks": {
+    "success": true,
+    "source_commit": "f10c7e7654269e670a0e7f0c678db497d4bc5ee0",
+    "groups": 105249,
+    "scores": 1051740,
+    "oracle_scores_independently_recomputed": 5000,
+    "timing_processes": 9,
+    "bootstrap_draws_per_contrast": 10000,
+    "comparisons": {
+      "mono": {
+        "range_over_baseline_ratio": 0.103632106535145,
+        "conditional95": [
+          0.10219294926932229,
+          0.10509354388281723
+        ],
+        "inverse_speedup": 9.649519183139134,
+        "inverse_speedup_conditional95": [
+          9.515332370131443,
+          9.785410903100278
+        ],
+        "per_process_ratios": [
+          0.10364058529997726,
+          0.10364741901046136,
+          0.10360831950336301
+        ],
+        "bootstrap_seed": 20261116,
+        "bootstrap_draws": 10000,
+        "classification": "range_lower_latency_in_this_calibration_scope"
+      },
+      "csr": {
+        "range_over_baseline_ratio": 0.021949111159451393,
+        "conditional95": [
+          0.02164900180070016,
+          0.022258923328507495
+        ],
+        "inverse_speedup": 45.559931458518086,
+        "inverse_speedup_conditional95": [
+          44.92580280014163,
+          46.191506158388265
+        ],
+        "per_process_ratios": [
+          0.021998831200331446,
+          0.021957560477608915,
+          0.021891076514226053
+        ],
+        "bootstrap_seed": 20261117,
+        "bootstrap_draws": 10000,
+        "classification": "range_lower_latency_in_this_calibration_scope"
+      }
+    },
+    "limits": [
+      "Candidate rows independently checked locally but full GSP remains on CIMS; hash binding/extraction source are provenance, not Merkle membership proofs.",
+      "Frozen500calibration queries, one GPU/session, no held-out or unmodified released GPUSparse speed claim."
+    ]
+  },
+  "portable_replay": {
+    "success": true,
+    "groups": 105249,
+    "scores": 1051740,
+    "oracle_scores_checked": 5000,
+    "independent_bootstrap_draws": 10000,
+    "qualification": "500calibration queries; canonicalU64adapted GPUSparse, not unmodified native. Partial source rows are remotely hash-bound, not a local full-index membership proof."
+  },
+  "files": {
+    "analysis\\independent_statistics.py": "f50dcff47486ab99bd83f7c957fb4974e3650e6a2c62d514fd2b9e2c4efc6d57",
+    "analysis\\replay_public.py": "b904a123e7d3772f8ace7aed15ac382bb38f78f7ce54384c27a22e7aa13a61fc"
+  },
+  "qualification": "Analysis/report packaging only; no measured CUDA code or source identity changes. Private complete evidence archiveSHA ece2efbeabf548a8b42debb1e73d578b6dfb0b6a4c7f5d5a09efc0519dcc7408.",
+  "limitations": [
+    "500 calibration queries/one GPU/session; conditional intervals.",
+    "Canonical U64 adaptation is distinct from unmodified GPUSparse; guardedFP32 baseline unmeasured.",
+    "Source rows are remotely hash-bound; full bulk index not independently present locally.",
+    "Sampled memory does not establish exact physical peak."
+  ]
+}

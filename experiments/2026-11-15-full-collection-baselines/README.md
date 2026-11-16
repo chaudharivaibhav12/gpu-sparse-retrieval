@@ -4,13 +4,13 @@ Question: on all 8,841,823 passages, which exact implementation provides lower c
 
 This experiment starts from the reviewed range-worker parent, merged in PR #13 at `201be6998bace088900e1b7ccb961bb5277273e4`. That parent retained W1024/T256 after a valid negative optimization study on a **1M subset**. Its latency is not a full-collection result.
 
-## Current status (November16)
+## Current status: complete and independently validated (November 16)
 
-All8,841,823passages, the full packed index and the500-query CPUreference are prepared and preserved. OriginalGPU attempt01 stopped on a query-reader argument-order bug before compilation. Reviewed repair1 (`ed470d8f9be395c84091dc8430411020267a620f`, run`20261116-cuda5-baseline-repair01`) compiled both programs and passed27synthetic checks plus three deliberate runtime rejections. Independent local exhaustive fixture replay confirmed249query groups and1,740returned scores.
+The full 8,841,823-passage comparison completed on source `f10c7e7654269e670a0e7f0c678db497d4bc5ee0`. Range W1024/T256 achieved a descriptive median of **0.687415 ms**, versus **6.890346 ms** for the canonical U64 GPUSparse adaptation and **32.374350 ms** for the CSR exhaustive control. Paired speed ratios were 9.65x and 45.56x, conditional on the fixed calibration/session protocol. The adaptation is distinct from unmodified released GPUSparse; full CPU BMP was not compared.
 
-The first full-range correctness attempt then stopped with CUDAout-of-memory before runtime reporting. During its CPUsetup another process acquired roughly8.6GiB on the sameGPU. Preserved samples show foreign memory pressure incompatible with the modeled3,675,984,612-byte application allocation. This is an observed **contaminated OOM**, not an isolated fit failure or proof that the range scorer is unsupported. No fullGPU correctness or timing result exists yet.
+All 27 synthetic runs, three deliberate runtime rejections, three full correctness runs and nine timing processes passed. Independent checks replayed 105,249 groups, 1,051,740 scores and 5,000 oracle scores, provenance and statistics. Both earlier technical failures and their reviewed repairs are preserved. The second repair completed successfully; a third repair is unnecessary.
 
-Repair2 changes only strict resource-failure handling: preserve recognized pre-gate OOMs, failed status and sampler evidence; after an idle check use a fresh registered replacement within the existing limit of three. Clean-device OOMs, other errors, config/input drift and missing monitoring still stop. Reviews include actual failure-branch checks and18unsafe-case rejections; all scoring kernels and fixed benchmark settings are unchanged. The completeGPU protocol must rerun from the committed repair source. See`reviews/contention-oom-repair2.json`. Earlier preparation/pending notes below are historical.
+Read the [final report](report.md), [team context](TEAM-CONTEXT.md), [successful run](../../results/2026-11-15-full-collection-baselines/20261116-cuda5-baseline-repair02/README.md) and [portable raw replay](analysis/replay_public.py). All raw ranked answers remain in lossless evidence archives. Earlier preparation/pending notes below are historical and superseded by this dated result. Held-out queries remain untouched. Next priority is guarded canonical FP32 baseline qualification before broader released-system claims; selection capacity remains a later hypothesis.
 
 ## Preparation
 
