@@ -158,8 +158,13 @@ def main():
                 cfg=me.expected(index,query,oracle,native,mono,environment,cpu,len(rows),10,512,repeats,warmups,verify,{'triton_kernel.py':inputs['native_monolithic_sha256']},inputs['native_revision']);behavior=me.marks(verify);allocation=cfg['index_gpu_bytes']+cfg['dense_score_bytes']+cfg['packed_key_bytes']
                 argv=[python,mono,'--variant','monolithic','--index',index,'--queries',query,'--reference',oracle,'--native-repo',native,'--csv',csvfile,'--top',tops,'--validation',native_report,'--jit-manifest',jit,'--limit',len(rows),'--k',10,'--gpu',0,'--block-pl',512,'--repeats',repeats,'--warmups',warmups,'--verify',verify]
             actual_cfg=dict(cfg)
+            if cfg['docs']!=gm['docs'] or cfg['query_count']!=len(rows):raise ValueError('resolved config/input scope differs')
+            if label=='mono' and (cfg['nnz']!=gm['nnz'] or cfg['vocab']!=gm['vocab']):raise ValueError('native header changed after qualification')
             if negative:cfg[negative]+=1
-            items=[dict(role=role,path=str(path),sha256=digest(path)) for role,path in [('index',index),('canonical_gsp',gm['path']),('queries',query),('reference',oracle)]]
+            query_sha=inputs['queries']['sha256'] if split=='calibration' else digest(query)
+            oracle_sha=inputs['oracle']['sha256'] if split=='calibration' else digest(oracle)
+            items=[dict(role='canonical_gsp',path=str(gm['path']),sha256=gm['sha256']),dict(role='queries',path=str(query),sha256=query_sha),dict(role='reference',path=str(oracle),sha256=oracle_sha)]
+            if label=='range':items.append(dict(role='index',path=str(index),sha256=rm['file_sha256']))
             if split=='calibration':items.append(dict(role='query_split',path=inputs['query_split']['path'],sha256=inputs['query_split']['sha256']))
             spec=l.plan(dict(title='Full baseline '+tag,question=question['id'],hypothesis='Exact common outputs; empirical full-corpus speed/resource ordering.' if not negative else 'Actual runtime drift is rejected before query computation.',motivation='Frozen full-baseline protocol with independent canonical checks.',owner='vaibhav',expected=cfg,behavior=behavior,split=split,success_rule='Deliberate drift: SPEC_VIOLATION and no query outputs.' if negative else 'Executed accepted real runtime; complete exact canonical outputs and all declared samples.',failure_rule='Preserve failure; inspect and separately review repair<=3. No repeated known-broken code.',next_if_null='Retain valid slower results; no outcome-driven retuning.',timing_boundary='Engineering runtime rejection only; no query compute.' if negative else BOUNDARY,correctness_rule=protocol['correctness'],analysis_plan=protocol['analysis'],inputs=items,build=frozen_builds[label],parent_external_experiment='2026-11-15-range-worker-sweep',declared_changes=protocol['declared_changes'],refs=[frozen['id'],build_event['id']]))
             required=allocation+(1536 if label=='mono' else 1024)*1024**2;wait_idle(required);status('running',tag,label=label)
@@ -186,7 +191,8 @@ def main():
                 review_run(current,dict(expected_rejection=True,field=negative),'Runtime mismatch rejected before query outputs.','Continue frozen protocol');completed.append(dict(tag=tag,label=label,run=current['id'],kind='engineering'));checkpoint(tag);return None
             if code or current['payload']['status']!='EXECUTED':
                 review_run(current,dict(status=current['payload']['status'],monitor=summary),'Attempt incomplete; no exactness/performance claim.','Inspect before reviewed repair');checkpoint(tag);raise RuntimeError(tag+' not executed')
-            report,latencies=validate(label,csvfile,tops,oracle,gm['path'],rows,actual_cfg,allocation,current['id'],digest(oracle),digest(query),gm['sha256'],native_report if label=='mono' else None)
+            if digest(oracle)!=oracle_sha or digest(query)!=query_sha:raise ValueError('reference/query changed before validation')
+            report,latencies=validate(label,csvfile,tops,oracle,gm['path'],rows,actual_cfg,allocation,current['id'],oracle_sha,query_sha,gm['sha256'],native_report if label=='mono' else None)
             path=out/'analysis'/(tag+'-validation.json');write_new(path,report)
             validation_blob=l.blob(path);monitor_blob=l.blob(out/'analysis'/(tag+'-monitor.json'))
             timing=tag.startswith('timing-')
