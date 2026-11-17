@@ -19,6 +19,8 @@
 #      0, ceil(n/3), ceil(2n/3)); answers of every process compared with the
 #      oracle. A process during which another GPU process was sampled is kept
 #      under raw/ineligible/ and replaced (at most 3 replacements per run).
+#      A timing process that runs out of GPU memory before its runtime report while another
+#      process is sampled on the GPU is handled the same way (see protocol.json, full_collection).
 # Every driver process passes the expected-versus-actual runtime gate
 # (code/gated_run.py) and leaves a receipt; ranked answers are kept losslessly
 # (code/pack_answers.py). Any failure stops the run and is preserved.
@@ -50,7 +52,6 @@ log() { echo "$*" >> "$RUN/logs/commands.txt"; "$@"; }
 others() { nvidia-smi -i "$GPU" --query-compute-apps=pid,used_memory --format=csv,noheader; }
 wait_idle() {
     local tag=$1 i
-    [ "$DEV" = 1 ] && return 0
     for i in $(seq 1 60); do
         if [ -z "$(others)" ]; then
             { date -u +%FT%TZ; nvidia-smi -i "$GPU" --query-gpu=name,uuid,utilization.gpu,memory.used,temperature.gpu,pstate --format=csv,noheader; } > "$RUN/logs/gpu-idle-$tag.txt"
@@ -76,6 +77,13 @@ checked() {
     log python3 "$PACK" pack "$out.tsv" --store "$RUN/raw/answers" --receipt "$out.answers.json" >> "$RUN/logs/pack.txt" 2>&1 || fail "answer packing $tag"
 }
 eligible() { python3 -c 'import json,sys; sys.exit(0 if json.load(open(sys.argv[1]))["eligible_for_timing"] else 1)' "$1"; }
+# contended_oom OUT_STEM: the driver ran out of GPU memory before reporting to the gate while another
+# process was sampled on the GPU, and wrote no result. Such a process is a resource failure, not a result.
+contended_oom() {
+    test ! -e "$1.csv" -a ! -e "$1.tsv" || return 1
+    grep -q "out of memory" "$1.receipt.log" || return 1
+    python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); m=r["sampled_memory"]; sys.exit(0 if r["verdict"]=="no-runtime-report" and r["exit_code"]!=0 and m["other_process_samples"]>0 and m["errors"]==0 else 1)' "$1.receipt.json"
+}
 
 stage build
 { echo "$COMMIT"; nvidia-smi --query-gpu=index,name,uuid,driver_version,memory.total --format=csv; nvcc --version; g++ --version | head -1; python3 --version; lscpu | grep -E "Model name|^CPU\(s\)"; } > "$RUN/logs/environment.txt" 2>&1
@@ -149,12 +157,15 @@ for ((p=0;p<PROCESSES;p++)); do
             echo "r$p $name" >> "$RUN/logs/order.txt"
             wait_idle "$tag"
             stage "$tag"
-            gated "$out" "${MODE[$name]}" "${BATCH[$name]}" "$k" 0 "$ROUNDS" "$WARMUPS" || fail "$tag"
-            if [ "$DEV" = 1 ] || eligible "$out.receipt.json"; then break; fi
-            # Another GPU process (or a sampler problem) was seen: keep everything, do not analyse it.
+            oom=0
+            gated "$out" "${MODE[$name]}" "${BATCH[$name]}" "$k" 0 "$ROUNDS" "$WARMUPS" || { contended_oom "$out" && oom=1 || fail "$tag"; }
+            if [ "$oom" = 0 ]; then if [ "$DEV" = 1 ] || eligible "$out.receipt.json"; then break; fi; fi
+            # Another GPU process (or a sampler problem) was seen, or it took the memory the driver
+            # needed: keep everything, do not analyse it.
             REPLACEMENTS=$((REPLACEMENTS+1))
             hold=$RUN/raw/ineligible/$tag-attempt$REPLACEMENTS; mkdir "$hold"
-            sha256sum "$out.tsv" > "$hold/top-sha256.txt"; rm "$out.tsv"
+            if [ "$oom" = 1 ]; then echo "CONTENDED_OOM $tag $(date -u +%FT%TZ)" | tee -a "$RUN/logs/stages.txt"
+            else sha256sum "$out.tsv" > "$hold/top-sha256.txt"; rm "$out.tsv"; fi
             mv "$out".* "$hold/"
             echo "INELIGIBLE $tag replacement $REPLACEMENTS $(date -u +%FT%TZ)" | tee -a "$RUN/logs/stages.txt"
             [ "$REPLACEMENTS" -le 3 ] || fail "more than 3 ineligible timing processes"
