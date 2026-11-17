@@ -1,0 +1,120 @@
+{
+  "experiment_id": "2026-11-17-gpusparse-u8-storage",
+  "status": "Frozen design; source review and target registration required before measurement",
+  "docs": 8841823,
+  "query_count": 500,
+  "k": 10,
+  "batch_size": 1,
+  "warmup_rounds": 3,
+  "measured_rounds": 20,
+  "process_repetitions": 3,
+  "target_uuid": "GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7",
+  "cpu_affinity": "0",
+  "inputs": {
+    "gsp": {
+      "sha256": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac"
+    },
+    "rbp": {
+      "sha256": "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab"
+    },
+    "queries": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"
+    },
+    "query_split": {
+      "sha256": "650a121bf25d71beee4e2be8d05228ce8d700b2a866d8c8ba996e0ec53ce33d1"
+    },
+    "oracle": {
+      "sha256": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed"
+    }
+  },
+  "variants": {
+    "control": "Parent guarded FP32 adapter unchanged, physical FP32 document storage.",
+    "compact": "uint8 document storage, checked before narrowing; same hash-pinned upstream scoring source specialized by uint8 input, FP32 query/products/atomics/dense scores; same canonical selector.",
+    "range": "Parent unchanged V2 W1024/T256, variant5,maxSlots128."
+  },
+  "process_order": [
+    [
+      "control",
+      "compact",
+      "range"
+    ],
+    [
+      "compact",
+      "range",
+      "control"
+    ],
+    [
+      "range",
+      "control",
+      "compact"
+    ]
+  ],
+  "correctness": {
+    "synthetic": "Eight inherited unique-term/doc fixtures (including empty corpus) plus hand-computed uint64-ID case; each implementation k10,1round,0warmups, internalVERIFY1 and independent complete ordered IDs/scores. Duplicate-posting fixture excluded only from shared native-loader domain; full corpus independently proved multiplicity1.",
+    "runtime_rejections": "Actual range.score_threads, control.query_count, compact.document_storage_bytes drift rejected before query outputs.",
+    "full": "All500calibration queries,1round,0warmups,VERIFY0 to reuse completed exhaustive CPUreference rather than recomputing it in C++ for every process. Every result compared externally to the fixed full CPUoracle; all unique returned query/doc scores independently recomputed with Python integers. Native adapter also retains its own post-run checks. Internal not_checked remains explicit. No timing starts until all three pass.",
+    "domain": "Parent guarded integer FP32 certificate plus exact uint8 storage/load audit; same-source full correctness required for both storage modes and range."
+  },
+  "timing_boundary": "Host query construction through complete scoring, selection/merge, original numeric-ID results, D2H and synchronization. Index load/upload, gate, file writes and independent checking excluded and separately recorded. Device-event spans differ and are diagnostics only, never compared as matched GPU spans.",
+  "availability_wait_limit_seconds": 0,
+  "availability": "Require empty target UUID, enough modeled core plus safety headroom before submission and each child; stop immediately if occupied, no automatic replacement or delayed launch.",
+  "monitoring": "One inherited conservative1s sampler/process. Any foreign context, missing owned timing context or sampling error makes timing ineligible and stops the study. No automatic replacement. Sampling is not exclusivity or exact peak proof.",
+  "analysis": {
+    "primary": "compact/control paired geometric latency ratio",
+    "bootstrap": "10000crossed process/query draws with replacement; multiplicity-weighted Cartesian product and linear quantiles. Conditional on calibration/session.",
+    "bootstrap_seed": 2026111701,
+    "control_seeds": {
+      "compact_over_control": 2026111701,
+      "range_over_compact": 2026111702,
+      "range_over_control": 2026111703
+    },
+    "secondary": "range/compact and range/control from fresh same-session data",
+    "memory": "C++tracked allocation bytes checked in every row; native Torch allocator/reserved peak since post-setup reset retained. Uniform one-second NVML own-process/board sampled peaks recorded separately, not exact physical peaks and not mixed with tracked/allocator quantities.",
+    "attribution": "Document storage dtype and necessary widening only; no atomic/selector tuning. Compilation specialization is disclosed."
+  },
+  "declared_changes": {
+    "parent": "2026-11-16-guarded-fp32-baseline measured edcd32e merged4fd69f7",
+    "systems": "Fresh FP32-storage control, compact uint8-storage treatment and unchanged range anchor; omit U64 repetition.",
+    "storage": "Document GPU dtypeFP32->uint8; widen via FP32 query multiplication in pinned kernel. Products/sums/selector remain parentFP32.",
+    "runtime": "Truthful compact mode/storage bytes/conversion marks and exact memory expectations; parent control source unchanged.",
+    "resource_policy": "Stop on occupancy/failure/ineligible timing; remove automatic waiting/resource replacements.",
+    "analysis": "Primary compact/control; fresh range comparisons; seeds2026111701/02/03.",
+    "invariants": "Full8841823/500calibration,k10,batch1,3processes,3warm20rounds,canonicalIDs/scores/ties,sameGPU/CPU0/boundary,noheldout/chunking."
+  },
+  "unsupported": {
+    "full_byte_B16": "Dense plane15848416906bytes alone exceeds4070board12878610432bytes. Unsupported by modeled capacity, not an observedOOM.",
+    "full_byte_B32": "CSRcore5458614690+plane7924208453=13382823143bytes exceedsboard before other allocations. Unsupported by modeled capacity, not observedOOM.",
+    "chunking": "Not performed; any future chunked method must include transfer/preparation/merging costs in a separately registered matched treatment."
+  },
+  "limitations": [
+    "Quantized integer-domain only; not original rawmodel float-valued embedding equivalence.",
+    "Original pinnedFP32scorer plus guard/canonicalselector is a labelled adaptation, not unmodified whole system.",
+    "500calibration/oneGPU/session;6480heldout untouched.",
+    "Sampled peaks are not exactphysical peaks; allocator/tracked scopes differ.",
+    "No new profiler/k/batch/secondGPU/fullCPU-BMPstudy.",
+    "Resident wall excludes indexsetup/load/upload,fileIO,validation; no chunking."
+  ],
+  "technical_failures": "Stop and preserve; separately review/fix technical failures for up to3repair attempts with fresh run directories. Do not replay unchanged known-broken code or tune valid slower/null results away.",
+  "publication": "Only after complete protocol plus independent local raw/provenance/statistical validation; existing user standing authorization then permits push/PR/merge.",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "0",
+    "OMP_NUM_THREADS": "1",
+    "CUDA_MODULE_LOADING": "LAZY",
+    "TRITON_CACHE_DIR": "fresh-per-run under scratch results",
+    "CUDA_CACHE_PATH": "fresh-per-run under scratch results"
+  },
+  "resource_oom_rule": "All failed attempts preserved/reviewed; no automatic OOM replacement. Diagnose isolated versus contaminated OOM; no new submission without satisfying current authorization.",
+  "parent_experiment": "2026-11-16-guarded-fp32-baseline",
+  "parent_measured_source": "edcd32eed32bff0fceca6db5c6755099f225eba8",
+  "parent_merge": "4fd69f7540903a7d085b35dc06952bba1efcad00",
+  "memory_feasibility": {
+    "board_bytes": 12878610432,
+    "range_tracked_bytes": 3675984612,
+    "fp32_native_core_bytes": 8536070804,
+    "qualification": "Core estimates exclude context/allocator/librarytransients. Actual upload/correctness required; contentionguard does not reserveGPU.",
+    "control_fp32_core_bytes": 8536070804,
+    "compact_fp32_core_bytes": 5388224246,
+    "compact_weight_saving_bytes": 3147846558
+  },
+  "next_if_complete": "Independent raw/statistics/source/library/compact-load PTX validation and scoped result review. Preserve negative result."
+}
