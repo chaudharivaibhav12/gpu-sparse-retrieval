@@ -53,6 +53,8 @@ Reported separately: throughput, individual completion latency, memory (tracked 
 
 ## Findings and decision
 
+Full result, interpretation and limits: [report.md](report.md).
+
 Step 1: with one slot per query, the unchanged kernel returns the exact ordered top-k for every calibration query when up to 32 queries are in flight at once (100K and 1M passages, k=10 and k=1000). No shared mutable state remains between concurrent launches in this driver. This is a correctness result on one GPU model; it says nothing yet about throughput or latency.
 
 Step 3: one launch for a whole batch (grid ranges x batch, one counter and one slice of every buffer per query) also returns the exact ordered top-k for every calibration query, including a partial last batch. The batched kernel body is a verbatim copy of `range_scores`, enforced by `tests/check_batched_kernel_sync.py`; if the single-query kernel changes, the copy must be refreshed and both checks rerun. Correctness only, one GPU model.
