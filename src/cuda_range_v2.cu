@@ -52,7 +52,13 @@ static const char* RBP_BLOCK_NAMES[RBP_NB]={"gt_start","clk_start","gt_rank_writ
 // Version-3 switches (experiment 2026-11-17-range-v3). With every switch 0 the
 // kernel is V2-5.
 #ifndef RBP_V3_LOOKUP
-#define RBP_V3_LOOKUP 1   // warp-cooperative block lookup
+#define RBP_V3_LOOKUP 0   // warp-cooperative block lookup (change 1)
+#endif
+#ifndef RBP_V3_THETA
+#define RBP_V3_THETA 1    // theta-filtered merge candidates (change 2)
+#endif
+#ifndef RBP_V3_STATS
+#define RBP_V3_STATS 0    // per-query candidate counts (change 2 diagnostics; off for timing)
 #endif
 constexpr uint32_t RBP_MAX_TERMS=128;
 #if RBP_V3_LOOKUP
@@ -126,6 +132,22 @@ __device__ inline GpuCandidate warp_best(GpuCandidate mine) {
 }
 
 // Best current head among the lists this thread owns (list % threads == thread).
+#if RBP_V3_THETA
+// List l holds lengths[l] candidates; heads below cut are treated as the end
+// of the list (lists are descending, so nothing after them can survive).
+__device__ inline GpuCandidate owned_best(const GpuCandidate* lists,uint32_t count,uint32_t k,const uint16_t* heads,
+                                          uint32_t thread,uint32_t threads,uint32_t* owner,const uint32_t* lengths,uint32_t cut) {
+    GpuCandidate best{};
+    for (uint32_t l=thread;l<count;l+=threads) {
+        if (heads[l]>=lengths[l]) continue;
+        const GpuCandidate c=lists[uint64_t(l)*k+heads[l]];
+        if (c.score<cut) continue;
+        if (candidate_better(c,best)) { best=c;*owner=l; }
+    }
+    return best;
+}
+#define RBP_OWNED_BEST(owner_ptr) owned_best(lists,count,k,heads,thread,threads,owner_ptr,lengths,cut)
+#else
 __device__ inline GpuCandidate owned_best(const GpuCandidate* lists,uint32_t count,uint32_t k,const uint16_t* heads,
                                           uint32_t thread,uint32_t threads,uint32_t* owner) {
     GpuCandidate best{};
@@ -136,23 +158,29 @@ __device__ inline GpuCandidate owned_best(const GpuCandidate* lists,uint32_t cou
     }
     return best;
 }
+#define RBP_OWNED_BEST(owner_ptr) owned_best(lists,count,k,heads,thread,threads,owner_ptr)
+#endif
 
 // Top k of `count` descending lists of k candidates each, by the same
 // pattern: warp selection with shuffles, one barrier, then rank and scatter.
 // heads (count entries) and scratch (warps*k entries) are device scratch.
 __device__ inline void merge_lists(const GpuCandidate* lists,uint32_t count,uint32_t k,uint16_t* heads,
-                                   GpuCandidate* scratch,uint32_t* warp_length,GpuCandidate* output) {
+                                   GpuCandidate* scratch,uint32_t* warp_length,GpuCandidate* output
+#if RBP_V3_THETA
+                                   ,const uint32_t* lengths,uint32_t cut
+#endif
+                                   ) {
     const uint32_t thread=threadIdx.x,threads=blockDim.x,lane=thread&31,warp=thread>>5,warps=threads>>5;
     for (uint32_t l=thread;l<count;l+=threads) heads[l]=0;
     uint32_t owner=0,length=0;
-    GpuCandidate mine=owned_best(lists,count,k,heads,thread,threads,&owner);
+    GpuCandidate mine=RBP_OWNED_BEST(&owner);
     for (uint32_t r=0;r<k;++r) {
         const GpuCandidate best=warp_best(mine);
         if (!best.valid) break;
         if (lane==0) scratch[uint64_t(warp)*k+r]=best;
         if (mine.valid && mine.doc==best.doc) {
             ++heads[owner];
-            mine=owned_best(lists,count,k,heads,thread,threads,&owner);
+            mine=RBP_OWNED_BEST(&owner);
         }
         ++length;
     }
@@ -176,7 +204,14 @@ __device__ inline void merge_lists(const GpuCandidate* lists,uint32_t count,uint
 // finished: device counter, 0 before every launch. heads (one per range) and
 // scratch (warps*k) are merge scratch; candidates holds every range's list.
 __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_cap,GpuCandidate* candidates,
-                             uint32_t* finished,uint16_t* heads,GpuCandidate* scratch,GpuCandidate* output) {
+                             uint32_t* finished,uint16_t* heads,GpuCandidate* scratch,GpuCandidate* output
+#if RBP_V3_THETA
+                             ,uint32_t* theta,uint32_t* lengths
+#if RBP_V3_STATS
+                             ,unsigned long long* stats
+#endif
+#endif
+                             ) {
     // Dynamic shared memory: warps*list_cap selection keys, then the scores.
     extern __shared__ uint64_t dynamic_shared[];
     // Per query term in this range: its block's metadata (count 0 if absent),
@@ -414,6 +449,40 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
     RBP_EV(9);
 #endif
 
+#if RBP_V3_THETA
+    // 4c/5 (theta). Rank pass: every listed key counts the keys ahead of it in
+    // the other warps' lists. The key ranked k-1 (present exactly when the
+    // range has >= k documents) raises theta to this range's k-th score:
+    // the range alone holds k documents with at least that score, so theta
+    // never exceeds the global k-th score.
+    __shared__ uint32_t cut_now,written;
+    for (uint32_t e=lane;e<warp_length[warp];e+=32) {
+        const uint64_t key=lists[size_t(warp)*list_cap+e];
+        uint32_t rank=e;
+        for (uint32_t w=0;w<warps && rank<k;++w)
+            if (w!=warp) rank+=count_greater(lists+size_t(w)*list_cap,warp_length[w],key);
+        if (rank==k-1) atomicMax(theta,uint32_t(key>>16));
+    }
+    if (thread==0) written=0;
+    __syncthreads();
+    if (thread==0) cut_now=*reinterpret_cast<volatile uint32_t*>(theta);
+    __syncthreads();
+    // Write pass: only keys at or above theta (equal scores kept). They are a
+    // prefix of the range's canonical order, so ranks 0..written-1 are filled.
+    const uint32_t cut=cut_now;
+    for (uint32_t e=lane;e<warp_length[warp];e+=32) {
+        const uint64_t key=lists[size_t(warp)*list_cap+e];
+        if (uint32_t(key>>16)<cut) continue;
+        uint32_t rank=e;
+        for (uint32_t w=0;w<warps && rank<k;++w)
+            if (w!=warp) rank+=count_greater(lists+size_t(w)*list_cap,warp_length[w],key);
+        if (rank<k) {
+            const uint32_t slot=v.rank_slot[first+(0xffffu-uint32_t(key&0xffffu))];
+            candidates[uint64_t(range)*k+rank]=GpuCandidate{key>>16,v.ids[first+slot],uint32_t(first+slot),1};
+            atomicAdd(&written,1u);
+        }
+    }
+#else
     // 4c/5. Every listed key counts the keys ahead of it in the other warps'
     //       lists; that count plus its own index is its final rank.
     for (uint32_t e=lane;e<warp_length[warp];e+=32) {
@@ -428,6 +497,7 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
     }
     // A range with fewer than k documents marks the rest of its list empty.
     for (uint32_t g=range_docs+thread;g<k;g+=threads) candidates[uint64_t(range)*k+g]=GpuCandidate{0,0,0,0};
+#endif
 #ifdef RBP_STAGE_CLOCKS
     RBP_EV(10);RBP_GT(2);
 #endif
@@ -445,6 +515,16 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
 #ifdef RBP_STAGE_CLOCKS
     RBP_EV(12);
 #endif
+#if RBP_V3_THETA
+    // After S5 every write pass is done; publish the count before the ticket.
+    if (thread==0) {
+        lengths[range]=written;
+#if RBP_V3_STATS
+        atomicAdd(stats,(unsigned long long)written);
+#endif
+        __threadfence();
+    }
+#endif
     if (thread==0) is_last=atomicAdd(finished,1u)==gridDim.x-1;
 #ifdef RBP_STAGE_CLOCKS
     RBP_EV(13);
@@ -457,8 +537,24 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
 #ifdef RBP_STAGE_CLOCKS
         RBP_EV(23);
 #endif
+#if RBP_V3_THETA
+        // Every other block raised theta before its fence and ticket.
+        __shared__ uint32_t final_cut;
+        if (thread==0) final_cut=*reinterpret_cast<volatile uint32_t*>(theta);
+        __syncthreads();
+#if RBP_V3_STATS
+        for (uint32_t l=thread;l<gridDim.x;l+=threads) {
+            uint32_t n=0;
+            while (n<lengths[l] && candidates[uint64_t(l)*k+n].score>=final_cut) ++n;
+            atomicAdd(stats+1,(unsigned long long)n);
+        }
+#endif
+        merge_lists(candidates,gridDim.x,k,heads,scratch,warp_length,output,lengths,final_cut);
+        if (thread==0) { *finished=0;*theta=0; }
+#else
         merge_lists(candidates,gridDim.x,k,heads,scratch,warp_length,output);
         if (thread==0) *finished=0;
+#endif
 #ifdef RBP_STAGE_CLOCKS
         RBP_EV(17);
 #endif
@@ -537,12 +633,27 @@ int main(int argc,char** argv) {
         GpuArray<uint32_t> finished(1),range_start(index.range_start.size());range_start.upload(index.range_start);cuda_checked(cudaMemset(finished.ptr,0,4));
         GpuArray<uint8_t> block_width(index.blocks()),impacts(index.impacts.size());
         GpuArray<GpuCandidate> candidates(size_t(R)*k),scratch(size_t(warps)*k),merged(k);
+#if RBP_V3_THETA
+        // theta must be 0 before every launch; the merging block re-arms it.
+        GpuArray<uint32_t> theta(1),lengths(R);cuda_checked(cudaMemset(theta.ptr,0,4));
+#if RBP_V3_STATS
+        // RBP_V3_STATS_OUT=path: per query, candidates written by all ranges and survivors of the final filter.
+        GpuArray<unsigned long long> stats(2);
+        const char* stats_path=getenv("RBP_V3_STATS_OUT");
+        require(stats_path && !filesystem::exists(stats_path),"RBP_V3_STATS builds need a new RBP_V3_STATS_OUT file");
+        ofstream stats_file(stats_path);stats_file<<"phase\tround\tquery_id\tk\tranges\tcandidates_written\tsurvivors_after_final_filter\n";
+#endif
+#endif
         lookup_first.upload(index.lookup_first);lookup_range.upload(index.lookup_range);value_start.upload(index.block_value_start);
         encoded.upload(index.encoded);bit_start.upload(index.block_bit_start);ids.upload(index.ids);
         block_count.upload(index.block_count);block_width.upload(index.block_width);impacts.upload(index.impacts);
         tie_rank.upload(tie_rank_host);rank_slot.upload(rank_slot_host);
         const RbpView view{lookup_first.ptr,lookup_range.ptr,bit_start.ptr,value_start.ptr,block_count.ptr,block_width.ptr,encoded.ptr,impacts.ptr,ids.ptr,tie_rank.ptr,rank_slot.ptr,range_start.ptr,N,W};
-        const uint64_t allocation=index.posting_bytes()+ids.count*8+(tie_rank.count+rank_slot.count+heads.count)*2+(finished.count+range_start.count)*4+(candidates.count+scratch.count+merged.count)*sizeof(GpuCandidate);
+        const uint64_t allocation=index.posting_bytes()+ids.count*8+(tie_rank.count+rank_slot.count+heads.count)*2+(finished.count+range_start.count)*4+(candidates.count+scratch.count+merged.count)*sizeof(GpuCandidate)
+#if RBP_V3_THETA
+            +(theta.count+lengths.count)*4
+#endif
+            ;
         string cpu_affinity="unknown",status_line;ifstream status("/proc/self/status");
         while (getline(status,status_line)) if (status_line.rfind("Cpus_allowed_list:",0)==0) { istringstream affinity(status_line.substr(18));affinity>>cpu_affinity; }
         research_gate("cuda-range-v2",N,count,k,gpu,argv[1],argv[2],
@@ -583,7 +694,17 @@ int main(int argc,char** argv) {
                 for (uint32_t i=0;i<terms;++i) args.term[i]={q.terms[i].first,q.terms[i].second};
                 cuda_checked(cudaEventRecord(begin.event));
                 if (wanted) {
-                    range_scores<<<R,threads,shared_bytes>>>(view,args,k,list_cap,candidates.ptr,finished.ptr,heads.ptr,scratch.ptr,merged.ptr);cuda_checked(cudaGetLastError());
+#if RBP_V3_STATS
+                    cuda_checked(cudaMemset(stats.ptr,0,16));
+#endif
+                    range_scores<<<R,threads,shared_bytes>>>(view,args,k,list_cap,candidates.ptr,finished.ptr,heads.ptr,scratch.ptr,merged.ptr
+#if RBP_V3_THETA
+                        ,theta.ptr,lengths.ptr
+#if RBP_V3_STATS
+                        ,stats.ptr
+#endif
+#endif
+                        );cuda_checked(cudaGetLastError());
                 }
                 cuda_checked(cudaEventRecord(end.event));
                 if (wanted) cuda_checked(cudaMemcpy(winners.data(),merged.ptr,size_t(wanted)*sizeof(GpuCandidate),cudaMemcpyDeviceToHost));
@@ -610,6 +731,10 @@ int main(int argc,char** argv) {
                 const auto check=[&](uint64_t value) { return verify ? to_string(value) : string("not_checked"); };
                 csv<<phase_name<<','<<round<<','<<q.id<<','<<N<<','<<k<<','<<wall_ms<<','<<gpu_ms<<','<<check(id_errors)<<','<<check(score_errors)<<','<<terms<<','<<W<<','<<R<<','<<threads<<','<<merge_threads<<','<<allocation<<','<<index.posting_bytes()<<','<<wanted*sizeof(GpuCandidate)<<','<<sizeof(QueryArgs)<<'\n';
                 for (uint32_t rank=0;rank<wanted;++rank) top<<phase_name<<'\t'<<round<<'\t'<<q.id<<'\t'<<rank+1<<'\t'<<winners[rank].id<<'\t'<<winners[rank].score<<'\n';
+#if RBP_V3_THETA && RBP_V3_STATS
+                if (wanted) { unsigned long long host_stats[2];cuda_checked(cudaMemcpy(host_stats,stats.ptr,16,cudaMemcpyDeviceToHost));
+                    stats_file<<phase_name<<'\t'<<round<<'\t'<<q.id<<'\t'<<k<<'\t'<<R<<'\t'<<host_stats[0]<<'\t'<<host_stats[1]<<'\n';stats_file.flush(); }
+#endif
                 csv.flush();top.flush();require(!id_errors&&!score_errors,"Range scorer disagrees with the CPU reference");
             }
             cerr<<"ROUND_COMPLETE "<<phase_name<<' '<<round<<'\n';
