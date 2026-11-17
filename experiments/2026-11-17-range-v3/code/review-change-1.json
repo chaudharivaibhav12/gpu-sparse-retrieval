@@ -1,0 +1,34 @@
+{
+  "change": 1,
+  "title": "Warp-cooperative block lookup",
+  "written": "before implementation",
+  "switch": "RBP_V3_LOOKUP (default 1; 0 restores the per-thread binary search)",
+  "design": [
+    "Query word i belongs to warp i % warps; a warp's words are i = warp, warp + warps, ... (M words). With 256 threads and at most 128 words, M <= 16.",
+    "Per word the warp keeps a half-open entry interval [lo, hi) of lookup_range in shared memory (the word's term_value / term_count slots, unused until metadata is stored) and its result block in term_width (RBP_NONE until found).",
+    "Round: stride = ceil(n / 32); lane l loads entry lo + l*stride if it is below hi. ballot(value == range) -> found at lo + (ffs - 1)*stride. Otherwise c = popc(ballot(valid && value < range)); c == 0 -> no block; else the gap is [lo + (c-1)*stride + 1, min(hi, lo + c*stride)). An empty interval means resolved.",
+    "Words of a warp are processed in chunks of 16: all of a chunk's loads are issued into separate registers before any ballot, so the number of dependent load rounds does not grow with the number of words (one chunk covers every word at 256 threads).",
+    "After the search each lane loads the four metadata arrays and the weight for one word (lane m handles the warp's m-th word), all four loads independent.",
+    "scores[] zeroing and everything after the S1 barrier are unchanged."
+  ],
+  "round_trips": "lookup_first (1) + search rounds (1 for n <= 32, 2 for n <= 1,056, 3 for n <= 34,848; so 2 at 1M/W=1024 with n <= 977 and 3 at the full collection with 8,635 ranges) + metadata (1); V2-5 needs 1 + ceil(log2 n) + 1.",
+  "bugs_and_edge_cases_checked_in_design": [
+    "n = 0 (word with no postings, or absent from the index): interval empty from the start, result RBP_NONE, count 0.",
+    "range before the first entry: c = 0 -> none. After the last: all valid lanes are below range; the gap is clipped to hi and becomes empty at stride 1 -> none.",
+    "range in a gap between two samples: gap interval excludes both samples (the lower is < range, the upper is > range because equality was tested first).",
+    "range equal to a sampled entry (multiples of the stride): caught by the equality ballot in that round.",
+    "n = 31, 32, 33, 977, 1024, 1025: stride boundaries; lanes whose index would pass hi load nothing and are excluded from both ballots (their value is forced to RBP_NONE, which is never a real range ID and never below range).",
+    "Sortedness: entries are strictly ascending within a word (checked by rbp_load), so lanes with value < range form a prefix and popc gives the gap index.",
+    "More words than warps and 128 words: chunks of 16 per warp; with 32 threads (one warp) 128 words take 8 chunks.",
+    "Repeated query word: rejected by host validation before the kernel, as today.",
+    "Shared-memory visibility inside a warp: lane 0 writes the updated interval and __syncwarp() precedes the next round's reads; all lanes compute the same values from the ballots, so the loop condition is warp-uniform. Other warps read the term_* arrays only after the S1 barrier, as today.",
+    "term_count / term_value / term_width hold search state only until the metadata step overwrites them with the same final values V2-5 stores (count 0, bit 0, value 0, width 1 when absent)."
+  ],
+  "semantics": "Same result per word as the binary search: the block whose range equals this block's range, or none. No change to scores, order, eligibility or guards.",
+  "risks": [
+    "More registers (16 pending values per lane) could lower blocks per SM; reported with the gate.",
+    "With few words (most queries have about 36) seven or more of eight warps run a single word; warps without a word skip straight to zeroing.",
+    "Parva's batched copy of range_scores and tests/check_batched_kernel_sync.py (not edited here) will need a refresh if this change is adopted."
+  ],
+  "tests": "v3 lookup cases in tests/check_range_bitpack.py (n = 0, 1, 31, 32, 33, 977, 1024, 1025 at W=1 with gaps, before/after, stride multiples; 128 and 40 words with 256 and 32 threads), the existing suite, and 100K/1M x 500 queries x k=10/100/1000."
+}

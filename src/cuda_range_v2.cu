@@ -49,7 +49,16 @@ static const char* RBP_BLOCK_NAMES[RBP_NB]={"gt_start","clk_start","gt_rank_writ
 #error "RBP_SPLIT_DECODE_ADD is a diagnostic of RBP_STAGE_CLOCKS"
 #endif
 
+// Version-3 switches (experiment 2026-11-17-range-v3). With every switch 0 the
+// kernel is V2-5.
+#ifndef RBP_V3_LOOKUP
+#define RBP_V3_LOOKUP 1   // warp-cooperative block lookup
+#endif
 constexpr uint32_t RBP_MAX_TERMS=128;
+#if RBP_V3_LOOKUP
+// Query words whose lookup loads one warp issues before consuming any of them.
+constexpr uint32_t RBP_LOOKUP_CHUNK=16;
+#endif
 constexpr uint32_t RBP_MAX_WARPS=32;
 constexpr uint32_t RBP_MAX_K=1000;
 // Most score slots one thread may own (ceil(range size / threads)).
@@ -183,6 +192,83 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
     RBP_EV(0);RBP_GT(0);RBP_BW(1,clock64());RBP_BW(5,rbp_smid());
 #endif
 
+#if RBP_V3_LOOKUP
+    // 1. Find each query term's block in this range: warp-cooperative search.
+    //    Word i belongs to warp i % warps. Per word the warp narrows a
+    //    half-open interval [lo, hi) of lookup_range, kept in the word's
+    //    term_value / term_count slots; term_width holds the block found.
+    //    Each round the 32 lanes sample the interval at a common stride: an
+    //    equality ballot ends the search, otherwise the count of samples
+    //    below this range selects the gap to search next (<= 2 rounds for up
+    //    to 1,056 entries, 3 for up to 34,848). A warp with several words
+    //    issues one round's loads for all of them before using any, so the
+    //    number of dependent global loads does not grow with the word count.
+    {
+        const uint32_t words=terms>warp ? (terms-1-warp)/warps+1 : 0;
+        for (uint32_t m=lane;m<words;m+=32) {
+            const uint32_t i=warp+m*warps;
+            const QueryTerm q=query.term[i];
+            term_value[i]=v.lookup_first[q.term];
+            term_count[i]=v.lookup_first[q.term+1];
+            term_width[i]=RBP_NONE;
+            term_weight[i]=q.weight;
+        }
+        __syncwarp();
+        for (uint32_t base=0;base<words;base+=RBP_LOOKUP_CHUNK) {
+            const uint32_t chunk=words-base<RBP_LOOKUP_CHUNK ? words-base : RBP_LOOKUP_CHUNK;
+            bool pending=true;
+            while (pending) {
+                uint32_t sample[RBP_LOOKUP_CHUNK];
+                for (uint32_t c=0;c<chunk;++c) {
+                    const uint32_t i=warp+(base+c)*warps;
+                    const uint32_t lo=term_value[i],hi=term_count[i],n=hi-lo;
+                    const uint32_t index=lo+lane*((n+31)/32);
+                    // RBP_NONE is never a range ID and never below one.
+                    sample[c]=(n && index<hi) ? v.lookup_range[index] : RBP_NONE;
+                }
+                pending=false;
+                for (uint32_t c=0;c<chunk;++c) {
+                    const uint32_t i=warp+(base+c)*warps;
+                    const uint32_t lo=term_value[i],hi=term_count[i],n=hi-lo;
+                    if (!n) continue;   // resolved; identical for every lane
+                    const uint32_t stride=(n+31)/32;
+                    // Every lane reaches these ballots after reading the
+                    // interval and before lane 0 rewrites it.
+                    const uint32_t equal=__ballot_sync(0xffffffffu,sample[c]==range);
+                    uint32_t next_lo=lo,next_hi=lo,found=RBP_NONE;   // default: no block
+                    if (equal) found=lo+uint32_t(__ffs(equal)-1)*stride;
+                    else {
+                        // Entries ascend, so the samples below this range are a prefix.
+                        const uint32_t below=uint32_t(__popc(__ballot_sync(0xffffffffu,sample[c]<range)));
+                        if (below) {
+                            next_lo=lo+(below-1)*stride+1;
+                            const uint32_t limit=lo+below*stride;
+                            next_hi=limit<hi ? limit : hi;
+                            if (next_hi<next_lo) next_hi=next_lo;
+                        }
+                    }
+                    if (lane==0) {
+                        term_value[i]=next_lo;term_count[i]=next_hi;
+                        if (found!=RBP_NONE) term_width[i]=found;
+                    }
+                    pending|=next_hi>next_lo;
+                }
+                __syncwarp();
+            }
+        }
+        // Metadata for every word of this warp, one word per lane, four
+        // independent loads each.
+        for (uint32_t m=lane;m<words;m+=32) {
+            const uint32_t i=warp+m*warps;
+            const uint32_t b=term_width[i];
+            const bool present=b!=RBP_NONE;
+            term_count[i]=present ? v.count[b] : 0;
+            term_bit[i]=present ? v.bit_start[b] : 0;
+            term_value[i]=present ? v.value_start[b] : 0;
+            term_width[i]=present ? v.width[b] : 1;
+        }
+    }
+#else
     // 1. Find each query term's block in this range and load its metadata.
     for (uint32_t i=thread;i<terms;i+=threads) {
         const QueryTerm q=query.term[i];
@@ -199,6 +285,7 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
         term_width[i]=present ? v.width[lo] : 1;
         term_weight[i]=q.weight;
     }
+#endif
     // 2. Every document in the range starts at zero and stays eligible.
     for (uint32_t s=thread;s<range_docs;s+=threads) scores[s]=0;
 #ifdef RBP_STAGE_CLOCKS
