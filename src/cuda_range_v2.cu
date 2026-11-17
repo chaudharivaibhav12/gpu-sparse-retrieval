@@ -57,7 +57,13 @@ static const char* RBP_BLOCK_NAMES[RBP_NB]={"gt_start","clk_start","gt_rank_writ
 constexpr uint32_t RBP_MAX_TERMS=128;
 #if RBP_V3_LOOKUP
 // Query words whose lookup loads one warp issues before consuming any of them.
-constexpr uint32_t RBP_LOOKUP_CHUNK=16;
+// 16 covers every word of a warp at 256 threads (128 words / 8 warps), so the
+// number of load rounds never depends on the word count; smaller values save
+// registers and add rounds only for warps with more words than the chunk.
+#ifndef RBP_LOOKUP_CHUNK_WORDS
+#define RBP_LOOKUP_CHUNK_WORDS 16
+#endif
+constexpr uint32_t RBP_LOOKUP_CHUNK=RBP_LOOKUP_CHUNK_WORDS;
 #endif
 constexpr uint32_t RBP_MAX_WARPS=32;
 constexpr uint32_t RBP_MAX_K=1000;

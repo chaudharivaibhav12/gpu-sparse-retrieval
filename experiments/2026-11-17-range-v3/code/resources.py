@@ -21,11 +21,17 @@ def main():
     a = p.parse_args()
     text = Path(a.log).read_text()
     kernels = []
-    for m in re.finditer(r"Compiling entry function '([^']+)' for '([^']+)'\s*\n.*?Used (\d+) registers(?:, used (\d+) barriers)?(?:, (\d+) bytes cumulative stack size)?(.*)", text):
-        name, arch, regs, bars, stack, rest = m.groups()
-        smem = re.search(r"(\d+) bytes smem", text[m.end():m.end() + 400] + rest)
-        kernels.append(dict(mangled=name, arch=arch, registers=int(regs), barriers=int(bars or 0), stack_bytes=int(stack or 0),
-                            static_shared_bytes=int(smem.group(1)) if smem else None))
+    # Each entry starts at "Compiling entry function" and runs to the next one.
+    parts = re.split(r"(?=ptxas info\s*: Compiling entry function)", text)
+    for part in parts:
+        head = re.search(r"Compiling entry function '([^']+)' for '([^']+)'", part)
+        used = re.search(r"Used (\d+) registers(?:, used (\d+) barriers)?(?:, (\d+) bytes cumulative stack size)?(?:, (\d+) bytes smem)?", part)
+        if not head or not used:
+            continue
+        spills = re.search(r"(\d+) bytes spill stores, (\d+) bytes spill loads", part)
+        kernels.append(dict(mangled=head.group(1), arch=head.group(2), registers=int(used.group(1)), barriers=int(used.group(2) or 0),
+                            stack_bytes=int(used.group(3) or 0), static_shared_bytes=int(used.group(4) or 0),
+                            spill_store_bytes=int(spills.group(1)) if spills else 0, spill_load_bytes=int(spills.group(2)) if spills else 0))
     dyn = dict(item.split("=") for item in a.dynamic)
     out = []
     for k in kernels:
@@ -42,7 +48,8 @@ def main():
         out.append(dict(k, per_setting=rows))
     Path(a.output).write_text(json.dumps(dict(threads=a.threads, kernels=out, note=__doc__.split("Standard library only.")[1].strip()), indent=2) + "\n")
     for k in out:
-        print(k["mangled"][:60], "regs", k["registers"], "static smem", k["static_shared_bytes"], {l: (r["total_shared_bytes"], r["blocks_per_sm_estimate"]) for l, r in k["per_setting"].items()})
+        print("range_scores regs %d, stack %d B, spills %d/%d B, static smem %d B | %s" % (k["registers"], k["stack_bytes"], k["spill_store_bytes"], k["spill_load_bytes"], k["static_shared_bytes"],
+              ", ".join("%s: smem %d B, ~%d blocks/SM" % (l, r["total_shared_bytes"], r["blocks_per_sm_estimate"]) for l, r in k["per_setting"].items())))
 
 
 if __name__ == "__main__":

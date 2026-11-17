@@ -30,5 +30,21 @@
     "With few words (most queries have about 36) seven or more of eight warps run a single word; warps without a word skip straight to zeroing.",
     "Parva's batched copy of range_scores and tests/check_batched_kernel_sync.py (not edited here) will need a refresh if this change is adopted."
   ],
-  "tests": "v3 lookup cases in tests/check_range_bitpack.py (n = 0, 1, 31, 32, 33, 977, 1024, 1025 at W=1 with gaps, before/after, stride multiples; 128 and 40 words with 256 and 32 threads), the existing suite, and 100K/1M x 500 queries x k=10/100/1000."
+  "tests": "v3 lookup cases in tests/check_range_bitpack.py (n = 0, 1, 31, 32, 33, 977, 1024, 1025 at W=1 with gaps, before/after, stride multiples; 128 and 40 words with 256 and 32 threads), the existing suite, and 100K/1M x 500 queries x k=10/100/1000.",
+  "after_implementation": {
+    "switch_off_identity": "-DRBP_V3_LOOKUP=0 compiles to SASS identical to ctrl (CUDA 13.3: 34c94253cf61c499).",
+    "findings": [
+      {
+        "id": 1,
+        "issue": "Holding one load per word for 16 words in registers raises range_scores from 40 to 55 registers (no spills); estimated resident blocks per SM at 256 threads fall from 6 to 4.",
+        "evidence": "Laptop development readings (1M, W=1024, 25 queries, NOT results): GPU span k=10 ctrl 0.159-0.163 ms, change 1 0.203 ms, change 1 with -maxrregcount=40 0.184-0.186 ms (20 B spilled). About half of the k=10 slowdown is occupancy. At k=100 change 1 read 0.538 ms vs ctrl 0.635 ms (noisy).",
+        "handling": "Kept the specified design (chunk 16: load rounds independent of the word count at 256 threads). Added RBP_LOOKUP_CHUNK_WORDS as a compile option: 8 gives 40 registers and 6 blocks/SM but adds a second set of rounds for warps with more than 8 words (queries with more than 64 words: 56 of the 500 calibration queries). Readings k=10: chunk 8 0.176-0.181 ms, chunk 4 0.152-0.177 ms. Decision left to the owner."
+      },
+      {
+        "id": 2,
+        "issue": "resources.py missed ptxas entries whose 'Used ... registers' line follows a 'Function properties' block.",
+        "fix": "Parse each 'Compiling entry function' section as a whole; report stack and spills."
+      }
+    ]
+  }
 }
