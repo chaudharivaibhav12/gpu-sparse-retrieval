@@ -1,6 +1,6 @@
 # Exact GPU sparse retrieval
 
-C++17/CUDA research project for exact ranked passage retrieval over a pre-encoded SPLADE index. The proposed system uses block-score bounds to avoid unnecessary payload reads while preserving exact results under a fixed scoring representation.
+C++17/CUDA research project for exact ranked passage retrieval over a pre-encoded SPLADE index. The current measured fast path uses exhaustive scoring over a range-split, bit-packed inverted index with GPU selection. Earlier block-bound pruning implementations remain available as separate controls.
 
 ## Team experiments
 
@@ -20,12 +20,14 @@ Start with [CONTRIBUTING.md](CONTRIBUTING.md). Every new experiment uses `exp/<o
 
 ## Current state
 
-The [full 8,841,823-passage comparison](experiments/2026-11-15-full-collection-baselines/report.md) is complete: range W1024/T256 median 0.687415 ms, canonical U64 GPUSparse adaptation 6.890346 ms, CSR control 32.374350 ms. Paired ratios are 9.65x/45.56x, scoped to this explicit adaptation and calibration protocol; all outputs/provenance/statistics were independently checked. See [Speed Up Results](Speed%20Up%20Results.md). Earlier results below are historical subset studies. Held-out queries remain untouched.
+The latest [guarded FP32 full-collection comparison](experiments/2026-11-16-guarded-fp32-baseline/report.md) is complete. Full **8,841,823 passages**, 500 calibration queries, RTX 4070, k=10, batch=1: range median **0.685848 ms**, canonical U64 GPUSparse **6.895403 ms**, guarded canonical FP32 GPUSparse **6.008201 ms**. FP32 uses 12.75% less query time than U64 by the paired estimator; range remains **8.43×** faster than FP32 (conditional 95% interval 8.31–8.56). See the [team handoff](experiments/2026-11-16-guarded-fp32-baseline/TEAM-CONTEXT.md) and [Speed Up Results](Speed%20Up%20Results.md). Held-out queries remain unused.
+
+Previous study: The [full 8,841,823-passage comparison](experiments/2026-11-15-full-collection-baselines/report.md) is complete: range W1024/T256 median 0.687415 ms, canonical U64 GPUSparse adaptation 6.890346 ms, CSR control 32.374350 ms. Paired ratios are 9.65x/45.56x, scoped to this explicit adaptation and calibration protocol; all outputs/provenance/statistics were independently checked. See [Speed Up Results](Speed%20Up%20Results.md). Earlier results below are historical subset studies. Held-out queries remain untouched.
 
 
 The sequential oracle, canonical GPU top-k, matched CSR block-exhaustive control and exact full-byte pruning are implemented and validated. [Replication and profiling](experiments/2026-11-11-pruning-replication-profile/README.md) on 500 calibration queries and three processes/B found 18.49–24.47% lower latency than the matched unpruned CSR control across RTX 2080 Ti/RTX 4070 and B16/B32.
 
-The [precision ablation](experiments/2026-11-11-cuda-bound-precision/README.md) is complete: all tested outputs remain canonical; coarse bounds halve bound storage but increase latency 21–36%, and selective refinement increases latency 0.8–4.9% relative to full byte. Full byte remains the current CSR latency reference. These are conditional calibration results; the next decisive comparison is contract-aligned released GPUSparse, followed by broader workloads and frozen held-out evaluation.
+The [precision ablation](experiments/2026-11-11-cuda-bound-precision/README.md) is complete: all tested outputs remain canonical; coarse bounds halve bound storage but increase latency 21–36%, and selective refinement increases latency 0.8–4.9% relative to full byte. Full byte remains the current CSR latency reference. These are conditional calibration results; the subsequent full-collection canonical controls are recorded above; broader workloads and frozen held-out evaluation remain separate work.
 
 The corrected canonical BMP variant passed its fixture/common-data checks and [resident CPU timing](experiments/2026-11-11-bmp-resident-timing/README.md); compressed bounds took 12.11% longer than raw on the first-25 calibration workload. Its documented corrections are distinct from native released BMP.
 
@@ -53,7 +55,7 @@ Choose compiler architecture flags appropriate to the device actually used. CMak
 
 Bulk input/index files are reproducible from pinned metadata and excluded from Git. Start with [implementation notes](docs/implementation-notes.md) for acquisition, subset selection, query preparation and exact command syntax. Shell drivers resolve the checkout relative to their location; load the CUDA toolkit on PATH before running the CUDA driver. They refuse existing experiment output files.
 
-The scoring contract uses exact uint8 document impacts, the pinned BMP float32/ceil cap 32 query transformation, uint64 accumulation, and score-descending/original-numeric-ID-ascending ties. These semantics do not establish equivalence to original model FP32 retrieval.
+The scoring contract uses exact uint8 document impacts, the pinned BMP float32/ceil cap 32 query transformation, uint64 accumulation, and score-descending/original-numeric-ID-ascending ties. Guarded U32 and FP32 implementations qualify the same canonical answers only on their documented finite integer domains while retaining physical arithmetic labels. These prepared-input semantics do not establish equivalence to arbitrary original-model FP32 retrieval.
 
 ## Documentation
 

@@ -1,0 +1,57 @@
+{
+  "status": "PASS",
+  "review_kind": "Separate final source/provenance/publication review",
+  "measured_source_commit": "edcd32eed32bff0fceca6db5c6755099f225eba8",
+  "parent_merge": "74dd5d303f0cf5690a10f2060f6da536726705dc",
+  "run_id": "20261117-cuda5-fp32-repair02",
+  "scientific_acceptance_records": {
+    "independent_observation": "OBSERVATION-c64445796ed4",
+    "primary_review": "REVIEW-b4efcfb43e9e",
+    "secondary_review": "REVIEW-4cec39e3272d",
+    "acceptance_decision": "DECISION-9493c150a8c7",
+    "source_commit": "edcd32eed32bff0fceca6db5c6755099f225eba8",
+    "run_id": "20261117-cuda5-fp32-repair02"
+  },
+  "postprocessing_files": {
+    "analysis/independent_statistics.py": "4f676436b036608c40fce14aab3c4dd6a621a0db72a8cf2915cc6178a19472e8",
+    "analysis/replay_public.py": "802795e6d318c5aebb21adbc765a641d331d9342e945f72f9b03d0e2118562f3"
+  },
+  "independent_validation": {
+    "archive": "../../../results/2026-11-16-guarded-fp32-baseline/20261117-cuda5-fp32-repair02/raw-evidence.zip",
+    "member": "analysis/local-independent-validation.json",
+    "sha256": "77a8ad318bad6d6c6b86834cb3a61340eb833e159af2245f9a671ed305005176"
+  },
+  "checks": {
+    "separate_pre_CIMS_code_and_repair_reviews": "PASS; immutable original/repair reviews retained; environment repair2does not change scientific code/settings",
+    "independent_public_replay": {
+      "success": true,
+      "groups": 128249,
+      "scores": 1281740,
+      "oracle_scores_checked": 5000,
+      "independent_bootstrap_draws": 10000,
+      "qualification": "500calibration queries; Guarded canonical FP32 and canonical U64 GPUSparse adaptations, not unmodified native. Partial source rows are remotely hash-bound, not a local full-index membership proof."
+    },
+    "source_binary_input_runtime_JIT_provenance": "PASS",
+    "actual_compiled_arithmetic": "PASS;8accepted native process PTX objects,2physical variants",
+    "selected_Torch_library_stability": "PASS;6selected library hashes and package versions unchanged",
+    "memory": "PASS; raw-frame peaks, allocator report arrays and range tracked-byte model verified",
+    "eligibility": "PASS;9unique clean slots,2contaminated timings excluded,all44attempts retained",
+    "public_archive_CRC_and_member_hashes": "PASS;all3runs",
+    "privacy": "PASS;private harness/ledger/auth/bulk/cache data and external process-owner identity excluded"
+  },
+  "findings_fixed": [
+    "Stale expected physical dtype fixed before first CIMS execution.",
+    "Unseen exited-process monitor race fixed conservatively in edcd32e; unknown/interfered timings remain ineligible.",
+    "Persistent outside-group GPU contention caused a retained stop; user coordination/direct availability check preceded a fresh unchanged-code matrix.",
+    "Public decoder vocabulary-trailer and strict resource-slot handling corrected/tested before publication.",
+    "Local postrun export placeholder collision failed expanded-code AST before remote probe. Fixed ordering; immutable core archive preserved and3postrun files transferred separately by hash, without altering any measurement."
+  ],
+  "limits": [
+    "Fixed500calibration queries/3processes/oneGPU/session; intervals conditional and P95describes query/process medians, not serving tails.",
+    "Canonical guarded FP32/U64 adaptations; no arbitrary-float/released end-to-end or matched fullCPU-BMP speed claim.",
+    "Sampling is not exact peak/exclusive access; no host-memory conclusion.",
+    "Full GSP stays remote, source rows are not cryptographic membership proof, originalCIFFposting bodies not independently replayed end-to-end.",
+    "Coupled representation/arithmetic/selection differences do not isolate a single instruction mechanism.",
+    "No held-out use/settings freeze/task division/fourth experiment."
+  ]
+}
