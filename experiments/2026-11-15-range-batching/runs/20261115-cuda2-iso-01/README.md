@@ -1,0 +1,5 @@
+# 20261115-cuda2-iso-01
+
+Passed. One RTX 2080 Ti (GPU 0, UUID `GPU-d5a480cd-7661-ba98-5d22-663c910e1001`), CUDA 12.6, `-arch=sm_75`, source `8afe62f`. Per-query isolation check of `cuda_range_batch`: 100K and 1M passages x 500 calibration queries, k=10 and k=1000, modes `sequential` and `streams`, batch 1/4/16/32, range size 1024 (positions), 256 threads, one warm-up and one measured round each, `VERIFY=1`. 32 configurations, 32 oracle comparisons, zero mismatches; every slot buffer was poisoned before each launch and every slot counter read 0 after each query. Correctness only: the GPU was shared with other users' jobs, so the timing columns are not results. Not recorded by the team runtime; self-recorded manifest.
+
+[Manifest](../../../../results/2026-11-15-range-batching/20261115-cuda2-iso-01/manifest.json) · [Logs](../../../../results/2026-11-15-range-batching/20261115-cuda2-iso-01/logs/) · [Raw](../../../../results/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/) · [Comparisons](../../../../results/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/)
