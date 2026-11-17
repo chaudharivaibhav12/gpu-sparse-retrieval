@@ -1,0 +1,46 @@
+{
+  "experiment_id": "2026-11-17-cpu-baselines",
+  "status": "DRAFT 2026-11-17; not registered; written before any recorded run, after one development probe (answers only checked) and before the development dry-run of code/run.sh",
+  "recording": "self-contained runtime gate (code/gate.py) and self-recorded manifests; not recorded by the team runtime",
+  "question": "How much faster is the GPU range scorer than an exact sequential CPU scorer and an exact multicore CPU scorer on the same machine, index, queries and answers?",
+  "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1; uint8 impacts, prepared integer query weights, uint32 accumulation under the conservative-bound guard, reported as uint64; ties by original numeric passage ID; all passages eligible",
+  "inputs": {
+    "rule": "the shared full-collection files pinned in experiments/2026-11-15-full-collection-baselines/configs/protocol.json, checked by whole-file SHA-256 before any scoring",
+    "gsp": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac",
+    "rbp_w1024": "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab",
+    "queries": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091 (500 calibration queries)",
+    "cpu_reference_top10": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed",
+    "provenance": "GSP and RBP regenerated on cuda5 from the pinned raw CIFF and accepted only on exact hash equality (experiments/2026-11-15-range-batching, full_collection entry); the reference is the published full-top10.tsv"
+  },
+  "fixed": {"documents": 8841823, "k": 10, "query_count": 500, "host": "cuda5 (2 x Xeon E5-2650 v2, 8 cores each, no SMT; RTX 4070)"},
+  "implementations": {
+    "gpu-range": "src/cuda_range_v2.cu unchanged (variant 5, W1024 positions, 256 score / 256 merge threads, VERIFY 0), nvcc -O3 -lineinfo -arch=sm_89 -std=c++17, host thread on CPU 0: the scorer and build of the full-collection baselines",
+    "cpu-tN": "src/cpu_exhaustive.cpp, g++ -O3 -march=native -fopenmp -std=c++17: term-at-a-time over an in-memory inverted index, documents split into N contiguous parts of about equal posting count, one OpenMP thread per part with its own accumulator and heap top-k, merged on the calling thread. N=1 runs without an OpenMP region",
+    "placement": "configs/configs.tsv: N=1,2,4,8 on socket 0 (even CPUs) with memory bound to socket 0; N=16 on both sockets with memory interleaved; GPU host thread on CPU 0 with local allocation. Placement was fixed from the machine layout before any timing, not chosen from measured latencies"
+  },
+  "configurations": ["gpu-range", "cpu-t1", "cpu-t2", "cpu-t4", "cpu-t8", "cpu-t16"],
+  "timing_boundary": "Per query, wall clock on the host from building the query representation from its parsed (term, weight) pairs to the ordered top-k (original IDs and scores) in host memory, including GPU launch, synchronisation and result transfer for the GPU and the OpenMP region for the CPU. Index loading, inverted-index construction, the gate, output writes and checking are outside it. The GPU scorer's existing boundary (query_wall_ms) is used unchanged",
+  "timing": {
+    "processes": 3, "warmup_rounds": 3, "measured_rounds": 20,
+    "order": "every configuration once per pass, three passes with rotation offsets 0, ceil(n/3), ceil(2n/3)",
+    "before_each_process": "wait (60 s polls, at most 60 minutes) until no GPU compute process is listed and other users' CPU use over 5 s is at most CPU_LIMIT cores",
+    "sampling": "every 0.5 s during each process: nvidia-smi compute processes on the GPU (GPU scorer only) and machine CPU time from /proc minus the scorer and the sampler; sampler on CPU 15",
+    "eligibility": "a timing process is ineligible if the gate did not accept it, it did not exit 0, it is the GPU scorer and another GPU process was sampled (or its own was not), or other users' CPU use averaged more than CPU_LIMIT cores over its life",
+    "replacement": "an ineligible process is kept under raw/ineligible/ and replaced; at most 3 replacements per configuration, a 4th stops the run. Per configuration, not per run, because the batching experiment showed that a per-run limit fails on a shared machine for reasons unrelated to the measurement",
+    "cpu_limit_cores": "TO BE SET before registration from the development dry-run's sampled background CPU use (the rule is about contamination, not about any measured latency)"
+  },
+  "correctness_gate": "From the timed source and binaries on the timed host: CPU-scorer fixtures (tests/check_cpu_exhaustive.py), two deliberate gate rejections (CPU thread count, GPU score threads), every configuration once against the CPU reference, and every timing process's answers against the CPU reference. Any mismatch stops the run",
+  "analysis": {
+    "per_process_query": "median of the 20 measured rounds",
+    "primary": "GPU speedup over cpu-t1 and over cpu-t16: geometric mean over (process, query) pairs of median_cpu / median_gpu, paired by process index and query",
+    "secondary": "GPU speedup over cpu-t2/t4/t8; CPU parallel speedup cpu-t1 / cpu-tN; descriptive median, mean and p95 of the query-process medians",
+    "interval": "crossed process/query bootstrap, 10,000 draws, seed 20261118, percentile 2.5/97.5; conditional on this session and the calibration queries",
+    "script": "analysis/analyze.py"
+  },
+  "limits": [
+    "one host; the CPU is a 2013 two-socket server part and the GPU a 2023 consumer card; speedups describe this machine",
+    "the CPU scorer is exhaustive like the GPU scorer; it is not the state-of-the-art CPU method (BMP), whose full-collection timing remains a separate, open comparison",
+    "shared machine: absence of other processes in the samples does not prove exclusivity",
+    "calibration queries only; the 6,480 held-out queries are untouched"
+  ]
+}

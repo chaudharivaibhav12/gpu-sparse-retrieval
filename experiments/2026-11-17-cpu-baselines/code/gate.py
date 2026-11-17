@@ -124,12 +124,14 @@ def main():
     runtime = receipt_path.with_suffix(".runtime")
     assert not receipt_path.exists() and not runtime.exists(), "refusing to reuse a receipt"
     runtime.mkdir(parents=True)
-    if a.sampler_cpu is not None:
-        os.sched_setaffinity(0, {a.sampler_cpu})
     env = dict(os.environ, RESEARCH_RUNTIME_DIR=str(runtime), RESEARCH_GATE_SECONDS=str(GATE_SECONDS))
     started = now()
     log = open(str(receipt_path.with_suffix(".log")), "x")
+    # Start the scorer with this script's full CPU mask (numactl places it), then pin this script and
+    # its sampler; pinning first would restrict the scorer to the sampler's CPU.
     process = subprocess.Popen(command, env=env, stdout=log, stderr=subprocess.STDOUT)
+    if a.sampler_cpu is not None:
+        os.sched_setaffinity(0, {a.sampler_cpu})
     sampler = Sampler(process.pid, a.gpu_uuid)
     sampler.start()
     actual, diff, verdict = None, None, "no-runtime-report"
