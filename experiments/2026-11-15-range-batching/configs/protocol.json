@@ -1,0 +1,104 @@
+{
+  "experiment_id": "2026-11-15-range-batching",
+  "status": "REGISTERED 2026-11-16, before any timed run. Repeats, primary GPU and the fixed W1024/256 setting were agreed with the team on 2026-11-16. A timed run is valid only from a commit that contains this file unchanged.",
+  "recording": "not recorded by the team's ledger runner (not in the repository); self-recorded manifests plus one gate receipt per driver process (code/gated_run.py)",
+  "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "queries": "500 calibration queries only, file order; held-out untouched",
+  "fixed": "range_scores kernel body (variant 5), index format, scoring, selection, merge; range size 1024 positions, 256 threads",
+  "implementations": {
+    "sequential": "control: one query at a time, each on its own slot and stream",
+    "streams": "all queries of a batch launched before any is collected, one stream per query",
+    "batched": "one launch per batch, grid (ranges, batch), last block detected per query"
+  },
+  "batch_sizes": [
+    1,
+    4,
+    16,
+    32
+  ],
+  "k": [
+    10,
+    1000
+  ],
+  "documents": [
+    1000000
+  ],
+  "later": "full collection (8,841,823 passages) with the shared prepared inputs pinned in experiments/2026-11-15-full-collection-baselines/configs/protocol.json (GSP e838dfbf..., W1024 RBP c7669620..., oracle 7a63bb52...), never an independent rebuild; a registration entry with batch sizes that fit the modelled memory is added before those runs. The 1M run is a labelled scaling study.",
+  "full_collection": {
+    "status": "REGISTERED 2026-11-17 before any full-collection batching run",
+    "documents": 8841823,
+    "ranges": 8635,
+    "inputs": "the shared prepared inputs pinned in experiments/2026-11-15-full-collection-baselines/configs/protocol.json, by SHA-256: GSP e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac, W1024 RBP c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab, queries 150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091, CPU reference (top-10) 7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed. The owner's copies on cuda5 are not readable by other accounts, so, as that experiment's report allows ('regenerate only against pinned source/hashes if needed'), GSP and RBP are regenerated from the pinned raw CIFF (pisa-engine/ciff-hub revision b5378954a58cb1cc46019618451d6402cd65f8d6, SHA-256 16b111a409c557b966322c3b093e96a83c54a76e7863a0af4db3d0ae57043953) with the unchanged cpu_pilot importer and range_bitpack_tool, and are used only if their whole-file SHA-256 equals the pinned values; the CPU reference is the full-top10.tsv member of the published 20261115-cuda5-reference01 raw-evidence.zip. No file with a different hash is used",
+    "k": [
+      10
+    ],
+    "k_1000": "not run: no pinned full-collection top-1000 CPU reference exists; adding one is a separate team decision. Modelled tracked bytes at k=1000 would be about 3.88, 4.50, 6.99 and 10.31 GB for batch 1/4/16/32 on a 12.88 GB board",
+    "batch_sizes": [
+      1,
+      4,
+      16,
+      32
+    ],
+    "modelled_tracked_allocation_bytes": "shared index about 3,673,892,778 (from the parent range run's 3,675,984,612 at batch 1) + 2,091,834 per query at k=10 (+1,028 per query in batched mode): about 3.68 GB at batch 1 and 3.74 GB at batch 32; exact values are derived from the index by the runtime gate before any query is computed",
+    "configuration": "configs/timing-full.tsv; everything else as registered above (W1024, 256 threads, 3 processes x (3 warm-up + 20 measured rounds), rotating order, gate, sampling, eligibility, at most 3 replacements, analysis)",
+    "hardware": "RTX 4070 (cuda5) only; the RTX 2080 Ti host has no copy of the pinned files and they are not rebuilt there",
+    "comparison_scope": "among our three execution modes only. The parent single-query range result (0.687415 ms) was measured with a different driver, timing boundary and session and is not a contrast here",
+    "contended_out_of_memory": "added 2026-11-17 after a development dry-run (dev-cuda5-full-01, not a result) was stopped by an out-of-memory error while another user's process held 8,324 MiB: the index alone needs about 3.7 GB, so a foreign process can exhaust the board. A timing process that exits with CUDA 'out of memory' before its runtime report, wrote no result file, and has sampled foreign-process memory with no sampler error is kept under raw/ineligible/ and replaced exactly like any other ineligible process, within the same limit of 3 replacements per run. It is a contaminated resource attempt, not a fit or capacity finding. Any other failure, or an out-of-memory error with no sampled foreign process, stops the run. This follows the resource_oom_rule of the full-collection baseline protocol. Outside the timing loop such an error still stops the run"
+  },
+  "correctness_gate": {
+    "where": "inside code/run_timing.sh, with the same binary, source commit and GPU as the timed processes; timing does not start unless every check passes",
+    "edge_cases": "tests/check_range_batch.py: synthetic fixtures (single document, empty documents, ties across ranges, partial last range, 128-term queries, repeated terms, empty index, empty and no-posting queries), all three modes, batch 1, a partial last batch, a batch equal to and larger than the query file; 1 warm-up + 2 rounds, VERIFY=1 (poisoned buffers, counter read-back, in-driver CPU reference) and independent Python rankings",
+    "runtime_gate": "every driver process reports its resolved configuration and behaviour marks before computing; code/gated_run.py compares them with an independently derived expectation (reviewed parser experiments/2026-11-15-range-worker-sweep/code/expected.py) and releases or rejects the process. Marks distinguish sequential, streams and batched execution.",
+    "runtime_rejections": "three deliberate mismatches (execution mode, batch size, score threads) must each be rejected before any result file exists",
+    "real_data": "every timed configuration plus batch 7 (partial last batch) per mode and k: 500 calibration queries, 1 warm-up + 1 round, VERIFY=2 (poisoned buffers, counter read-back), every answer compared with the CPU oracle file",
+    "earlier_runs": "20261115-cuda2-iso-01 and 20261115-cuda2-batched-01 (code/check_isolation.sh, code/check_batched.sh) are correctness records for earlier commits on RTX 2080 Ti; they do not replace the checks above",
+    "rule": "any mismatch, rejection failure or driver failure stops the run before timing; it is preserved and reported, not rerun unchanged"
+  },
+  "timing": {
+    "processes_per_configuration": 3,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "order": "rotating across the three processes: in process p configuration (i + offset_p) mod n runs i-th, offsets 0, ceil(n/3), ceil(2n/3)",
+    "batch_formation": "consecutive queries in file order; the last batch may be partial; batches are complete before timing starts, so no wait-to-form time is included or modelled",
+    "boundary": "per batch, wall clock: host build of query arguments, query transfer (kernel argument for sequential/streams, one H2D copy for batched), all kernels, top-k D2H to pinned memory, event completion. Excluded: index load/upload, tie-rank and buffer setup, runtime gate, file output, correctness checking. Device event spans are diagnostics only.",
+    "gpu_check": "before each process: no other compute process on the target GPU (poll 60 s, abort after 60 min). During each process: one nvidia-smi sample every 0.25 s of the processes on the target GPU. A timing process during which another process was sampled, or whose sampler failed, is ineligible: it is kept under raw/ineligible/ and replaced, at most 3 replacements per run. No sampled foreign process is not proof of an exclusive GPU.",
+    "correctness_during_timing": "every saved top-k of every timing process compared with the CPU oracle",
+    "cpu": "driver pinned to CPU 0; gate and sampler pinned to CPU 1",
+    "identity": "source commit, binary SHA-256 and GPU UUID in every receipt; index and query SHA-256 in the manifest; the analysis refuses mixed identities",
+    "raw_answers": "ranked answers of every correctness and timing process kept losslessly: each distinct per-round answer body stored once (gzip, named by SHA-256) and a per-process receipt that rebuilds the full listing to its original SHA-256 (code/pack_answers.py)",
+    "valid_results": "a completed valid result is not rerun to obtain better numbers; technical failures are preserved, reviewed and repaired in a fresh run directory"
+  },
+  "metrics": {
+    "throughput_qps": "queries / sum of batch_wall_ms over a measured round, per process; reported per configuration as the median over rounds and processes with the range",
+    "completion_latency_ms": "per query, from batch start to that query's results on the host; reported as median, p95 and p99 over queries, per configuration",
+    "batch_processing_ms": "batch_wall_ms per full batch; partial batches reported separately",
+    "exactness": "oracle mismatches (must be zero)",
+    "memory": {
+      "tracked_allocation_bytes": "device buffers the driver allocates itself: shared index + per-query bytes x batch; checked against the independent expectation at the gate; excludes the CUDA context and allocator rounding",
+      "device_used_delta_bytes": "change in device used memory across the driver's allocations, read once by the driver",
+      "sampled_process_memory_mib": "largest 0.25-second nvidia-smi sample of the driver process (a timing process at 1M lasts only a few seconds on the GPU); a sampled maximum, not an exact peak",
+      "rule": "reported separately from each other and from time; never mixed or called peak without the qualifier"
+    }
+  },
+  "contrasts": [
+    "streams / sequential and batched / sequential throughput at each batch size and k",
+    "batched / streams throughput at each batch size and k",
+    "each mode at batch b / the same mode at batch 1"
+  ],
+  "analysis": "paired by measured round and process; geometric mean of throughput ratios; 10,000-draw crossed bootstrap over rounds and processes, seed 20261117, conditional on the calibration set and session; completion-latency percentiles are descriptive, not serving tails",
+  "hardware": {
+    "primary": "RTX 4070 on cuda5, UUID GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7, sm_89 (the GPU of the full-collection baseline). Shared machine: runs are announced to the team first; no exclusive slot is implied.",
+    "replication": "RTX 2080 Ti on cuda2, sm_75, same protocol, reported as a separately labelled replication; the GPU UUID is recorded in the run",
+    "fixed_setting": "range size 1024 positions, 256 threads on both; no per-GPU tuning in this registration",
+    "rule": "results from different GPU models are never pooled"
+  },
+  "not_in_this_registration": "held-out queries, arrival processes or batch-formation wait, multi-GPU, changes to scoring/selection/storage, pruning",
+  "parent_results": "Full-collection single-query baseline: experiments/2026-11-15-full-collection-baselines (measured source f10c7e7). Its numbers are not re-measured or extended here.",
+  "limits": [
+    "128-term query limit of the scorer; calibration queries have at most 95 terms; held-out lengths are not audited here",
+    "guarded uint32 accumulation equals uint64 only on the verified integer domain (see the full-collection report); arithmetic labels are kept",
+    "completion is stamped by polling events on one host thread; batches are formed before timing, so no arrival process or formation wait",
+    "three processes on a shared GPU; intervals are conditional on this session",
+    "comparisons are among our own three execution modes on the same scorer; no claim about released GPUSparse or CPU BMP"
+  ]
+}

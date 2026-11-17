@@ -3,8 +3,8 @@
   "experiment_id": "2026-11-15-range-batching",
   "title": "Batching and concurrent queries on the range scorer",
   "owner": "parva",
-  "branch": "exp/parva/2026-11-15-range-batching",
-  "status": "step-1-passed-correctness",
+  "branch": "exp/parva/2026-11-15-range-batching (step 1), exp/parva/2026-11-15-range-batching-batched (batched launch, protocol, timing)",
+  "status": "steps-1-and-3-passed-correctness; timing completed at 1M (RTX 4070 primary, RTX 2080 Ti replication, 2026-11-16) and on the full collection at k=10 (RTX 4070, 2026-11-17)",
   "parent_experiment": "2026-11-14-range-bitpack-v2",
   "parent_source_commit": "201be69",
   "question": "How do throughput, per-query completion latency and peak GPU memory change when the reviewed range scorer serves several queries at once?",
@@ -13,9 +13,21 @@
   "code_paths": [
     "src/cuda_range_batch.cu",
     "src/cuda_range_v2.cu",
-    "experiments/2026-11-15-range-batching/code/check_isolation.sh"
+    "experiments/2026-11-15-range-batching/code/check_isolation.sh",
+    "experiments/2026-11-15-range-batching/code/check_batched.sh",
+    "tests/check_batched_kernel_sync.py",
+    "experiments/2026-11-15-range-batching/code/run_timing.sh",
+    "experiments/2026-11-15-range-batching/analysis/analyze_batching.py",
+    "experiments/2026-11-15-range-batching/code/gated_run.py",
+    "experiments/2026-11-15-range-batching/code/pack_answers.py",
+    "tests/check_range_batch.py"
   ],
-  "configuration_files": [],
+  "configuration_files": [
+    "experiments/2026-11-15-range-batching/configs/protocol.json (registered 2026-11-16)",
+    "experiments/2026-11-15-range-batching/configs/timing-1m.tsv",
+    "experiments/2026-11-15-range-batching/configs/smoke.tsv",
+    "experiments/2026-11-15-range-batching/configs/timing-full.tsv"
+  ],
   "declared_changes": {
     "driver": "per-query slots; sequential and streams modes",
     "kernel": "unchanged",
@@ -24,15 +36,25 @@
   "scoring_contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
   "input_manifest": "results/derived-sha256.txt",
   "query_split": "calibration-500 only; held-out untouched",
-  "timing_boundary": "Step 1 has none (correctness only). Timed steps: to be registered before running.",
+  "timing_boundary": "See configs/protocol.json (timing.boundary).",
   "correctness_rule": "Every query's ordered (original_id, score) top-k equals the cpu_pilot oracle in every mode and batch size; every slot counter reads 0 after its query.",
-  "measurement_and_analysis_plan": "See README plan; timing protocol registered before step 2.",
+  "measurement_and_analysis_plan": "configs/protocol.json; analysis/analyze_batching.py",
   "success_rule": "Step 1: all isolation checks pass at 100K and 1M, k=10 and k=1000, batch 1/4/16/32.",
   "failure_rule": "Any mismatch, invalid candidate or non-zero counter.",
   "next_if_negative": "Locate the shared mutable state, fix, re-review, rerun.",
   "recording_ids": [],
   "runs": [
     "20261115-cuda2-iso-01",
-    "dev-cuda2-iso-01"
+    "20261115-cuda2-batched-01",
+    "dev-cuda2-iso-01",
+    "20261116-cuda5-timing-02",
+    "20261116-cuda2-timing-01",
+    "20261116-cuda5-timing-01 (failed)",
+    "aborted-20261116-cuda2-wrong-commit (aborted)",
+    "dev-cuda5-smoke-01, dev-cuda5-smoke-02 (development, cuda5 scratch only)",
+    "20261117-cuda5-full-03",
+    "20261117-cuda5-full-01 (failed)",
+    "20261117-cuda5-full-02 (failed)",
+    "dev-cuda5-full-01 to -04 (development, cuda5 scratch only)"
   ]
 }
