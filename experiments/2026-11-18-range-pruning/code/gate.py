@@ -13,9 +13,14 @@ While COMMAND runs, once per SAMPLE_SECONDS:
 - /proc/stat gives the CPU time used by the whole machine and /proc/<pid>/stat that of the
   scorer and of this script; the rest is "other" CPU use, in cores.
 The receipt records the expectation, the report, the differences, the verdict, the exit code
-and both samples. `gpu_eligible` is true when the GPU scorer's own process was sampled, no
-other GPU process was, and there were no sampler errors. CPU use by others is recorded for
-every process; the eligibility rule for it is in configs/protocol.json.
+and both samples. GPU samples are counted over the whole life of the process and, separately,
+over its released phase: from just before `continue` is written (the scorer's timed rounds,
+warm-up included, all follow) to its exit. A sample is released if the release happened before
+its nvidia-smi call returned, so a sample that straddles the release counts. `gpu_eligible`
+(amendment 1 of this experiment's protocol) is true when the scorer's own process was sampled
+and no other GPU process was in the released phase, with no sampler errors; whole-life counts
+stay in the receipt. CPU use by others is recorded for every process; the eligibility rule for
+it is in configs/protocol.json.
 """
 import argparse, datetime, json, os, subprocess, sys, threading, time
 from pathlib import Path
@@ -51,8 +56,10 @@ class Sampler(threading.Thread):
         super().__init__(daemon=True)
         self.pid, self.gpu_uuid = pid, gpu_uuid
         self.stop = threading.Event()
+        self.released = threading.Event()
         self.lines = []
-        self.gpu = dict(samples=0, own_samples=0, other_samples=0, own_max_mib=0, other_max_mib=0, errors=0)
+        self.gpu = dict(samples=0, own_samples=0, other_samples=0, own_max_mib=0, other_max_mib=0, errors=0,
+                        released_samples=0, released_own_samples=0, released_other_samples=0, released_other_max_mib=0)
         self.cpu = dict(samples=0, other_cores_sum=0.0, other_cores_max=0.0, own_cores_sum=0.0, errors=0)
 
     def run(self):
@@ -75,7 +82,11 @@ class Sampler(threading.Thread):
                     g = self.gpu
                     g["samples"] += 1; g["own_samples"] += own > 0; g["other_samples"] += other > 0
                     g["own_max_mib"] = max(g["own_max_mib"], own); g["other_max_mib"] = max(g["other_max_mib"], other)
-                    line += " gpu_own_mib=%d gpu_other_mib=%d" % (own, other)
+                    released = self.released.is_set()  # read after nvidia-smi returned
+                    if released:
+                        g["released_samples"] += 1; g["released_own_samples"] += own > 0; g["released_other_samples"] += other > 0
+                        g["released_other_max_mib"] = max(g["released_other_max_mib"], other)
+                    line += " gpu_own_mib=%d gpu_other_mib=%d released=%d" % (own, other, released)
                 except Exception as error:
                     self.gpu["errors"] += 1
                     line += " GPU_ERROR %r" % error
@@ -140,6 +151,8 @@ def main():
             actual = json.loads((runtime / "runtime.json").read_text())
             diff = differences(expected, actual)
             verdict = "rejected" if diff else "accepted"
+            if not diff:
+                sampler.released.set()
             (runtime / ("reject" if diff else "continue")).touch()
         time.sleep(0.02)
     sampler.stop.set()
@@ -153,7 +166,7 @@ def main():
                own_cores_mean=c["own_cores_sum"] / c["samples"] if c["samples"] else None,
                note="whole-run averages over the process's life, including index loading; machine busy time minus this scorer and this sampler")
     gpu = dict(g, interval_seconds=SAMPLE_SECONDS) if a.gpu_uuid else None
-    gpu_eligible = (g["own_samples"] > 0 and g["other_samples"] == 0 and g["errors"] == 0) if a.gpu_uuid else None
+    gpu_eligible = (g["released_own_samples"] > 0 and g["released_other_samples"] == 0 and g["errors"] == 0) if a.gpu_uuid else None
     receipt = dict(started_utc=started, ended_utc=now(), argv=command, expected=expected, actual=actual, differences=diff,
                    verdict=verdict, exit_code=process.returncode, gpu_uuid=a.gpu_uuid, gpu_sampling=gpu,
                    gpu_eligible=gpu_eligible, cpu_sampling=cpu)
