@@ -14,25 +14,23 @@ The V2-5 profile (branch `exp/arnav/2026-11-15-range-bitpack-v2-profile`, run `2
 
 ## Status
 
-The three changes are implemented, reviewed and pass the laptop gate. No cuda5 runs yet; `configs/protocol.json` is still an uncommitted draft.
+Complete on 1M documents: **[report.md](report.md)**. Measurement A (paired timing) and Measurement B (ctrl vs v3-all profile) ran on cuda5 as registered in [configs/protocol.json](configs/protocol.json) (two amendments: fix 1 and the build directories). Recommendation: carry v3-3 (θ merge + radix select) forward; change 1 was slower on cuda5.
 
-| Label | Commit | Changes | Registers (small-k / radix) | Laptop gate |
-|---|---|---|---|---|
-| ctrl | `74dd5d3` | main's V2-5 | 40 / — | (reference) |
-| v3-1 | `5f1ccd9` | 1 warp-cooperative lookup | 55 / — | [passed](runs/20261117-laptop-v3-1-01/README.md) |
-| v3-2 | `025dbdb` | 2 theta-filtered merge | 40 / — | [passed](runs/20261117-laptop-v3-2-01/README.md) |
-| v3-3 | `510def3` | 2 + 3 radix select for k >= 100 | 40 / 40 | [passed](runs/20261117-laptop-v3-3-01/README.md) |
-| v3-all | `313e255` | 1 + 2 + 3 | 55 / 55 | [passed](runs/20261117-laptop-v3-all-01/README.md) |
+| Label | Commit | Changes | cuda5 gate |
+|---|---|---|---|
+| ctrl | `74dd5d3` | main's V2-5 | passed (01) |
+| v3-1 | `ea4f506` | 1 warp-cooperative lookup, chunk 8 (fix 1) | passed (02) |
+| v3-2 | `025dbdb` | 2 θ-filtered merge | passed (01) |
+| v3-3 | `510def3` | 2 + 3 radix select for k >= 100 | passed (01) |
+| v3-all | `a8a9a1e` | 1 + 2 + 3, chunk 8 (fix 1) | passed (02); 01 failed (kept) |
 
-Each commit's default compile switches (`RBP_V3_LOOKUP`, `RBP_V3_THETA`, `RBP_V3_RADIX`) build its label; [code/build_variants.sh](code/build_variants.sh) builds each from its own commit and the resulting SASS equals the gated builds. Reviews written before each change: [1](code/review-change-1.json), [2](code/review-change-2.json), [3](code/review-change-3.json) (each with findings after implementation). Gate: fixtures including the version-3 cases (enforced), then 100K and 1M x 500 calibration queries x k = 10, 100, 1000 at W=1024 / 256 threads, all exact.
-
-Open points for the owner: change 1's lookup chunk (16 words, as specified, costs 15 registers and two resident blocks per SM; `RBP_LOOKUP_CHUNK_WORDS=8` restores 40 registers but adds a second load round for warps with more than 8 words); the radix crossover (default 100; on the laptop radix was already faster at k=32).
+Reviews: [change 1](code/review-change-1.json), [change 2](code/review-change-2.json), [change 3](code/review-change-3.json), [fix 1](code/review-fix-1.json), [run scripts](code/review-run-scripts.json).
 
 Not edited, will need a refresh if these changes are adopted: Parva's batched copy of `range_scores` and her `tests/check_batched_kernel_sync.py`.
 
 ## Runs
 
-Laptop gates (RTX 4070 Laptop, CUDA 13.3; correctness only, timing readings are development readings): v3-1, v3-2, v3-3, v3-all, linked above.
+cuda5: [Measurement A](runs/20261117-cuda5-timing-01/README.md), [Measurement B](runs/20261117-cuda5-profile-01/README.md), gates `results/2026-11-17-range-v3/20261117-cuda5-gate-*`. Laptop gates (CUDA 13.3, development only): [v3-1](runs/20261117-laptop-v3-1-01/README.md), [v3-2](runs/20261117-laptop-v3-2-01/README.md), [v3-3](runs/20261117-laptop-v3-3-01/README.md), [v3-all](runs/20261117-laptop-v3-all-01/README.md) (chunk-16 commits).
 
 ## Findings
 
