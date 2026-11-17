@@ -1,0 +1,225 @@
+{
+  "run": "/scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01",
+  "processes": 3,
+  "warmups": 3,
+  "rounds": 20,
+  "queries": 500,
+  "development": false,
+  "cpu_limit_cores": 1.0,
+  "estimator": "per (process, query) median of the measured rounds; paired ratios by process index and query; geometric mean; crossed process/query bootstrap, 10000 draws, seed 20261118",
+  "reading": "'X / gpu-range' is how many times longer configuration X takes than the GPU scorer (GPU speedup); 'cpu-t1 / cpu-tN' is the CPU's parallel speedup with N threads",
+  "configurations": {
+    "gpu-range": {
+      "query_process_medians_ms": {
+        "median": 0.68978825,
+        "mean": 0.7198798523333333,
+        "p95": 0.96136735,
+        "max": 1.168065
+      },
+      "per_process_median_ms": [
+        0.68703675,
+        0.69084125,
+        0.68978825
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.6091266211365816,
+        0.29566754471068474,
+        0.22488509929929928
+      ],
+      "other_cpu_cores_max_per_process": [
+        1.8214035889580171,
+        1.431127462950658,
+        0.9175074735957595
+      ]
+    },
+    "cpu-t1": {
+      "query_process_medians_ms": {
+        "median": 46.901775,
+        "mean": 49.91907176666667,
+        "p95": 82.95050750000001,
+        "max": 108.881
+      },
+      "per_process_median_ms": [
+        46.951325000000004,
+        46.94265,
+        46.6781
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.18717048890857452,
+        0.18454235226694643,
+        0.15129290303020604
+      ],
+      "other_cpu_cores_max_per_process": [
+        1.159850662486615,
+        1.1397103224378529,
+        1.4195807296709635
+      ]
+    },
+    "cpu-t2": {
+      "query_process_medians_ms": {
+        "median": 29.90865,
+        "mean": 31.10106473333333,
+        "p95": 50.122519999999994,
+        "max": 67.66825
+      },
+      "per_process_median_ms": [
+        29.91705,
+        29.93965,
+        29.854925
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.19305065701178803,
+        0.1931706957732392,
+        0.1577789527189739
+      ],
+      "other_cpu_cores_max_per_process": [
+        0.9795851043464343,
+        1.839304157888702,
+        0.9795686995736603
+      ]
+    },
+    "cpu-t4": {
+      "query_process_medians_ms": {
+        "median": 24.418975,
+        "mean": 25.46396774333333,
+        "p95": 41.1539775,
+        "max": 58.448499999999996
+      },
+      "per_process_median_ms": [
+        24.4334,
+        24.418975,
+        24.428175
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.21722446467741094,
+        0.2113423985833041,
+        0.16823717860484874
+      ],
+      "other_cpu_cores_max_per_process": [
+        1.6192368114985012,
+        1.2198763703399504,
+        0.8597792346365788
+      ]
+    },
+    "cpu-t8": {
+      "query_process_medians_ms": {
+        "median": 22.857775,
+        "mean": 23.945337633333335,
+        "p95": 39.2192075,
+        "max": 54.261849999999995
+      },
+      "per_process_median_ms": [
+        22.95805,
+        22.78165,
+        22.815624999999997
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.2448944844221354,
+        0.24488856076504287,
+        0.24404676407041534
+      ],
+      "other_cpu_cores_max_per_process": [
+        1.479441481270449,
+        1.5341112674531736,
+        1.6191931523589584
+      ]
+    },
+    "cpu-t16": {
+      "query_process_medians_ms": {
+        "median": 7.628665,
+        "mean": 7.847170223333333,
+        "p95": 12.056725,
+        "max": 15.204799999999999
+      },
+      "per_process_median_ms": [
+        7.400180000000001,
+        7.4642875,
+        8.0001
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.2619241858542056,
+        0.2535634000606238,
+        0.22478457910306765
+      ],
+      "other_cpu_cores_max_per_process": [
+        1.4193544436024335,
+        1.3795248064552528,
+        1.159899624573844
+      ]
+    }
+  },
+  "contrasts": {
+    "cpu-t1 / gpu-range": {
+      "ratio": 66.03630165201638,
+      "interval_95": [
+        64.75429079660562,
+        67.26581297290238
+      ],
+      "pairs": 1500
+    },
+    "cpu-t2 / gpu-range": {
+      "ratio": 41.130797199031285,
+      "interval_95": [
+        40.37257546879818,
+        41.93028023708366
+      ],
+      "pairs": 1500
+    },
+    "cpu-t4 / gpu-range": {
+      "ratio": 33.49830597799522,
+      "interval_95": [
+        32.8098783065189,
+        34.20422498989276
+      ],
+      "pairs": 1500
+    },
+    "cpu-t8 / gpu-range": {
+      "ratio": 31.52395785024431,
+      "interval_95": [
+        30.860349397776815,
+        32.177818181514056
+      ],
+      "pairs": 1500
+    },
+    "cpu-t16 / gpu-range": {
+      "ratio": 10.57206543194757,
+      "interval_95": [
+        10.204363591191322,
+        11.033860189135769
+      ],
+      "pairs": 1500
+    },
+    "cpu-t1 / cpu-t2": {
+      "ratio": 1.605519614231345,
+      "interval_95": [
+        1.5990883990153772,
+        1.612032328817434
+      ],
+      "pairs": 1500
+    },
+    "cpu-t1 / cpu-t4": {
+      "ratio": 1.9713325711274792,
+      "interval_95": [
+        1.9601898424338104,
+        1.9830907433987282
+      ],
+      "pairs": 1500
+    },
+    "cpu-t1 / cpu-t8": {
+      "ratio": 2.0947972956227154,
+      "interval_95": [
+        2.081469700403002,
+        2.1086876338450073
+      ],
+      "pairs": 1500
+    },
+    "cpu-t1 / cpu-t16": {
+      "ratio": 6.246300883880465,
+      "interval_95": [
+        5.9516506151610695,
+        6.475558997094994
+      ],
+      "pairs": 1500
+    }
+  }
+}

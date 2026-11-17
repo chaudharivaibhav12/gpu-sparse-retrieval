@@ -1,0 +1,2825 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-17-cpu-baselines",
+  "run_id": "20261117-cuda5-cpu-01",
+  "status": "completed-timing",
+  "scope": "host cuda5; GPU GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7; 8841823 documents; 500 calibration queries; k=10; configurations gpu-range cpu-t1 cpu-t2 cpu-t4 cpu-t8 cpu-t16; fixtures, gate and correctness checks then 3 processes each in rotating order; 3 warm-up + 20 measured rounds; CPU_LIMIT 1.0 cores; replacements gpu-range=0 cpu-t1=0 cpu-t2=0 cpu-t4=0 cpu-t8=0 cpu-t16=0 ",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "eb2228b34ae72e993ff770d028ce59056c13aa38",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "g++ -O3 -march=native -fopenmp -Wall -Wextra -Wpedantic -std=c++17; nvcc -O3 -lineinfo -arch=sm_89 -std=c++17",
+    "source_sha256": {
+      "src/cpu_exhaustive.cpp": "b1db1b0c5eebbc2f5472754a7d77f7cfba2cbbd7d31b986eef64547351dd3704",
+      "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+      "src/cuda_range_v2.cu": "9515dfe1addeb1eea6a4b65b8144190ec32ec5909870d8ba2508df3d2560af2e",
+      "src/range_bitpack.h": "98fb4ae1e2f3a01bc214d749c47eaa59dbeb17ad0726cc2a18fd1125d9c9c37c",
+      "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+      "src/research_runtime.h": "949757134d97142fa1f5d6e56a79cc61b596d706c0c0ea1577485ca0325d1c59",
+      "tests/check_cpu_exhaustive.py": "9cc20064978020c2a1d797f39a877b34f06179967abe0fb59cc39bd84e42fb87",
+      "tests/check_range_bitpack.py": "12c65d6e53e901ead26a412d59860de48fe51b1225a03239832b4d66ac77f7de",
+      "experiments/2026-11-17-cpu-baselines/configs/configs.tsv": "26e5ac2d2dba6502bd9b127a56c3e14d1cb7f8331dd2f1544c663a8656ea06b3",
+      "experiments/2026-11-17-cpu-baselines/code/gate.py": "103b0ee700ec851e7690614439b98669aac8efbf149921a4bdef80fb9ab82679",
+      "experiments/2026-11-17-cpu-baselines/code/expect.py": "f47a19c620fb470f98bf1c7c7fee8e9cfb931f7a783360fa64907a32b4946f04",
+      "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py": "ca43fb45ed74e0fc8d24c14898ac8ae3d32c7ebd3f805b55f6d59db87378d18e",
+      "experiments/2026-11-17-cpu-baselines/analysis/analyze.py": "c580ece1e608ab674f5f2e2f523592c32ab75bd1f300ba0b2c0f2f44c34cd170",
+      "experiments/2026-11-17-cpu-baselines/code/run.sh": "f80827fa411bc04fa2ad69570e0f79d166328189ab0a562a7bb1c61ac333ad01"
+    },
+    "binary_sha256": {
+      "build/20261117-cuda5-cpu-01/cpu_exhaustive": "88d791628ebe25da32839650b84a96d30d1f0ae3422fea8cc48f49eaa2c7ab45",
+      "build/20261117-cuda5-cpu-01/cuda_range_v2": "f7ae800af4c6c30532ed51f90fba7aa208a33f9bcbd10e61b14a07f3940fb359"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "/scratch/psp8502/full/full-8841823.gsp": {
+      "sha256": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac",
+      "bytes": 5388181537
+    },
+    "/scratch/psp8502/full/full-8841823-w1024.rbp": {
+      "sha256": "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab",
+      "bytes": 3638491070
+    },
+    "/scratch/psp8502/full/oracle/cpu-top10-8841823.tsv": {
+      "sha256": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed",
+      "bytes": 116558
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_12.6.r12.6/compiler.35059454_0"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "g++ -O3 -march=native -fopenmp -Wall -Wextra -Wpedantic -std=c++17 src/cpu_exhaustive.cpp -o build/20261117-cuda5-cpu-01/cpu_exhaustive",
+    "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 src/cuda_range_v2.cu -o build/20261117-cuda5-cpu-01/cuda_range_v2",
+    "python3 tests/check_cpu_exhaustive.py build/20261117-cuda5-cpu-01/cpu_exhaustive --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/fixtures",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t1 --rounds 1 --warmups 0 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --threads 2 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/reject-cpu-threads.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/reject-cpu-threads.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/reject-cpu-threads.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/reject-cpu-threads.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/reject-cpu-threads.tsv 500 10 1 1 0",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py gpu-range --rounds 1 --warmups 0 --limit 500 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/reject-gpu-threads.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/reject-gpu-threads.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/reject-gpu-threads.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 build/20261117-cuda5-cpu-01/cuda_range_v2 /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/reject-gpu-threads.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/reject-gpu-threads.tsv 500 10 0 0 1 0 128 128 -",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py gpu-range --rounds 1 --warmups 0 --limit 500 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/correct-gpu-range.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/correct-gpu-range.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-gpu-range.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 OMP_NUM_THREADS=1 numactl --physcpubind=0 --localalloc build/20261117-cuda5-cpu-01/cuda_range_v2 /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-gpu-range.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-gpu-range.tsv 500 10 0 0 1 0 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-gpu-range.tsv --queries 500 --k 10 --groups-per-query 1 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-correct-gpu-range.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t1 --rounds 1 --warmups 0 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/correct-cpu-t1.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/correct-cpu-t1.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t1.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t1.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t1.tsv 500 10 1 1 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t1.tsv --queries 500 --k 10 --groups-per-query 1 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-correct-cpu-t1.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t2 --rounds 1 --warmups 0 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/correct-cpu-t2.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/correct-cpu-t2.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t2.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0,2 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t2.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t2.tsv 500 10 2 1 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t2.tsv --queries 500 --k 10 --groups-per-query 1 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-correct-cpu-t2.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t4 --rounds 1 --warmups 0 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/correct-cpu-t4.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/correct-cpu-t4.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t4.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0,2,4,6 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t4.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t4.tsv 500 10 4 1 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t4.tsv --queries 500 --k 10 --groups-per-query 1 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-correct-cpu-t4.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t8 --rounds 1 --warmups 0 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/correct-cpu-t8.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/correct-cpu-t8.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t8.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0,2,4,6,8,10,12,14 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t8.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t8.tsv 500 10 8 1 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t8.tsv --queries 500 --k 10 --groups-per-query 1 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-correct-cpu-t8.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t16 --rounds 1 --warmups 0 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/correct-cpu-t16.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/correct-cpu-t16.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t16.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0-15 --interleave=all build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t16.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t16.tsv 500 10 16 1 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t16.tsv --queries 500 --k 10 --groups-per-query 1 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-correct-cpu-t16.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py gpu-range --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r0-gpu-range.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r0-gpu-range.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-gpu-range.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 OMP_NUM_THREADS=1 numactl --physcpubind=0 --localalloc build/20261117-cuda5-cpu-01/cuda_range_v2 /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-gpu-range.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-gpu-range.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-gpu-range.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r0-gpu-range.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t1 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r0-cpu-t1.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r0-cpu-t1.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t1.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t1.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t1.tsv 500 10 1 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t1.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r0-cpu-t1.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t2 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r0-cpu-t2.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r0-cpu-t2.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t2.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0,2 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t2.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t2.tsv 500 10 2 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t2.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r0-cpu-t2.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t4 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r0-cpu-t4.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r0-cpu-t4.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t4.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0,2,4,6 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t4.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t4.tsv 500 10 4 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t4.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r0-cpu-t4.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t8 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r0-cpu-t8.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r0-cpu-t8.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t8.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0,2,4,6,8,10,12,14 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t8.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t8.tsv 500 10 8 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t8.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r0-cpu-t8.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t16 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r0-cpu-t16.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r0-cpu-t16.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t16.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0-15 --interleave=all build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t16.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t16.tsv 500 10 16 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t16.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r0-cpu-t16.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t2 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r1-cpu-t2.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r1-cpu-t2.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t2.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0,2 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t2.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t2.tsv 500 10 2 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t2.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r1-cpu-t2.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t4 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r1-cpu-t4.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r1-cpu-t4.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t4.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0,2,4,6 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t4.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t4.tsv 500 10 4 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t4.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r1-cpu-t4.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t8 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r1-cpu-t8.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r1-cpu-t8.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t8.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0,2,4,6,8,10,12,14 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t8.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t8.tsv 500 10 8 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t8.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r1-cpu-t8.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t16 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r1-cpu-t16.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r1-cpu-t16.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t16.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0-15 --interleave=all build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t16.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t16.tsv 500 10 16 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t16.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r1-cpu-t16.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py gpu-range --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r1-gpu-range.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r1-gpu-range.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-gpu-range.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 OMP_NUM_THREADS=1 numactl --physcpubind=0 --localalloc build/20261117-cuda5-cpu-01/cuda_range_v2 /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-gpu-range.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-gpu-range.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-gpu-range.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r1-gpu-range.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t1 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r1-cpu-t1.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r1-cpu-t1.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t1.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t1.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t1.tsv 500 10 1 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t1.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r1-cpu-t1.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t8 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r2-cpu-t8.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r2-cpu-t8.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t8.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0,2,4,6,8,10,12,14 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t8.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t8.tsv 500 10 8 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t8.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r2-cpu-t8.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t16 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r2-cpu-t16.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r2-cpu-t16.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t16.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0-15 --interleave=all build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t16.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t16.tsv 500 10 16 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t16.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r2-cpu-t16.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py gpu-range --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r2-gpu-range.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r2-gpu-range.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-gpu-range.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 OMP_NUM_THREADS=1 numactl --physcpubind=0 --localalloc build/20261117-cuda5-cpu-01/cuda_range_v2 /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-gpu-range.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-gpu-range.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-gpu-range.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r2-gpu-range.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t1 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r2-cpu-t1.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r2-cpu-t1.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t1.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t1.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t1.tsv 500 10 1 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t1.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r2-cpu-t1.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t2 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r2-cpu-t2.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r2-cpu-t2.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t2.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0,2 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t2.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t2.tsv 500 10 2 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t2.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r2-cpu-t2.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/expect.py cpu-t4 --rounds 20 --warmups 3 --limit 500 --index /scratch/psp8502/full/full-8841823.gsp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r2-cpu-t4.json",
+    "python3 experiments/2026-11-17-cpu-baselines/code/gate.py --expect /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/expect/timing-r2-cpu-t4.json --receipt /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t4.receipt.json --sampler-cpu 15 -- env OMP_PROC_BIND=close OMP_PLACES=cores numactl --physcpubind=0,2,4,6 --membind=0 build/20261117-cuda5-cpu-01/cpu_exhaustive /scratch/psp8502/full/full-8841823.gsp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t4.csv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t4.tsv 500 10 4 20 3",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t4.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/compare-timing-r2-cpu-t4.json",
+    "python3 experiments/2026-11-17-cpu-baselines/analysis/analyze.py /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01 --processes 3 --warmups 3 --rounds 20 --cpu-limit 1.0 --output /scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/analysis/statistics.json"
+  ],
+  "artifacts": {
+    "analysis/compare-correct-cpu-t1.json": {
+      "sha256": "6cc0672ab647a6440ca3d659da185f857317020e7640d406313bcf2262b2bc87",
+      "bytes": 351
+    },
+    "analysis/compare-correct-cpu-t16.json": {
+      "sha256": "6dd0c355f4593beb3925a5a2860e73464dee5d2536a07f2530c876e7c7f245df",
+      "bytes": 352
+    },
+    "analysis/compare-correct-cpu-t2.json": {
+      "sha256": "5db7a45498449698fee08d6f2f2d3432f1a79af9a1b67279120dea51dc47aecd",
+      "bytes": 351
+    },
+    "analysis/compare-correct-cpu-t4.json": {
+      "sha256": "a2bdf339e24304d030582c4968358122a24cdacc36eaf63575e22d9c06891b70",
+      "bytes": 351
+    },
+    "analysis/compare-correct-cpu-t8.json": {
+      "sha256": "a7a321209536bb1711a345d72b3d0be5da3c666fa05e36f7206f93c47348b97b",
+      "bytes": 351
+    },
+    "analysis/compare-correct-gpu-range.json": {
+      "sha256": "afdda9188c9f4c27fa0fddd404b9cff1d220596e8c363477d84d0d2ac172893a",
+      "bytes": 354
+    },
+    "analysis/compare-timing-r0-cpu-t1.json": {
+      "sha256": "2fd6246ce5fac8e7ceaba460056daa276040a8833b8e5afd9e09532c7dd34aad",
+      "bytes": 357
+    },
+    "analysis/compare-timing-r0-cpu-t16.json": {
+      "sha256": "daf67d8475c0d90171cbea842f2ae413258a378b82e9d200ddf86852b456c093",
+      "bytes": 358
+    },
+    "analysis/compare-timing-r0-cpu-t2.json": {
+      "sha256": "f5b0baa38d451169a3fb785be48b5bcdd98595c8279556da5233a342b736a106",
+      "bytes": 357
+    },
+    "analysis/compare-timing-r0-cpu-t4.json": {
+      "sha256": "deaa95f76e6593a8334ee15eaf74139e86898e852f52b53f1df66752c9ec5f6b",
+      "bytes": 357
+    },
+    "analysis/compare-timing-r0-cpu-t8.json": {
+      "sha256": "22db05e2d94d5bd7eb859c71ce4a812ef73ae25ae4ed99cc6aac30cf1d802a7d",
+      "bytes": 357
+    },
+    "analysis/compare-timing-r0-gpu-range.json": {
+      "sha256": "099cf7ffa20a89c11822331ae2a42954736aaea2b4b296b108094aa19f7ce720",
+      "bytes": 360
+    },
+    "analysis/compare-timing-r1-cpu-t1.json": {
+      "sha256": "eb1e2b621ecbfd0637cfe50b380ca53c3474f9be3f5adb5d2fb28b9690bb030e",
+      "bytes": 357
+    },
+    "analysis/compare-timing-r1-cpu-t16.json": {
+      "sha256": "4c2e89b8abb4cd8311a83897a21a65910259901ef9bd7a5fa71f0c2d63c05d6b",
+      "bytes": 358
+    },
+    "analysis/compare-timing-r1-cpu-t2.json": {
+      "sha256": "34a6fc12f835c1b7b38d1e0ceacb833ecd68d3e915df05b7587f2117e31e0a46",
+      "bytes": 357
+    },
+    "analysis/compare-timing-r1-cpu-t4.json": {
+      "sha256": "1a093b8498a490efbc917cb7d7e72821a83fa0450d12a696c5b9c43f8eff7f1f",
+      "bytes": 357
+    },
+    "analysis/compare-timing-r1-cpu-t8.json": {
+      "sha256": "ce8cf730f5fcbebd9c7e540699cb53a975a16f3df6e6b572611ff7db06505d3e",
+      "bytes": 357
+    },
+    "analysis/compare-timing-r1-gpu-range.json": {
+      "sha256": "7fdbba0a8824dbd8bcd9da80ba0681eae59ce0dc912052f68c3977e99215c13a",
+      "bytes": 360
+    },
+    "analysis/compare-timing-r2-cpu-t1.json": {
+      "sha256": "eff9e106aa66ead44c4a7a36aecff192be6d01f8d87c1b045c37dfd1701ebfbe",
+      "bytes": 357
+    },
+    "analysis/compare-timing-r2-cpu-t16.json": {
+      "sha256": "1d7f236e5b896c22753338a06257132e9605f568701c16d4ff49f11319622c52",
+      "bytes": 358
+    },
+    "analysis/compare-timing-r2-cpu-t2.json": {
+      "sha256": "8de3fe860d1c10f91dd8358b3422d9b165cc014c360ba2654dcf14e9ca86ca06",
+      "bytes": 357
+    },
+    "analysis/compare-timing-r2-cpu-t4.json": {
+      "sha256": "360d2207867252d9451318d9c0bfa23b332c527dd83a4892c64166dfba6d54a7",
+      "bytes": 357
+    },
+    "analysis/compare-timing-r2-cpu-t8.json": {
+      "sha256": "7d90e8314e19c591a2da73b371017aedcd31b69f0571381a6e5bae304742f2f4",
+      "bytes": 357
+    },
+    "analysis/compare-timing-r2-gpu-range.json": {
+      "sha256": "825f73a97e1d37d38059a520567142bafc0de2de860a32a656ff0493ea47f4c3",
+      "bytes": 360
+    },
+    "analysis/statistics.json": {
+      "sha256": "3c3433692ce8330c8d01442a06da57d434750805ca94a0da8d9d876671d4b849",
+      "bytes": 5558
+    },
+    "configs.tsv": {
+      "sha256": "26e5ac2d2dba6502bd9b127a56c3e14d1cb7f8331dd2f1544c663a8656ea06b3",
+      "bytes": 611
+    },
+    "expect/correct-cpu-t1.json": {
+      "sha256": "fbd0b39809c7711410c5bbbdaf29aee7dea9bf799b8f321c684b24c73327ddbb",
+      "bytes": 901
+    },
+    "expect/correct-cpu-t16.json": {
+      "sha256": "2260d485ddeb6b2b807843270c23d533b9089b990e00272dd4de283f3945a0cd",
+      "bytes": 916
+    },
+    "expect/correct-cpu-t2.json": {
+      "sha256": "4bf4e7661ff60c10e59aa92e7fee65b3a9ba37a1c18655ef78e80c75c54a2062",
+      "bytes": 915
+    },
+    "expect/correct-cpu-t4.json": {
+      "sha256": "78b08fa265d3c597b49652ef99f096bcb11632360f6f666728db41d2612d7fe5",
+      "bytes": 915
+    },
+    "expect/correct-cpu-t8.json": {
+      "sha256": "0d0c31959d4dc69702d8e7b4a7098543ede6d98d8949991f575d712990c3e30b",
+      "bytes": 915
+    },
+    "expect/correct-gpu-range.json": {
+      "sha256": "25e33b761ec855df2ed4e8fa34437dbaf7ad6640e6eff89b92f95a6785f351e5",
+      "bytes": 977
+    },
+    "expect/reject-cpu-threads.json": {
+      "sha256": "4bf4e7661ff60c10e59aa92e7fee65b3a9ba37a1c18655ef78e80c75c54a2062",
+      "bytes": 915
+    },
+    "expect/reject-gpu-threads.json": {
+      "sha256": "25e33b761ec855df2ed4e8fa34437dbaf7ad6640e6eff89b92f95a6785f351e5",
+      "bytes": 977
+    },
+    "expect/timing-r0-cpu-t1.json": {
+      "sha256": "f92c766749cac0fc415ceabdbc9b0ed160469f32f10907dc339ddd421c441b47",
+      "bytes": 902
+    },
+    "expect/timing-r0-cpu-t16.json": {
+      "sha256": "2aa95ef541b49b09e67ea71a8d1dda8f3bcdfbebfcc2b2bc8fcd0d029c5342f3",
+      "bytes": 917
+    },
+    "expect/timing-r0-cpu-t2.json": {
+      "sha256": "c34bb42d8360c397a360fe9a44bc272b059ea49e195caabf952704a43de8bf52",
+      "bytes": 916
+    },
+    "expect/timing-r0-cpu-t4.json": {
+      "sha256": "93fbf5a52b7c680dcee6e8cb6f60d5969b5b16c1791f6610c0eba51373ad475a",
+      "bytes": 916
+    },
+    "expect/timing-r0-cpu-t8.json": {
+      "sha256": "840501ba56a7571e33b6a1762037e417d080065980ec9bf47c5747cf419b655e",
+      "bytes": 916
+    },
+    "expect/timing-r0-gpu-range.json": {
+      "sha256": "0e5b1fa18cc99f93a391b45a3d0bbb9e941d41233a7b29a6919338f8c9b626fe",
+      "bytes": 978
+    },
+    "expect/timing-r1-cpu-t1.json": {
+      "sha256": "f92c766749cac0fc415ceabdbc9b0ed160469f32f10907dc339ddd421c441b47",
+      "bytes": 902
+    },
+    "expect/timing-r1-cpu-t16.json": {
+      "sha256": "2aa95ef541b49b09e67ea71a8d1dda8f3bcdfbebfcc2b2bc8fcd0d029c5342f3",
+      "bytes": 917
+    },
+    "expect/timing-r1-cpu-t2.json": {
+      "sha256": "c34bb42d8360c397a360fe9a44bc272b059ea49e195caabf952704a43de8bf52",
+      "bytes": 916
+    },
+    "expect/timing-r1-cpu-t4.json": {
+      "sha256": "93fbf5a52b7c680dcee6e8cb6f60d5969b5b16c1791f6610c0eba51373ad475a",
+      "bytes": 916
+    },
+    "expect/timing-r1-cpu-t8.json": {
+      "sha256": "840501ba56a7571e33b6a1762037e417d080065980ec9bf47c5747cf419b655e",
+      "bytes": 916
+    },
+    "expect/timing-r1-gpu-range.json": {
+      "sha256": "0e5b1fa18cc99f93a391b45a3d0bbb9e941d41233a7b29a6919338f8c9b626fe",
+      "bytes": 978
+    },
+    "expect/timing-r2-cpu-t1.json": {
+      "sha256": "f92c766749cac0fc415ceabdbc9b0ed160469f32f10907dc339ddd421c441b47",
+      "bytes": 902
+    },
+    "expect/timing-r2-cpu-t16.json": {
+      "sha256": "2aa95ef541b49b09e67ea71a8d1dda8f3bcdfbebfcc2b2bc8fcd0d029c5342f3",
+      "bytes": 917
+    },
+    "expect/timing-r2-cpu-t2.json": {
+      "sha256": "c34bb42d8360c397a360fe9a44bc272b059ea49e195caabf952704a43de8bf52",
+      "bytes": 916
+    },
+    "expect/timing-r2-cpu-t4.json": {
+      "sha256": "93fbf5a52b7c680dcee6e8cb6f60d5969b5b16c1791f6610c0eba51373ad475a",
+      "bytes": 916
+    },
+    "expect/timing-r2-cpu-t8.json": {
+      "sha256": "840501ba56a7571e33b6a1762037e417d080065980ec9bf47c5747cf419b655e",
+      "bytes": 916
+    },
+    "expect/timing-r2-gpu-range.json": {
+      "sha256": "0e5b1fa18cc99f93a391b45a3d0bbb9e941d41233a7b29a6919338f8c9b626fe",
+      "bytes": 978
+    },
+    "fixtures/bad-term.tsv": {
+      "sha256": "4d1aeb67823f5203e07fa27f7211945717e1f3cf17707daa2174070e995124ce",
+      "bytes": 13
+    },
+    "fixtures/big-queries.tsv": {
+      "sha256": "2079a44e1908275827d6ad40f76d83c448aa4d8f6a21e1e2e5e971a386fa385c",
+      "bytes": 2282
+    },
+    "fixtures/big-t1-k0.csv": {
+      "sha256": "89f092fa90d6102e690f4794f477d41dcab706bcef85eee7010d8e5e21f2b17f",
+      "bytes": 951
+    },
+    "fixtures/big-t1-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/big-t1-k1.csv": {
+      "sha256": "365eebff08e57a02ac682fdbcb1f712e0e2421b15f01e583533a99c579373a3e",
+      "bytes": 957
+    },
+    "fixtures/big-t1-k1.tsv": {
+      "sha256": "88e6079a0a46445207594eeacaa9d710e6a130c8dc5623cbe64d76f22afd0929",
+      "bytes": 1255
+    },
+    "fixtures/big-t1-k10.csv": {
+      "sha256": "7d7f2bfefb488e246d6815980e1295b87e81cb8bdf0630e6c79301f5ff11a5dd",
+      "bytes": 989
+    },
+    "fixtures/big-t1-k10.tsv": {
+      "sha256": "6174854fe8dc3264e682f707a8c185e9afe56b42b7b8ab58e687688d50ed73b4",
+      "bytes": 12046
+    },
+    "fixtures/big-t1-k1000.csv": {
+      "sha256": "69e8191652367f55c564d9ae71161c4fcce065e0d3229a8e7c7698564ac08d1c",
+      "bytes": 1064
+    },
+    "fixtures/big-t1-k1000.tsv": {
+      "sha256": "29913d14c42af421d2138caaf5d277d54b6428b797798cf990899a5a1fd793b7",
+      "bytes": 728570
+    },
+    "fixtures/big-t16-k0.csv": {
+      "sha256": "8ec6db2861c6d30100f311ff46984fadb60f18385a48ba11a9bb43131a96c9cc",
+      "bytes": 986
+    },
+    "fixtures/big-t16-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/big-t16-k1.csv": {
+      "sha256": "b8e65253ce229a99dd2c471521c047f58935a15d290ad6b5f78f178b02531ccc",
+      "bytes": 992
+    },
+    "fixtures/big-t16-k1.tsv": {
+      "sha256": "88e6079a0a46445207594eeacaa9d710e6a130c8dc5623cbe64d76f22afd0929",
+      "bytes": 1255
+    },
+    "fixtures/big-t16-k10.csv": {
+      "sha256": "901e223897cba6f8d4adb5fcf4bb42534ba96afd1e5767be6ae8c654bbdfef4c",
+      "bytes": 1018
+    },
+    "fixtures/big-t16-k10.tsv": {
+      "sha256": "6174854fe8dc3264e682f707a8c185e9afe56b42b7b8ab58e687688d50ed73b4",
+      "bytes": 12046
+    },
+    "fixtures/big-t16-k1000.csv": {
+      "sha256": "37e4efceb549f589b63b0a343b0284c64d65b5e819407a68f8b9f061cb704569",
+      "bytes": 1096
+    },
+    "fixtures/big-t16-k1000.tsv": {
+      "sha256": "29913d14c42af421d2138caaf5d277d54b6428b797798cf990899a5a1fd793b7",
+      "bytes": 728570
+    },
+    "fixtures/big-t2-k0.csv": {
+      "sha256": "45847540fc841c553180d4d4762d8664c27b6002a1f7759068f55710a3db8e23",
+      "bytes": 963
+    },
+    "fixtures/big-t2-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/big-t2-k1.csv": {
+      "sha256": "c02e73e2b2ec4d21eb5607b6d5b3d527ac2fa0aff5d9572e2d04b2dd7fe610e9",
+      "bytes": 961
+    },
+    "fixtures/big-t2-k1.tsv": {
+      "sha256": "88e6079a0a46445207594eeacaa9d710e6a130c8dc5623cbe64d76f22afd0929",
+      "bytes": 1255
+    },
+    "fixtures/big-t2-k10.csv": {
+      "sha256": "f074b8df4e3309d79fff378dd2b88de73fe9fc6fe1d73ed963203ab808e76f1b",
+      "bytes": 986
+    },
+    "fixtures/big-t2-k10.tsv": {
+      "sha256": "6174854fe8dc3264e682f707a8c185e9afe56b42b7b8ab58e687688d50ed73b4",
+      "bytes": 12046
+    },
+    "fixtures/big-t2-k1000.csv": {
+      "sha256": "d361acbb0c926a6992ab0582bec15d6dc743160a002d19e0a9300d41ebaa0c6b",
+      "bytes": 1057
+    },
+    "fixtures/big-t2-k1000.tsv": {
+      "sha256": "29913d14c42af421d2138caaf5d277d54b6428b797798cf990899a5a1fd793b7",
+      "bytes": 728570
+    },
+    "fixtures/big-t3-k0.csv": {
+      "sha256": "64c068d58184b4df55ba2177889831c5e050a00ca918400ad8551ce9870e4f62",
+      "bytes": 954
+    },
+    "fixtures/big-t3-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/big-t3-k1.csv": {
+      "sha256": "8c401453b940e494abac4f9f82a72e815a0fa7ec73768d85cd3e19a853d18561",
+      "bytes": 955
+    },
+    "fixtures/big-t3-k1.tsv": {
+      "sha256": "88e6079a0a46445207594eeacaa9d710e6a130c8dc5623cbe64d76f22afd0929",
+      "bytes": 1255
+    },
+    "fixtures/big-t3-k10.csv": {
+      "sha256": "a521753cc05d072082a5ed77d9d400c615d53d0b4ecb22106175190f6a95d6a0",
+      "bytes": 988
+    },
+    "fixtures/big-t3-k10.tsv": {
+      "sha256": "6174854fe8dc3264e682f707a8c185e9afe56b42b7b8ab58e687688d50ed73b4",
+      "bytes": 12046
+    },
+    "fixtures/big-t3-k1000.csv": {
+      "sha256": "5b4013ca64a83895dc01fd1e73e04b2cbe57733af6c1f10bcc275a0c0c611869",
+      "bytes": 1063
+    },
+    "fixtures/big-t3-k1000.tsv": {
+      "sha256": "29913d14c42af421d2138caaf5d277d54b6428b797798cf990899a5a1fd793b7",
+      "bytes": 728570
+    },
+    "fixtures/big.gsp": {
+      "sha256": "8aef887fa68e88352a90c8a0c4a06af2db3e334466cc1e853af983170ed7d4a7",
+      "bytes": 50417
+    },
+    "fixtures/duplicate-queries.tsv": {
+      "sha256": "5f0461da51693163a0125cd5124897f4489c98b754f35061480492e17b0b42d3",
+      "bytes": 173
+    },
+    "fixtures/duplicate-t1-k0.csv": {
+      "sha256": "99fb7deb3fd9f76448984e13f315993588479c99ccf147add8e7395c95b14d65",
+      "bytes": 870
+    },
+    "fixtures/duplicate-t1-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/duplicate-t1-k1.csv": {
+      "sha256": "53af74fe1b9ca44d10b9194e393bc285b566160bdfe0ded147ce05526065701b",
+      "bytes": 865
+    },
+    "fixtures/duplicate-t1-k1.tsv": {
+      "sha256": "d5196902739519e5a2862fc13b65dc8bc273cd5358d01b87769bd5d5604cbcd2",
+      "bytes": 834
+    },
+    "fixtures/duplicate-t1-k10.csv": {
+      "sha256": "1d26812d76ac81b257c2c62c4ccd0f4bc75c3ab3b7f70d10b3161023f7a03961",
+      "bytes": 890
+    },
+    "fixtures/duplicate-t1-k10.tsv": {
+      "sha256": "03c907ba311b15b2a21a808b40312d4a39c02d790f7f5d63e1cba2301175ae5e",
+      "bytes": 7929
+    },
+    "fixtures/duplicate-t1-k1000.csv": {
+      "sha256": "85acf36931851f7b63b3d9f8135d2f2368c33c0384408ebe166e74055b025a82",
+      "bytes": 955
+    },
+    "fixtures/duplicate-t1-k1000.tsv": {
+      "sha256": "03ffa71d63421529c7183eb8d5289eb95276f10d904a6cc3ecc60ba67c0459b4",
+      "bytes": 39508
+    },
+    "fixtures/duplicate-t16-k0.csv": {
+      "sha256": "4b43ee9726889b0fa6dac7275856b634848c9c5ff0a44c253cb66ec85f5b8ea7",
+      "bytes": 894
+    },
+    "fixtures/duplicate-t16-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/duplicate-t16-k1.csv": {
+      "sha256": "405602be3485fafcbe6e9002b249e09af522e7fbccbe3ec2ab50f4f8ab3b7dc8",
+      "bytes": 894
+    },
+    "fixtures/duplicate-t16-k1.tsv": {
+      "sha256": "d5196902739519e5a2862fc13b65dc8bc273cd5358d01b87769bd5d5604cbcd2",
+      "bytes": 834
+    },
+    "fixtures/duplicate-t16-k10.csv": {
+      "sha256": "1636e172498e4c6a1695ff86698753062f4e7c8796afa742373a9781997cb849",
+      "bytes": 922
+    },
+    "fixtures/duplicate-t16-k10.tsv": {
+      "sha256": "03c907ba311b15b2a21a808b40312d4a39c02d790f7f5d63e1cba2301175ae5e",
+      "bytes": 7929
+    },
+    "fixtures/duplicate-t16-k1000.csv": {
+      "sha256": "2123892bd5ee29a2b0240884a9656330c077125b899ee0dca9a482f70f8b292d",
+      "bytes": 992
+    },
+    "fixtures/duplicate-t16-k1000.tsv": {
+      "sha256": "03ffa71d63421529c7183eb8d5289eb95276f10d904a6cc3ecc60ba67c0459b4",
+      "bytes": 39508
+    },
+    "fixtures/duplicate-t2-k0.csv": {
+      "sha256": "46b54ece5badfa7bfa7a831ae9ba3ed66ff9b97bea6754098b78c4bdf41288f1",
+      "bytes": 866
+    },
+    "fixtures/duplicate-t2-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/duplicate-t2-k1.csv": {
+      "sha256": "81428a29b83cb9a324702a062b4992f580e6c4f94edaf2d86005c3d4f1073cab",
+      "bytes": 866
+    },
+    "fixtures/duplicate-t2-k1.tsv": {
+      "sha256": "d5196902739519e5a2862fc13b65dc8bc273cd5358d01b87769bd5d5604cbcd2",
+      "bytes": 834
+    },
+    "fixtures/duplicate-t2-k10.csv": {
+      "sha256": "155e94d0029102852b9c22f402449e8f4f5fba1345296ff5c5cfae62bd90b54d",
+      "bytes": 900
+    },
+    "fixtures/duplicate-t2-k10.tsv": {
+      "sha256": "03c907ba311b15b2a21a808b40312d4a39c02d790f7f5d63e1cba2301175ae5e",
+      "bytes": 7929
+    },
+    "fixtures/duplicate-t2-k1000.csv": {
+      "sha256": "b2563bddb80f8e3db699f1e008c9dc964790658468e9a69617cf2ce5acfd1e9d",
+      "bytes": 956
+    },
+    "fixtures/duplicate-t2-k1000.tsv": {
+      "sha256": "03ffa71d63421529c7183eb8d5289eb95276f10d904a6cc3ecc60ba67c0459b4",
+      "bytes": 39508
+    },
+    "fixtures/duplicate-t3-k0.csv": {
+      "sha256": "f2fc8917a665333cd90a7c2dd10391350bb7f5819478956b5736cfef96d2c1d6",
+      "bytes": 862
+    },
+    "fixtures/duplicate-t3-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/duplicate-t3-k1.csv": {
+      "sha256": "1dce281fed2286cfebb321e1280fce6bd4aec9bebdb922efb0d443f62dc4d359",
+      "bytes": 867
+    },
+    "fixtures/duplicate-t3-k1.tsv": {
+      "sha256": "d5196902739519e5a2862fc13b65dc8bc273cd5358d01b87769bd5d5604cbcd2",
+      "bytes": 834
+    },
+    "fixtures/duplicate-t3-k10.csv": {
+      "sha256": "319a911012ee00efd0e54c643465b7d3443da825b059bb9d4d379458c3303f45",
+      "bytes": 892
+    },
+    "fixtures/duplicate-t3-k10.tsv": {
+      "sha256": "03c907ba311b15b2a21a808b40312d4a39c02d790f7f5d63e1cba2301175ae5e",
+      "bytes": 7929
+    },
+    "fixtures/duplicate-t3-k1000.csv": {
+      "sha256": "d7f863a89651541d41c74d2e1b3e7ebb6ca0ce9b982f9490da852e912c149656",
+      "bytes": 956
+    },
+    "fixtures/duplicate-t3-k1000.tsv": {
+      "sha256": "03ffa71d63421529c7183eb8d5289eb95276f10d904a6cc3ecc60ba67c0459b4",
+      "bytes": 39508
+    },
+    "fixtures/duplicate.gsp": {
+      "sha256": "2d0cb21f73da200f6f727d6f4604ca27dfaff4ca736861c467b5cf7d40772e12",
+      "bytes": 1508
+    },
+    "fixtures/empty-index-queries.tsv": {
+      "sha256": "c55aa43cd31ba08ce7fc0011860e3c11be4e1beeafe8fada591992ac885bb901",
+      "bytes": 163
+    },
+    "fixtures/empty-index-t1-k0.csv": {
+      "sha256": "69fbc7ea0aec99fbbeb93aae2d5e3d602d5f2efb90f95cd26af437b6c1a959a0",
+      "bytes": 857
+    },
+    "fixtures/empty-index-t1-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t1-k1.csv": {
+      "sha256": "394d6ce016d3de5fdf0bb1b09ab9b7f8e2a3ac0c96e777a62196214ec4895d1b",
+      "bytes": 862
+    },
+    "fixtures/empty-index-t1-k1.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t1-k10.csv": {
+      "sha256": "fdd56a1a424fcc177f60aa91c4d11321d82c259c10bd9d88d3223f38ea4f7da9",
+      "bytes": 893
+    },
+    "fixtures/empty-index-t1-k10.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t1-k1000.csv": {
+      "sha256": "11f2d2c8248380d4a533f9ca39df3a5e45f7c0a1e9f31683fce84f65aa02eff3",
+      "bytes": 951
+    },
+    "fixtures/empty-index-t1-k1000.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t16-k0.csv": {
+      "sha256": "696c512d4a1dacb184c90518eeb3351fe167eafd4dcd6eb16f0ea3b790a23169",
+      "bytes": 894
+    },
+    "fixtures/empty-index-t16-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t16-k1.csv": {
+      "sha256": "58b06fd40fcf2576f147fcc0556a5b15336ed16544c8191b111fafd82e73d1cb",
+      "bytes": 896
+    },
+    "fixtures/empty-index-t16-k1.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t16-k10.csv": {
+      "sha256": "cda8cb82eda8a021e2ac9670019e46f08aba95bc326ecf6bbe797c51ef848fea",
+      "bytes": 925
+    },
+    "fixtures/empty-index-t16-k10.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t16-k1000.csv": {
+      "sha256": "5cfa80de9c5a2f994c4ad218e64a16111dce2caaf353650741b1c15eaca42914",
+      "bytes": 983
+    },
+    "fixtures/empty-index-t16-k1000.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t2-k0.csv": {
+      "sha256": "c4aa4fc165f30506e28393c0aab9554b259aea22119425a6d022cc4e0f29baee",
+      "bytes": 866
+    },
+    "fixtures/empty-index-t2-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t2-k1.csv": {
+      "sha256": "549783535f1329230303246128123842ff6f2823596febecac82c20cbbda032f",
+      "bytes": 863
+    },
+    "fixtures/empty-index-t2-k1.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t2-k10.csv": {
+      "sha256": "c115dbb9c3d1431d219f8d67b163cdce7cc278850a804b72488f0846d257d850",
+      "bytes": 895
+    },
+    "fixtures/empty-index-t2-k10.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t2-k1000.csv": {
+      "sha256": "31cc5b43fe92c3213c44a3709195e9e316f8e3eb5289264fb831101b3f7fe2ba",
+      "bytes": 958
+    },
+    "fixtures/empty-index-t2-k1000.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t3-k0.csv": {
+      "sha256": "1d98e0fdd8579abb8003a76509394cd5ad77922a7902926ea73c884c95e0c61a",
+      "bytes": 866
+    },
+    "fixtures/empty-index-t3-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t3-k1.csv": {
+      "sha256": "16dcdef23072a46801eb3b89bcb97682e62498f054e39e282a95a9aa2814f90d",
+      "bytes": 867
+    },
+    "fixtures/empty-index-t3-k1.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t3-k10.csv": {
+      "sha256": "0d089dfb708d8fcf4d634176e18e93cb3caaf43e67d5a17befc5a1d68a8e7caf",
+      "bytes": 888
+    },
+    "fixtures/empty-index-t3-k10.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index-t3-k1000.csv": {
+      "sha256": "b95ed0b63e465701645ad58a062e3c51b5521b47f89017f276734bb7ff309b47",
+      "bytes": 955
+    },
+    "fixtures/empty-index-t3-k1000.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/empty-index.gsp": {
+      "sha256": "cba7ec642151675a87207848724865a45e08565e5c95652337cc85f0946b6b8b",
+      "bytes": 62
+    },
+    "fixtures/exists.csv": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "fixtures/gaps-queries.tsv": {
+      "sha256": "080c9676c3f6b6eacbf6694aa3d916d52497efa0145eb803d268e973a8b1470c",
+      "bytes": 231
+    },
+    "fixtures/gaps-t1-k0.csv": {
+      "sha256": "af9c393e61639682b2ecf081bdeffad25cdef07590d98db89153acfe6e85838f",
+      "bytes": 871
+    },
+    "fixtures/gaps-t1-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/gaps-t1-k1.csv": {
+      "sha256": "0c0a7d36cbafef2103c714cd43ff9b675f67d0b5aca9dfa9e27bc0464f55de3a",
+      "bytes": 869
+    },
+    "fixtures/gaps-t1-k1.tsv": {
+      "sha256": "7bcc2ceb8c839a2cb249cbf3fff1379af466aaf7007fe0b9b2999ac146aa2e99",
+      "bytes": 813
+    },
+    "fixtures/gaps-t1-k10.csv": {
+      "sha256": "51e96e2b5f07f7d7b55c0dc4d38115d50dc92d0b21e5240d3598f322af9ef1c8",
+      "bytes": 900
+    },
+    "fixtures/gaps-t1-k10.tsv": {
+      "sha256": "fa6290f309fd668929781acd218a7e2e280ca0477273ab443e6b5ca7ddd1c9b0",
+      "bytes": 7647
+    },
+    "fixtures/gaps-t1-k1000.csv": {
+      "sha256": "8b2ab1b292ee9dcd9e206a6b2551cca8c6dee1dbfae530a33f73cfb03915c6fc",
+      "bytes": 960
+    },
+    "fixtures/gaps-t1-k1000.tsv": {
+      "sha256": "8e4949bea5aea14ef0a90d6c80a7b437b811dc6530090fbeef1279f2ec5c293a",
+      "bytes": 807570
+    },
+    "fixtures/gaps-t16-k0.csv": {
+      "sha256": "dc376b0e3da24558fc2d6ef813b19ecd793ff13419b5f9d44dee6424aa66b713",
+      "bytes": 899
+    },
+    "fixtures/gaps-t16-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/gaps-t16-k1.csv": {
+      "sha256": "f43731428e381885a6fea10dca757dbda2f9adfb0dd1cb6f4db4fe4937f67c2b",
+      "bytes": 892
+    },
+    "fixtures/gaps-t16-k1.tsv": {
+      "sha256": "7bcc2ceb8c839a2cb249cbf3fff1379af466aaf7007fe0b9b2999ac146aa2e99",
+      "bytes": 813
+    },
+    "fixtures/gaps-t16-k10.csv": {
+      "sha256": "82a3f45bfab546cb319bba9c9c8438d742ddc980def128b91ffdb12e76c95852",
+      "bytes": 923
+    },
+    "fixtures/gaps-t16-k10.tsv": {
+      "sha256": "fa6290f309fd668929781acd218a7e2e280ca0477273ab443e6b5ca7ddd1c9b0",
+      "bytes": 7647
+    },
+    "fixtures/gaps-t16-k1000.csv": {
+      "sha256": "361caecbc67ffcd2e8b6555c9cec45a804303e80e25b5657fc8f645188dc2090",
+      "bytes": 984
+    },
+    "fixtures/gaps-t16-k1000.tsv": {
+      "sha256": "8e4949bea5aea14ef0a90d6c80a7b437b811dc6530090fbeef1279f2ec5c293a",
+      "bytes": 807570
+    },
+    "fixtures/gaps-t2-k0.csv": {
+      "sha256": "d2435a5b696d330ab9c7e6bcdad2752d41e0b85576e54273f8a738c3da2af30a",
+      "bytes": 871
+    },
+    "fixtures/gaps-t2-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/gaps-t2-k1.csv": {
+      "sha256": "cb820e95732e28b83ff01aa0afd2ad02fe3795c77de6cbb20c7be273980b70ff",
+      "bytes": 869
+    },
+    "fixtures/gaps-t2-k1.tsv": {
+      "sha256": "7bcc2ceb8c839a2cb249cbf3fff1379af466aaf7007fe0b9b2999ac146aa2e99",
+      "bytes": 813
+    },
+    "fixtures/gaps-t2-k10.csv": {
+      "sha256": "aca216ef3275c54f4aa0f653771c4a4d809ac4e391992d8d691c557b1aa4a1c0",
+      "bytes": 900
+    },
+    "fixtures/gaps-t2-k10.tsv": {
+      "sha256": "fa6290f309fd668929781acd218a7e2e280ca0477273ab443e6b5ca7ddd1c9b0",
+      "bytes": 7647
+    },
+    "fixtures/gaps-t2-k1000.csv": {
+      "sha256": "68d3ec21fbcdabd78bbd794a634574e926edfb9496b532b929d22a399b5d7a9a",
+      "bytes": 959
+    },
+    "fixtures/gaps-t2-k1000.tsv": {
+      "sha256": "8e4949bea5aea14ef0a90d6c80a7b437b811dc6530090fbeef1279f2ec5c293a",
+      "bytes": 807570
+    },
+    "fixtures/gaps-t3-k0.csv": {
+      "sha256": "af8f8f40ef6fc0df12a4b2e3e2870df4991f7412a2f5172d09f8c715826fd39a",
+      "bytes": 864
+    },
+    "fixtures/gaps-t3-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/gaps-t3-k1.csv": {
+      "sha256": "c96daf18923a6f6a32a12c01f570530adf99ad471ba36aa6cf834b7586b92dd5",
+      "bytes": 868
+    },
+    "fixtures/gaps-t3-k1.tsv": {
+      "sha256": "7bcc2ceb8c839a2cb249cbf3fff1379af466aaf7007fe0b9b2999ac146aa2e99",
+      "bytes": 813
+    },
+    "fixtures/gaps-t3-k10.csv": {
+      "sha256": "736cfb6290b41d8fc4a2c4b1384378efdc872bcf538e45af65cb5ba87715f335",
+      "bytes": 899
+    },
+    "fixtures/gaps-t3-k10.tsv": {
+      "sha256": "fa6290f309fd668929781acd218a7e2e280ca0477273ab443e6b5ca7ddd1c9b0",
+      "bytes": 7647
+    },
+    "fixtures/gaps-t3-k1000.csv": {
+      "sha256": "412149c515303c87a2a2a3416c92c77f9ffa96702be5fac6efde6d8bfab87dde",
+      "bytes": 951
+    },
+    "fixtures/gaps-t3-k1000.tsv": {
+      "sha256": "8e4949bea5aea14ef0a90d6c80a7b437b811dc6530090fbeef1279f2ec5c293a",
+      "bytes": 807570
+    },
+    "fixtures/gaps.gsp": {
+      "sha256": "c369a456147554c97c8542a6a18e9d1963d5d2f304725bc348912bd621ce028c",
+      "bytes": 209637
+    },
+    "fixtures/huge-weight.tsv": {
+      "sha256": "1fe4440198cf6364309b0e80febd9b4153cee29f83d2c3078a9111af3e02acfe",
+      "bytes": 57
+    },
+    "fixtures/random-1-queries.tsv": {
+      "sha256": "5147ec0e6370dcc2af302e160753017745f99f325212de657f05abafc1e4a2aa",
+      "bytes": 700
+    },
+    "fixtures/random-1-t1-k0.csv": {
+      "sha256": "3ef1e072f3fc8e18304378dbb47620a18e35c3850b1a984c6c4b9297f6fab3f7",
+      "bytes": 868
+    },
+    "fixtures/random-1-t1-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-1-t1-k1.csv": {
+      "sha256": "c9c0a52aa80f313613f593792dc12b8904fe4ac6224833c844f25facf249b1a0",
+      "bytes": 865
+    },
+    "fixtures/random-1-t1-k1.tsv": {
+      "sha256": "777a70bd9f8ed07c814929eea237f46e49303ff92bae230bdd156a265b812d33",
+      "bytes": 813
+    },
+    "fixtures/random-1-t1-k10.csv": {
+      "sha256": "90cf7f9693db5ac7c234bf509f4fc411005abc8b43f3eae32325f6124b8d689a",
+      "bytes": 896
+    },
+    "fixtures/random-1-t1-k10.tsv": {
+      "sha256": "777a70bd9f8ed07c814929eea237f46e49303ff92bae230bdd156a265b812d33",
+      "bytes": 813
+    },
+    "fixtures/random-1-t1-k1000.csv": {
+      "sha256": "54593c2366cb0f9b64b6bc56f3e36f849d35ed455917b9cb93ee9226c4515612",
+      "bytes": 955
+    },
+    "fixtures/random-1-t1-k1000.tsv": {
+      "sha256": "777a70bd9f8ed07c814929eea237f46e49303ff92bae230bdd156a265b812d33",
+      "bytes": 813
+    },
+    "fixtures/random-1-t16-k0.csv": {
+      "sha256": "179e01910737ee064def7185dc30ad386c394bf42b430504aa4448bbcf67a258",
+      "bytes": 896
+    },
+    "fixtures/random-1-t16-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-1-t16-k1.csv": {
+      "sha256": "606565753fbe68a0ec3996f748968eef249faeef3e5450b57d88c5c51e2456ca",
+      "bytes": 891
+    },
+    "fixtures/random-1-t16-k1.tsv": {
+      "sha256": "777a70bd9f8ed07c814929eea237f46e49303ff92bae230bdd156a265b812d33",
+      "bytes": 813
+    },
+    "fixtures/random-1-t16-k10.csv": {
+      "sha256": "957b880e75b00ae23389647ab6290c32ef8ab735d740aeca8b1dcb8e98329f49",
+      "bytes": 917
+    },
+    "fixtures/random-1-t16-k10.tsv": {
+      "sha256": "777a70bd9f8ed07c814929eea237f46e49303ff92bae230bdd156a265b812d33",
+      "bytes": 813
+    },
+    "fixtures/random-1-t16-k1000.csv": {
+      "sha256": "264cbfd3ebca0fe2246fe8cae0df8fd07d423965171f291fd319b0c5a1318752",
+      "bytes": 985
+    },
+    "fixtures/random-1-t16-k1000.tsv": {
+      "sha256": "777a70bd9f8ed07c814929eea237f46e49303ff92bae230bdd156a265b812d33",
+      "bytes": 813
+    },
+    "fixtures/random-1-t2-k0.csv": {
+      "sha256": "eb1b3cf1e5daeeb79c0fb55b496c725459cbf9f0bd515ef834c605350fc03508",
+      "bytes": 863
+    },
+    "fixtures/random-1-t2-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-1-t2-k1.csv": {
+      "sha256": "7d7f957a5c5053bf77b92720b7969f3388f7a24f3c88ed943ee1336d7cac52ff",
+      "bytes": 863
+    },
+    "fixtures/random-1-t2-k1.tsv": {
+      "sha256": "777a70bd9f8ed07c814929eea237f46e49303ff92bae230bdd156a265b812d33",
+      "bytes": 813
+    },
+    "fixtures/random-1-t2-k10.csv": {
+      "sha256": "5169ab95ca5d462688c7ad4ae815d3438fd1a5b46644d5ef86a8ecef9cc83bdd",
+      "bytes": 888
+    },
+    "fixtures/random-1-t2-k10.tsv": {
+      "sha256": "777a70bd9f8ed07c814929eea237f46e49303ff92bae230bdd156a265b812d33",
+      "bytes": 813
+    },
+    "fixtures/random-1-t2-k1000.csv": {
+      "sha256": "4ae173c0ad37f4740c6d952220ac6a99777c463a20041388fed6fc08969c1021",
+      "bytes": 957
+    },
+    "fixtures/random-1-t2-k1000.tsv": {
+      "sha256": "777a70bd9f8ed07c814929eea237f46e49303ff92bae230bdd156a265b812d33",
+      "bytes": 813
+    },
+    "fixtures/random-1-t3-k0.csv": {
+      "sha256": "b8299282e164bbfc99b930e797dddf1920db740d5705e5a395f6db9429755dc9",
+      "bytes": 861
+    },
+    "fixtures/random-1-t3-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-1-t3-k1.csv": {
+      "sha256": "dcc6787726017bae7ea6917342be133d7956f4059518e2dea2e6d2721d2148f1",
+      "bytes": 860
+    },
+    "fixtures/random-1-t3-k1.tsv": {
+      "sha256": "777a70bd9f8ed07c814929eea237f46e49303ff92bae230bdd156a265b812d33",
+      "bytes": 813
+    },
+    "fixtures/random-1-t3-k10.csv": {
+      "sha256": "8b25143c889c44e00a71412f57e187a8124a15ff2d75c371a58c1c62b89ffee0",
+      "bytes": 891
+    },
+    "fixtures/random-1-t3-k10.tsv": {
+      "sha256": "777a70bd9f8ed07c814929eea237f46e49303ff92bae230bdd156a265b812d33",
+      "bytes": 813
+    },
+    "fixtures/random-1-t3-k1000.csv": {
+      "sha256": "c4e690b7cb6716a7e68397fbbd08860eba34fad31de1cf388e6a2d50028b54d6",
+      "bytes": 952
+    },
+    "fixtures/random-1-t3-k1000.tsv": {
+      "sha256": "777a70bd9f8ed07c814929eea237f46e49303ff92bae230bdd156a265b812d33",
+      "bytes": 813
+    },
+    "fixtures/random-1.gsp": {
+      "sha256": "10c53b9495a396e4aa78d43d1df9535716164c5de14f9d6a286d00153b5525b1",
+      "bytes": 373
+    },
+    "fixtures/random-1025-queries.tsv": {
+      "sha256": "a3135ba55b501667624fe662ae73e0ac1da724642be9b5b9fd7088bc1970966f",
+      "bytes": 560
+    },
+    "fixtures/random-1025-t1-k0.csv": {
+      "sha256": "4af5100f61554640fe1fece72830f7f6bbab6be8102768eae936e38516c2dc5a",
+      "bytes": 869
+    },
+    "fixtures/random-1025-t1-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-1025-t1-k1.csv": {
+      "sha256": "b801629c3a042d94e8cc13f90c725e3690aa216e9d90740c74070f676bcc78b3",
+      "bytes": 860
+    },
+    "fixtures/random-1025-t1-k1.tsv": {
+      "sha256": "0f01603cec5191e261e6a55f2dbc6e8685cafd8919d0a8f05b53ffe073550557",
+      "bytes": 846
+    },
+    "fixtures/random-1025-t1-k10.csv": {
+      "sha256": "7e4579dde5843396768849888e7cbc96ac6dd37f1845cff2bdc700c551f42c9a",
+      "bytes": 895
+    },
+    "fixtures/random-1025-t1-k10.tsv": {
+      "sha256": "68cfa7f1f27a1fdfb1dc5b982e9fe6fa5c896d5916d8dfb7e84d4f214c72ae1d",
+      "bytes": 8082
+    },
+    "fixtures/random-1025-t1-k1000.csv": {
+      "sha256": "cb1b38d03f941dc0983c5422fb9976e65bc64fc2e6144cd14b59771928fd664b",
+      "bytes": 959
+    },
+    "fixtures/random-1025-t1-k1000.tsv": {
+      "sha256": "ed55fc6815e2f2571baaf5703a583f33985dd4dbcaf231d83c144ef3bf7e6fc7",
+      "bytes": 811716
+    },
+    "fixtures/random-1025-t16-k0.csv": {
+      "sha256": "f56a94bd0121d224489326bf869c12ac6bb9ddb7a173c513e7339dec23059692",
+      "bytes": 888
+    },
+    "fixtures/random-1025-t16-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-1025-t16-k1.csv": {
+      "sha256": "f0dbc0b19f06df34ffc71b549e7dd86237d7016db913b116dd31a5431e19f8b3",
+      "bytes": 890
+    },
+    "fixtures/random-1025-t16-k1.tsv": {
+      "sha256": "0f01603cec5191e261e6a55f2dbc6e8685cafd8919d0a8f05b53ffe073550557",
+      "bytes": 846
+    },
+    "fixtures/random-1025-t16-k10.csv": {
+      "sha256": "0290f0342268ab1e3da53c6077fe5a7c7ed4b8c50d3e3364990634c685787769",
+      "bytes": 928
+    },
+    "fixtures/random-1025-t16-k10.tsv": {
+      "sha256": "68cfa7f1f27a1fdfb1dc5b982e9fe6fa5c896d5916d8dfb7e84d4f214c72ae1d",
+      "bytes": 8082
+    },
+    "fixtures/random-1025-t16-k1000.csv": {
+      "sha256": "045c54b561f242165b3ffe33a23285d9679ae69b40d14ecb9d7c6cc6e477f9ac",
+      "bytes": 991
+    },
+    "fixtures/random-1025-t16-k1000.tsv": {
+      "sha256": "ed55fc6815e2f2571baaf5703a583f33985dd4dbcaf231d83c144ef3bf7e6fc7",
+      "bytes": 811716
+    },
+    "fixtures/random-1025-t2-k0.csv": {
+      "sha256": "32439d53010f79485f298f457cd155f0ced49136f8c651403fb8b1e299ba42eb",
+      "bytes": 864
+    },
+    "fixtures/random-1025-t2-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-1025-t2-k1.csv": {
+      "sha256": "29565504aeaea0e70adbf2c7839981ea51e091d6a3e44d04af3f2ded4800b660",
+      "bytes": 862
+    },
+    "fixtures/random-1025-t2-k1.tsv": {
+      "sha256": "0f01603cec5191e261e6a55f2dbc6e8685cafd8919d0a8f05b53ffe073550557",
+      "bytes": 846
+    },
+    "fixtures/random-1025-t2-k10.csv": {
+      "sha256": "e88fdfda7f609344f43b7f11ccb1124cf36b3f8d50c945fae5c6f9d73f08391a",
+      "bytes": 896
+    },
+    "fixtures/random-1025-t2-k10.tsv": {
+      "sha256": "68cfa7f1f27a1fdfb1dc5b982e9fe6fa5c896d5916d8dfb7e84d4f214c72ae1d",
+      "bytes": 8082
+    },
+    "fixtures/random-1025-t2-k1000.csv": {
+      "sha256": "6de69e5874e072ecbd9975ad636356e4fc92dc4a46b6b0ef2bbb8b8236b9deae",
+      "bytes": 951
+    },
+    "fixtures/random-1025-t2-k1000.tsv": {
+      "sha256": "ed55fc6815e2f2571baaf5703a583f33985dd4dbcaf231d83c144ef3bf7e6fc7",
+      "bytes": 811716
+    },
+    "fixtures/random-1025-t3-k0.csv": {
+      "sha256": "ae0ac692171bcdca6b187d2186ebe75dbf7977c9aa159e2f9858ef44cc1d2618",
+      "bytes": 858
+    },
+    "fixtures/random-1025-t3-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-1025-t3-k1.csv": {
+      "sha256": "82f37445d4c5538b02d06f36d201ff62000f8427b41e43afb5f507486a5cf802",
+      "bytes": 862
+    },
+    "fixtures/random-1025-t3-k1.tsv": {
+      "sha256": "0f01603cec5191e261e6a55f2dbc6e8685cafd8919d0a8f05b53ffe073550557",
+      "bytes": 846
+    },
+    "fixtures/random-1025-t3-k10.csv": {
+      "sha256": "cec9147475ae42d85663b63d21c53a732e60c2f54dca33be5e9f33e89e9c2e8b",
+      "bytes": 896
+    },
+    "fixtures/random-1025-t3-k10.tsv": {
+      "sha256": "68cfa7f1f27a1fdfb1dc5b982e9fe6fa5c896d5916d8dfb7e84d4f214c72ae1d",
+      "bytes": 8082
+    },
+    "fixtures/random-1025-t3-k1000.csv": {
+      "sha256": "80ac75cf983a8b3b4946b5ceb900f303ffd30d91bcec591c041113c3142bbb23",
+      "bytes": 960
+    },
+    "fixtures/random-1025-t3-k1000.tsv": {
+      "sha256": "ed55fc6815e2f2571baaf5703a583f33985dd4dbcaf231d83c144ef3bf7e6fc7",
+      "bytes": 811716
+    },
+    "fixtures/random-1025.gsp": {
+      "sha256": "e0995d8da398ae8083fdd1466f45f790797dfde878fda6dfd60d590d2dab364f",
+      "bytes": 53622
+    },
+    "fixtures/random-193-queries.tsv": {
+      "sha256": "834af4c157769323cf70e41a993cecacb6df7d393fd93f8a3bd5ab9f2ada73ec",
+      "bytes": 665
+    },
+    "fixtures/random-193-t1-k0.csv": {
+      "sha256": "b020b48ace37d4bf65bb98ae39e455828b621f1331e4333734daed4d6553190a",
+      "bytes": 864
+    },
+    "fixtures/random-193-t1-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-193-t1-k1.csv": {
+      "sha256": "0d2f7275469fe8164a69b21b9575e820ff9f728fb7189baa6560ff484c81768b",
+      "bytes": 868
+    },
+    "fixtures/random-193-t1-k1.tsv": {
+      "sha256": "667e04182203c975674e08d09284f48f281849841dae3c25b36efd0fa455b206",
+      "bytes": 843
+    },
+    "fixtures/random-193-t1-k10.csv": {
+      "sha256": "4b2520e62795f6b5da194d6c567d12d620ae1c1e4ed7ec104f6781fd0a7591ed",
+      "bytes": 894
+    },
+    "fixtures/random-193-t1-k10.tsv": {
+      "sha256": "7dd36124dde7d07357c2514922538204ed7495eaeab204eae544649d4ac90d22",
+      "bytes": 8037
+    },
+    "fixtures/random-193-t1-k1000.csv": {
+      "sha256": "fdaed10535a0062b4dd6ccfd84158dff35e7cbc4a77ecc988c08c25e3b5dbfa7",
+      "bytes": 957
+    },
+    "fixtures/random-193-t1-k1000.tsv": {
+      "sha256": "e47d3f360396b0036311a0a8b87828e658e87b6f95f4e083e0d0688082d7e934",
+      "bytes": 154173
+    },
+    "fixtures/random-193-t16-k0.csv": {
+      "sha256": "3d0fbb3e8cd3d4817ecf64cc609f95fa0772d4b3d486cc9e190d278dfef8bc3c",
+      "bytes": 893
+    },
+    "fixtures/random-193-t16-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-193-t16-k1.csv": {
+      "sha256": "45a85750dd21b78b8a663659688eff031750b2cc7fb165985c28aa4f16405434",
+      "bytes": 896
+    },
+    "fixtures/random-193-t16-k1.tsv": {
+      "sha256": "667e04182203c975674e08d09284f48f281849841dae3c25b36efd0fa455b206",
+      "bytes": 843
+    },
+    "fixtures/random-193-t16-k10.csv": {
+      "sha256": "0de1b15a1ee0dc5f5261adae3005c3105f4e4befc1003d301807ec8ce6ffbb61",
+      "bytes": 924
+    },
+    "fixtures/random-193-t16-k10.tsv": {
+      "sha256": "7dd36124dde7d07357c2514922538204ed7495eaeab204eae544649d4ac90d22",
+      "bytes": 8037
+    },
+    "fixtures/random-193-t16-k1000.csv": {
+      "sha256": "2ff318ee0a16f4680ea74b6ab9f2661756c3e10b443aa9aac3d94520bdc07195",
+      "bytes": 992
+    },
+    "fixtures/random-193-t16-k1000.tsv": {
+      "sha256": "e47d3f360396b0036311a0a8b87828e658e87b6f95f4e083e0d0688082d7e934",
+      "bytes": 154173
+    },
+    "fixtures/random-193-t2-k0.csv": {
+      "sha256": "acdf44d1ae57703d8152ba694bb6e2aac079854dd2644925fe77dbae206506b3",
+      "bytes": 861
+    },
+    "fixtures/random-193-t2-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-193-t2-k1.csv": {
+      "sha256": "d379117495128ceeac74361a09f25ded72d9b15150b4f203cd7f040c02fa5ca9",
+      "bytes": 862
+    },
+    "fixtures/random-193-t2-k1.tsv": {
+      "sha256": "667e04182203c975674e08d09284f48f281849841dae3c25b36efd0fa455b206",
+      "bytes": 843
+    },
+    "fixtures/random-193-t2-k10.csv": {
+      "sha256": "ded0bd772fafe1b70ce3f534df5932c9bae9cb47e0f81c45510fe51ffe3d092a",
+      "bytes": 889
+    },
+    "fixtures/random-193-t2-k10.tsv": {
+      "sha256": "7dd36124dde7d07357c2514922538204ed7495eaeab204eae544649d4ac90d22",
+      "bytes": 8037
+    },
+    "fixtures/random-193-t2-k1000.csv": {
+      "sha256": "2047d402a2009d4b855810f78021e492044ed7f64b92dd78c361d819e5502724",
+      "bytes": 957
+    },
+    "fixtures/random-193-t2-k1000.tsv": {
+      "sha256": "e47d3f360396b0036311a0a8b87828e658e87b6f95f4e083e0d0688082d7e934",
+      "bytes": 154173
+    },
+    "fixtures/random-193-t3-k0.csv": {
+      "sha256": "2ee182d1d79cb98ffe9d7e73a9828c064eb254f65637fb3f963c5a83fc981bd4",
+      "bytes": 865
+    },
+    "fixtures/random-193-t3-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-193-t3-k1.csv": {
+      "sha256": "a70912503ba0b80d114ba5bc1f974332f52e952ba656718ef29311ca8b4e8aef",
+      "bytes": 866
+    },
+    "fixtures/random-193-t3-k1.tsv": {
+      "sha256": "667e04182203c975674e08d09284f48f281849841dae3c25b36efd0fa455b206",
+      "bytes": 843
+    },
+    "fixtures/random-193-t3-k10.csv": {
+      "sha256": "61f8263a630076190323934b4c901ed4fe58b53dc2eef16699e4160afc3f5e45",
+      "bytes": 893
+    },
+    "fixtures/random-193-t3-k10.tsv": {
+      "sha256": "7dd36124dde7d07357c2514922538204ed7495eaeab204eae544649d4ac90d22",
+      "bytes": 8037
+    },
+    "fixtures/random-193-t3-k1000.csv": {
+      "sha256": "1a003b351d82618014d4c89762bcb4c31c5e4bffb74929c6648f7bcd348daf53",
+      "bytes": 958
+    },
+    "fixtures/random-193-t3-k1000.tsv": {
+      "sha256": "e47d3f360396b0036311a0a8b87828e658e87b6f95f4e083e0d0688082d7e934",
+      "bytes": 154173
+    },
+    "fixtures/random-193.gsp": {
+      "sha256": "706be5ca274e17a967cc6471c6262f50a147517f8c2c8ce52f3b0f965dd8b293",
+      "bytes": 10415
+    },
+    "fixtures/random-5-queries.tsv": {
+      "sha256": "8f233f9b131cf3fd46fbfe4eea2a7bd3788a3977afafa6e86141bfcca7e80819",
+      "bytes": 627
+    },
+    "fixtures/random-5-t1-k0.csv": {
+      "sha256": "6545e371f0ae1a79b91c58a437eefe5c7d4ce7a47a14c30387a72c161902685a",
+      "bytes": 865
+    },
+    "fixtures/random-5-t1-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-5-t1-k1.csv": {
+      "sha256": "588d9f7a2ea8c84c177473ca94f08cc22e7d1839bfe4eda4ec99acf990fd3d12",
+      "bytes": 863
+    },
+    "fixtures/random-5-t1-k1.tsv": {
+      "sha256": "83b2d9930109d703749cf1b1a24360598e7535c86788fe7467435e633da9585a",
+      "bytes": 834
+    },
+    "fixtures/random-5-t1-k10.csv": {
+      "sha256": "1879f5841b80dea37aaad5efa715b7f2b0e0fd04cdd0f3177bebd03ae2de372b",
+      "bytes": 890
+    },
+    "fixtures/random-5-t1-k10.tsv": {
+      "sha256": "3d128fec24f78d1b0eb88007a195c159362875140d72183d51692e193f36ae2e",
+      "bytes": 3880
+    },
+    "fixtures/random-5-t1-k1000.csv": {
+      "sha256": "97b961c3b4c33a3c48aea361a0a791d0993df1d967c6ca12e70953e6f24eb5b7",
+      "bytes": 952
+    },
+    "fixtures/random-5-t1-k1000.tsv": {
+      "sha256": "3d128fec24f78d1b0eb88007a195c159362875140d72183d51692e193f36ae2e",
+      "bytes": 3880
+    },
+    "fixtures/random-5-t16-k0.csv": {
+      "sha256": "801c0cbc1ace040830c4c887c5c9f226ecb32784b850a428bea7af72c1fc0d5a",
+      "bytes": 898
+    },
+    "fixtures/random-5-t16-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-5-t16-k1.csv": {
+      "sha256": "dfce5c055673e3a0f61b28955b2bc0512c0b1db40a0ec023b6dd7d8ae30e0a48",
+      "bytes": 896
+    },
+    "fixtures/random-5-t16-k1.tsv": {
+      "sha256": "83b2d9930109d703749cf1b1a24360598e7535c86788fe7467435e633da9585a",
+      "bytes": 834
+    },
+    "fixtures/random-5-t16-k10.csv": {
+      "sha256": "7fa0385339bc97c39d1546407360031cbe25763f7f33268f8a42f468775c3863",
+      "bytes": 925
+    },
+    "fixtures/random-5-t16-k10.tsv": {
+      "sha256": "3d128fec24f78d1b0eb88007a195c159362875140d72183d51692e193f36ae2e",
+      "bytes": 3880
+    },
+    "fixtures/random-5-t16-k1000.csv": {
+      "sha256": "1af4bfe8b718ff0941538e236cb53791be4ac616d4409a850641d5b4a291beb7",
+      "bytes": 985
+    },
+    "fixtures/random-5-t16-k1000.tsv": {
+      "sha256": "3d128fec24f78d1b0eb88007a195c159362875140d72183d51692e193f36ae2e",
+      "bytes": 3880
+    },
+    "fixtures/random-5-t2-k0.csv": {
+      "sha256": "4355993ab9c00cbd071c86f7765bbdf2c28809a0b13617a93a040239f54ff558",
+      "bytes": 864
+    },
+    "fixtures/random-5-t2-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-5-t2-k1.csv": {
+      "sha256": "b8626a9548afc471474900faa9c2384f5f11a6ef18ec9515f3a66970ae8b480b",
+      "bytes": 862
+    },
+    "fixtures/random-5-t2-k1.tsv": {
+      "sha256": "83b2d9930109d703749cf1b1a24360598e7535c86788fe7467435e633da9585a",
+      "bytes": 834
+    },
+    "fixtures/random-5-t2-k10.csv": {
+      "sha256": "0626b66e71a2690324f43a4c23ff461eb04f50bd963b35cba525aaf09b48458b",
+      "bytes": 897
+    },
+    "fixtures/random-5-t2-k10.tsv": {
+      "sha256": "3d128fec24f78d1b0eb88007a195c159362875140d72183d51692e193f36ae2e",
+      "bytes": 3880
+    },
+    "fixtures/random-5-t2-k1000.csv": {
+      "sha256": "c510f73f1ae4480622a9915a7dbe0df8b3ab1cf376ea3bf0d1868b8398defeb5",
+      "bytes": 959
+    },
+    "fixtures/random-5-t2-k1000.tsv": {
+      "sha256": "3d128fec24f78d1b0eb88007a195c159362875140d72183d51692e193f36ae2e",
+      "bytes": 3880
+    },
+    "fixtures/random-5-t3-k0.csv": {
+      "sha256": "e8df396f7ab60bc416355c89373cea90c6fb7b4b6deaa8f5f2e9d40326f38b63",
+      "bytes": 865
+    },
+    "fixtures/random-5-t3-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/random-5-t3-k1.csv": {
+      "sha256": "f220796cfa7694199bb3802136c8c433a1d1bfd00f4e218251de2c31b354ff29",
+      "bytes": 861
+    },
+    "fixtures/random-5-t3-k1.tsv": {
+      "sha256": "83b2d9930109d703749cf1b1a24360598e7535c86788fe7467435e633da9585a",
+      "bytes": 834
+    },
+    "fixtures/random-5-t3-k10.csv": {
+      "sha256": "483c3aee78190b75ed5fee8c84a35dc3ee281e2dc941d9a281b9d307fd67bbd6",
+      "bytes": 897
+    },
+    "fixtures/random-5-t3-k10.tsv": {
+      "sha256": "3d128fec24f78d1b0eb88007a195c159362875140d72183d51692e193f36ae2e",
+      "bytes": 3880
+    },
+    "fixtures/random-5-t3-k1000.csv": {
+      "sha256": "0b57e0defe296a8afa22dcd81eed3100797e3ed98f9373c5f6ec9b2c71b8b5ee",
+      "bytes": 957
+    },
+    "fixtures/random-5-t3-k1000.tsv": {
+      "sha256": "3d128fec24f78d1b0eb88007a195c159362875140d72183d51692e193f36ae2e",
+      "bytes": 3880
+    },
+    "fixtures/random-5.gsp": {
+      "sha256": "e084ed0e64c49eff6a3a49d2506e771c09ec44e1fb706dc9b5b5f368a97c3bf4",
+      "bytes": 607
+    },
+    "fixtures/summary.json": {
+      "sha256": "75cd7f081f78c15b4c831361c8c37e83aaccd5399c8b17a2c9fc73a1343e62d3",
+      "bytes": 819
+    },
+    "fixtures/ties-queries.tsv": {
+      "sha256": "67f0e7b167bf5303b2dc4a20caff585bbaaa7b026922afc1a4781e9d59ce41ea",
+      "bytes": 192
+    },
+    "fixtures/ties-t1-k0.csv": {
+      "sha256": "a09811df87ecd0d0ed74970e26e584cbb89af440e5f8a59668bcbd19944edacd",
+      "bytes": 864
+    },
+    "fixtures/ties-t1-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/ties-t1-k1.csv": {
+      "sha256": "016a46927bbb70dd05530c938ffbff991056bbd1b84aad32da101232f4f546b1",
+      "bytes": 862
+    },
+    "fixtures/ties-t1-k1.tsv": {
+      "sha256": "900c31147798f37819a606cbf09be171f16387ed2a9dd9a1647e797a5c8377d3",
+      "bytes": 804
+    },
+    "fixtures/ties-t1-k10.csv": {
+      "sha256": "09b56140cf6ce67ad1d561371001de57de60c2abbb18d304855f5d53b4e71194",
+      "bytes": 894
+    },
+    "fixtures/ties-t1-k10.tsv": {
+      "sha256": "1fab464749b3b9591e6a990b7a6784b77e3411f3f820238fe80169a7c5d47217",
+      "bytes": 7674
+    },
+    "fixtures/ties-t1-k1000.csv": {
+      "sha256": "07da0d909e1e6ae33a89d7b6cbed53d89fd9ef8fdfa62de1caf8ee2cbbebc77d",
+      "bytes": 961
+    },
+    "fixtures/ties-t1-k1000.tsv": {
+      "sha256": "0eddc7e0b35eb60f1d9be865944dbbcb360e65155318ccf2b6eac40311566932",
+      "bytes": 242660
+    },
+    "fixtures/ties-t16-k0.csv": {
+      "sha256": "066bdfddcc85554750cfbe816b0cef7eb7dbbd536c8f5b827a5602ec370d4479",
+      "bytes": 897
+    },
+    "fixtures/ties-t16-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/ties-t16-k1.csv": {
+      "sha256": "51fab6339eaf7922a9fe152e08b98c7178501b4f754c4c4cd47659c10f3dc8d6",
+      "bytes": 899
+    },
+    "fixtures/ties-t16-k1.tsv": {
+      "sha256": "900c31147798f37819a606cbf09be171f16387ed2a9dd9a1647e797a5c8377d3",
+      "bytes": 804
+    },
+    "fixtures/ties-t16-k10.csv": {
+      "sha256": "707ad129577aa3741b9e3a8d4aa7ab8ea6d2b9fb6c3c1f27e218cec5705684f0",
+      "bytes": 929
+    },
+    "fixtures/ties-t16-k10.tsv": {
+      "sha256": "1fab464749b3b9591e6a990b7a6784b77e3411f3f820238fe80169a7c5d47217",
+      "bytes": 7674
+    },
+    "fixtures/ties-t16-k1000.csv": {
+      "sha256": "94b480f076b7318bc5700e160fa48c66648d45be88c12805cab834511110101a",
+      "bytes": 993
+    },
+    "fixtures/ties-t16-k1000.tsv": {
+      "sha256": "0eddc7e0b35eb60f1d9be865944dbbcb360e65155318ccf2b6eac40311566932",
+      "bytes": 242660
+    },
+    "fixtures/ties-t2-k0.csv": {
+      "sha256": "a18001324cf779a3ac7004d0d403c0284388e28ddd11e4e743cba3a356e9c538",
+      "bytes": 864
+    },
+    "fixtures/ties-t2-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/ties-t2-k1.csv": {
+      "sha256": "bbe36361318aa58ffe67b6017d41c08867917e125e880941c5a9251650607885",
+      "bytes": 868
+    },
+    "fixtures/ties-t2-k1.tsv": {
+      "sha256": "900c31147798f37819a606cbf09be171f16387ed2a9dd9a1647e797a5c8377d3",
+      "bytes": 804
+    },
+    "fixtures/ties-t2-k10.csv": {
+      "sha256": "0cc024bd5e41bc9d34d798e89f8f3b711ccf8abeced793f57b2cfa91efe7c5fe",
+      "bytes": 895
+    },
+    "fixtures/ties-t2-k10.tsv": {
+      "sha256": "1fab464749b3b9591e6a990b7a6784b77e3411f3f820238fe80169a7c5d47217",
+      "bytes": 7674
+    },
+    "fixtures/ties-t2-k1000.csv": {
+      "sha256": "7ffc95e6c79512c0d84ba7fb02919eb82d64637906d97c55cf20ed8ee7be15b8",
+      "bytes": 957
+    },
+    "fixtures/ties-t2-k1000.tsv": {
+      "sha256": "0eddc7e0b35eb60f1d9be865944dbbcb360e65155318ccf2b6eac40311566932",
+      "bytes": 242660
+    },
+    "fixtures/ties-t3-k0.csv": {
+      "sha256": "61c0dc4ac0d60ea47d75aedf5b95fc95b6fb6fc2534127ae9fdfec17912ab40e",
+      "bytes": 856
+    },
+    "fixtures/ties-t3-k0.tsv": {
+      "sha256": "feb9c63e5ecf332f312f189c47fd886e74369712fc0125d325ae07a82dfcf56e",
+      "bytes": 44
+    },
+    "fixtures/ties-t3-k1.csv": {
+      "sha256": "8ae12b612640919abaf6db3b83729093bf9c869ba1152f2435c941958dbedbf3",
+      "bytes": 860
+    },
+    "fixtures/ties-t3-k1.tsv": {
+      "sha256": "900c31147798f37819a606cbf09be171f16387ed2a9dd9a1647e797a5c8377d3",
+      "bytes": 804
+    },
+    "fixtures/ties-t3-k10.csv": {
+      "sha256": "d05798d8f7337876070a6ce81428116769e452340cb281503d55e3d6407c1902",
+      "bytes": 896
+    },
+    "fixtures/ties-t3-k10.tsv": {
+      "sha256": "1fab464749b3b9591e6a990b7a6784b77e3411f3f820238fe80169a7c5d47217",
+      "bytes": 7674
+    },
+    "fixtures/ties-t3-k1000.csv": {
+      "sha256": "10a0a74e0487f313dca0298398ba33e2b3bc8fa61c16b7297c696a390b8936eb",
+      "bytes": 960
+    },
+    "fixtures/ties-t3-k1000.tsv": {
+      "sha256": "0eddc7e0b35eb60f1d9be865944dbbcb360e65155318ccf2b6eac40311566932",
+      "bytes": 242660
+    },
+    "fixtures/ties.gsp": {
+      "sha256": "7cd0dffc6769609a429e913da4a8032607bd3b9bb1bcb18ce132bda00998af99",
+      "bytes": 7838
+    },
+    "logs/analyze.log": {
+      "sha256": "3f62d0cecf87a3551c198aa1415c1e980ceea59bfa23615b6cda0861e83e4c93",
+      "bytes": 1077
+    },
+    "logs/binaries-sha256.txt": {
+      "sha256": "e5f018b4c834216dc18be69f4c5d2be0c50aabddae4fc0dd40e5a14f2211a426",
+      "bytes": 217
+    },
+    "logs/commands.txt": {
+      "sha256": "89b750c1014606fe92f1830f8b84f6f3dd368181a8646d2387a9a3eeb01ccfec",
+      "bytes": 36252
+    },
+    "logs/environment.txt": {
+      "sha256": "ff2e97ebce4361c7f69dff5ea8496db6f83c91c6fb5620a613f6545ddc1761cb",
+      "bytes": 988
+    },
+    "logs/fixtures.log": {
+      "sha256": "16827f072475e8a270c193220bdabcc7b614bdbfab0c971c58575cf7162603ae",
+      "bytes": 649
+    },
+    "logs/gate.txt": {
+      "sha256": "ddfe9ab5a31bd1e17c2a4efa3c4c4af5b4eb50491b39a82e696924c327e15e53",
+      "bytes": 1586
+    },
+    "logs/gxx.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/inputs-sha256.txt": {
+      "sha256": "7a9daa4b27c645135c61379873643e4ee59606d000b1b90781487c1417d1a911",
+      "bytes": 432
+    },
+    "logs/nvcc.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/order.txt": {
+      "sha256": "3a05866c3598b4c9a087df1bf6e3063b514ca60dc258b4b50ea608be852aeb39",
+      "bytes": 279
+    },
+    "logs/quiet-correct-cpu-t1.txt": {
+      "sha256": "7d0e01cdf057f3f75ae4872b7fecaaf74acbe368c855552bfd42a09a5a23695e",
+      "bytes": 44
+    },
+    "logs/quiet-correct-cpu-t16.txt": {
+      "sha256": "3345e35d1e83772034163751be8069ccfb10fed8490121e418b3c9e5725482b4",
+      "bytes": 44
+    },
+    "logs/quiet-correct-cpu-t2.txt": {
+      "sha256": "97ecb9630a9220f8d04900f6d86d8a9d58cc0c3db27b61c4356ac7b2706f0921",
+      "bytes": 44
+    },
+    "logs/quiet-correct-cpu-t4.txt": {
+      "sha256": "1f2224c64b69751623cd600084a295d2fa7f458f6068bb1dda740606b15d33a7",
+      "bytes": 44
+    },
+    "logs/quiet-correct-cpu-t8.txt": {
+      "sha256": "89c7aa097886786c2304cf025056aaed2d2ea60cc5e93f565c7db5b955e6790e",
+      "bytes": 44
+    },
+    "logs/quiet-correct-gpu-range.txt": {
+      "sha256": "f44fa3fd3cbef4bb5b9ab88a409b49367daa02dfd3a5429232c4a10b6856e930",
+      "bytes": 44
+    },
+    "logs/quiet-reject-cpu-threads.txt": {
+      "sha256": "9ef629780402ef15489ad1c27e0eb415d9b8bf331f8ac94a3e1c80b59057f14f",
+      "bytes": 44
+    },
+    "logs/quiet-reject-gpu-threads.txt": {
+      "sha256": "97a284ee0acd0eebf0a08a09ed46cf1e8e985c6b7e7b0575c84761c8d8634093",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r0-cpu-t1.txt": {
+      "sha256": "c5003c922a9a612d158803613b00971339e2d603660e9bcd0e8f17a631eb3765",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r0-cpu-t16.txt": {
+      "sha256": "eef421c8d985d331248ca9800ac8cda2b5c584414273f63909c12251d6062192",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r0-cpu-t2.txt": {
+      "sha256": "dde84360031f2bc81aab2ba78b970fb59137593fea79d1c438dba7d9226c703b",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r0-cpu-t4.txt": {
+      "sha256": "7e4b5ad81da8995b961944cb761403538fe3e69f538a22f9f62475a17fe83a8a",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r0-cpu-t8.txt": {
+      "sha256": "940b582a48c5efc4f88c1d9f456da4f15c4ce73755da0224b1a7a9465e06b09b",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r0-gpu-range.txt": {
+      "sha256": "1fe9104ce36f41a6d45bbd02cd3dbb49afde6c94a65ba4890477f34b890e38ab",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r1-cpu-t1.txt": {
+      "sha256": "68ddb3d33bf02d6fcbc48f5fc701ebc206170cd07aa2f4ee812937259d60f414",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r1-cpu-t16.txt": {
+      "sha256": "102e9c10fb839ae95489f16dddc9df1b1a6aab7db78b6032c9624c0c0fccb30d",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r1-cpu-t2.txt": {
+      "sha256": "c81ffead541f718d6e55ec680d4f5e8ae6bd2a681bc8b9c9f1d8e12dc7a534b8",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r1-cpu-t4.txt": {
+      "sha256": "71c7283d27e0e3d3d2703121bc59f0f724e122e59b48495397094bb53bf33c9e",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r1-cpu-t8.txt": {
+      "sha256": "bc2dc576fb848aa2c8c40ebdb1f7199f79816f5bad99174868f45f533c2245d1",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r1-gpu-range.txt": {
+      "sha256": "57baa7b2a8d35ce2f92f3c9d633d8aec8c581c682aa265c56283cf4e89786885",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r2-cpu-t1.txt": {
+      "sha256": "404172afbcbab56aa86044d7c57c5b4550eab4e76a41271147246dd22966ec0f",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r2-cpu-t16.txt": {
+      "sha256": "b2938e6839cc2b3970c4afa0419e13bd7ab5cfba6e4c753376a386c980e61f38",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r2-cpu-t2.txt": {
+      "sha256": "86bfa516e2004e1e3280273b5b5be4e1269d918a8127fcd3b77828108a4fa7cc",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r2-cpu-t4.txt": {
+      "sha256": "ac93885cb9b6bfa8fad9fc820602fbe862cde487965bcb69fcb06249d32e823f",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r2-cpu-t8.txt": {
+      "sha256": "7c5ca11f638352ba5141691a3920853e29d872de06ce3183e9a43115e2371472",
+      "bytes": 44
+    },
+    "logs/quiet-timing-r2-gpu-range.txt": {
+      "sha256": "e6f3911e796853179d60c0551335f04f8f601b3e596dde27d8e4b5d544ab29ac",
+      "bytes": 44
+    },
+    "logs/stages.txt": {
+      "sha256": "ec20365c85de45b07047976619a4cc940b3e2719cd89175bdbc52bc127764843",
+      "bytes": 1150
+    },
+    "raw/correct-cpu-t1.csv": {
+      "sha256": "07375a2e265e114c1ed1606bacfd437a9ebb41cba122517675d004ecf9908264",
+      "bytes": 15628
+    },
+    "raw/correct-cpu-t1.receipt.json": {
+      "sha256": "35cedb1fb170f1d3f70427021ce7c0c6e2b1431b9697fcdc8e5a6be174cd6d03",
+      "bytes": 3081
+    },
+    "raw/correct-cpu-t1.receipt.log": {
+      "sha256": "39ddcca68d77f0d29fa9c5d809a22885301ade95e91eb6ec464d6bdb649f50c7",
+      "bytes": 144
+    },
+    "raw/correct-cpu-t1.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-cpu-t1.receipt.runtime/runtime.json": {
+      "sha256": "e7a38582acdb207042fd61fc76516447f616cfef2ce1bdf547874bc8403b6466",
+      "bytes": 776
+    },
+    "raw/correct-cpu-t1.receipt.sampler.log": {
+      "sha256": "48dc26977063d76f5785828f8a94bf5fe8348ce2f6aba28c872486892f7bcf09",
+      "bytes": 14104
+    },
+    "raw/correct-cpu-t1.tsv.xz": {
+      "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+      "bytes": 34504
+    },
+    "raw/correct-cpu-t16.csv": {
+      "sha256": "0ee332f4122cfd5d01ee7057ac8c4ea4d5d0a89ff09b606405f95c5c52099670",
+      "bytes": 16142
+    },
+    "raw/correct-cpu-t16.receipt.json": {
+      "sha256": "5954c7fea68f2312711fb251607de9fab8e66ac20c38d47a8cdedfbdf8688f5f",
+      "bytes": 3120
+    },
+    "raw/correct-cpu-t16.receipt.log": {
+      "sha256": "b5a9bc9c914d28598b5a821b61b80522fbe4f53e411e11a43972f51237fdf3d7",
+      "bytes": 145
+    },
+    "raw/correct-cpu-t16.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-cpu-t16.receipt.runtime/runtime.json": {
+      "sha256": "9705d3f2ee8bf9efbafe45367684ff218f6c76eef27a52b69d79f034e61b7ab1",
+      "bytes": 790
+    },
+    "raw/correct-cpu-t16.receipt.sampler.log": {
+      "sha256": "71a2a52cd2f2b149ec91413c82f913213d140423782153c7159b4c2463cd88fc",
+      "bytes": 11869
+    },
+    "raw/correct-cpu-t16.tsv.xz": {
+      "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+      "bytes": 34504
+    },
+    "raw/correct-cpu-t2.csv": {
+      "sha256": "6ef2b4f3cec92b676115d81bb29daeb7ad732cf06b63f250ae006e337d513453",
+      "bytes": 15638
+    },
+    "raw/correct-cpu-t2.receipt.json": {
+      "sha256": "e8e20144e37d8b8c0a2121553d0c5174379d6b2dfa562e4e6f782ee04f47cfb5",
+      "bytes": 3110
+    },
+    "raw/correct-cpu-t2.receipt.log": {
+      "sha256": "8d964f9cef89204243ff4c7316537990c17f5458a99560b7cf26c3fa003a86f6",
+      "bytes": 144
+    },
+    "raw/correct-cpu-t2.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-cpu-t2.receipt.runtime/runtime.json": {
+      "sha256": "93f71bb434d5cfc31006cf2536c2b1a0563dc32f8e6f9b5f9f39bfadc25d780a",
+      "bytes": 790
+    },
+    "raw/correct-cpu-t2.receipt.sampler.log": {
+      "sha256": "b99547ba8304921f52bff72ef5eea5da1cc623a5dba0152807cf2d09f8357ffe",
+      "bytes": 12812
+    },
+    "raw/correct-cpu-t2.tsv.xz": {
+      "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+      "bytes": 34504
+    },
+    "raw/correct-cpu-t4.csv": {
+      "sha256": "a35f693870b1ec8658c7ee91356abe557bce6bb3dae86fd9ca8ef5afbc546a28",
+      "bytes": 15646
+    },
+    "raw/correct-cpu-t4.receipt.json": {
+      "sha256": "030edddccdc98dce39be1945dbe0f96d6fce5b82c07b3caa31411e5f17787775",
+      "bytes": 3114
+    },
+    "raw/correct-cpu-t4.receipt.log": {
+      "sha256": "7f48fd012e608466020339c490146b1a068c85d10624c349983a47d2697b23b9",
+      "bytes": 144
+    },
+    "raw/correct-cpu-t4.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-cpu-t4.receipt.runtime/runtime.json": {
+      "sha256": "c901467ba5d3ee310673e1a07a83dba8dc3c87542958f96f3b454a0a2f61ca4d",
+      "bytes": 790
+    },
+    "raw/correct-cpu-t4.receipt.sampler.log": {
+      "sha256": "a66b8af8f4613df9afeb3f6e3d387f774a297b1307d079ca4213ddc7c8242870",
+      "bytes": 12404
+    },
+    "raw/correct-cpu-t4.tsv.xz": {
+      "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+      "bytes": 34504
+    },
+    "raw/correct-cpu-t8.csv": {
+      "sha256": "03453f61c57b9fef6493bc1a98ff2ab940204ddd66436cb44b552baa265a465c",
+      "bytes": 15643
+    },
+    "raw/correct-cpu-t8.receipt.json": {
+      "sha256": "b3afbc7502228d3af4f1b8728cd1ab1f069448cc2f79a6060fb502eda2403c32",
+      "bytes": 3125
+    },
+    "raw/correct-cpu-t8.receipt.log": {
+      "sha256": "6444607c028b0c8d587971b2c30cae4955be8ffe74b88ee2a3a797960cdff9f6",
+      "bytes": 144
+    },
+    "raw/correct-cpu-t8.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-cpu-t8.receipt.runtime/runtime.json": {
+      "sha256": "3f27aafea347f62d709b49179c3af292054cb3554c76ebec8dfd80bce00998fd",
+      "bytes": 790
+    },
+    "raw/correct-cpu-t8.receipt.sampler.log": {
+      "sha256": "af1c43fc70751c90bbb8a7584b2bc6968b8d1abbf7453480b72f42a60028de4a",
+      "bytes": 12336
+    },
+    "raw/correct-cpu-t8.tsv.xz": {
+      "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+      "bytes": 34504
+    },
+    "raw/correct-gpu-range.csv": {
+      "sha256": "76b9c56348e821630fda5ebf28d5470c94c8c268e6e0e650173e0540649533d5",
+      "bytes": 61649
+    },
+    "raw/correct-gpu-range.receipt.json": {
+      "sha256": "46477e67fbdbe04c2accfa2c9219123eaf3187167fb9459cb54b7513bdcd8ea5",
+      "bytes": 4718
+    },
+    "raw/correct-gpu-range.receipt.log": {
+      "sha256": "cd8ce3a4d3711ad877b51ac69082635f5c667de0aeeacbe87762ddfdef0c1ffc",
+      "bytes": 341
+    },
+    "raw/correct-gpu-range.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-gpu-range.receipt.runtime/runtime.json": {
+      "sha256": "7fab749ccc9746fdd0445c80be1038f76d1ee72a8eddd486096f42f12efb080a",
+      "bytes": 1808
+    },
+    "raw/correct-gpu-range.receipt.sampler.log": {
+      "sha256": "fa0e7073eea1781d5f38a7ae9878eeae2566242b654926706d3c29a54036fe8a",
+      "bytes": 8107
+    },
+    "raw/correct-gpu-range.tsv.xz": {
+      "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+      "bytes": 34504
+    },
+    "raw/reject-cpu-threads.receipt.json": {
+      "sha256": "f39b3290c2311e1f37554bb842ebee9395c96006a2728070125c77871ef6ace1",
+      "bytes": 3345
+    },
+    "raw/reject-cpu-threads.receipt.log": {
+      "sha256": "8bd69e1c3eacf3b98b432d263883ae37b4f5ec7af1d229fd8009cb5f6681638a",
+      "bytes": 38
+    },
+    "raw/reject-cpu-threads.receipt.runtime/reject": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/reject-cpu-threads.receipt.runtime/runtime.json": {
+      "sha256": "e7a38582acdb207042fd61fc76516447f616cfef2ce1bdf547874bc8403b6466",
+      "bytes": 776
+    },
+    "raw/reject-cpu-threads.receipt.sampler.log": {
+      "sha256": "919f0a68c5b6e15a64ba865141173db3e09087c89cc68c5f4954820b80a76d16",
+      "bytes": 10636
+    },
+    "raw/reject-gpu-threads.receipt.json": {
+      "sha256": "be84fc2edebf4b04da7f94e0a1cf671d1a8f1aa516ebee7d7599b21a6d3ec6f1",
+      "bytes": 4863
+    },
+    "raw/reject-gpu-threads.receipt.log": {
+      "sha256": "8bd69e1c3eacf3b98b432d263883ae37b4f5ec7af1d229fd8009cb5f6681638a",
+      "bytes": 38
+    },
+    "raw/reject-gpu-threads.receipt.runtime/reject": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/reject-gpu-threads.receipt.runtime/runtime.json": {
+      "sha256": "c8b16f242613b5bedb7d7144ef436294634582c45e61484ba94cd10d4cbbf5cf",
+      "bytes": 1808
+    },
+    "raw/reject-gpu-threads.receipt.sampler.log": {
+      "sha256": "47f63d7a8350a10d20d36be1dbdf82a00be75ab07028675d0c073ad0a1c529a4",
+      "bytes": 7911
+    },
+    "raw/timing-r0-cpu-t1.csv": {
+      "sha256": "d2da7aded145f2fdefa72b50898a240f8e5fa57d9ac4e4e213b6adc5049f58d8",
+      "bytes": 360788
+    },
+    "raw/timing-r0-cpu-t1.receipt.json": {
+      "sha256": "2632d8b7cc14c761f4969e437d9dfdfc63777cfc5384036a4d62084105b8df54",
+      "bytes": 3088
+    },
+    "raw/timing-r0-cpu-t1.receipt.log": {
+      "sha256": "6e4825d7a78144c771b51dc32bf9ab75f66714c0a63d2ca9be59f6b8fada607f",
+      "bytes": 145
+    },
+    "raw/timing-r0-cpu-t1.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-cpu-t1.receipt.runtime/runtime.json": {
+      "sha256": "ab9818d426ce9e3c86c90cd825db6718a1a7921cace92c7717cafa35a88e23e1",
+      "bytes": 777
+    },
+    "raw/timing-r0-cpu-t1.receipt.sampler.log": {
+      "sha256": "a0d6fb020ca5df304a647f6d0ef2bdcc9ba7ee2f13718142b2d19451fd231095",
+      "bytes": 88904
+    },
+    "raw/timing-r0-cpu-t1.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-cpu-t16.csv": {
+      "sha256": "638eec318e3ebc82f3322c7e4abe4a15bef9631830d1f51d18acc190b13a94ba",
+      "bytes": 372334
+    },
+    "raw/timing-r0-cpu-t16.receipt.json": {
+      "sha256": "538d80c66100f76f4e2860c1fa1f80c4ed039b6c6d2f1cc563776bb40f973771",
+      "bytes": 3126
+    },
+    "raw/timing-r0-cpu-t16.receipt.log": {
+      "sha256": "6f55e5bce89ef0953265cad287e7b05baf0d380b63a14afe89ce357e03d337d9",
+      "bytes": 146
+    },
+    "raw/timing-r0-cpu-t16.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-cpu-t16.receipt.runtime/runtime.json": {
+      "sha256": "679820e751ed417de3bebf7a78f15449a871d86f1559c422d2d2a12da72912fa",
+      "bytes": 791
+    },
+    "raw/timing-r0-cpu-t16.receipt.sampler.log": {
+      "sha256": "eea23dbf100ec89da183c83e96b69164f293d5b4653593cb1eb8f06ee595f491",
+      "bytes": 24422
+    },
+    "raw/timing-r0-cpu-t16.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-cpu-t2.csv": {
+      "sha256": "01b868555d1e7d9eeb6ca0f390b4ff980ac61dd3da7ef7e4fae0541599676803",
+      "bytes": 360830
+    },
+    "raw/timing-r0-cpu-t2.receipt.json": {
+      "sha256": "30347526260ef9883e6e3714b50e5e8941a216db1986ece55f5224245367fee2",
+      "bytes": 3118
+    },
+    "raw/timing-r0-cpu-t2.receipt.log": {
+      "sha256": "d9ed124cb0f6d18e1c63063f186d92ef7f0ae8b4a8f86e763ed8bd7a088ebf67",
+      "bytes": 145
+    },
+    "raw/timing-r0-cpu-t2.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-cpu-t2.receipt.runtime/runtime.json": {
+      "sha256": "35926e033662bb20a3df95424e877372f5d60531e362a8c55c9bdb1d156f9eb9",
+      "bytes": 791
+    },
+    "raw/timing-r0-cpu-t2.receipt.sampler.log": {
+      "sha256": "28aa07cd215d9bc8de39314ef7f714bc4e3a2425ad74ff7b1494e97a949af744",
+      "bytes": 59460
+    },
+    "raw/timing-r0-cpu-t2.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-cpu-t4.csv": {
+      "sha256": "5ba213fd2451485440df14685ddf7755a1b6096ad6f2897ca767c38d7f973e2e",
+      "bytes": 360845
+    },
+    "raw/timing-r0-cpu-t4.receipt.json": {
+      "sha256": "9bda60d52da80741b923ee3ee86e9189c7117b5a5685e45960d1ca8d85296722",
+      "bytes": 3120
+    },
+    "raw/timing-r0-cpu-t4.receipt.log": {
+      "sha256": "db5289008c4cf63994534252d6ef86948c680a8295a8f0c642d7fccc2fa5efd2",
+      "bytes": 145
+    },
+    "raw/timing-r0-cpu-t4.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-cpu-t4.receipt.runtime/runtime.json": {
+      "sha256": "21d8728136d0c03c7291590a9668ec0d621aa2689420b89e4da9960164ceeb85",
+      "bytes": 791
+    },
+    "raw/timing-r0-cpu-t4.receipt.sampler.log": {
+      "sha256": "81aa050979294b967e3aef9e821b075eb794d2891168896afebff4b322c89fdf",
+      "bytes": 50688
+    },
+    "raw/timing-r0-cpu-t4.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-cpu-t8.csv": {
+      "sha256": "9ab1ae3f8abc9c87a1cdb741693141351a16266eb642be0b7eaf86fd60a2b868",
+      "bytes": 360788
+    },
+    "raw/timing-r0-cpu-t8.receipt.json": {
+      "sha256": "f441067aa88f99bdbab66bde0d17add52e9108231b1a9c35d01598e832e9e5f1",
+      "bytes": 3130
+    },
+    "raw/timing-r0-cpu-t8.receipt.log": {
+      "sha256": "208d18cba65e6748ebbbad2372fd5b70075720d38f22234f1873120a37dad06a",
+      "bytes": 145
+    },
+    "raw/timing-r0-cpu-t8.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-cpu-t8.receipt.runtime/runtime.json": {
+      "sha256": "4ff7fbe6828dbd793a13c2bed5b1a48e5b1f5e92da225a7ad17933adcf271be6",
+      "bytes": 791
+    },
+    "raw/timing-r0-cpu-t8.receipt.sampler.log": {
+      "sha256": "0bec2b9557dd146342519c894e9feff2a34ad7cd5c9f046a353662ffa89f269f",
+      "bytes": 48376
+    },
+    "raw/timing-r0-cpu-t8.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-gpu-range.csv": {
+      "sha256": "123866face70edd8941b42c3e67f4db4346a30b593839a6183a1cf1c34d362a5",
+      "bytes": 1415210
+    },
+    "raw/timing-r0-gpu-range.receipt.json": {
+      "sha256": "976152231dc50ec302af1db6983b680189f62be160414b22103c8cbba4edd8b8",
+      "bytes": 4724
+    },
+    "raw/timing-r0-gpu-range.receipt.log": {
+      "sha256": "d3761472625dcebaf6cf1685cee506bd1f1500309d7239e7bc7e8f5b5e4129f4",
+      "bytes": 917
+    },
+    "raw/timing-r0-gpu-range.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-gpu-range.receipt.runtime/runtime.json": {
+      "sha256": "dafc73d0c3f585fcb6c457cb7e4a9c7b26e47c39332070cbca7e4b2764f4bba4",
+      "bytes": 1809
+    },
+    "raw/timing-r0-gpu-range.receipt.sampler.log": {
+      "sha256": "e7e63c0b5c893890dc471b91535726ea48506e226587ac74079bd7eb96d3fc76",
+      "bytes": 9625
+    },
+    "raw/timing-r0-gpu-range.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-cpu-t1.csv": {
+      "sha256": "6e2c97d0c20cda4c6dc99ae5e0d7cb82568974518c1f5bed8ec41bebe5fd9f62",
+      "bytes": 360834
+    },
+    "raw/timing-r1-cpu-t1.receipt.json": {
+      "sha256": "991a8f2b85f896ea86e4ea7c5b82f40d263a5a0628459dc3de6ced6fd601835c",
+      "bytes": 3089
+    },
+    "raw/timing-r1-cpu-t1.receipt.log": {
+      "sha256": "6e4825d7a78144c771b51dc32bf9ab75f66714c0a63d2ca9be59f6b8fada607f",
+      "bytes": 145
+    },
+    "raw/timing-r1-cpu-t1.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-cpu-t1.receipt.runtime/runtime.json": {
+      "sha256": "ab9818d426ce9e3c86c90cd825db6718a1a7921cace92c7717cafa35a88e23e1",
+      "bytes": 777
+    },
+    "raw/timing-r1-cpu-t1.receipt.sampler.log": {
+      "sha256": "bcf394f06fe040f20b13dffa36dd297eacae2a25fc9e9831f0275c0b94394b52",
+      "bytes": 89176
+    },
+    "raw/timing-r1-cpu-t1.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-cpu-t16.csv": {
+      "sha256": "ab8d4997b0b23c0c663141147068b902dbe4e54ae1f2cab8a35eff91cd11a235",
+      "bytes": 372278
+    },
+    "raw/timing-r1-cpu-t16.receipt.json": {
+      "sha256": "c180212f8c93903314c8aebf8600fcb619eb361c6618bb27abfde7da362171ce",
+      "bytes": 3126
+    },
+    "raw/timing-r1-cpu-t16.receipt.log": {
+      "sha256": "6f55e5bce89ef0953265cad287e7b05baf0d380b63a14afe89ce357e03d337d9",
+      "bytes": 146
+    },
+    "raw/timing-r1-cpu-t16.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-cpu-t16.receipt.runtime/runtime.json": {
+      "sha256": "679820e751ed417de3bebf7a78f15449a871d86f1559c422d2d2a12da72912fa",
+      "bytes": 791
+    },
+    "raw/timing-r1-cpu-t16.receipt.sampler.log": {
+      "sha256": "a2c26339858fc62f5678064d899f0cf1a5a2e186127b5daef033c99778ae6ffc",
+      "bytes": 24222
+    },
+    "raw/timing-r1-cpu-t16.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-cpu-t2.csv": {
+      "sha256": "f1faf3dd6d04240f677bdd7f7f5f22a375e4223d5d046ae1640466ef44772071",
+      "bytes": 360765
+    },
+    "raw/timing-r1-cpu-t2.receipt.json": {
+      "sha256": "7d0e81f7436b2cd71e599119979332a082cfb3f40c60d3921190e1a802845c43",
+      "bytes": 3115
+    },
+    "raw/timing-r1-cpu-t2.receipt.log": {
+      "sha256": "d9ed124cb0f6d18e1c63063f186d92ef7f0ae8b4a8f86e763ed8bd7a088ebf67",
+      "bytes": 145
+    },
+    "raw/timing-r1-cpu-t2.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-cpu-t2.receipt.runtime/runtime.json": {
+      "sha256": "35926e033662bb20a3df95424e877372f5d60531e362a8c55c9bdb1d156f9eb9",
+      "bytes": 791
+    },
+    "raw/timing-r1-cpu-t2.receipt.sampler.log": {
+      "sha256": "5fb31323ecb6e66a771d51891380eab7a967a8cea37b5177000b94f4d278808f",
+      "bytes": 59664
+    },
+    "raw/timing-r1-cpu-t2.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-cpu-t4.csv": {
+      "sha256": "1d86f4ea272f3ed6d64d95dc52728b4d827779d4a91f183c9c0bb5d2a14ea928",
+      "bytes": 360859
+    },
+    "raw/timing-r1-cpu-t4.receipt.json": {
+      "sha256": "5a12dbb78d6fd1ef61f6937988d1195457df87aa2996914a87f9c2265b9accd5",
+      "bytes": 3121
+    },
+    "raw/timing-r1-cpu-t4.receipt.log": {
+      "sha256": "db5289008c4cf63994534252d6ef86948c680a8295a8f0c642d7fccc2fa5efd2",
+      "bytes": 145
+    },
+    "raw/timing-r1-cpu-t4.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-cpu-t4.receipt.runtime/runtime.json": {
+      "sha256": "21d8728136d0c03c7291590a9668ec0d621aa2689420b89e4da9960164ceeb85",
+      "bytes": 791
+    },
+    "raw/timing-r1-cpu-t4.receipt.sampler.log": {
+      "sha256": "22df7ce9ac28897dd1aede75bb8607024f0713174c4489f35a024252923c0747",
+      "bytes": 50688
+    },
+    "raw/timing-r1-cpu-t4.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-cpu-t8.csv": {
+      "sha256": "312e06f05e0642e0203d91c28cebb60edf119c7083c742bfb671cdde9929bdba",
+      "bytes": 360760
+    },
+    "raw/timing-r1-cpu-t8.receipt.json": {
+      "sha256": "513f628dc6ae9fbf086a1b852e7e52decbb78f2e9b924cfbd8bb52d66c0e21e8",
+      "bytes": 3132
+    },
+    "raw/timing-r1-cpu-t8.receipt.log": {
+      "sha256": "208d18cba65e6748ebbbad2372fd5b70075720d38f22234f1873120a37dad06a",
+      "bytes": 145
+    },
+    "raw/timing-r1-cpu-t8.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-cpu-t8.receipt.runtime/runtime.json": {
+      "sha256": "4ff7fbe6828dbd793a13c2bed5b1a48e5b1f5e92da225a7ad17933adcf271be6",
+      "bytes": 791
+    },
+    "raw/timing-r1-cpu-t8.receipt.sampler.log": {
+      "sha256": "eb8c49e3b0884ad5b0fb9cd7b8bdd9ba0cecf451bf64b2d7cce30c8dbcb27c85",
+      "bytes": 48172
+    },
+    "raw/timing-r1-cpu-t8.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-gpu-range.csv": {
+      "sha256": "f49245cb058aca4d57eb6f67bff39ddb19c35c06f8fc4cff9c1675ca74fc2789",
+      "bytes": 1415202
+    },
+    "raw/timing-r1-gpu-range.receipt.json": {
+      "sha256": "939d5114ce8ce7c6aee9eb1c8eda8002385e2109fe367bbfa8198bfcffac8f0f",
+      "bytes": 4724
+    },
+    "raw/timing-r1-gpu-range.receipt.log": {
+      "sha256": "d3761472625dcebaf6cf1685cee506bd1f1500309d7239e7bc7e8f5b5e4129f4",
+      "bytes": 917
+    },
+    "raw/timing-r1-gpu-range.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-gpu-range.receipt.runtime/runtime.json": {
+      "sha256": "dafc73d0c3f585fcb6c457cb7e4a9c7b26e47c39332070cbca7e4b2764f4bba4",
+      "bytes": 1809
+    },
+    "raw/timing-r1-gpu-range.receipt.sampler.log": {
+      "sha256": "fcf08d73184aee7e5085ae3a2c19acd767c6ecc0a42d5d0d3b3c59cb46cc5f52",
+      "bytes": 9723
+    },
+    "raw/timing-r1-gpu-range.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-cpu-t1.csv": {
+      "sha256": "dc3db089449735c7b0568cb5e2b83b1d84d72da9c9848aa6101e4eb37e04bbae",
+      "bytes": 360847
+    },
+    "raw/timing-r2-cpu-t1.receipt.json": {
+      "sha256": "ec523288bea02d147bd95d5dfce1449d784392352b29a0d285941fb8d77c2705",
+      "bytes": 3089
+    },
+    "raw/timing-r2-cpu-t1.receipt.log": {
+      "sha256": "6e4825d7a78144c771b51dc32bf9ab75f66714c0a63d2ca9be59f6b8fada607f",
+      "bytes": 145
+    },
+    "raw/timing-r2-cpu-t1.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-cpu-t1.receipt.runtime/runtime.json": {
+      "sha256": "ab9818d426ce9e3c86c90cd825db6718a1a7921cace92c7717cafa35a88e23e1",
+      "bytes": 777
+    },
+    "raw/timing-r2-cpu-t1.receipt.sampler.log": {
+      "sha256": "fb5914883442b1be4cf0c404205c25e3bbf88534dd8cf54b8b953741c178216c",
+      "bytes": 88564
+    },
+    "raw/timing-r2-cpu-t1.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-cpu-t16.csv": {
+      "sha256": "1e00173289af622d0f5adcf7595394c13c5ec6c5b5898b95868d0bc9d8fc74e2",
+      "bytes": 372342
+    },
+    "raw/timing-r2-cpu-t16.receipt.json": {
+      "sha256": "50b30619b68866898f404d5eb406dea0bbb822f35110e2a34dc63daf86f280e3",
+      "bytes": 3126
+    },
+    "raw/timing-r2-cpu-t16.receipt.log": {
+      "sha256": "6f55e5bce89ef0953265cad287e7b05baf0d380b63a14afe89ce357e03d337d9",
+      "bytes": 146
+    },
+    "raw/timing-r2-cpu-t16.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-cpu-t16.receipt.runtime/runtime.json": {
+      "sha256": "679820e751ed417de3bebf7a78f15449a871d86f1559c422d2d2a12da72912fa",
+      "bytes": 791
+    },
+    "raw/timing-r2-cpu-t16.receipt.sampler.log": {
+      "sha256": "3f30eed149a78421c0662f4bd88ae6f37891798c7e98fa10e5574d58663c1502",
+      "bytes": 24562
+    },
+    "raw/timing-r2-cpu-t16.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-cpu-t2.csv": {
+      "sha256": "b393599b4e44cdb53479e4a91cd8bbe54646ae8c266fc64821313fd6880d5622",
+      "bytes": 360790
+    },
+    "raw/timing-r2-cpu-t2.receipt.json": {
+      "sha256": "d2a8930ffd3134f757dad2640a71db9744c7a32f47ca5f3c12aed48573a4072f",
+      "bytes": 3117
+    },
+    "raw/timing-r2-cpu-t2.receipt.log": {
+      "sha256": "d9ed124cb0f6d18e1c63063f186d92ef7f0ae8b4a8f86e763ed8bd7a088ebf67",
+      "bytes": 145
+    },
+    "raw/timing-r2-cpu-t2.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-cpu-t2.receipt.runtime/runtime.json": {
+      "sha256": "35926e033662bb20a3df95424e877372f5d60531e362a8c55c9bdb1d156f9eb9",
+      "bytes": 791
+    },
+    "raw/timing-r2-cpu-t2.receipt.sampler.log": {
+      "sha256": "2d43d422458b7c6b826159e0bc75aa47f76bb73fbf818a4caf0d235b3432381d",
+      "bytes": 59324
+    },
+    "raw/timing-r2-cpu-t2.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-cpu-t4.csv": {
+      "sha256": "9c7d9603853f07d07bec174ede2b6aa16fc0741ff3cd8af0733e229b1160a765",
+      "bytes": 360852
+    },
+    "raw/timing-r2-cpu-t4.receipt.json": {
+      "sha256": "2ced1d8fe20527e6cfd8d4c8e1905e2b3440b6dade0417754a83d8bee3d97877",
+      "bytes": 3122
+    },
+    "raw/timing-r2-cpu-t4.receipt.log": {
+      "sha256": "db5289008c4cf63994534252d6ef86948c680a8295a8f0c642d7fccc2fa5efd2",
+      "bytes": 145
+    },
+    "raw/timing-r2-cpu-t4.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-cpu-t4.receipt.runtime/runtime.json": {
+      "sha256": "21d8728136d0c03c7291590a9668ec0d621aa2689420b89e4da9960164ceeb85",
+      "bytes": 791
+    },
+    "raw/timing-r2-cpu-t4.receipt.sampler.log": {
+      "sha256": "11b8861e5198d1e5dc724bd4bc26674e8aff218577863779021c0b89b0509c10",
+      "bytes": 51096
+    },
+    "raw/timing-r2-cpu-t4.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-cpu-t8.csv": {
+      "sha256": "6714bb0cedf73fe907cbf9fff016199422d0d269e90b8c08cfa3925c92733a51",
+      "bytes": 360756
+    },
+    "raw/timing-r2-cpu-t8.receipt.json": {
+      "sha256": "84bc2c40e24b72c8807ce2e686f04d5b3feb009cde8537e6cfdac16ee9bbaa54",
+      "bytes": 3132
+    },
+    "raw/timing-r2-cpu-t8.receipt.log": {
+      "sha256": "208d18cba65e6748ebbbad2372fd5b70075720d38f22234f1873120a37dad06a",
+      "bytes": 145
+    },
+    "raw/timing-r2-cpu-t8.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-cpu-t8.receipt.runtime/runtime.json": {
+      "sha256": "4ff7fbe6828dbd793a13c2bed5b1a48e5b1f5e92da225a7ad17933adcf271be6",
+      "bytes": 791
+    },
+    "raw/timing-r2-cpu-t8.receipt.sampler.log": {
+      "sha256": "c645294c8054d2ce710127e5d6eafd20daba5df685610e87c3858c8435d33fd8",
+      "bytes": 48172
+    },
+    "raw/timing-r2-cpu-t8.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-gpu-range.csv": {
+      "sha256": "89318102f8f875c473c3e2f09bed938c3631427032ac2b48d1f85150f36d4087",
+      "bytes": 1415347
+    },
+    "raw/timing-r2-gpu-range.receipt.json": {
+      "sha256": "a38aeb8825a1f3bef390a87d46992730c9180c6a7dd6d934b0e8f533faf2ef1c",
+      "bytes": 4725
+    },
+    "raw/timing-r2-gpu-range.receipt.log": {
+      "sha256": "d3761472625dcebaf6cf1685cee506bd1f1500309d7239e7bc7e8f5b5e4129f4",
+      "bytes": 917
+    },
+    "raw/timing-r2-gpu-range.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-gpu-range.receipt.runtime/runtime.json": {
+      "sha256": "dafc73d0c3f585fcb6c457cb7e4a9c7b26e47c39332070cbca7e4b2764f4bba4",
+      "bytes": 1809
+    },
+    "raw/timing-r2-gpu-range.receipt.sampler.log": {
+      "sha256": "29b8c1a9ac92066d460b14f67aef03c0d41f3bdc1cda6c85ee32c2250f07cbf2",
+      "bytes": 9628
+    },
+    "raw/timing-r2-gpu-range.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/top-sha256.txt": {
+      "sha256": "29edfa3d0cc1d6acaf726b519bf7ecdf69b573289144cfab298d534e4b6b80a1",
+      "bytes": 3844
+    }
+  },
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [
+      {
+        "original": "raw/correct-cpu-t1.tsv",
+        "sha256": "a58c2134bbef03af24d50767b6938f4c58ca3eb171f40f3399d78421fcf31ad3",
+        "bytes": 171570,
+        "public": "raw/correct-cpu-t1.tsv",
+        "transformation": "decompressed from raw/correct-cpu-t1.tsv.xz (sha256 62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd); original hash computed at packaging"
+      },
+      {
+        "original": "raw/correct-cpu-t16.tsv",
+        "sha256": "a58c2134bbef03af24d50767b6938f4c58ca3eb171f40f3399d78421fcf31ad3",
+        "bytes": 171570,
+        "public": "raw/correct-cpu-t16.tsv",
+        "transformation": "decompressed from raw/correct-cpu-t16.tsv.xz (sha256 62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd); original hash computed at packaging"
+      },
+      {
+        "original": "raw/correct-cpu-t2.tsv",
+        "sha256": "a58c2134bbef03af24d50767b6938f4c58ca3eb171f40f3399d78421fcf31ad3",
+        "bytes": 171570,
+        "public": "raw/correct-cpu-t2.tsv",
+        "transformation": "decompressed from raw/correct-cpu-t2.tsv.xz (sha256 62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd); original hash computed at packaging"
+      },
+      {
+        "original": "raw/correct-cpu-t4.tsv",
+        "sha256": "a58c2134bbef03af24d50767b6938f4c58ca3eb171f40f3399d78421fcf31ad3",
+        "bytes": 171570,
+        "public": "raw/correct-cpu-t4.tsv",
+        "transformation": "decompressed from raw/correct-cpu-t4.tsv.xz (sha256 62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd); original hash computed at packaging"
+      },
+      {
+        "original": "raw/correct-cpu-t8.tsv",
+        "sha256": "a58c2134bbef03af24d50767b6938f4c58ca3eb171f40f3399d78421fcf31ad3",
+        "bytes": 171570,
+        "public": "raw/correct-cpu-t8.tsv",
+        "transformation": "decompressed from raw/correct-cpu-t8.tsv.xz (sha256 62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd); original hash computed at packaging"
+      },
+      {
+        "original": "raw/correct-gpu-range.tsv",
+        "sha256": "a58c2134bbef03af24d50767b6938f4c58ca3eb171f40f3399d78421fcf31ad3",
+        "bytes": 171570,
+        "public": "raw/correct-gpu-range.tsv",
+        "transformation": "decompressed from raw/correct-gpu-range.tsv.xz (sha256 62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-cpu-t1.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-cpu-t1.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-cpu-t1.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-cpu-t16.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-cpu-t16.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-cpu-t16.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-cpu-t2.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-cpu-t2.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-cpu-t2.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-cpu-t4.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-cpu-t4.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-cpu-t4.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-cpu-t8.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-cpu-t8.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-cpu-t8.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-gpu-range.csv",
+        "sha256": "123866face70edd8941b42c3e67f4db4346a30b593839a6183a1cf1c34d362a5",
+        "bytes": 1415210,
+        "public": "raw/timing-r0-gpu-range.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-gpu-range.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-gpu-range.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-gpu-range.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-cpu-t1.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-cpu-t1.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-cpu-t1.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-cpu-t16.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-cpu-t16.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-cpu-t16.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-cpu-t2.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-cpu-t2.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-cpu-t2.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-cpu-t4.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-cpu-t4.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-cpu-t4.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-cpu-t8.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-cpu-t8.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-cpu-t8.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-gpu-range.csv",
+        "sha256": "f49245cb058aca4d57eb6f67bff39ddb19c35c06f8fc4cff9c1675ca74fc2789",
+        "bytes": 1415202,
+        "public": "raw/timing-r1-gpu-range.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-gpu-range.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-gpu-range.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-gpu-range.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-cpu-t1.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-cpu-t1.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-cpu-t1.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-cpu-t16.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-cpu-t16.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-cpu-t16.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-cpu-t2.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-cpu-t2.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-cpu-t2.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-cpu-t4.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-cpu-t4.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-cpu-t4.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-cpu-t8.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-cpu-t8.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-cpu-t8.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-gpu-range.csv",
+        "sha256": "89318102f8f875c473c3e2f09bed938c3631427032ac2b48d1f85150f36d4087",
+        "bytes": 1415347,
+        "public": "raw/timing-r2-gpu-range.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-gpu-range.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-gpu-range.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-gpu-range.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      }
+    ],
+    "excluded": [
+      {
+        "original": "raw/correct-cpu-t1.tsv.xz",
+        "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+        "bytes": 34504,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t1.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/correct-cpu-t16.tsv.xz",
+        "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+        "bytes": 34504,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t16.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/correct-cpu-t2.tsv.xz",
+        "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+        "bytes": 34504,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t2.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/correct-cpu-t4.tsv.xz",
+        "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+        "bytes": 34504,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t4.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/correct-cpu-t8.tsv.xz",
+        "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+        "bytes": 34504,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-cpu-t8.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/correct-gpu-range.tsv.xz",
+        "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+        "bytes": 34504,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/correct-gpu-range.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-cpu-t1.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t1.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-cpu-t16.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t16.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-cpu-t2.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t2.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-cpu-t4.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t4.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-cpu-t8.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-cpu-t8.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-gpu-range.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r0-gpu-range.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-cpu-t1.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t1.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-cpu-t16.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t16.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-cpu-t2.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t2.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-cpu-t4.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t4.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-cpu-t8.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-cpu-t8.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-gpu-range.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r1-gpu-range.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-cpu-t1.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t1.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-cpu-t16.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t16.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-cpu-t2.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t2.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-cpu-t4.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t4.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-cpu-t8.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t8.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-gpu-range.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-gpu-range.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      }
+    ],
+    "recorded_artifacts_not_in_public_tree_or_lists": []
+  }
+}

@@ -1,0 +1,11 @@
+# Full collection, k=10, 500 calibration queries. One row per configuration (see protocol.json).
+# cfg	NAME	CPUS	MEMORY_POLICY   (run as: numactl --physcpubind=CPUS MEMORY_POLICY ...)
+# gpu-range: the RTX 4070 range scorer, host thread on CPU 0 as in the full-collection baselines.
+# cpu-t1..t8: one socket (cuda5 socket 0 = even CPUs), memory bound to that socket.
+# cpu-t16: both sockets, memory interleaved across them.
+cfg	gpu-range	0	--localalloc
+cfg	cpu-t1	0	--membind=0
+cfg	cpu-t2	0,2	--membind=0
+cfg	cpu-t4	0,2,4,6	--membind=0
+cfg	cpu-t8	0,2,4,6,8,10,12,14	--membind=0
+cfg	cpu-t16	0-15	--interleave=all
