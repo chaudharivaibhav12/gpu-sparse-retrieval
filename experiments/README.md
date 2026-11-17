@@ -26,3 +26,5 @@ Add new experiments here on their own branches. Merge index rows through pull re
 - [2026-11-15-range-worker-sweep](2026-11-15-range-worker-sweep/README.md): complete valid negative result — 119 synthetic / 9 real-data checks and 27 timing processes validated; retain W1024/T256 (~0.108109 ms, 420.90 MiB). Alternatives 1.31–2.94 times slower; retained failed attempts and quota-safe timing continuation; calibration only.
 
 - [Full-collection matched baselines](2026-11-15-full-collection-baselines/report.md): complete; exact 8,841,823-passage comparison, independently replayed outputs/provenance/statistics. Range median 0.687415 ms; paired ratios 9.65x versus canonical U64 adaptation and 45.56x versus CSR, with explicit scope/limits and preserved failed attempts.
+
+- [Guarded canonical FP32, full collection](2026-11-16-guarded-fp32-baseline/report.md): complete — exact 8,841,823-passage / 500-calibration comparison. FP32/U64 paired ratio 0.872542; range remains 8.43× faster than FP32. All44attempts and earlier failures retained; independent replay and compiled arithmetic verified.

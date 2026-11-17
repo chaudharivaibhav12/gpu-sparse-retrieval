@@ -1,6 +1,6 @@
 # Current project status
 
-November 16: [full-collection matched baselines](../experiments/2026-11-15-full-collection-baselines/report.md) are complete, source `f10c7e7654269e670a0e7f0c678db497d4bc5ee0`. Range median 0.687415 ms versus canonical U64 adaptation 6.890346 ms and CSR 32.374350 ms; independent raw/statistical validation passed. Earlier status text is historical. Guarded FP32 qualification and held-out evaluation remain open.
+November 17: [guarded FP32 qualification](../experiments/2026-11-16-guarded-fp32-baseline/report.md) is complete. Full **8,841,823 passages**, 500 calibration queries, RTX 4070, k=10, batch=1: range median **0.685848 ms**, canonical U64 GPUSparse **6.895403 ms**, guarded canonical FP32 GPUSparse **6.008201 ms**. FP32 uses 12.75% less query time than U64 by the paired estimator; range remains **8.43×** faster than FP32 (conditional 95% interval 8.31–8.56). All correctness/provenance/statistical checks passed; earlier failures are preserved. FP32 qualification is resolved for this bounded domain; full CPU-BMP, broader workloads, settings freeze and held-out evaluation remain open. The older status text below is historical. See [team context](../experiments/2026-11-16-guarded-fp32-baseline/TEAM-CONTEXT.md).
 
 
 Updated November 11, 2026. The scoring contract is exact uint8 impacts, BMP float32/ceil cap 32 queries, uint64 accumulation, all-passage eligibility and score-descending/original-numeric-ID-ascending ties.
