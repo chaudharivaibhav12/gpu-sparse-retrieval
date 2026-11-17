@@ -15,13 +15,15 @@ EXTRA_NVCC_FLAGS=${EXTRA_NVCC_FLAGS:-}
 # Each v3 commit's default compile switches build its label: v3-1 = change 1 (lookup),
 # v3-2 = change 2 (theta merge), v3-3 = changes 2 + 3 (theta + radix), v3-all = 1 + 2 + 3.
 # v3-3 and v3-all take an optional 15th scorer argument: the radix crossover k (default 100).
+# Fix 1 (code/review-fix-1.json): v3-1 and v3-all moved to lookup chunk 8 with a host-side
+# thread-limit check; their previous commits were 5f1ccd9 (v3-1) and 313e255 (v3-all).
 VARIANTS=(
   "ctrl:74dd5d303f0cf5690a10f2060f6da536726705dc"
   "ctrl-instrumented:6bd88916988e6accaa54e4b6a5f048391c3d1dda"
-  "v3-1:5f1ccd94b0d4f422f378618c29005e407afba9ee"
+  "v3-1:ea4f5064602f043f9693cb9ac0e0fe47a98c88d4"
   "v3-2:025dbdb7a457de096423ff21e73b4b5c069039f8"
   "v3-3:510def3d965c1ba73daf4e9dc93fe537de88efb0"
-  "v3-all:313e255f919cc0ca117d91833188c4d00bdbdd0e"
+  "v3-all:a8a9a1ebdac02f7ee3767d9a4d39c64230829525"
 )
 want=("$@")
 for entry in "${VARIANTS[@]}"; do

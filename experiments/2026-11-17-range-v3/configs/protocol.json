@@ -12,9 +12,10 @@
       "what": "main's V2-5"
     },
     "v3-1": {
-      "commit": "5f1ccd94b0d4f422f378618c29005e407afba9ee",
-      "what": "change 1: warp-cooperative block lookup (chunk 16 words)",
-      "review": "code/review-change-1.json"
+      "commit": "ea4f5064602f043f9693cb9ac0e0fe47a98c88d4",
+      "what": "change 1: warp-cooperative block lookup (chunk 8 words, fix 1) and host thread-limit check",
+      "review": "code/review-change-1.json, code/review-fix-1.json",
+      "previous_commit": "5f1ccd94b0d4f422f378618c29005e407afba9ee (chunk 16)"
     },
     "v3-2": {
       "commit": "025dbdb7a457de096423ff21e73b4b5c069039f8",
@@ -27,8 +28,10 @@
       "review": "code/review-change-3.json"
     },
     "v3-all": {
-      "commit": "313e255f919cc0ca117d91833188c4d00bdbdd0e",
-      "what": "changes 1 + 2 + 3"
+      "commit": "a8a9a1ebdac02f7ee3767d9a4d39c64230829525",
+      "what": "changes 1 + 2 + 3 with fix 1 (lookup chunk 8, host thread-limit check)",
+      "review": "code/review-fix-1.json",
+      "previous_commit": "313e255f919cc0ca117d91833188c4d00bdbdd0e (chunk 16)"
     }
   },
   "selection_path_per_run": "v3-3 and v3-all use the radix path at k >= 100 (default crossover). In the k=32 and k=64 sets v3-3 is run with crossover argument 1 so that it uses the radix path; v3-2 has no radix path. v3-all at k=10 uses the small-k path.",
@@ -157,5 +160,12 @@
   "stopping": "all correctness before timing; no optional stopping; a technical failure is inspected, fixed, reviewed and rerun under a new run ID, at most three attempts; overlap replacements follow gpu_policy.overlap",
   "not_in_this_registration": "the full collection; other range sizes; held-out queries; lookup chunk 8 (RBP_LOOKUP_CHUNK_WORDS=8) and 11-bit radix digits; Nsight Compute; any further code change. Each needs its own registration or an amendment before it runs.",
   "notes": "Parva's batched copy of range_scores and tests/check_batched_kernel_sync.py are not edited and will need a refresh if these changes are adopted.",
-  "amendments": []
+  "amendments": [
+    {
+      "date": "2026-11-17",
+      "after": "cuda5 gate 20261117-cuda5-gate-v3-all-01 failed (forced radix at 1,024 threads: too many resources requested for launch); no timed or profiled run had started",
+      "change": "v3-1 and v3-all are rebuilt from new commits with RBP_LOOKUP_CHUNK_WORDS=8 (owner decision) and a host-side check that refuses SCORE_THREADS above the launched instantiation's maxThreadsPerBlock, with a rejection fixture (-DRBP_TEST_LAUNCH_BOUND=256 build). ctrl, v3-2 and v3-3 are unchanged. v3-1, v3-all, v3-all-clocks and v3-all-stats are re-gated (run IDs ...-02); the failed gate is kept.",
+      "reason": "CUDA 12.6 compiled v3-all's radix instantiation to 68 registers (55 under CUDA 13.3), above the 64 that a 1,024-thread block allows. Chunk 16 also cost v3-1 occupancy on the laptop. Lookup chunk 8 was listed as an open owner decision in review-change-1.json."
+    }
+  ]
 }
