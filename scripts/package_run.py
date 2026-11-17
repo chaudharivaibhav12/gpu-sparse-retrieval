@@ -7,8 +7,8 @@ Mirrors the published runs on main:
   (gzip level 9, no name or timestamp, so output bytes are reproducible);
 - .xz files and .tar.xz archives of listings are converted to per-file .gz
   after checking each original's SHA-256;
-- full profiler reports (.ncu-rep, .nsys-rep) and JIT caches (raw/triton-cache)
-  stay outside Git;
+- full profiler reports (.ncu-rep, .nsys-rep), JIT caches (raw/triton-cache) and
+  raw .bin dumps over 1 MB stay outside Git;
 - manifest.json gains a "public_packaging" section: "originals" (original
   path, SHA-256, bytes, public path, transformation) and "excluded" (original
   path, SHA-256, bytes, custody). The original "artifacts" section is left
@@ -101,10 +101,10 @@ def main():
         path = run / rel
         if rel == "manifest.json":
             continue
-        if rel.startswith("raw/triton-cache/") or rel.endswith((".ncu-rep", ".nsys-rep")):
+        if rel.startswith("raw/triton-cache/") or rel.endswith((".ncu-rep", ".nsys-rep")) or (rel.endswith(".bin") and path.stat().st_size > GZIP_OVER):
             data = path.read_bytes()
-            excluded.append(dict(original=rel, sha256=sha(data), bytes=len(data), custody=custody(rel, sha(data)),
-                                 reason="full profiler report" if rel.endswith("-rep") else "Triton JIT cache"))
+            reason = "full profiler report" if rel.endswith("-rep") else "raw binary dump too large for Git" if rel.endswith(".bin") else "Triton JIT cache"
+            excluded.append(dict(original=rel, sha256=sha(data), bytes=len(data), custody=custody(rel, sha(data)), reason=reason))
             move_out(rel)
         elif rel.endswith(".tar.xz"):
             data = path.read_bytes()

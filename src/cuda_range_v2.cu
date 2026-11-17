@@ -16,6 +16,38 @@
 #include "cuda_topk.cuh"
 #include "range_bitpack.h"
 #include <chrono>
+// Optional profiling instrumentation (from experiment 2026-11-15-range-bitpack-v2-profile).
+// Without these flags the kernel compiles to the same GPU code (SASS) as main's
+// V2-5. -DRBP_STAGE_CLOCKS records clock64() per warp (lane 0) at
+// every stage boundary and around every __syncthreads(), plus %globaltimer per
+// block; -DRBP_SPLIT_DECODE_ADD (with RBP_STAGE_CLOCKS) decodes a chunk of the
+// work list into shared memory, synchronises, then adds (diagnostic only).
+#ifdef RBP_STAGE_CLOCKS
+#include <cstdlib>
+constexpr uint32_t RBP_NE=24;   // events per warp, see RBP_EVENT_NAMES
+constexpr uint32_t RBP_NB=8;    // per-block words
+// Set before each launch to that query's slice, or null to record nothing.
+__device__ uint64_t* rbp_clock_buf;
+__device__ uint64_t* rbp_block_buf;
+#define RBP_EV(e) do { if (rbp_clock_buf && (threadIdx.x&31)==0) rbp_clock_buf[(size_t(blockIdx.x)*(blockDim.x>>5)+(threadIdx.x>>5))*RBP_NE+(e)]=clock64(); } while (0)
+#define RBP_EVV(e,value) do { if (rbp_clock_buf && (threadIdx.x&31)==0) rbp_clock_buf[(size_t(blockIdx.x)*(blockDim.x>>5)+(threadIdx.x>>5))*RBP_NE+(e)]=(value); } while (0)
+__device__ inline uint64_t rbp_globaltimer() { uint64_t t;asm volatile("mov.u64 %0, %%globaltimer;" : "=l"(t));return t; }
+__device__ inline uint32_t rbp_smid() { uint32_t s;asm volatile("mov.u32 %0, %%smid;" : "=r"(s));return s; }
+#define RBP_GT(slot) do { if (rbp_block_buf && threadIdx.x==0) rbp_block_buf[size_t(blockIdx.x)*RBP_NB+(slot)]=rbp_globaltimer(); } while (0)
+#define RBP_BW(slot,value) do { if (rbp_block_buf && threadIdx.x==0) rbp_block_buf[size_t(blockIdx.x)*RBP_NB+(slot)]=(value); } while (0)
+static const char* RBP_EVENT_NAMES[RBP_NE]={"start","lookup_zero_end","S1_after","prefix_end","S2_after","decode_add_end","S3_after",
+    "sort_end","select_end","S4_after","rank_write_end","fence_end","S5_after","ticket_end","S6_after",
+    "merge_select_end","S7_after","merge_end","end","split_decode_cycles","split_bar1_cycles","split_add_cycles","split_bar2_cycles","merge_start"};
+static const char* RBP_BLOCK_NAMES[RBP_NB]={"gt_start","clk_start","gt_rank_write_end","gt_end","clk_end","smid","is_last","postings"};
+#else
+#define RBP_EV(e)
+#define RBP_EVV(e,value)
+#define RBP_GT(slot)
+#define RBP_BW(slot,value)
+#endif
+#if defined(RBP_SPLIT_DECODE_ADD) && !defined(RBP_STAGE_CLOCKS)
+#error "RBP_SPLIT_DECODE_ADD is a diagnostic of RBP_STAGE_CLOCKS"
+#endif
 
 constexpr uint32_t RBP_MAX_TERMS=128;
 constexpr uint32_t RBP_MAX_WARPS=32;
@@ -110,7 +142,13 @@ __device__ inline void merge_lists(const GpuCandidate* lists,uint32_t count,uint
         ++length;
     }
     if (lane==0) warp_length[warp]=length;
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(15);
+#endif
     __syncthreads();
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(16);
+#endif
     for (uint32_t e=lane;e<warp_length[warp];e+=32) {
         const GpuCandidate c=scratch[uint64_t(warp)*k+e];
         uint32_t rank=e;
@@ -141,6 +179,9 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
     const uint32_t range=blockIdx.x;
     const uint64_t first=v.range_start[range];
     const uint32_t range_docs=v.range_start[range+1]-v.range_start[range];
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(0);RBP_GT(0);RBP_BW(1,clock64());RBP_BW(5,rbp_smid());
+#endif
 
     // 1. Find each query term's block in this range and load its metadata.
     for (uint32_t i=thread;i<terms;i+=threads) {
@@ -160,19 +201,64 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
     }
     // 2. Every document in the range starts at zero and stays eligible.
     for (uint32_t s=thread;s<range_docs;s+=threads) scores[s]=0;
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(1);
+#endif
     __syncthreads();
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(2);
+#endif
     // Work-list offsets: postings before each term.
     for (uint32_t i=thread;i<=terms;i+=threads) {
         uint32_t postings=0;
         for (uint32_t earlier=0;earlier<i;++earlier) postings+=term_count[earlier];
         count_start[i]=postings;
     }
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(3);
+#endif
     __syncthreads();
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(4);
+#endif
 
     // 3. Score the combined work list. Each lane takes postings g = thread,
     //    thread + threads, ...; positions are stored directly, so lanes never
     //    wait for each other.
     const uint32_t postings=count_start[terms];
+#ifdef RBP_STAGE_CLOCKS
+    RBP_BW(7,postings);
+#endif
+#ifdef RBP_SPLIT_DECODE_ADD
+    // Diagnostic: decode a chunk into shared memory, barrier, then add.
+    constexpr uint32_t RBP_CHUNK=2048;
+    __shared__ uint16_t split_position[RBP_CHUNK];
+    __shared__ uint32_t split_value[RBP_CHUNK];
+    uint64_t split_decode=0,split_bar1=0,split_add=0,split_bar2=0;
+    for (uint32_t base=0;base<postings;base+=RBP_CHUNK) {
+        const uint32_t stop=postings-base<RBP_CHUNK ? postings : base+RBP_CHUNK;
+        const uint64_t t0=clock64();
+        for (uint32_t g=base+thread;g<stop;g+=threads) {
+            uint32_t i=0,hi=terms;
+            while (hi-i>1) {
+                const uint32_t mid=i+(hi-i)/2;
+                if (count_start[mid]<=g) i=mid; else hi=mid;
+            }
+            const uint32_t j=g-count_start[i];
+            split_position[g-base]=uint16_t(rbp_extract(v.encoded,term_bit[i]+uint64_t(j)*term_width[i],term_width[i]));
+            split_value[g-base]=term_weight[i]*uint32_t(v.impacts[term_value[i]+j]);
+        }
+        const uint64_t t1=clock64();
+        __syncthreads();
+        const uint64_t t2=clock64();
+        for (uint32_t g=base+thread;g<stop;g+=threads) atomicAdd(&scores[split_position[g-base]],split_value[g-base]);
+        const uint64_t t3=clock64();
+        __syncthreads();
+        const uint64_t t4=clock64();
+        split_decode+=t1-t0;split_bar1+=t2-t1;split_add+=t3-t2;split_bar2+=t4-t3;
+    }
+    RBP_EVV(19,split_decode);RBP_EVV(20,split_bar1);RBP_EVV(21,split_add);RBP_EVV(22,split_bar2);
+#else
     for (uint32_t g=thread;g<postings;g+=threads) {
         // Last term whose work-list start is at or before g; it is never an
         // absent term because such a term's range of g is empty.
@@ -185,7 +271,14 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
         const uint32_t position=rbp_extract(v.encoded,term_bit[i]+uint64_t(j)*term_width[i],term_width[i]);
         atomicAdd(&scores[position],term_weight[i]*uint32_t(v.impacts[term_value[i]+j]));
     }
+#endif
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(5);
+#endif
     __syncthreads();
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(6);
+#endif
 
     // 4a. Each thread keeps the best min(k, slots) of the slots it owns
     //     (slot % threads == thread), sorted best first.
@@ -201,6 +294,9 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
             local[p]=key;
         }
     }
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(7);
+#endif
     // 4b. Each warp selects its best list_cap keys with register shuffles; no
     //     barrier. The lane holding the winner advances to its next key.
     uint32_t head=0,length=0;
@@ -217,7 +313,13 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
         ++length;
     }
     if (lane==0) warp_length[warp]=length;
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(8);
+#endif
     __syncthreads();
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(9);
+#endif
 
     // 4c/5. Every listed key counts the keys ahead of it in the other warps'
     //       lists; that count plus its own index is its final rank.
@@ -233,6 +335,9 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
     }
     // A range with fewer than k documents marks the rest of its list empty.
     for (uint32_t g=range_docs+thread;g<k;g+=threads) candidates[uint64_t(range)*k+g]=GpuCandidate{0,0,0,0};
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(10);RBP_GT(2);
+#endif
 
     // 6. Last block finishes. Every thread fences its candidate writes; after
     //    the barrier the whole list is visible device-wide, and only then does
@@ -240,13 +345,34 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
     //    therefore sees every range's list. It merges them and re-arms the
     //    counter for the next launch.
     __threadfence();
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(11);
+#endif
     __syncthreads();
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(12);
+#endif
     if (thread==0) is_last=atomicAdd(finished,1u)==gridDim.x-1;
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(13);
+#endif
     __syncthreads();
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(14);RBP_BW(6,is_last);
+#endif
     if (is_last) {
+#ifdef RBP_STAGE_CLOCKS
+        RBP_EV(23);
+#endif
         merge_lists(candidates,gridDim.x,k,heads,scratch,warp_length,output);
         if (thread==0) *finished=0;
+#ifdef RBP_STAGE_CLOCKS
+        RBP_EV(17);
+#endif
     }
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(18);RBP_GT(3);RBP_BW(4,clock64());
+#endif
 }
 
 struct GpuEvent {
@@ -337,6 +463,13 @@ int main(int argc,char** argv) {
         csv<<"phase,round,query_id,docs,k,query_wall_ms,gpu_span_ms,ordered_id_mismatches,result_score_mismatches,query_terms,range_size,ranges,score_threads,merge_threads,device_allocation_bytes,index_posting_bytes,result_transfer_bytes,query_transfer_bytes\n";
         top<<"phase\tround\tquery_id\trank\toriginal_id\tscore\n";
         QueryArgs args{};vector<GpuCandidate> winners(wanted);
+#ifdef RBP_STAGE_CLOCKS
+        // RBP_CLOCKS_OUT=prefix: record every measured round into prefix.{events,blocks}.bin + prefix.json
+        const char* clocks_out=getenv("RBP_CLOCKS_OUT");
+        const size_t event_words=size_t(R)*warps*RBP_NE,block_words=size_t(R)*RBP_NB,slices=size_t(rounds)*count;
+        GpuArray<uint64_t> event_buffer(clocks_out ? slices*event_words : 0),block_buffer(clocks_out ? slices*block_words : 0);
+        if (clocks_out) { cuda_checked(cudaMemset(event_buffer.ptr,0xff,event_buffer.count*8));cuda_checked(cudaMemset(block_buffer.ptr,0xff,block_buffer.count*8)); }
+#endif
         vector<uint32_t> weights(verify ? index.vocab : 0);vector<uint64_t> reference(verify ? N : 0);
         GpuEvent begin,end;
         for (uint32_t phase=0;phase<2;++phase) for (uint32_t round=0;round<(phase ? rounds : warmups);++round) {
@@ -344,6 +477,14 @@ int main(int argc,char** argv) {
             for (uint32_t qi=0;qi<count;++qi) {
                 const auto& q=queries[qi];
                 const uint32_t terms=uint32_t(q.terms.size());
+#ifdef RBP_STAGE_CLOCKS
+                {
+                    // Outside the wall-clock boundary: point the kernel at this query's slice (measured rounds only).
+                    uint64_t* e=nullptr;uint64_t* b=nullptr;
+                    if (clocks_out && phase==1) { const size_t slice=size_t(round)*count+qi;e=event_buffer.ptr+slice*event_words;b=block_buffer.ptr+slice*block_words; }
+                    cuda_checked(cudaMemcpyToSymbol(rbp_clock_buf,&e,sizeof e));cuda_checked(cudaMemcpyToSymbol(rbp_block_buf,&b,sizeof b));
+                }
+#endif
                 const auto wall_begin=chrono::steady_clock::now();
                 args.terms=terms;
                 for (uint32_t i=0;i<terms;++i) args.term[i]={q.terms[i].first,q.terms[i].second};
@@ -380,6 +521,33 @@ int main(int argc,char** argv) {
             }
             cerr<<"ROUND_COMPLETE "<<phase_name<<' '<<round<<'\n';
         }
+#ifdef RBP_STAGE_CLOCKS
+        if (clocks_out) {
+            vector<uint64_t> events(event_buffer.count),blocks(block_buffer.count);
+            cuda_checked(cudaMemcpy(events.data(),event_buffer.ptr,events.size()*8,cudaMemcpyDeviceToHost));
+            cuda_checked(cudaMemcpy(blocks.data(),block_buffer.ptr,blocks.size()*8,cudaMemcpyDeviceToHost));
+            const string prefix=clocks_out;
+            for (const auto& name:{prefix+".events.bin",prefix+".blocks.bin",prefix+".json"}) require(!filesystem::exists(name),"Refusing to overwrite "+name);
+            ofstream(prefix+".events.bin",ios::binary).write(reinterpret_cast<const char*>(events.data()),streamsize(events.size()*8));
+            ofstream(prefix+".blocks.bin",ios::binary).write(reinterpret_cast<const char*>(blocks.data()),streamsize(blocks.size()*8));
+            int clock_khz=0;cuda_checked(cudaDeviceGetAttribute(&clock_khz,cudaDevAttrClockRate,int(gpu)));
+            ofstream meta(prefix+".json");
+            meta<<"{\"ranges\":"<<R<<",\"warps\":"<<warps<<",\"events_per_warp\":"<<RBP_NE<<",\"block_words\":"<<RBP_NB<<",\"measured_rounds\":"<<rounds<<",\"queries\":"<<count
+                <<",\"k\":"<<k<<",\"range_size\":"<<W<<",\"threads\":"<<threads<<",\"device_max_clock_khz\":"<<clock_khz
+#ifdef RBP_SPLIT_DECODE_ADD
+                <<",\"split_decode_add\":true"
+#else
+                <<",\"split_decode_add\":false"
+#endif
+                <<",\"layout\":\"events[round][query][range][warp][event], blocks[round][query][range][word]; missing = 0xffffffffffffffff\",\"event_names\":[";
+            for (uint32_t e=0;e<RBP_NE;++e) meta<<(e ? "," : "")<<'"'<<RBP_EVENT_NAMES[e]<<'"';
+            meta<<"],\"block_names\":[";
+            for (uint32_t e=0;e<RBP_NB;++e) meta<<(e ? "," : "")<<'"'<<RBP_BLOCK_NAMES[e]<<'"';
+            meta<<"],\"query_ids\":[";
+            for (uint32_t qi=0;qi<count;++qi) meta<<(qi ? "," : "")<<'"'<<queries[qi].id<<'"';
+            meta<<"]}\n";
+        }
+#endif
         cout<<"RANGE_V2_COMPLETE docs="<<N<<" queries="<<count<<" k="<<k<<" range_size="<<W<<" verify="<<verify<<'\n';return 0;
     } catch (const exception& e) { cerr<<"ERROR: "<<e.what()<<'\n';return 1; }
 }
