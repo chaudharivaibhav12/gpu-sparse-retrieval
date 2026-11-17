@@ -4,30 +4,44 @@
 #   experiments/2026-11-18-range-pruning/code/run.sh RUN_ID
 #
 # Stages, all from one source commit on one host:
-#   1. build cuda_range_v2, cuda_range_prune (nvcc) and range_bitpack_tool (g++); check every input
-#      against its pinned SHA-256;
+#   1. build cuda_range_v2, cuda_range_prune (nvcc) and range_bitpack_tool (g++), or, with REUSE_FROM,
+#      copy the verified binaries of an earlier run (see below); check every input against its pinned SHA-256;
 #   2. fixtures: tests/check_range_bitpack.py for the unchanged v2 control and tests/check_range_prune.py;
 #   3. two deliberate runtime-gate rejections (prune seed count, v2 score threads);
 #   4. correctness: every configuration once (0 warm-up, 1 round), answers compared with the CPU
 #      reference; the seeds-64 configurations also run VERIFY=1, which checks every answer and the
 #      whole pruning schedule (bounds, seeds, theta, scored ranges and postings) on the host;
 #   5. timing: every configuration PROCESSES times in rotating order (offsets 0, ceil(n/3), ceil(2n/3)),
-#      WARMUPS + ROUNDS rounds; answers of every process compared with the reference. A process is
-#      ineligible (kept under raw/ineligible/ and replaced, at most 3 times per configuration) if another
-#      GPU process was sampled during it (or its own was not), or other users' CPU use averaged more than
-#      CPU_LIMIT cores. A process that fails while another GPU process was sampled is ineligible too
-#      (contended failure); any other failure stops the run. Before each process the script waits until
-#      the machine is quiet.
+#      WARMUPS + ROUNDS rounds; answers of every process compared with the reference. Before each timing
+#      process the script waits until no GPU compute process is listed and other users' CPU use is at
+#      most CPU_LIMIT cores. A process is ineligible if another GPU process was sampled in its released
+#      phase (amendment 1), its own was not, or other users' CPU use averaged more than CPU_LIMIT cores;
+#      one that exits non-zero while another GPU process was sampled is ineligible too (contended
+#      failure). Ineligible processes are kept under raw/ineligible/ and replaced, without a count
+#      limit (amendment 2); any other failure stops the run;
 #   6. analysis and manifest.
+# Robustness (amendment 2):
+#   - only timing processes wait for a quiet machine; stages 2-4 do not depend on contention;
+#   - the run stops only at DEADLINE_HOURS of wall clock since it was first started (waiting and
+#     replacement have no other limit);
+#   - RESUME=1 continues an existing run folder from the same commit: completed stages are skipped,
+#     every timing process with a reference comparison is kept, and one interrupted mid-way is moved
+#     to raw/interrupted/ and run again;
+#   - REUSE_FROM=DIR (an earlier run of this experiment) skips build, fixtures and correctness and
+#     times that run's own binaries: allowed only if DIR passed fixtures and correctness, src/ and
+#     tests/ are unchanged between its commit and this one, and the copied binaries have the hashes
+#     DIR recorded. The reuse is written to logs/reuse.txt and the manifest.
 # Environment: GPU (index, default 0), PROCESSES (3), WARMUPS (3), ROUNDS (20), CPU_LIMIT (cores),
-# SAMPLER_CPU (15), FIXTURES (1), RUN_ROOT, FULL_DIR, DEV=1 (development: no clean-tree check, not a result;
-# with DEV=1 only, CORRECTNESS=0 skips correctness and FORCE_REPLACE=1 forces one replacement).
+# SAMPLER_CPU (15), FIXTURES (1), RUN_ROOT, FULL_DIR, DEADLINE_HOURS (12), RESUME, REUSE_FROM,
+# DEV=1 (development: no clean-tree check, not a result; with DEV=1 only, CORRECTNESS=0 skips
+# correctness and FORCE_REPLACE=1 forces one replacement).
 set -u
 RUN_ID=$1
 EXP=2026-11-18-range-pruning
 GPU=${GPU:-0}; PROCESSES=${PROCESSES:-3}; WARMUPS=${WARMUPS:-3}; ROUNDS=${ROUNDS:-20}
 CPU_LIMIT=${CPU_LIMIT:?set CPU_LIMIT (registered in protocol.json)}; SAMPLER_CPU=${SAMPLER_CPU:-15}
-FIXTURES=${FIXTURES:-1}; DEV=${DEV:-0}; LIMIT=500
+FIXTURES=${FIXTURES:-1}; DEV=${DEV:-0}; LIMIT=500; RESUME=${RESUME:-0}; REUSE_FROM=${REUSE_FROM:-}
+DEADLINE_HOURS=${DEADLINE_HOURS:-12}
 F=${FULL_DIR:-/scratch/psp8502/full}
 GSP=$F/full-8841823.gsp; ORACLE=$F/oracle/cpu-top10-8841823.tsv
 declare -A RBP=([1024]=$F/full-8841823-w1024.rbp [512]=$F/full-8841823-w512.rbp [256]=$F/full-8841823-w256.rbp)
@@ -37,23 +51,34 @@ CONFIGS=experiments/$EXP/configs/configs.tsv
 GATE=experiments/$EXP/code/gate.py; EXPECT=experiments/$EXP/code/expect.py
 COMPARE=experiments/2026-11-13-range-bitpack/analysis/compare_topk.py
 ANALYZE=experiments/$EXP/analysis/analyze.py
-test ! -e "$RUN" || { echo "Refusing to reuse $RUN"; exit 1; }
+BINARIES=(cuda_range_v2 cuda_range_prune range_bitpack_tool)
 if [ "$DEV" != 1 ]; then test -z "$(git status --porcelain --untracked-files=no)" || { echo "Commit source changes before a recorded run"; exit 1; }; fi
 COMMIT=$(git rev-parse HEAD)
 UUID=$(nvidia-smi -i "$GPU" --query-gpu=uuid --format=csv,noheader | tr -d ' ')
 BUILD=build/$RUN_ID
-mkdir -p "$RUN/logs" "$RUN/raw/ineligible" "$RUN/analysis" "$RUN/expect" "$BUILD"
-cp "$CONFIGS" "$RUN/configs.tsv"
+if [ "$RESUME" = 1 ]; then
+    test -d "$RUN" || { echo "RESUME=1 but $RUN does not exist"; exit 1; }
+    [ "$(cat "$RUN/logs/commit.txt")" = "$COMMIT" ] || { echo "RESUME=1 needs the run's commit $(cat "$RUN/logs/commit.txt")"; exit 1; }
+else
+    test ! -e "$RUN" || { echo "Refusing to reuse $RUN (RESUME=1 continues it)"; exit 1; }
+    mkdir -p "$RUN/logs" "$RUN/raw/ineligible" "$RUN/raw/interrupted" "$RUN/analysis" "$RUN/expect" "$BUILD"
+    echo "$COMMIT" > "$RUN/logs/commit.txt"; date +%s > "$RUN/logs/started-epoch.txt"
+    cp "$CONFIGS" "$RUN/configs.tsv"
+fi
+cmp -s "$CONFIGS" "$RUN/configs.tsv" || { echo "configs.tsv differs from the run's copy"; exit 1; }
+DEADLINE=$(( $(cat "$RUN/logs/started-epoch.txt") + DEADLINE_HOURS * 3600 ))
 stage() { echo "STAGE $* $(date -u +%FT%TZ)" | tee -a "$RUN/logs/stages.txt"; }
+done_stage() { grep -q "^STAGE $1 " "$RUN/logs/stages.txt" 2>/dev/null; }
 fail() { echo "FAILED $* $(date -u +%FT%TZ)" | tee -a "$RUN/logs/stages.txt"; exit 1; }
 log() { echo "$*" >> "$RUN/logs/commands.txt"; "$@"; }
+[ "$RESUME" = 1 ] && echo "RESUMED $(date -u +%FT%TZ) deadline_hours=$DEADLINE_HOURS" | tee -a "$RUN/logs/stages.txt"
 
 declare -A SCORER SIZE SEEDS
 NAMES=()
 while IFS=$'\t' read -r tag name scorer size seeds; do
     [ "$tag" = cfg ] || continue
     NAMES+=("$name"); SCORER[$name]=$scorer; SIZE[$name]=$size; SEEDS[$name]=$seeds
-done < "$CONFIGS"
+done < "$RUN/configs.tsv"
 n=${#NAMES[@]}
 
 gpu_others() { nvidia-smi -i "$GPU" --query-compute-apps=pid,used_memory --format=csv,noheader; }
@@ -62,17 +87,18 @@ import time
 def busy():
     v=[int(x) for x in open("/proc/stat").readline().split()[1:9]]; return sum(v)-v[3]-v[4]
 import os; t=os.sysconf("SC_CLK_TCK"); a=busy(); time.sleep(5); print("%.2f"%((busy()-a)/t/5))'; }
-wait_quiet() {
-    local tag=$1 i g c
-    for i in $(seq 1 60); do
+past_deadline() { [ "$(date +%s)" -ge "$DEADLINE" ]; }
+wait_quiet() {  # timing processes only; waits until quiet or the deadline
+    local tag=$1 g c
+    while true; do
+        past_deadline && fail "deadline reached waiting before $tag (resume with RESUME=1 and a later DEADLINE_HOURS)"
         g=$(gpu_others); c=$(cpu_others)
         if [ -z "$g" ] && python3 -c "import sys; sys.exit(0 if $c <= $CPU_LIMIT else 1)"; then
             echo "$(date -u +%FT%TZ) quiet other_cores=$c" >> "$RUN/logs/quiet-$tag.txt"; return 0
         fi
-        { echo "$(date -u +%FT%TZ) busy other_cores=$c gpu_processes=$(echo "$g" | grep -c .)"; } >> "$RUN/logs/busy-$tag.txt"
-        sleep 60
+        echo "$(date -u +%FT%TZ) busy other_cores=$c gpu_processes=$(echo "$g" | grep -c .)" >> "$RUN/logs/busy-$tag.txt"
+        sleep 30
     done
-    fail "machine busy for 60 minutes before $tag"
 }
 # run_cfg OUT_STEM NAME ROUNDS WARMUPS VERIFY [SEEDS_FOR_EXPECTATION]
 run_cfg() {
@@ -95,6 +121,19 @@ checked() {  # checked OUT_STEM GROUPS_PER_QUERY
     sha256sum "$out.tsv" >> "$RUN/raw/top-sha256.txt"
     xz -9 -T1 "$out.tsv" || fail "compress $tag"
 }
+# Move a process's outputs and expectation aside (DIR), e.g. after an ineligible or interrupted attempt.
+hold() {  # hold OUT_STEM TAG DIR
+    local out=$1 tag=$2 dir=$3
+    local any=0
+    ls "$out".* > /dev/null 2>&1 && any=1
+    [ -e "$RUN/expect/$tag.json" ] && any=1
+    [ "$any" = 1 ] || return 0
+    mkdir -p "$dir"
+    [ -e "$out.tsv" ] && { sha256sum "$out.tsv" > "$dir/top-sha256.txt"; rm "$out.tsv"; }
+    ls "$out".* > /dev/null 2>&1 && mv "$out".* "$dir/"
+    [ -e "$RUN/expect/$tag.json" ] && mv "$RUN/expect/$tag.json" "$dir/expect.json"
+    rm -f "$RUN/analysis/compare-$tag.json"
+}
 # verdict RECEIPT -> prints eligible | ineligible | failed
 verdict() {
     python3 - "$1" "$CPU_LIMIT" <<'PY'
@@ -110,17 +149,49 @@ ok = r["gpu_eligible"] and c["errors"] == 0 and c["samples"] > 0 and c["other_co
 print("eligible" if ok else "ineligible")
 PY
 }
+binaries_match() {  # binaries_match DIR RECORD: the three binaries in DIR have the hashes in RECORD
+    python3 - "$1" "$2" "${BINARIES[@]}" <<'PY'
+import hashlib, sys
+from pathlib import Path
+d, record, names = Path(sys.argv[1]), sys.argv[2], sys.argv[3:]
+want = {Path(p).name: h for h, p in (line.split() for line in open(record))}
+got = {n: hashlib.sha256((d / n).read_bytes()).hexdigest() for n in names if (d / n).exists()}
+sys.exit(0 if all(n in want and got.get(n) == want[n] for n in names) else 1)
+PY
+}
 
-stage build
-{ echo "$COMMIT"; nvidia-smi --query-gpu=index,name,uuid,driver_version,memory.total --format=csv; nvcc --version; g++ --version | head -1; python3 --version;
-  lscpu | grep -E "Model name|^CPU\(s\)|Socket|NUMA node"; numactl --hardware | head -6; } > "$RUN/logs/environment.txt" 2>&1
-log nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 src/cuda_range_v2.cu -o "$BUILD/cuda_range_v2" > "$RUN/logs/nvcc-v2.log" 2>&1 || fail "nvcc v2"
-log nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 src/cuda_range_prune.cu -o "$BUILD/cuda_range_prune" > "$RUN/logs/nvcc-prune.log" 2>&1 || fail "nvcc prune"
-log g++ -O3 -std=c++17 -pthread src/range_bitpack_tool.cpp -o "$BUILD/range_bitpack_tool" > "$RUN/logs/gxx.log" 2>&1 || fail g++
-sha256sum "$BUILD/cuda_range_v2" "$BUILD/cuda_range_prune" "$BUILD/range_bitpack_tool" > "$RUN/logs/binaries-sha256.txt"
-stage inputs
-sha256sum "$GSP" "${RBP[1024]}" "${RBP[512]}" "${RBP[256]}" "$Q" "$ORACLE" > "$RUN/logs/inputs-sha256.txt" || fail "hash inputs"
-python3 - "$RUN/logs/inputs-sha256.txt" <<'PY' || fail "input hash differs from the pinned value"
+if ! done_stage build; then
+    stage build
+    { echo "$COMMIT"; nvidia-smi --query-gpu=index,name,uuid,driver_version,memory.total --format=csv; nvcc --version; g++ --version | head -1; python3 --version;
+      lscpu | grep -E "Model name|^CPU\(s\)|Socket|NUMA node"; numactl --hardware | head -6; } > "$RUN/logs/environment.txt" 2>&1
+    if [ -n "$REUSE_FROM" ]; then
+        [ "$DEV" = 1 ] || [ "$(dirname "$REUSE_FROM")" = "$(dirname "$RUN")" ] || fail "REUSE_FROM must be a run of this experiment"
+        grep -q "^STAGE correctness-passed " "$REUSE_FROM/logs/stages.txt" && grep -q "^PASS" "$REUSE_FROM/logs/fixtures-v2.log" \
+            && grep -q "^PASS" "$REUSE_FROM/logs/fixtures-prune.log" || fail "REUSE_FROM did not pass fixtures and correctness"
+        from_commit=$(head -1 "$REUSE_FROM/logs/environment.txt")
+        git diff --quiet "$from_commit" "$COMMIT" -- src tests || fail "src/ or tests/ changed since $from_commit"
+        from_build=build/$(basename "$REUSE_FROM")
+        for b in "${BINARIES[@]}"; do cp "$from_build/$b" "$BUILD/$b" || fail "copy $b"; done
+        binaries_match "$BUILD" "$REUSE_FROM/logs/binaries-sha256.txt" || fail "copied binaries differ from $REUSE_FROM's record"
+        { echo "reuse_from $REUSE_FROM"; echo "reuse_from_commit $from_commit"; echo "src_and_tests_unchanged_to $COMMIT";
+          echo "binaries copied from $from_build; hashes equal to $REUSE_FROM/logs/binaries-sha256.txt";
+          echo "fixtures and correctness: not repeated; evidence in $REUSE_FROM (logs/fixtures-*.log, analysis/compare-correct-*.json)";
+          sha256sum "$REUSE_FROM"/analysis/compare-correct-*.json "$REUSE_FROM"/logs/fixtures-*.log; } > "$RUN/logs/reuse.txt"
+    else
+        log nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 src/cuda_range_v2.cu -o "$BUILD/cuda_range_v2" > "$RUN/logs/nvcc-v2.log" 2>&1 || fail "nvcc v2"
+        log nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 src/cuda_range_prune.cu -o "$BUILD/cuda_range_prune" > "$RUN/logs/nvcc-prune.log" 2>&1 || fail "nvcc prune"
+        log g++ -O3 -std=c++17 -pthread src/range_bitpack_tool.cpp -o "$BUILD/range_bitpack_tool" > "$RUN/logs/gxx.log" 2>&1 || fail g++
+    fi
+    (cd "$BUILD" && sha256sum "${BINARIES[@]}") | sed "s|  |  $BUILD/|" > "$RUN/logs/binaries-sha256.txt"
+    stage build-done
+fi
+done_stage build-done || fail "build did not complete; start a new run"
+binaries_match "$BUILD" "$RUN/logs/binaries-sha256.txt" || fail "binaries in $BUILD differ from the run's record"
+
+if ! done_stage inputs-passed; then
+    stage inputs
+    sha256sum "$GSP" "${RBP[1024]}" "${RBP[512]}" "${RBP[256]}" "$Q" "$ORACLE" > "$RUN/logs/inputs-sha256.txt" || fail "hash inputs"
+    python3 - "$RUN/logs/inputs-sha256.txt" <<'PY' || fail "input hash differs from the pinned value"
 import sys
 want = ["e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac", "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab",
         "d35a69909ea2507e29ac6c27edc96b4ca259e69614f9aca5029c6801d3f408a0", "0ad6531c7698c7541fd9f6d62fb4fa34619e4b765656cccfa3d13fdc64202892",
@@ -128,19 +199,23 @@ want = ["e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac", "c76
 got = [line.split()[0] for line in open(sys.argv[1])]
 sys.exit(0 if got == want else 1)
 PY
-if [ "$FIXTURES" = 1 ]; then
+    stage inputs-passed
+fi
+
+if [ "$FIXTURES" = 1 ] && [ -z "$REUSE_FROM" ] && ! done_stage fixtures-passed; then
     stage fixtures
-    wait_quiet fixtures
+    rm -rf "$RUN/fixtures-v2" "$RUN/fixtures-prune"
     log python3 tests/check_range_bitpack.py "$BUILD/range_bitpack_tool" "$BUILD/cuda_range_v2" --max-k 1000 --encoding positions --single-kernel \
         --output "$RUN/fixtures-v2" > "$RUN/logs/fixtures-v2.log" 2>&1 || fail "fixtures v2"
     log python3 tests/check_range_prune.py "$BUILD/range_bitpack_tool" "$BUILD/cuda_range_prune" \
         --output "$RUN/fixtures-prune" > "$RUN/logs/fixtures-prune.log" 2>&1 || fail "fixtures prune"
+    stage fixtures-passed
 fi
 
-stage gate-rejections
 reject() {  # reject TAG NAME FIELD
     local out=$RUN/raw/reject-$1 status=0
-    wait_quiet "reject-$1"
+    done_stage "reject-$1-passed" && return 0
+    hold "$out" "reject-$1" "$RUN/raw/interrupted/reject-$1-$(date +%s)"
     if [ "$1" = prune-seeds ]; then
         run_cfg "$out" "$2" 1 0 0 16 || status=$?
     else
@@ -154,30 +229,42 @@ reject() {  # reject TAG NAME FIELD
     python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["verdict"]=="rejected" and r["exit_code"]!=0 and any(d["field"]==sys.argv[2] for d in r["differences"]), r' \
         "$out.receipt.json" "$3" || fail "rejection $1: receipt"
     test ! -e "$out.csv" -a ! -e "$out.tsv" || fail "rejection $1 wrote results"
+    stage "reject-$1-passed"
 }
+stage gate-rejections
 reject prune-seeds prune-w1024-s64 config.seed_ranges
 reject v2-threads v2-w1024 config.score_threads
 
-stage correctness
-# Development only: CORRECTNESS=0 skips this stage (a recorded run always runs it).
-[ "$DEV" = 1 ] && [ "${CORRECTNESS:-1}" = 0 ] && NAMES_CORRECT=() || NAMES_CORRECT=("${NAMES[@]}")
-for name in "${NAMES_CORRECT[@]}"; do
-    out=$RUN/raw/correct-$name
-    verify=0; [ "${SEEDS[$name]}" = 64 ] && verify=1
-    wait_quiet "correct-$name"
-    run_cfg "$out" "$name" 1 0 "$verify" || fail "correct-$name"
-    checked "$out" 1
-done
-stage correctness-passed
+if [ -n "$REUSE_FROM" ]; then
+    done_stage correctness-passed || stage "correctness-passed reused from $(basename "$REUSE_FROM")"
+elif ! done_stage correctness-passed; then
+    stage correctness
+    # Development only: CORRECTNESS=0 skips this stage (a recorded run always runs it or reuses it).
+    if [ "$DEV" = 1 ] && [ "${CORRECTNESS:-1}" = 0 ]; then NAMES_CORRECT=(); else NAMES_CORRECT=("${NAMES[@]}"); fi
+    for name in "${NAMES_CORRECT[@]}"; do
+        out=$RUN/raw/correct-$name
+        [ -e "$RUN/analysis/compare-correct-$name.json" ] && continue
+        hold "$out" "correct-$name" "$RUN/raw/interrupted/correct-$name-$(date +%s)"
+        verify=0; [ "${SEEDS[$name]}" = 64 ] && verify=1
+        run_cfg "$out" "$name" 1 0 "$verify" || fail "correct-$name"
+        checked "$out" 1
+    done
+    stage correctness-passed
+fi
 
 OFFSETS=(0 $(( (n+2)/3 )) $(( (2*n+2)/3 )))
-echo "configurations: ${NAMES[*]}; rotation offsets: ${OFFSETS[*]}" > "$RUN/logs/order.txt"
+[ -e "$RUN/logs/order.txt" ] || echo "configurations: ${NAMES[*]}; rotation offsets: ${OFFSETS[*]}" > "$RUN/logs/order.txt"
 declare -A REPLACED
-for name in "${NAMES[@]}"; do REPLACED[$name]=0; done
+for name in "${NAMES[@]}"; do REPLACED[$name]=$(ls -d "$RUN"/raw/ineligible/timing-r*-"$name"-attempt* 2>/dev/null | wc -l | tr -d ' '); done
 for ((p=0;p<PROCESSES;p++)); do
     for ((i=0;i<n;i++)); do
         name=${NAMES[$(( (i+OFFSETS[p%3]) % n ))]}
         tag=timing-r$p-$name; out=$RUN/raw/$tag
+        [ -e "$RUN/analysis/compare-$tag.json" ] && continue   # completed and checked (resume)
+        if ls "$out".* > /dev/null 2>&1; then
+            hold "$out" "$tag" "$RUN/raw/interrupted/$tag-$(date +%s)"
+            echo "INTERRUPTED $tag moved to raw/interrupted $(date -u +%FT%TZ)" | tee -a "$RUN/logs/stages.txt"
+        fi
         while true; do
             echo "r$p $name" >> "$RUN/logs/order.txt"
             wait_quiet "$tag"
@@ -191,13 +278,9 @@ for ((p=0;p<PROCESSES;p++)); do
                 if [ "${FORCE_REPLACE:-0}" = 1 ] && [ -z "${FORCED:-}" ]; then FORCED=1; else break; fi
             elif [ "$v" = eligible ]; then break; fi
             REPLACED[$name]=$(( REPLACED[$name] + 1 ))
-            hold=$RUN/raw/ineligible/$tag-attempt${REPLACED[$name]}; mkdir "$hold"
-            [ -e "$out.tsv" ] && { sha256sum "$out.tsv" > "$hold/top-sha256.txt"; rm "$out.tsv"; }
-            mv "$out".* "$hold/"
-            # The replacement writes a fresh expectation; keep this attempt's with its receipt.
-            mv "$RUN/expect/$tag.json" "$hold/expect.json"
+            hold "$out" "$tag" "$RUN/raw/ineligible/$tag-attempt${REPLACED[$name]}"
             echo "INELIGIBLE $tag replacement ${REPLACED[$name]} $(date -u +%FT%TZ)" | tee -a "$RUN/logs/stages.txt"
-            [ "${REPLACED[$name]}" -le 3 ] || fail "more than 3 ineligible timing processes for $name"
+            past_deadline && fail "deadline reached after an ineligible $tag (resume with RESUME=1 and a later DEADLINE_HOURS)"
         done
         checked "$out" $((WARMUPS+ROUNDS))
     done
@@ -206,12 +289,15 @@ stage timing-complete
 
 stage analysis
 DEVFLAG=; [ "$DEV" = 1 ] && DEVFLAG=--development
+rm -f "$RUN/analysis/statistics.json"
 log python3 "$ANALYZE" "$RUN" --processes "$PROCESSES" --warmups "$WARMUPS" --rounds "$ROUNDS" --cpu-limit "$CPU_LIMIT" $DEVFLAG \
     --output "$RUN/analysis/statistics.json" > "$RUN/logs/analyze.log" 2>&1 || fail analysis
 stage manifest
 STATUS=completed-timing; [ "$DEV" = 1 ] && STATUS=development-not-a-timing-result
+REUSE_NOTE=; [ -n "$REUSE_FROM" ] && REUSE_NOTE="; binaries, fixtures and correctness reused from $(basename "$REUSE_FROM") (logs/reuse.txt)"
+rm -f "$RUN/manifest.json"
 python3 experiments/2026-11-13-range-bitpack/code/write_manifest.py "$RUN" --status "$STATUS" \
-    --scope "host $(hostname -s); GPU $UUID; 8841823 documents; $LIMIT calibration queries; k=10; configurations ${NAMES[*]}; fixtures, gate and correctness checks then $PROCESSES processes each in rotating order; $WARMUPS warm-up + $ROUNDS measured rounds; CPU_LIMIT $CPU_LIMIT cores; replacements $(for x in "${NAMES[@]}"; do printf '%s=%s ' "$x" "${REPLACED[$x]}"; done)" \
+    --scope "host $(hostname -s); GPU $UUID; 8841823 documents; $LIMIT calibration queries; k=10; configurations ${NAMES[*]}; fixtures, gate and correctness checks then $PROCESSES processes each in rotating order; $WARMUPS warm-up + $ROUNDS measured rounds; CPU_LIMIT $CPU_LIMIT cores; replacements $(for x in "${NAMES[@]}"; do printf '%s=%s ' "$x" "${REPLACED[$x]}"; done)$REUSE_NOTE" \
     --flags "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17; g++ -O3 -std=c++17 -pthread" \
     --input "$Q" --input "$GSP" --input "${RBP[1024]}" --input "${RBP[512]}" --input "${RBP[256]}" --input "$ORACLE" \
     --binary "$BUILD/cuda_range_v2" --binary "$BUILD/cuda_range_prune" --binary "$BUILD/range_bitpack_tool" \
