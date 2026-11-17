@@ -1,0 +1,20 @@
+{
+  "scripts": ["code/run_timing.sh", "code/run_profile.sh", "code/session_lib.sh", "code/overlap.py", "analysis/analyze_timing_v3.py", "analysis/theta_counts.py"],
+  "written": "before the cuda5 session, after laptop dry runs (25 queries, 1 + 2 rounds; profile with nsys) completed every step",
+  "checks": [
+    "Registered settings are enforced unless DRY=1: 500 queries, 3 warm-up + 20 measured rounds, clean tracked tree.",
+    "Binaries: each label's commit.txt must equal build_variants.sh; binary and SASS hashes are logged per run.",
+    "Rotation: offsets 0, ceil(n/3), ceil(2n/3) per k set, process p of each implementation paired by p in the analysis; the order is logged (order.tsv).",
+    "v3-3 gets crossover argument 1 only at k=32/64 (radix path); everywhere else the default crossover 100 applies, as registered.",
+    "k=32/64 oracles are the first k rows per query of the cpu_pilot top-100 oracle (the canonical order is total); their hashes are logged.",
+    "Idle check before every process; monitors: 0.5 s poll with owner class from /proc/<pid> uid, and pmon -s um -d 1 with the command column dropped. Only PIDs, owner class, SM %, memory are written.",
+    "Overlap: window [start-1 s, end+1 s] (pmon one more second earlier, 1 s resolution); a PID is ours if it is the launched process or the poll classified it as ours (covers the nsys child); unknown PIDs count as other. No poll samples in the window counts as overlap. Overlapped attempts are renamed TAG-overlap-N and kept; at most 3 replacements per slot.",
+    "Monitors are killed by an EXIT trap, also on failure.",
+    "Every saved top-k is compared with the oracle; any mismatch stops the session. TSVs are hashed, then compressed.",
+    "Analysis: per-process per-query medians of measured rounds; geometric mean of paired ratios; crossed bootstrap 10,000 draws seed 20261117; interaction and crossover as registered."
+  ],
+  "limits_found": [
+    "On the laptop (WSL) neither nvidia-smi query-compute-apps nor pmon lists processes, so overlap detection could only be tested for the no-overlap path there; on cuda5 both list processes (seen in earlier sessions).",
+    "On v3-all's radix path (k=100) the clock stages named topk_thread_sort and topk_warp_select measure radix select + gather and bitonic sort; the new barriers of changes 2 and 3 are inside stage times (registered limit)."
+  ]
+}

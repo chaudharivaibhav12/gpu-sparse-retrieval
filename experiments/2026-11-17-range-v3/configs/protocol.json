@@ -166,6 +166,12 @@
       "after": "cuda5 gate 20261117-cuda5-gate-v3-all-01 failed (forced radix at 1,024 threads: too many resources requested for launch); no timed or profiled run had started",
       "change": "v3-1 and v3-all are rebuilt from new commits with RBP_LOOKUP_CHUNK_WORDS=8 (owner decision) and a host-side check that refuses SCORE_THREADS above the launched instantiation's maxThreadsPerBlock, with a rejection fixture (-DRBP_TEST_LAUNCH_BOUND=256 build). ctrl, v3-2 and v3-3 are unchanged. v3-1, v3-all, v3-all-clocks and v3-all-stats are re-gated (run IDs ...-02); the failed gate is kept.",
       "reason": "CUDA 12.6 compiled v3-all's radix instantiation to 68 registers (55 under CUDA 13.3), above the 64 that a 1,024-thread block allows. Chunk 16 also cost v3-1 occupancy on the laptop. Lookup chunk 8 was listed as an open owner decision in review-change-1.json."
+    },
+    {
+      "date": "2026-11-17",
+      "after": "fix-1 re-gates passed; before any timed or profiled run",
+      "change": "Binaries are taken from the fix-1 build directories on cuda5: build/v3variants-fix1 (all five variants, rebuilt from their registered commits; ctrl, v3-2 and v3-3 SASS equal to their gated builds), build/v3variants-clocks-fix1 and build/v3variants-stats-fix1. Session scripts: code/run_timing.sh, code/run_profile.sh, code/session_lib.sh, code/overlap.py; analyses analysis/analyze_timing_v3.py and analysis/theta_counts.py (code/review-run-scripts.json).",
+      "reason": "The registered build commands were run into new directories after fix 1 so that no earlier build directory was overwritten."
     }
   ]
 }
