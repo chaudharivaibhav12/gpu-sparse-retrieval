@@ -170,6 +170,9 @@ for ((p=0;p<PROCESSES;p++)); do
             hold=$RUN/raw/ineligible/$tag-attempt${REPLACED[$name]}; mkdir "$hold"
             sha256sum "$out.tsv" > "$hold/top-sha256.txt"; rm "$out.tsv"
             mv "$out".* "$hold/"
+            # The replacement writes a fresh expectation; keep this attempt's with its receipt.
+            # (Fixed after run 20261117-cuda5-cpu-01, which needed no replacement; see the README.)
+            mv "$RUN/expect/$tag.json" "$hold/expect.json"
             echo "INELIGIBLE $tag replacement ${REPLACED[$name]} $(date -u +%FT%TZ)" | tee -a "$RUN/logs/stages.txt"
             [ "${REPLACED[$name]}" -le 3 ] || fail "more than 3 ineligible timing processes for $name"
         done

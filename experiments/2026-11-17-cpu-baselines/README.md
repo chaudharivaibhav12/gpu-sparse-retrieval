@@ -21,6 +21,8 @@ Parent: `main` at `4fd69f7` (guarded FP32 baseline merged). No shared file is mo
 
 Development (not results): a probe of the scorer on the full collection matched the CPU reference on all 500 queries at 1 and 16 threads. Dry-runs `dev-cpu-01` and `dev-cpu-02` stopped on two tooling bugs (the gate pinned itself before starting the scorer; the deliberate GPU rejection used a setting the scorer refuses by itself), both fixed. `dev-cpu-03` passed end to end. Review so far is the author's own.
 
+After the recorded run, the same replacement path failed in the range-pruning experiment: a replacement could not start because the ineligible attempt's expectation file was left in place. `code/run.sh` here had the same latent defect. It now keeps that file with the held attempt, as in `experiments/2026-11-18-range-pruning/code/run.sh`, where the path was tested by a forced replacement (`dev-prune-03`). Run `20261117-cuda5-cpu-01` used the earlier script at `eb2228b` and needed no replacement, so its results are unaffected.
+
 ## Runs
 
 - [20261117-cuda5-cpu-01](runs/20261117-cuda5-cpu-01/README.md): recorded run, completed under the registered protocol. All 24 answer comparisons equal the CPU reference; no ineligible processes.
