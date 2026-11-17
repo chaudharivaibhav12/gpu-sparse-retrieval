@@ -127,10 +127,11 @@ reject() {  # reject TAG NAME FIELD THREADS_FOR_EXPECTATION
     local out=$RUN/raw/reject-$1 status=0
     wait_quiet "reject-$1"
     if [ "$2" = gpu-range ]; then
-        # Expect the registered 256 score threads but launch with 128.
+        # Expect the registered 256 score/merge threads but launch with 128/128 (a valid setting the
+        # scorer accepts, so only the gate can stop it).
         log python3 "$EXPECT" gpu-range --rounds 1 --warmups 0 --limit "$LIMIT" --index "$RBP" --queries "$Q" --output "$RUN/expect/reject-$1.json"
         log python3 "$GATE" --expect "$RUN/expect/reject-$1.json" --receipt "$out.receipt.json" --gpu-uuid "$UUID" --sampler-cpu "$SAMPLER_CPU" -- \
-            env CUDA_VISIBLE_DEVICES="$UUID" numactl --physcpubind=0 "$BUILD/cuda_range_v2" "$RBP" "$Q" "$out.csv" "$out.tsv" "$LIMIT" 10 0 0 1 0 128 256 - >> "$RUN/logs/gate.txt" 2>&1 || status=$?
+            env CUDA_VISIBLE_DEVICES="$UUID" numactl --physcpubind=0 "$BUILD/cuda_range_v2" "$RBP" "$Q" "$out.csv" "$out.tsv" "$LIMIT" 10 0 0 1 0 128 128 - >> "$RUN/logs/gate.txt" 2>&1 || status=$?
     else
         run_cfg "$out" "$2" 1 0 "$4" || status=$?
     fi
