@@ -1,0 +1,29 @@
+{
+  "config": {
+    "docs": 8841823,
+    "query_count": 500,
+    "k": 10,
+    "index_path": "/scratch/psp8502/full/full-8841823.gsp",
+    "queries_path": "data/derived/calibration-500.tsv",
+    "mode": "cpu-exhaustive",
+    "gpu_id": -1,
+    "threads": 1,
+    "warmup_rounds": 3,
+    "repeats": 20,
+    "nnz": 1049282186,
+    "vocab": 28679
+  },
+  "behavior": {
+    "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+    "arithmetic": "uint32-guarded-exact-widened-uint64",
+    "document_impacts": "uint8-exact",
+    "query_policy": "BMP-f32-ceil-cap32",
+    "tie_order": "score_desc_original_numeric_id_asc",
+    "eligibility": "all_documents",
+    "layout": "term-major-inverted-in-memory",
+    "schedule": "exhaustive-term-at-a-time",
+    "parallelism": "sequential-single-thread",
+    "selection": "per-part-heap-then-merge",
+    "accumulator": "uint32-gated-below-2^32-1-widened-to-uint64"
+  }
+}

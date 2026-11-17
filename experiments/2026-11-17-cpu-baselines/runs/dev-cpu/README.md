@@ -1,0 +1,3 @@
+# dev-cpu (development, not results)
+
+A probe of `cpu_exhaustive` on the full collection (1 and 16 threads, all 500 calibration queries equal to the CPU reference), then three dry-runs of `code/run.sh` with a short timing stage. `dev-cpu-01` stopped because the gate pinned itself to the sampler CPU before starting the scorer, so `numactl` could not place it (fixed in `0a60d7f`). `dev-cpu-02` stopped because the deliberate GPU rejection used 128 score / 256 merge threads, which the scorer refuses by itself before the gate (fixed in `b4986c9`: 128 / 128). `dev-cpu-03` passed end to end; its sampled background CPU use set `cpu_limit_cores` in the protocol. No latency from these runs was used to choose any setting. Their outputs stay on cuda5 scratch and are not published.

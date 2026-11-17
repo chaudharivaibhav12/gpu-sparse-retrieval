@@ -23,12 +23,13 @@ Development (not results): a probe of the scorer on the full collection matched 
 
 ## Runs
 
-None recorded yet.
+- [20261117-cuda5-cpu-01](runs/20261117-cuda5-cpu-01/README.md): recorded run, completed under the registered protocol. All 24 answer comparisons equal the CPU reference; no ineligible processes.
+- [dev-cpu](runs/dev-cpu/README.md): development probe and dry-runs (not results).
 
 ## Findings and decision
 
-Pending.
+Full collection, 500 calibration queries, k=10, cuda5. The GPU range scorer answers in 0.690 ms (median). It is **66.0x [64.8, 67.3] faster than the exact sequential CPU scorer** (46.9 ms) and **10.6x [10.2, 11.0] faster than the exact 16-core CPU scorer** (7.63 ms). Both scorers return the identical ranked top-10 for every query. On one socket the CPU scorer scales sub-linearly and saturates: 1.61x at 2 threads, 1.97x at 4 and 2.09x at 8. With both sockets (16 threads, interleaved memory) it reaches 6.25x. That jump is not explained by thread count alone; see the run README for one untested hypothesis (accumulators fitting each socket's L3). The hypothesis's memory-bound part is supported: the speedup stalls within one socket. The CPU baseline numbers are ready for the report's speedup-over-sequential and multicore comparisons. The remaining open comparison is against the state-of-the-art CPU method (BMP) at full scale.
 
 ## Limits
 
-One host; the CPU is a 2013 two-socket server part and the GPU a 2023 consumer card, so speedups describe this machine. The CPU scorer is exhaustive, like the GPU scorer; it is not the state-of-the-art CPU method (BMP), whose full-collection timing remains a separate, open comparison. Shared machine; calibration queries only; held-out queries untouched.
+One host; the CPU is a 2013 two-socket server part and the GPU a 2023 consumer card, so speedups describe this machine. The CPU frequency governor was not fixed. The CPU scorer is exhaustive, like the GPU scorer; it is not the state-of-the-art CPU method (BMP), whose full-collection timing remains a separate, open comparison. Shared machine; calibration queries only; held-out queries untouched.

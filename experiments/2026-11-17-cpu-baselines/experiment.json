@@ -4,7 +4,7 @@
   "title": "Exact CPU baselines for the GPU range scorer",
   "owner": "parva",
   "branch": "exp/parva/2026-11-17-cpu-baselines",
-  "status": "protocol registered 2026-11-17; no recorded run yet",
+  "status": "completed 2026-11-17: recorded run 20261117-cuda5-cpu-01 under the registered protocol",
   "parent_experiment": "2026-11-15-full-collection-baselines",
   "parent_source_commit": "4fd69f7",
   "question": "How much faster is the GPU range scorer than an exact sequential and an exact multicore CPU scorer on the same machine, index, queries and answers?",
@@ -33,5 +33,29 @@
   "success_rule": "A complete run under the registered protocol; the result is reported whatever the speedups are.",
   "failure_rule": "Any mismatch, rejected expected run, or more than 3 ineligible processes for one configuration.",
   "recording_ids": [],
-  "runs": []
+  "runs": [
+    {
+      "run_id": "20261117-cuda5-cpu-01",
+      "kind": "recorded",
+      "host": "cuda5",
+      "source_commit": "eb2228b34ae72e993ff770d028ce59056c13aa38",
+      "status": "completed",
+      "readme": "experiments/2026-11-17-cpu-baselines/runs/20261117-cuda5-cpu-01/README.md",
+      "results": "results/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01",
+      "correctness": "24 of 24 comparisons equal the CPU reference (6 correctness runs, 18 timing processes x 23 rounds)",
+      "ineligible_processes": 0,
+      "median_ms": {"gpu-range": 0.690, "cpu-t1": 46.90, "cpu-t2": 29.91, "cpu-t4": 24.42, "cpu-t8": 22.86, "cpu-t16": 7.63},
+      "primary": {
+        "cpu-t1 / gpu-range": {"ratio": 66.04, "interval_95": [64.75, 67.27]},
+        "cpu-t16 / gpu-range": {"ratio": 10.57, "interval_95": [10.20, 11.03]}
+      },
+      "cpu_parallel_speedup": {"t2": 1.61, "t4": 1.97, "t8": 2.09, "t16": 6.25}
+    },
+    {
+      "run_id": "dev-cpu",
+      "kind": "development",
+      "status": "probe and dry-runs dev-cpu-01/02 (tooling bugs, fixed) and dev-cpu-03 (passed); not results",
+      "readme": "experiments/2026-11-17-cpu-baselines/runs/dev-cpu/README.md"
+    }
+  ]
 }
