@@ -1,0 +1,92 @@
+{
+  "experiment_id": "2026-11-17-range-v3",
+  "registered": "2026-11-17, before any timed or profiled run on cuda5 (laptop gates and laptop development readings were used only to develop the code)",
+  "recording": "not recorded by the team runtime; self-recorded manifests under results/2026-11-17-range-v3/; large outputs in ~/csciga3033-025/project/run-bulk/ with SHA-256 in the manifests",
+  "parent": "main 74dd5d3 (V2-5 from PR #12; W=1024 / 256 threads retained by PR #13; full-collection baselines PR #16). main has since gained PR #17 (guarded FP32 baseline), which touches no file used here; the branch is not rebased so the variant commits stay fixed.",
+  "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "question": "Do (1) a warp-cooperative block lookup, (2) a theta-filtered merge and (3) radix-select local top-k for large k reduce batch-1 latency of the range scorer, separately and combined, and where does the time go in ctrl and v3-all?",
+  "hypothesis": "Each variant returns the canonical top-k for every calibration query. Speed effects are empirical; no speedup is promised. Laptop development readings suggested change 1 may be slower at k=10 (55 registers, 4 instead of 6 blocks per SM) and changes 2 and 3 faster at k >= 100.",
+  "variants": {
+    "ctrl": {"commit": "74dd5d303f0cf5690a10f2060f6da536726705dc", "what": "main's V2-5"},
+    "v3-1": {"commit": "5f1ccd94b0d4f422f378618c29005e407afba9ee", "what": "change 1: warp-cooperative block lookup (chunk 16 words)", "review": "code/review-change-1.json"},
+    "v3-2": {"commit": "025dbdb7a457de096423ff21e73b4b5c069039f8", "what": "change 2: theta-filtered merge candidates", "review": "code/review-change-2.json"},
+    "v3-3": {"commit": "510def3d965c1ba73daf4e9dc93fe537de88efb0", "what": "changes 2 + 3: theta merge and radix-select local top-k (8-bit digits) for k >= crossover (15th scorer argument, default 100)", "review": "code/review-change-3.json"},
+    "v3-all": {"commit": "313e255f919cc0ca117d91833188c4d00bdbdd0e", "what": "changes 1 + 2 + 3"}
+  },
+  "selection_path_per_run": "v3-3 and v3-all use the radix path at k >= 100 (default crossover). In the k=32 and k=64 sets v3-3 is run with crossover argument 1 so that it uses the radix path; v3-2 has no radix path. v3-all at k=10 uses the small-k path.",
+  "build": {
+    "host": "cuda5.cims.nyu.edu, NVIDIA GeForce RTX 4070, CUDA 12.6, sm_89",
+    "checkout": "/scratch/ag11163/gsr-v3 (fresh clone; branch brought over by git bundle, commits verified equal to the laptop)",
+    "normal": "experiments/2026-11-17-range-v3/code/build_variants.sh sm_89 -> build/v3variants/<label>/scorer (nvcc -O3 -lineinfo -arch=sm_89 -std=c++17), each variant from its own commit",
+    "clocks": "OUT=build/v3variants-clocks EXTRA_NVCC_FLAGS=-DRBP_STAGE_CLOCKS build_variants.sh sm_89 ctrl-instrumented v3-all (ctrl-instrumented = ctrl plus compiled-out instrumentation; without the flag its SASS equals ctrl's, code/sass-identity.md)",
+    "stats": "OUT=build/v3variants-stats EXTRA_NVCC_FLAGS=-DRBP_V3_STATS=1 build_variants.sh sm_89 v3-all (theta candidate counts; Measurement B only, never timed)"
+  },
+  "correctness_before_timing": {
+    "gates": "code/gate_build.sh for every build (ctrl, v3-1, v3-2, v3-3, v3-all, both clock builds, the stats build): tests/check_range_bitpack.py --encoding positions --single-kernel --max-k 1000 --v3-cases enforce (radix builds also with crossover 1, radix for every k); 100K and 1M x all 500 calibration queries x k=10/100/1000 against the cpu_pilot oracles; zero mismatches. Run IDs 20261117-cuda5-gate-<label>-01.",
+    "k32_k64": "v3-2 and v3-3 (crossover 1) on all 500 queries at 1M for k=32 and k=64, compared with oracles cut from the cpu_pilot top-100 oracle (the canonical order is total, so the top-k is the first k entries of the top-100); done as the first step of the Measurement A session.",
+    "rule": "any mismatch stops the session; the failing output is kept"
+  },
+  "gpu_policy": {
+    "idle_check": "before every process: no compute process on the GPU (nvidia-smi --query-compute-apps) and none of our scorer or profiler processes running (pgrep -f with bracketed patterns so the check does not match itself); otherwise wait in 30 s steps up to 30 minutes, then stop the session",
+    "monitoring": "for the whole session: nvidia-smi pmon -s um -d 1 and a 0.5 s poll of --query-compute-apps (pid, used memory) with UTC timestamps; every process records its own PID and UTC start/end",
+    "overlap": "a process overlaps if any GPU process not owned by our user is seen between its start and end (1 s margin on both sides, in either monitor). An overlapping process is preserved (its directory renamed with suffix -overlap-<n>, kept in the run and the manifest) and replaced: the same slot is rerun after the idle check. At most 3 replacements per slot; on the 4th overlap the session stops and is reported.",
+    "redaction": "logs record PIDs, owner class (ours/other), SM %, memory; process names, paths and other users' usernames are not recorded, and any that reach a committed file are replaced by <other-user>",
+    "samplers": "every sampler started by a session is killed at the end of the session, also on failure (trap)"
+  },
+  "measurement_A": {
+    "name": "paired timing at 1M",
+    "script": "code/run_timing.sh (written and reviewed before the run)",
+    "workload": {"documents": 1000000, "index": "data/derived/hash-1000000-w1024-pos.rbp", "queries": "data/derived/calibration-500.tsv, all 500; the 6,480 held-out queries are not used", "batch_size": 1, "range_size": 1024, "score_threads": 256, "merge_threads": 256},
+    "processes_per_implementation": 3,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "sets": {
+      "k=10": ["ctrl", "v3-1", "v3-2", "v3-all"],
+      "k=100": ["ctrl", "v3-1", "v3-2", "v3-3", "v3-all"],
+      "k=1000": ["ctrl", "v3-3", "v3-all"],
+      "k=32": ["v3-2", "v3-3"],
+      "k=64": ["v3-2", "v3-3"]
+    },
+    "set_order": "k=10, k=100, k=1000, k=32, k=64",
+    "order": "rotating within each set: in round p (p = 0, 1, 2), implementation (i + offset_p) mod n runs i-th, offsets 0, ceil(n/3), ceil(2n/3)",
+    "boundary": "as V2-5: host query construction, kernel launch (query as kernel argument), result D2H, event synchronisation; index load, rank setup, validation and file writes excluded",
+    "during_timing": "every saved top-k group of every warm-up and measured round is compared with the oracle after each process; any mismatch stops the session",
+    "analysis": {
+      "reduction": "per process, median wall latency of each query over the 20 measured rounds",
+      "statistic": "geometric mean over queries of paired ratios (variant / reference, process p with process p of the same round), pooled over the 3 x 500 query/process pairs",
+      "uncertainty": "crossed query/process bootstrap, 10,000 draws, 95% percentile interval, seed 20261117; conditional on this calibration set and session",
+      "also_reported": "pooled median latency and median GPU event span per implementation and k; per-process medians",
+      "contrasts": {
+        "k=10": ["v3-1/ctrl", "v3-2/ctrl", "v3-all/ctrl", "v3-all/v3-1", "v3-all/v3-2"],
+        "k=100": ["v3-1/ctrl", "v3-2/ctrl", "v3-3/ctrl", "v3-all/ctrl", "v3-3/v3-2", "v3-all/v3-3", "v3-all/v3-1"],
+        "k=1000": ["v3-3/ctrl", "v3-all/ctrl", "v3-all/v3-3"],
+        "k=32": ["v3-3/v3-2"],
+        "k=64": ["v3-3/v3-2"]
+      },
+      "decision_language": "a ratio is called faster/slower only when its 95% interval excludes 1; otherwise 'no difference resolved'",
+      "crossover_rule": "recommended radix crossover = the smallest k in {32, 64, 100} at which v3-3/v3-2 has its upper 95% bound below 1; if none, keep 100 and report 'radix not shown faster at k <= 100'. k values below 32 are not tested, so 32 is the lowest possible recommendation. k=1000 has no v3-2 run; v3-3/ctrl there is reported but not part of the rule."
+    }
+  },
+  "measurement_B": {
+    "name": "stage, barrier and host/GPU profile of ctrl and v3-all",
+    "script": "code/run_profile.sh (written and reviewed before the run)",
+    "workload": "1M documents, W=1024, 256 threads, first 25 calibration queries, batch 1, k = 10 and k = 100 (v3-all uses its small-k path at k=10 and the radix path at k=100)",
+    "steps_per_k": {
+      "reference": "normal binaries of ctrl and v3-all, 3 warm-up + 20 measured rounds, one process each: wall and event span per query, to relate profiled numbers to unprofiled ones",
+      "clocks": "clock builds (ctrl-instrumented and v3-all with -DRBP_STAGE_CLOCKS), RBP_CLOCKS_OUT, 3 warm-up + 5 measured rounds: stage table (setup, decode+add, local top-k, candidate write and done counter, merge tail; mean per block and critical path) and per-barrier-site table (wait mean, max and share for S1-S7) with analysis/analyze_clocks.py",
+      "nsys": "normal binaries under nsys profile --trace=cuda, 3 warm-up + 20 measured rounds; per query host versus GPU time (GPU busy, span, launch call, launch-to-kernel latency, copy call and return) with analysis/analyze_nsys_v2.py from the SQLite export",
+      "theta_counts": "stats build of v3-all, RBP_V3_STATS_OUT, 1 warm-up + 5 measured rounds: per query candidates written by all ranges and survivors of the final filter (median, max); ctrl writes ranges x k by construction (977 x k)"
+    },
+    "order": "for k=10 then k=100: reference (ctrl, v3-all), clocks (ctrl, v3-all), nsys (ctrl, v3-all), theta_counts (v3-all)",
+    "correctness": "every step's saved top-k compared with the oracle before its numbers are used",
+    "limits": [
+      "the new barriers of changes 2 and 3 (theta rank/read barriers; radix pass and bitonic barriers) carry no clock markers: their waits are inside the 'local top-k' and 'candidate write' stage times, not in the per-site table; sites S1-S7 keep their V2-5 meaning in both builds",
+      "clock and profiler numbers are diagnostic; latency claims come only from Measurement A"
+    ]
+  },
+  "artifacts": "small CSV/JSON exports and tables committed; .nsys-rep, SQLite exports, clock .bin dumps and raw CSV/TSV over 1 MB kept in run-bulk with SHA-256 via scripts/package_run.py",
+  "stopping": "all correctness before timing; no optional stopping; a technical failure is inspected, fixed, reviewed and rerun under a new run ID, at most three attempts; overlap replacements follow gpu_policy.overlap",
+  "not_in_this_registration": "the full collection; other range sizes; held-out queries; lookup chunk 8 (RBP_LOOKUP_CHUNK_WORDS=8) and 11-bit radix digits; Nsight Compute; any further code change. Each needs its own registration or an amendment before it runs.",
+  "notes": "Parva's batched copy of range_scores and tests/check_batched_kernel_sync.py are not edited and will need a refresh if these changes are adopted.",
+  "amendments": []
+}
