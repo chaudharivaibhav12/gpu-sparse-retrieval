@@ -43,9 +43,17 @@ idle() {   # $1 = job name; waits until the GPU is idle, logs one line per check
 sha256sum "$BUILD/scorer" "$BUILD/range_bitpack_tool" | sed "s|$BUILD/||" > "$RUN/logs/binary-sha256.txt"
 cuobjdump -sass "$BUILD/scorer" | grep -E '^\s+/\*[0-9a-f]{4}\*/' | sed -E 's#/\*[0-9a-f]{4}\*/##; s#;\s*/\*.*##' | sha256sum | cut -d' ' -f1 > "$RUN/logs/sass-sha256.txt"
 cuobjdump -res-usage "$BUILD/scorer" > "$RUN/logs/res-usage.txt" 2>&1
+# Thread-limit rejection fixture (sources with the RBP_TEST_LAUNCH_BOUND hook only):
+# the build's own source with -DRBP_TEST_LAUNCH_BOUND=256 must refuse 1,024 threads.
+LIMIT=()
+if grep -q RBP_TEST_LAUNCH_BOUND "$BUILD/src/cuda_range_v2.cu"; then
+    # shellcheck disable=SC2046
+    log nvcc -O3 -arch=sm_89 -std=c++17 $(cat "$BUILD/flags.txt" | grep -o -- '-D[^ ]*' || true) -DRBP_TEST_LAUNCH_BOUND=256 "$BUILD/src/cuda_range_v2.cu" -o "$RUN/raw/limit-scorer"
+    LIMIT=(--limit-scorer "$RUN/raw/limit-scorer")
+fi
 if [ "${STATS:-0}" != 1 ]; then
 idle fixtures
-log python3 tests/check_range_bitpack.py "$BUILD/range_bitpack_tool" "$BUILD/scorer" --gpu "$GPU" --max-k 1000 --encoding positions --single-kernel --v3-cases enforce --output "$RUN/raw/fixtures" > "$RUN/logs/fixtures.log" 2>&1 \
+log python3 tests/check_range_bitpack.py "$BUILD/range_bitpack_tool" "$BUILD/scorer" --gpu "$GPU" --max-k 1000 --encoding positions --single-kernel --v3-cases enforce "${LIMIT[@]}" --output "$RUN/raw/fixtures" > "$RUN/logs/fixtures.log" 2>&1 \
     || { echo "FIXTURES_FAILED"; tail -4 "$RUN/logs/fixtures.log" | cut -c1-600; exit 1; }
 if [ "${RADIX:-0}" = 1 ]; then
     idle fixtures-radix-every-k
@@ -53,6 +61,7 @@ if [ "${RADIX:-0}" = 1 ]; then
         || { echo "FIXTURES_RADIX1_FAILED"; tail -4 "$RUN/logs/fixtures-radix1.log" | cut -c1-600; exit 1; }
 fi
 fi
+rm -f "$RUN/raw/limit-scorer"
 for F in "$RUN"/raw/fixtures*; do [ -d "$F" ] || continue; find "$F" -type f ! -name summary.json -delete; find "$F" -depth -type d -empty -delete; done
 for N in 100000 1000000; do
     RBP=data/derived/hash-$N-w1024-pos.rbp

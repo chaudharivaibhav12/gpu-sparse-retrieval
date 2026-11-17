@@ -408,6 +408,7 @@ def main():
     parser.add_argument("--v3-cases", default="off", choices=["off", "report", "enforce"],
                         help="version-3 cases (%s): report = run and record outcomes; enforce = any non-pass fails" % PENDING)
     parser.add_argument("--only-v3", action="store_true", help="run only the version-3 cases")
+    parser.add_argument("--limit-scorer", type=Path, help="scorer built with -DRBP_TEST_LAUNCH_BOUND=256: must refuse 1,024 threads before scoring")
     parser.add_argument("--scorer-arg", action="append", default=[], help="extra trailing scorer argument for every scoring run (e.g. a selection crossover)")
     args = parser.parse_args()
     assert not args.only_v3 or args.v3_cases != "off", "--only-v3 needs --v3-cases report or enforce"
@@ -517,6 +518,10 @@ def main():
         gaps_index = root / "big-w64-gaps.rbp"
         run([tool, "build", gsp, gaps_index, 64])
         reject("position-encoded index", p1=gaps_index, p2=good_queries)
+    if args.limit_scorer:
+        # Thread counts above the kernel's limit are refused on the host, not at launch.
+        reject("exceeds this kernel's limit of 256 threads per block", p0=args.limit_scorer, p2=good_queries, p11=1024, p12=1024)
+        summary["thread_limit_rejection"] = True
     run([tool, "build", gsp, rbp, 64] + extra_build, expect_failure="Refusing to overwrite")
     summary["expected_rejections"] += 1
 

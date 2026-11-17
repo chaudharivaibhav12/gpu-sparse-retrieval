@@ -55,13 +55,13 @@ static const char* RBP_BLOCK_NAMES[RBP_NB]={"gt_start","clk_start","gt_rank_writ
 #define RBP_V3_LOOKUP 1   // warp-cooperative block lookup (change 1)
 #endif
 #ifndef RBP_V3_THETA
-#define RBP_V3_THETA 1    // theta-filtered merge candidates (change 2)
+#define RBP_V3_THETA 0    // theta-filtered merge candidates (change 2)
 #endif
 #ifndef RBP_V3_STATS
 #define RBP_V3_STATS 0    // per-query candidate counts (change 2 diagnostics; off for timing)
 #endif
 #ifndef RBP_V3_RADIX
-#define RBP_V3_RADIX 1    // radix-select local top-k for large k (change 3; requires theta)
+#define RBP_V3_RADIX 0    // radix-select local top-k for large k (change 3; requires theta)
 #endif
 #if RBP_V3_RADIX && !RBP_V3_THETA
 #error "RBP_V3_RADIX writes its winners through the theta filter (RBP_V3_THETA=1)"
@@ -83,7 +83,7 @@ constexpr uint32_t RBP_MAX_TERMS=128;
 // number of load rounds never depends on the word count; smaller values save
 // registers and add rounds only for warps with more words than the chunk.
 #ifndef RBP_LOOKUP_CHUNK_WORDS
-#define RBP_LOOKUP_CHUNK_WORDS 16
+#define RBP_LOOKUP_CHUNK_WORDS 8   // 16 needs 68 registers under CUDA 12.6 (review-fix-1)
 #endif
 constexpr uint32_t RBP_LOOKUP_CHUNK=RBP_LOOKUP_CHUNK_WORDS;
 #endif
@@ -222,10 +222,17 @@ __device__ inline void merge_lists(const GpuCandidate* lists,uint32_t count,uint
 // RADIX: large-k instantiation (change 3). There list_cap is the winner
 // buffer size P (a power of two >= k) and dynamic shared memory holds
 // P winner keys, the radix buckets, then the scores.
+// Test hook: -DRBP_TEST_LAUNCH_BOUND=n lowers the kernel's thread limit so the
+// host-side thread-limit check can be exercised; empty in normal builds.
+#ifdef RBP_TEST_LAUNCH_BOUND
+#define RBP_KERNEL_BOUNDS __launch_bounds__(RBP_TEST_LAUNCH_BOUND)
+#else
+#define RBP_KERNEL_BOUNDS
+#endif
 #if RBP_V3_RADIX
 template<bool RADIX>
 #endif
-__global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_cap,GpuCandidate* candidates,
+__global__ void RBP_KERNEL_BOUNDS range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_cap,GpuCandidate* candidates,
                              uint32_t* finished,uint16_t* heads,GpuCandidate* scratch,GpuCandidate* output
 #if RBP_V3_THETA
                              ,uint32_t* theta,uint32_t* lengths
@@ -791,6 +798,13 @@ int main(int argc,char** argv) {
         const size_t shared_bytes=size_t(warps)*list_cap*8+size_t(W)*4;
         const void* kernel=reinterpret_cast<const void*>(range_scores);
 #endif
+        // Refuse thread counts the chosen instantiation cannot launch (its
+        // register use or launch bounds), before any query is scored.
+        cudaFuncAttributes kernel_attributes{};
+        require(cudaFuncGetAttributes(&kernel_attributes,kernel)==cudaSuccess,"Cannot read the scoring kernel's attributes");
+        require(threads<=uint32_t(kernel_attributes.maxThreadsPerBlock),
+                "SCORE_THREADS "+to_string(threads)+" exceeds this kernel's limit of "+to_string(kernel_attributes.maxThreadsPerBlock)+
+                " threads per block (registers or launch bounds); use fewer threads");
         require(cudaFuncSetAttribute(kernel,cudaFuncAttributeMaxDynamicSharedMemorySize,int(shared_bytes))==cudaSuccess,
                 "Range size and k need more shared memory than this GPU allows per thread block");
         GpuArray<uint32_t> lookup_first(index.lookup_first.size()),lookup_range(index.blocks()),value_start(index.blocks()),encoded(index.encoded.size());
