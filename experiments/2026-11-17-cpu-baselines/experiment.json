@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-17-cpu-baselines",
+  "title": "Exact CPU baselines for the GPU range scorer",
+  "owner": "parva",
+  "branch": "exp/parva/2026-11-17-cpu-baselines",
+  "status": "protocol registered 2026-11-17; no recorded run yet",
+  "parent_experiment": "2026-11-15-full-collection-baselines",
+  "parent_source_commit": "4fd69f7",
+  "question": "How much faster is the GPU range scorer than an exact sequential and an exact multicore CPU scorer on the same machine, index, queries and answers?",
+  "hypothesis": "The GPU scorer is much faster than one CPU core; the multicore scorer narrows the gap but scales sub-linearly because exhaustive scoring is memory-bound.",
+  "motivation": "No measured CPU latency exists at full scale; the course asks for speedup over sequential and over state-of-the-art implementations.",
+  "code_paths": [
+    "src/cpu_exhaustive.cpp",
+    "tests/check_cpu_exhaustive.py",
+    "experiments/2026-11-17-cpu-baselines/code/gate.py",
+    "experiments/2026-11-17-cpu-baselines/code/expect.py",
+    "experiments/2026-11-17-cpu-baselines/code/run.sh",
+    "experiments/2026-11-17-cpu-baselines/analysis/analyze.py"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-17-cpu-baselines/configs/protocol.json",
+    "experiments/2026-11-17-cpu-baselines/configs/configs.tsv"
+  ],
+  "declared_changes": {
+    "new_scorer": "src/cpu_exhaustive.cpp",
+    "gpu_scorer": "src/cuda_range_v2.cu unchanged",
+    "shared_files": "none modified"
+  },
+  "scoring_contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "query_split": "calibration-500 only; held-out untouched",
+  "correctness_rule": "Every configuration's ordered (original_id, score) top-10 equals the pinned CPU reference for every query, in correctness and in every timing process.",
+  "success_rule": "A complete run under the registered protocol; the result is reported whatever the speedups are.",
+  "failure_rule": "Any mismatch, rejected expected run, or more than 3 ineligible processes for one configuration.",
+  "recording_ids": [],
+  "runs": []
+}
