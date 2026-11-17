@@ -1,6 +1,6 @@
 {
   "experiment_id": "2026-11-18-range-pruning",
-  "status": "DRAFT: not registered; no recorded run",
+  "status": "REGISTERED 2026-11-17 before any recorded run; after a development census, fixtures, one full-collection probe and two dry-runs (dev-prune-01 stopped by the author when the CPU limit was changed from 1.0 to 4.0 cores; dev-prune-02 passed). No latency from this experiment was read before registration",
   "recording": "self-contained runtime gate (code/gate.py, a copy of experiments/2026-11-17-cpu-baselines/code/gate.py at eb2228b) and self-recorded manifests; not recorded by the team runtime",
   "question": "Does seeded range-bound pruning make the exact GPU range scorer faster on the full collection, and how much of any change comes from the range size, the work-list scheduling and the pruning itself?",
   "hypothesis": "Pruning scores far fewer postings and ranges (development census: at 64 seeds, median 64.6% / 41.7% / 21.8% of postings at range size 1024 / 512 / 256), so the pruned scorer is faster than the exhaustive control, more so at smaller ranges; per-query overhead (four extra launches, a 64-range seed phase) limits the gain",

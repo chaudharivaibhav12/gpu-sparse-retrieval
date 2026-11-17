@@ -32,7 +32,7 @@ Medians over queries. Smaller ranges have tighter bounds. 64 seeds come within 3
 
 ## Code and review
 
-Development: the fixture suite passed on the first build (864 scorer runs, 17,472 answer checks, 12,960 schedule checks). A full-collection probe (range size 256, 64 seeds, VERIFY=1) is described under [runs/dev](runs/dev/README.md). Review so far is the author's own.
+Development: the fixture suite passed on the first build (864 scorer runs, 17,472 answer checks, 12,960 schedule checks). A full-collection probe (range size 256, 64 seeds, VERIFY=1) matched the reference and the host schedule on all 500 queries. Dry run `dev-prune-01` was stopped when the CPU limit was changed to 4.0 cores, and `dev-prune-02` passed end to end; see [runs/dev](runs/dev/README.md). Review so far is the author's own.
 
 ## Runs
 
