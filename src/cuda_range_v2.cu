@@ -52,7 +52,7 @@ static const char* RBP_BLOCK_NAMES[RBP_NB]={"gt_start","clk_start","gt_rank_writ
 // Version-3 switches (experiment 2026-11-17-range-v3). With every switch 0 the
 // kernel is V2-5.
 #ifndef RBP_V3_LOOKUP
-#define RBP_V3_LOOKUP 0   // warp-cooperative block lookup (change 1)
+#define RBP_V3_LOOKUP 1   // warp-cooperative block lookup (change 1)
 #endif
 #ifndef RBP_V3_THETA
 #define RBP_V3_THETA 1    // theta-filtered merge candidates (change 2)
