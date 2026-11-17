@@ -1,0 +1,4 @@
+python3 tests/check_batched_kernel_sync.py
+g++ -O3 -Wall -Wextra -Wpedantic -std=c++17 src/range_bitpack_tool.cpp -o build/range_bitpack_tool
+nvcc -O3 -lineinfo -arch=sm_75 -std=c++17 src/cuda_range_batch.cu -o build/cuda_range_batch
+./build/range_bitpack_tool verify data/derived/hash-1000000.gsp data/derived/hash-1000000-w1024-pos.rbp

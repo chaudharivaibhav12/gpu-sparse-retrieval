@@ -42,6 +42,11 @@ Reported separately: throughput, individual completion latency, memory (tracked 
 - [20261115-cuda2-iso-01](runs/20261115-cuda2-iso-01/README.md): passed, 32 configurations.
 - [20261115-cuda2-batched-01](runs/20261115-cuda2-batched-01/README.md): passed, 20 configurations of the single batched launch.
 - [dev-cuda2-iso-01](runs/dev-cuda2-iso-01/README.md): development attempt, out of GPU memory held by other users.
+- [20261116-cuda5-timing-02](runs/20261116-cuda5-timing-02/README.md): primary timing run at 1M passages, RTX 4070, completed.
+- [20261116-cuda2-timing-01](runs/20261116-cuda2-timing-01/README.md): replication at 1M passages, RTX 2080 Ti, completed.
+- [20261116-cuda5-timing-01](runs/20261116-cuda5-timing-01/README.md): first primary attempt, failed on the replacement limit; not analysed.
+- [aborted-20261116-cuda2-wrong-commit](runs/aborted-20261116-cuda2-wrong-commit/README.md): wrong-commit launch, stopped before any query.
+- [dev-cuda5-smoke](runs/dev-cuda5-smoke/README.md): development dry-runs.
 
 ## Findings and decision
 
@@ -49,4 +54,29 @@ Step 1: with one slot per query, the unchanged kernel returns the exact ordered 
 
 Step 3: one launch for a whole batch (grid ranges x batch, one counter and one slice of every buffer per query) also returns the exact ordered top-k for every calibration query, including a partial last batch. The batched kernel body is a verbatim copy of `range_scores`, enforced by `tests/check_batched_kernel_sync.py`; if the single-query kernel changes, the copy must be refreshed and both checks rerun. Correctness only, one GPU model.
 
-Next: run `code/run_timing.sh` with `configs/timing-1m.tsv` on the RTX 4070 after announcing the run to the team, then the RTX 2080 Ti replication, then the full collection.
+Timing at 1M passages (scaling study; primary RTX 4070, source `8053d6f`, 3 processes x 20 measured rounds, every answer equal to the oracle):
+
+| k | batch | sequential q/s | streams q/s | batched q/s | batched / sequential | batched / streams | batched completion ms (median / p99) | streams completion ms (median / p99) | tracked MB | sampled MiB |
+|---:|---:|---:|---:|---:|---|---|---|---|---:|---:|
+| 10 | 1 | 9,205 | 9,214 | 8,840 | 0.972 [0.958, 0.997] | 0.960 [0.957, 0.962] | 0.109 / 0.150 | 0.105 / 0.146 | 441.3 | 586 |
+| 10 | 4 | 9,385 | 14,094 | 13,863 | 1.472 [1.418, 1.530] | 0.972 [0.946, 0.992] | 0.291 / 0.350 | 0.218 / 0.328 | 442.1 | 586 |
+| 10 | 16 | 9,356 | 16,194 | 16,115 | 1.717 [1.702, 1.727] | 0.998 [0.993, 1.007] | 0.996 / 1.106 | 0.576 / 1.044 | 444.9 | 590 |
+| 10 | 32 | 9,362 | 16,599 | 16,620 | 1.766 [1.747, 1.780] | 0.999 [0.993, 1.002] | 1.938 / 2.165 | 1.019 / 1.978 | 448.8 | 594 |
+| 1000 | 1 | 592 | 591 | 584 | 0.986 [0.985, 0.989] | 0.987 [0.984, 0.990] | 1.712 / 1.808 | 1.691 / 1.782 | 464.8 | 610 |
+| 1000 | 4 | 591 | 1,553 | 1,528 | 2.586 [2.580, 2.591] | 0.984 [0.980, 0.989] | 2.596 / 2.863 | 2.369 / 2.763 | 535.8 | 676 |
+| 1000 | 16 | 592 | 1,771 | 2,634 | 4.449 [4.438, 4.459] | 1.488 [1.482, 1.495] | 6.022 / 6.311 | 5.255 / 9.203 | 819.8 | 948 |
+| 1000 | 32 | 592 | 1,818 | 3,000 | 5.072 [5.068, 5.077] | 1.651 [1.647, 1.655] | 10.614 / 10.911 | 9.439 / 17.705 | 1198.5 | 1308 |
+
+Throughput is the median over 60 measured rounds (3 processes x 20) of 500 / (sum of the round's batch wall times). Ratios are paired by process and round (geometric mean, crossed bootstrap 95% interval, 10,000 draws, seed 20261117; with three processes the interval is a rough guide). Completion latency is measured from the start of the query's batch with complete batches; no batch-formation wait is included. "Tracked MB" is the device memory the driver allocates itself for the batched mode (10^6 bytes, checked by the runtime gate); "sampled MiB" is the largest 0.25-second `nvidia-smi` sample of the batched process. They are different quantities and neither is an exact peak.
+
+- At k=1000, one batched launch of 32 queries gives 5.07x the throughput of the sequential control and 1.65x that of 32 concurrent streams; the advantage over streams appears at batch 16 (1.49x) and is absent at batch 4 (0.98x).
+- At k=10, batching and streams are indistinguishable from batch 16 up (0.998 and 0.999) and both reach about 1.77x the sequential control at batch 32; most of that gain is already there at batch 4 (1.47x).
+- A batch of one costs a little: 0.972x (k=10) and 0.986x (k=1000) of the sequential control.
+- Throughput is bought with completion latency: the batched median rises from 0.109 ms (batch 1) to 1.938 ms (batch 32) at k=10 and from 1.71 ms to 10.61 ms at k=1000. In a batched launch all queries finish together, so its p99 is close to its median, while streams finish queries progressively (lower median, higher p99: 9.44 / 17.71 ms against 10.61 / 10.91 ms at batch 32, k=1000).
+- Tracked device memory grows with batch x k: 441 MB at batch 1, k=10 to 1,198 MB at batch 32, k=1000 (sampled process maximum 586 to 1,308 MiB).
+
+The RTX 2080 Ti replication shows the same pattern at lower absolute throughput: batched / sequential 1.62x (k=10) and 5.38x (k=1000) at batch 32, batched / streams 1.00x and 1.79x. It is a separately labelled replication on a shared host, not pooled with the primary run.
+
+Limits: 1M passages only, one primary GPU, shared machines (overlapping processes detected by 0.25-second sampling were replaced and are preserved, but exclusivity is not proven), calibration queries only, complete batches with no arrival process or batch-formation wait, three processes. These numbers say nothing about the full collection, where one query's range blocks occupy more of the GPU; no comparison with any baseline is made here.
+
+Next: review; then the full-collection runs with the pinned inputs of `experiments/2026-11-15-full-collection-baselines` under an added protocol entry.
