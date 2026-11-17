@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-18-range-pruning",
+  "title": "Seeded range-bound pruning for the exact GPU range scorer",
+  "owner": "parva",
+  "branch": "exp/parva/2026-11-18-range-pruning",
+  "status": "protocol draft; development census, fixtures and probe; no recorded run yet",
+  "parent_experiment": "2026-11-15-full-collection-baselines",
+  "parent_source_commit": "4fd69f7",
+  "question": "Does seeded range-bound pruning make the exact GPU range scorer faster on the full collection, and how much of any change comes from the range size, the work-list scheduling and the pruning itself?",
+  "hypothesis": "Pruning scores far fewer postings and ranges, so the pruned scorer is faster than the exhaustive control, more so at smaller ranges; per-query overhead limits the gain.",
+  "motivation": "The range scorer is exhaustive; the project's safe-block-bound idea was tested only on the older CSR layout. A development census shows that at 64 seeds only 22-65% of postings need scoring, depending on range size.",
+  "code_paths": [
+    "src/cuda_range_prune.cu",
+    "tests/check_range_prune.py",
+    "experiments/2026-11-18-range-pruning/code/range_bound_census.cpp",
+    "experiments/2026-11-18-range-pruning/code/gate.py",
+    "experiments/2026-11-18-range-pruning/code/expect.py",
+    "experiments/2026-11-18-range-pruning/code/run.sh",
+    "experiments/2026-11-18-range-pruning/analysis/analyze.py"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-18-range-pruning/configs/protocol.json",
+    "experiments/2026-11-18-range-pruning/configs/configs.tsv"
+  ],
+  "declared_changes": {
+    "new_scorer": "src/cuda_range_prune.cu (derived from cuda_range_v2.cu variant 5)",
+    "control": "src/cuda_range_v2.cu unchanged",
+    "new_inputs": "range-size 512 and 256 indexes built from the pinned GSP with the unchanged builder, pinned by SHA-256",
+    "shared_files": "none modified"
+  },
+  "scoring_contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "query_split": "calibration-500 only; held-out untouched",
+  "correctness_rule": "Every configuration's ordered (original_id, score) top-10 equals the pinned CPU reference for every query, in correctness and in every timing process; the seeds-64 configurations' schedules equal the host recomputation on every query.",
+  "success_rule": "A complete run under the registered protocol; the result is reported whatever the speedups are.",
+  "failure_rule": "Any mismatch, rejected expected run, failure other than a contended GPU failure, or more than 3 ineligible processes for one configuration.",
+  "recording_ids": [],
+  "runs": []
+}

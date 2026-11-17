@@ -1,0 +1,64 @@
+{
+  "experiment_id": "2026-11-18-range-pruning",
+  "status": "DRAFT: not registered; no recorded run",
+  "recording": "self-contained runtime gate (code/gate.py, a copy of experiments/2026-11-17-cpu-baselines/code/gate.py at eb2228b) and self-recorded manifests; not recorded by the team runtime",
+  "question": "Does seeded range-bound pruning make the exact GPU range scorer faster on the full collection, and how much of any change comes from the range size, the work-list scheduling and the pruning itself?",
+  "hypothesis": "Pruning scores far fewer postings and ranges (development census: at 64 seeds, median 64.6% / 41.7% / 21.8% of postings at range size 1024 / 512 / 256), so the pruned scorer is faster than the exhaustive control, more so at smaller ranges; per-query overhead (four extra launches, a 64-range seed phase) limits the gain",
+  "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1; uint8 impacts, prepared integer query weights, uint32 accumulation under the conservative-bound guard, reported as uint64; ties by original numeric passage ID; all passages eligible",
+  "exactness": "A range is skipped only when its bound (sum of query weight x largest impact of the term in the range x largest term multiplicity) is strictly below theta, the k-th best exact score among the seed ranges' documents. Every document of a skipped range scores at most its bound < theta, and k distinct seeded documents score >= theta, so no skipped document can be in the top k, ties included. Fewer than k seeded documents give theta = 0 and nothing is skipped",
+  "inputs": {
+    "rule": "checked by whole-file SHA-256 before any scoring",
+    "gsp": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac",
+    "rbp_w1024": "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab (pinned in experiments/2026-11-15-full-collection-baselines; content hash 482cb80e9e0830275fb9e9c4a56341a8965c565e31045677a8f1bf822cdd6b25)",
+    "rbp_w512": "d35a69909ea2507e29ac6c27edc96b4ca259e69614f9aca5029c6801d3f408a0 (content hash b5a23d269b58f29eaca1b1960db683f9b0064d3c6d5e71d7193f7017357cd3df)",
+    "rbp_w256": "0ad6531c7698c7541fd9f6d62fb4fa34619e4b765656cccfa3d13fdc64202892 (content hash 90b86a651aa0be4cc45094e9f1891df184c2d93718dc71f081a74072248cd328)",
+    "queries": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091 (500 calibration queries)",
+    "cpu_reference_top10": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed",
+    "provenance": "W512 and W256 built on cuda5 from the pinned GSP by range_bitpack_tool (`build GSP OUT SIZE positions`, uniform ranges), compiled from src/range_bitpack_tool.cpp and src/range_bitpack.h as last changed in 223cf4b; the same binary regenerated the pinned W1024 index with an equal hash"
+  },
+  "fixed": {
+    "documents": 8841823,
+    "k": 10,
+    "query_count": 500,
+    "score_threads": 256,
+    "host": "cuda5 (RTX 4070, UUID GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7; host thread on CPU 0, local allocation)"
+  },
+  "implementations": {
+    "v2": "src/cuda_range_v2.cu unchanged (variant 5): one block per range, exhaustive",
+    "prune": "src/cuda_range_prune.cu: five kernels per query (bounds, seed selection, seed scoring with theta, compaction, scoring of kept ranges with the final merge); scoring kernels are a persistent grid (occupancy x SMs blocks) over a work list; the per-range body is variant 5's. seeds 0 = the same path with nothing skipped",
+    "build": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6)",
+    "seed_count_choice": "64, fixed from the development census (work only, no timing): median postings within 3 percentage points of the oracle threshold's at every range size (2.9 / 2.2 / 1.9 at 1024 / 512 / 256), while 256 seeds gain at most 2.7 more"
+  },
+  "configurations": ["v2-w1024", "v2-w512", "v2-w256", "prune-w1024-s0", "prune-w1024-s64", "prune-w512-s0", "prune-w512-s64", "prune-w256-s0", "prune-w256-s64"],
+  "control": "v2-w1024, the current best exact GPU scorer (full-collection median 0.686-0.690 ms in earlier sessions)",
+  "timing_boundary": "Per query, host wall clock from building the query argument from its parsed (term, weight) pairs to the ordered top-k (original IDs and scores) in host memory, including every kernel launch, synchronisation and the result transfer (query_wall_ms, unchanged from v2). The pruned scorer's schedule statistics are copied after the boundary. Index loading, block maxima, tie ranks, the gate, output writes and checks are outside it",
+  "timing": {
+    "processes": 3,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "order": "every configuration once per pass, three passes with rotation offsets 0, ceil(n/3), ceil(2n/3)",
+    "before_each_process": "wait (60 s polls, at most 60 minutes) until no GPU compute process is listed and other users' CPU use over 5 s is at most CPU_LIMIT cores",
+    "sampling": "every 0.5 s during each process: nvidia-smi compute processes on the GPU and machine CPU time from /proc minus the scorer and the sampler; sampler on CPU 15",
+    "eligibility": "a timing process is ineligible if another GPU process was sampled during it (or its own was not), or other users' CPU use averaged more than CPU_LIMIT cores over its life; a process that exits non-zero while another GPU process was sampled is ineligible (contended failure); any other failure stops the run",
+    "replacement": "an ineligible process is kept under raw/ineligible/ and replaced; at most 3 replacements per configuration, a 4th stops the run",
+    "cpu_limit_cores": 1.0,
+    "cpu_limit_rationale": "the value registered for experiments/2026-11-17-cpu-baselines from that experiment's development background measurements (0.15-0.25 cores); its recorded run measured 0.15-0.61 cores per process"
+  },
+  "correctness_gate": "From the timed source and binaries on the timed host: tests/check_range_bitpack.py for v2 and tests/check_range_prune.py for the pruned scorer (answers and the independent schedule model), two deliberate runtime-gate rejections (prune seed count, v2 score threads), every configuration once against the CPU reference with VERIFY=1 for the seeds-64 configurations (host recomputation of every answer and of the bounds, seeds, theta, scored ranges and postings), and every timing process's answers against the CPU reference. Any mismatch stops the run",
+  "analysis": {
+    "per_process_query": "median of the 20 measured rounds",
+    "primary": "v2-w1024 / prune-w<size>-s64 for size 1024, 512 and 256: geometric mean over (process, query) pairs of median_control / median_pruned. All three are reported; none is selected after the fact",
+    "decomposition": "v2-w1024 / v2-w<size> (range size, exhaustive); v2-w<size> / prune-w<size>-s0 (work-list scheduling); prune-w<size>-s0 / prune-w<size>-s64 (pruning)",
+    "descriptive": "median, mean, p95, p99 of the query-process medians; scored range fraction and postings per query of each prune configuration (deterministic; checked identical across rounds and processes)",
+    "interval": "crossed process/query bootstrap, 10,000 draws, seed 20261118, percentile 2.5/97.5; conditional on this session and the calibration queries",
+    "script": "analysis/analyze.py"
+  },
+  "decision_rule": "Pruning is adopted as the project's exact GPU scorer if a primary interval lies wholly above 1; the fastest such configuration by point estimate is named, with its decomposition. If no primary interval lies above 1, the result is reported as negative with the decomposition. The held-out evaluation would then need a separately frozen choice",
+  "limits": [
+    "one host, one GPU (RTX 4070), k=10, batch 1",
+    "the seed count was set from calibration-query work counts, so the held-out evaluation is the unbiased test",
+    "pruning effectiveness depends on the document order (this index is BP-reordered) and on k",
+    "shared machine: absence of other processes in the samples does not prove exclusivity",
+    "calibration queries only; the 6,480 held-out queries are untouched"
+  ]
+}
