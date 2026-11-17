@@ -20,7 +20,8 @@
 #      the machine is quiet.
 #   6. analysis and manifest.
 # Environment: GPU (index, default 0), PROCESSES (3), WARMUPS (3), ROUNDS (20), CPU_LIMIT (cores),
-# SAMPLER_CPU (15), FIXTURES (1), RUN_ROOT, FULL_DIR, DEV=1 (development: no clean-tree check, not a result).
+# SAMPLER_CPU (15), FIXTURES (1), RUN_ROOT, FULL_DIR, DEV=1 (development: no clean-tree check, not a result;
+# with DEV=1 only, CORRECTNESS=0 skips correctness and FORCE_REPLACE=1 forces one replacement).
 set -u
 RUN_ID=$1
 EXP=2026-11-18-range-pruning
@@ -158,7 +159,9 @@ reject prune-seeds prune-w1024-s64 config.seed_ranges
 reject v2-threads v2-w1024 config.score_threads
 
 stage correctness
-for name in "${NAMES[@]}"; do
+# Development only: CORRECTNESS=0 skips this stage (a recorded run always runs it).
+[ "$DEV" = 1 ] && [ "${CORRECTNESS:-1}" = 0 ] && NAMES_CORRECT=() || NAMES_CORRECT=("${NAMES[@]}")
+for name in "${NAMES_CORRECT[@]}"; do
     out=$RUN/raw/correct-$name
     verify=0; [ "${SEEDS[$name]}" = 64 ] && verify=1
     wait_quiet "correct-$name"
@@ -183,11 +186,16 @@ for ((p=0;p<PROCESSES;p++)); do
             [ -e "$out.receipt.json" ] || fail "$tag: no gate receipt"
             v=$(verdict "$out.receipt.json")
             [ "$v" = failed ] && fail "$tag"
-            if [ "$DEV" = 1 ] || [ "$v" = eligible ]; then break; fi
+            if [ "$DEV" = 1 ]; then
+                # Development only: FORCE_REPLACE=1 treats the first timing process as ineligible to exercise replacement.
+                if [ "${FORCE_REPLACE:-0}" = 1 ] && [ -z "${FORCED:-}" ]; then FORCED=1; else break; fi
+            elif [ "$v" = eligible ]; then break; fi
             REPLACED[$name]=$(( REPLACED[$name] + 1 ))
             hold=$RUN/raw/ineligible/$tag-attempt${REPLACED[$name]}; mkdir "$hold"
             [ -e "$out.tsv" ] && { sha256sum "$out.tsv" > "$hold/top-sha256.txt"; rm "$out.tsv"; }
             mv "$out".* "$hold/"
+            # The replacement writes a fresh expectation; keep this attempt's with its receipt.
+            mv "$RUN/expect/$tag.json" "$hold/expect.json"
             echo "INELIGIBLE $tag replacement ${REPLACED[$name]} $(date -u +%FT%TZ)" | tee -a "$RUN/logs/stages.txt"
             [ "${REPLACED[$name]}" -le 3 ] || fail "more than 3 ineligible timing processes for $name"
         done
