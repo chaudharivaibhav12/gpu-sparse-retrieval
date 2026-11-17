@@ -47,6 +47,9 @@ Reported separately: throughput, individual completion latency, memory (tracked 
 - [20261116-cuda5-timing-01](runs/20261116-cuda5-timing-01/README.md): first primary attempt, failed on the replacement limit; not analysed.
 - [aborted-20261116-cuda2-wrong-commit](runs/aborted-20261116-cuda2-wrong-commit/README.md): wrong-commit launch, stopped before any query.
 - [dev-cuda5-smoke](runs/dev-cuda5-smoke/README.md): development dry-runs.
+- [20261117-cuda5-full-03](runs/20261117-cuda5-full-03/README.md): full collection (8,841,823 passages), k=10, RTX 4070, completed.
+- [20261117-cuda5-full-01](runs/20261117-cuda5-full-01/README.md), [20261117-cuda5-full-02](runs/20261117-cuda5-full-02/README.md): full-collection attempts, failed on the replacement limit; not analysed.
+- [dev-cuda5-full](runs/dev-cuda5-full/README.md): development dry-runs on the full collection.
 
 ## Findings and decision
 
@@ -77,6 +80,20 @@ Throughput is the median over 60 measured rounds (3 processes x 20) of 500 / (su
 
 The RTX 2080 Ti replication shows the same pattern at lower absolute throughput: batched / sequential 1.62x (k=10) and 5.38x (k=1000) at batch 32, batched / streams 1.00x and 1.79x. It is a separately labelled replication on a shared host, not pooled with the primary run.
 
-Limits: 1M passages only, one primary GPU, shared machines (overlapping processes detected by 0.25-second sampling were replaced and are preserved, but exclusivity is not proven), calibration queries only, complete batches with no arrival process or batch-formation wait, three processes. These numbers say nothing about the full collection, where one query's range blocks occupy more of the GPU; no comparison with any baseline is made here.
+Timing on the full collection (8,841,823 passages, k=10, RTX 4070, source `902278f`, the pinned shared inputs, 3 processes x 20 measured rounds, every answer equal to the CPU reference):
 
-Next: review; then the full-collection runs with the pinned inputs of `experiments/2026-11-15-full-collection-baselines` under an added protocol entry.
+| batch | sequential q/s | streams q/s | batched q/s | batched / sequential | batched / streams | completion ms, median / p99: sequential | streams | batched | tracked MB | sampled MiB |
+|---:|---:|---:|---:|---|---|---|---|---|---:|---:|
+| 1 | 1,390 | 1,392 | 1,383 | 0.994 [0.992, 0.995] | 0.993 [0.991, 0.994] | 0.688 / 1.085 | 0.688 / 1.085 | 0.692 / 1.086 | 3676.0 | 3668 |
+| 4 | 1,396 | 1,602 | 1,601 | 1.147 [1.145, 1.149] | 1.000 [0.998, 1.001] | 1.854 / 3.391 | 1.705 / 3.013 | 2.463 / 3.093 | 3682.3 | 3674 |
+| 16 | 1,395 | 1,659 | 1,661 | 1.192 [1.190, 1.195] | 1.002 [1.001, 1.003] | 6.119 / 11.962 | 5.262 / 10.092 | 9.624 / 10.914 | 3707.4 | 3698 |
+| 32 | 1,397 | 1,669 | 1,672 | 1.198 [1.197, 1.201] | 1.002 [1.002, 1.003] | 11.446 / 23.404 | 9.783 / 19.732 | 19.213 / 20.450 | 3740.9 | 3730 |
+
+- The gain from serving several queries at once shrinks from 1.77x at 1M passages to 1.20x on the full collection (batch 32, batched / sequential 1.198 [1.197, 1.201]); most of it is reached at batch 4 (1.147x). This agrees with the hypothesis: one query's 8,635 range blocks already occupy most of the GPU.
+- A single batched launch and concurrent streams are equivalent in throughput at every batch size (1.000 to 1.002), and a batch of one costs 0.6% against the sequential control.
+- Completion latency grows almost in proportion to the batch: the batched median goes from 0.692 ms (batch 1) to 19.2 ms (batch 32) for 1.2x the throughput. Streams finish queries progressively (median 9.78 ms, p99 19.7 ms at batch 32).
+- Memory is dominated by the index: tracked allocation 3,676 MB at batch 1 and 3,741 MB at batch 32.
+
+Limits: at 1M passages two GPU models, on the full collection one GPU and k=10 only (no pinned top-1000 reference exists); shared machines (overlapping processes detected by 0.25-second sampling were replaced and are preserved, but exclusivity is not proven); calibration queries only; complete batches with no arrival process or batch-formation wait; three processes. Comparisons are among our own three execution modes; no comparison with any baseline is made here, and the 1M and full-collection ratios come from different sessions.
+
+Next: review. Open team decisions: whether a full-collection top-1000 reference is worth building, and held-out evaluation after a recorded freeze.

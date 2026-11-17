@@ -1,0 +1,3 @@
+# dev-cuda5-full-01 to dev-cuda5-full-04
+
+Development dry-runs of `run_timing.sh` on the full collection (three configurations, one process, 1 warm-up + 2 rounds); not results; kept on cuda5 scratch only. `01` and `02` stopped at the gate-rejection stage with CUDA out of memory while a teammate's full-collection baseline process held about 8.3 GB of the board (dry-runs then did not wait for an idle GPU; they do since `902278f`). `03` was stopped by its owner before any GPU work so as not to disturb that baseline run. `04` passed end to end: 3 rejections rejected, 9 processes accepted, 9 comparisons equal to the CPU reference. The out-of-memory replacement rule in `protocol.json` (`full_collection.contended_out_of_memory`) was added after `01`.
