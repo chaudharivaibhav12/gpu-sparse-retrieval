@@ -60,6 +60,22 @@ static const char* RBP_BLOCK_NAMES[RBP_NB]={"gt_start","clk_start","gt_rank_writ
 #ifndef RBP_V3_STATS
 #define RBP_V3_STATS 0    // per-query candidate counts (change 2 diagnostics; off for timing)
 #endif
+#ifndef RBP_V3_RADIX
+#define RBP_V3_RADIX 1    // radix-select local top-k for large k (change 3; requires theta)
+#endif
+#if RBP_V3_RADIX && !RBP_V3_THETA
+#error "RBP_V3_RADIX writes its winners through the theta filter (RBP_V3_THETA=1)"
+#endif
+#if RBP_V3_RADIX
+#ifndef RBP_RADIX_BITS
+#define RBP_RADIX_BITS 8  // digit width of the radix selection (8 or 11)
+#endif
+constexpr uint32_t RBP_RADIX_BUCKETS=1u<<RBP_RADIX_BITS;
+static_assert(RBP_RADIX_BUCKETS%32==0,"warp 0 scans the buckets in 32 equal chunks");
+#define RBP_IS_RADIX RADIX
+#else
+#define RBP_IS_RADIX false
+#endif
 constexpr uint32_t RBP_MAX_TERMS=128;
 #if RBP_V3_LOOKUP
 // Query words whose lookup loads one warp issues before consuming any of them.
@@ -203,6 +219,12 @@ __device__ inline void merge_lists(const GpuCandidate* lists,uint32_t count,uint
 
 // finished: device counter, 0 before every launch. heads (one per range) and
 // scratch (warps*k) are merge scratch; candidates holds every range's list.
+// RADIX: large-k instantiation (change 3). There list_cap is the winner
+// buffer size P (a power of two >= k) and dynamic shared memory holds
+// P winner keys, the radix buckets, then the scores.
+#if RBP_V3_RADIX
+template<bool RADIX>
+#endif
 __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_cap,GpuCandidate* candidates,
                              uint32_t* finished,uint16_t* heads,GpuCandidate* scratch,GpuCandidate* output
 #if RBP_V3_THETA
@@ -225,7 +247,14 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
     const uint32_t thread=threadIdx.x,threads=blockDim.x,lane=thread&31,warp=thread>>5,warps=threads>>5;
     const uint32_t terms=query.terms;
     uint64_t* lists=dynamic_shared;
+#if RBP_V3_RADIX
+    uint32_t* scores=reinterpret_cast<uint32_t*>(dynamic_shared+(RBP_IS_RADIX ? size_t(list_cap)+RBP_RADIX_BUCKETS/2 : size_t(warps)*list_cap));
+#else
     uint32_t* scores=reinterpret_cast<uint32_t*>(dynamic_shared+size_t(warps)*list_cap);
+#endif
+#if RBP_V3_THETA
+    __shared__ uint32_t cut_now,written;
+#endif
     const uint32_t range=blockIdx.x;
     const uint64_t first=v.range_start[range];
     const uint32_t range_docs=v.range_start[range+1]-v.range_start[range];
@@ -408,6 +437,100 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
     RBP_EV(6);
 #endif
 
+#if RBP_V3_RADIX
+    if constexpr (RBP_IS_RADIX) {
+        // Radix selection (change 3). Key = (score << key_bits) | (W-1 - r),
+        // r = in-range original-ID rank: unique, larger = higher score, then
+        // smaller original ID. Find the want-th largest key digit by digit,
+        // then gather the keys at or above it and sort them.
+        __shared__ uint64_t radix_warp_max[RBP_MAX_WARPS];
+        __shared__ uint32_t radix_state[4];   // boundary bucket, count above it, its count, gathered
+        uint32_t* buckets=reinterpret_cast<uint32_t*>(dynamic_shared+list_cap);
+        const uint32_t key_bits=32-__clz(v.range_size-1);
+        const uint64_t rank_top=uint64_t(v.range_size-1);
+        const uint32_t want=k<range_docs ? k : range_docs;
+        uint64_t threshold=0;   // want == range_docs: every key wins
+        if (want<range_docs) {
+            uint64_t top_key=0;
+            for (uint32_t s=thread;s<range_docs;s+=threads) {
+                const uint64_t key=(uint64_t(scores[s])<<key_bits)|(rank_top-v.tie_rank[first+s]);
+                if (key>top_key) top_key=key;
+            }
+            for (uint32_t offset=16;offset;offset>>=1) {
+                const uint64_t other=__shfl_xor_sync(0xffffffffu,top_key,offset);
+                if (other>top_key) top_key=other;
+            }
+            if (lane==0) radix_warp_max[warp]=top_key;
+            __syncthreads();
+            for (uint32_t w=0;w<warps;++w) if (radix_warp_max[w]>top_key) top_key=radix_warp_max[w];
+            // Keys are unique and want < range_docs, so top_key > 0. Start at
+            // the digit holding its top bit: higher digits are zero everywhere.
+            int shift=(63-__clzll(top_key))/RBP_RADIX_BITS*RBP_RADIX_BITS;
+            uint64_t prefix=0,mask=0;
+            uint32_t remaining=want;
+            for (;;shift-=RBP_RADIX_BITS) {
+                for (uint32_t b=thread;b<RBP_RADIX_BUCKETS;b+=threads) buckets[b]=0;
+                __syncthreads();
+                for (uint32_t s=thread;s<range_docs;s+=threads) {
+                    const uint64_t key=(uint64_t(scores[s])<<key_bits)|(rank_top-v.tie_rank[first+s]);
+                    if ((key&mask)==prefix) atomicAdd(&buckets[(key>>shift)&(RBP_RADIX_BUCKETS-1)],1u);
+                }
+                __syncthreads();
+                if (warp==0) {
+                    // Lane L sums buckets top-down in a contiguous chunk; a warp
+                    // scan and ballot find the chunk holding the boundary.
+                    constexpr uint32_t per=RBP_RADIX_BUCKETS/32;
+                    const uint32_t top=RBP_RADIX_BUCKETS-1-lane*per;
+                    uint32_t sum=0;
+                    for (uint32_t j=0;j<per;++j) sum+=buckets[top-j];
+                    uint32_t inclusive=sum;
+                    for (uint32_t offset=1;offset<32;offset<<=1) {
+                        const uint32_t below=__shfl_up_sync(0xffffffffu,inclusive,offset);
+                        if (lane>=offset) inclusive+=below;
+                    }
+                    const uint32_t hit=__ballot_sync(0xffffffffu,inclusive>=remaining);
+                    if (lane==uint32_t(__ffs(hit)-1)) {
+                        uint32_t above=inclusive-sum;
+                        for (uint32_t j=0;j<per;++j) {
+                            const uint32_t c=buckets[top-j];
+                            if (above+c>=remaining) { radix_state[0]=top-j;radix_state[1]=above;radix_state[2]=c;break; }
+                            above+=c;
+                        }
+                    }
+                }
+                __syncthreads();
+                remaining-=radix_state[1];
+                prefix|=uint64_t(radix_state[0])<<shift;
+                mask|=uint64_t(RBP_RADIX_BUCKETS-1)<<shift;
+                const bool done=radix_state[2]==remaining || shift==0;
+                __syncthreads();   // radix_state and buckets are reused by the next pass
+                if (done) break;
+            }
+            threshold=prefix;
+        }
+        // Exactly `want` keys are >= threshold. Gather, pad to list_cap, sort descending.
+        if (thread==0) radix_state[3]=0;
+        __syncthreads();
+        for (uint32_t s=thread;s<range_docs;s+=threads) {
+            const uint64_t key=(uint64_t(scores[s])<<key_bits)|(rank_top-v.tie_rank[first+s]);
+            if (key>=threshold) lists[atomicAdd(&radix_state[3],1u)]=key;
+        }
+        for (uint32_t i=want+thread;i<list_cap;i+=threads) lists[i]=0;
+        __syncthreads();
+#ifdef RBP_STAGE_CLOCKS
+        RBP_EV(7);
+#endif
+        for (uint32_t size=2;size<=list_cap;size<<=1)
+            for (uint32_t stride=size>>1;stride;stride>>=1) {
+                for (uint32_t i=thread;i<list_cap/2;i+=threads) {
+                    const uint32_t x=2*i-(i&(stride-1)),y=x+stride;
+                    const uint64_t a=lists[x],b=lists[y];
+                    if ((a<b)==((x&size)==0)) { lists[x]=b;lists[y]=a; }
+                }
+                __syncthreads();
+            }
+    } else {
+#endif
     // 4a. Each thread keeps the best min(k, slots) of the slots it owns
     //     (slot % threads == thread), sorted best first.
     uint64_t local[RBP_MAX_SLOTS];
@@ -441,6 +564,9 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
         ++length;
     }
     if (lane==0) warp_length[warp]=length;
+#if RBP_V3_RADIX
+    }
+#endif
 #ifdef RBP_STAGE_CLOCKS
     RBP_EV(8);
 #endif
@@ -450,12 +576,34 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
 #endif
 
 #if RBP_V3_THETA
+#if RBP_V3_RADIX
+    if constexpr (RBP_IS_RADIX) {
+        // Radix path: lists[0..want) is the range's canonical order. The
+        // k-th entry raises theta; entries at or above theta are written at
+        // their index (a prefix), plus the count.
+        const uint32_t key_bits=32-__clz(v.range_size-1);
+        const uint64_t rank_top=uint64_t(v.range_size-1),low=(uint64_t(1)<<key_bits)-1;
+        const uint32_t want=k<range_docs ? k : range_docs;
+        if (want==k && thread==0) atomicMax(theta,uint32_t(lists[k-1]>>key_bits));
+        if (thread==0) written=0;
+        __syncthreads();
+        if (thread==0) cut_now=*reinterpret_cast<volatile uint32_t*>(theta);
+        __syncthreads();
+        const uint32_t cut=cut_now;
+        for (uint32_t i=thread;i<want;i+=threads) {
+            const uint64_t key=lists[i];
+            if (uint32_t(key>>key_bits)<cut) continue;
+            const uint32_t slot=v.rank_slot[first+uint32_t(rank_top-(key&low))];
+            candidates[uint64_t(range)*k+i]=GpuCandidate{key>>key_bits,v.ids[first+slot],uint32_t(first+slot),1};
+            atomicAdd(&written,1u);
+        }
+    } else {
+#endif
     // 4c/5 (theta). Rank pass: every listed key counts the keys ahead of it in
     // the other warps' lists. The key ranked k-1 (present exactly when the
     // range has >= k documents) raises theta to this range's k-th score:
     // the range alone holds k documents with at least that score, so theta
     // never exceeds the global k-th score.
-    __shared__ uint32_t cut_now,written;
     for (uint32_t e=lane;e<warp_length[warp];e+=32) {
         const uint64_t key=lists[size_t(warp)*list_cap+e];
         uint32_t rank=e;
@@ -482,6 +630,9 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
             atomicAdd(&written,1u);
         }
     }
+#if RBP_V3_RADIX
+    }
+#endif
 #else
     // 4c/5. Every listed key counts the keys ahead of it in the other warps'
     //       lists; that count plus its own index is its final rank.
@@ -572,10 +723,17 @@ struct GpuEvent {
 
 int main(int argc,char** argv) {
     try {
-        require(argc==14,"Usage: cuda_range_v2 RBP QUERIES CSV TOP_TSV LIMIT K GPU VERIFY ROUNDS WARMUPS SCORE_THREADS MERGE_THREADS GSP|-");
+        require(argc==14||argc==15,"Usage: cuda_range_v2 RBP QUERIES CSV TOP_TSV LIMIT K GPU VERIFY ROUNDS WARMUPS SCORE_THREADS MERGE_THREADS GSP|- [RADIX_MIN_K]");
         const auto parse=[](const char* p) { const string s(p);size_t used=0;auto n=stoull(s,&used);require(!s.empty()&&s[0]!='-'&&used==s.size()&&n<=UINT32_MAX,"Invalid unsigned argument");return uint32_t(n); };
         const uint32_t limit=parse(argv[5]),k=parse(argv[6]),gpu=parse(argv[7]),verify=parse(argv[8]),rounds=parse(argv[9]),warmups=parse(argv[10]),threads=parse(argv[11]),merge_threads=parse(argv[12]);
         const string gsp_path=argv[13];
+        // Large-k selection path (change 3) from k >= radix_min_k; default 100.
+        const uint32_t radix_min_k=argc==15 ? parse(argv[14]) : 100;
+#if RBP_V3_RADIX
+        const bool radix=k>=radix_min_k;
+#else
+        const bool radix=false;
+#endif
         const auto valid_threads=[](uint32_t t) { return t>=32&&t<=32*RBP_MAX_WARPS&&t%32==0; };
         require(k<=RBP_MAX_K&&verify<=1&&rounds>0&&valid_threads(threads)&&valid_threads(merge_threads),"Unsupported setting");
         require(!verify || gsp_path!="-","VERIFY=1 needs the source GSP index");
@@ -624,8 +782,16 @@ int main(int argc,char** argv) {
             }
         }
         cuda_checked(cudaSetDevice(gpu));cudaDeviceProp properties{};cuda_checked(cudaGetDeviceProperties(&properties,gpu));
+        uint32_t winner_cap=1;
+        while (winner_cap<k) winner_cap<<=1;
+#if RBP_V3_RADIX
+        const size_t shared_bytes=radix ? size_t(winner_cap)*8+size_t(RBP_RADIX_BUCKETS)*4+size_t(W)*4 : size_t(warps)*list_cap*8+size_t(W)*4;
+        const void* kernel=radix ? reinterpret_cast<const void*>(range_scores<true>) : reinterpret_cast<const void*>(range_scores<false>);
+#else
         const size_t shared_bytes=size_t(warps)*list_cap*8+size_t(W)*4;
-        require(cudaFuncSetAttribute(range_scores,cudaFuncAttributeMaxDynamicSharedMemorySize,int(shared_bytes))==cudaSuccess,
+        const void* kernel=reinterpret_cast<const void*>(range_scores);
+#endif
+        require(cudaFuncSetAttribute(kernel,cudaFuncAttributeMaxDynamicSharedMemorySize,int(shared_bytes))==cudaSuccess,
                 "Range size and k need more shared memory than this GPU allows per thread block");
         GpuArray<uint32_t> lookup_first(index.lookup_first.size()),lookup_range(index.blocks()),value_start(index.blocks()),encoded(index.encoded.size());
         GpuArray<uint64_t> bit_start(index.blocks()),ids(N);
@@ -657,7 +823,7 @@ int main(int argc,char** argv) {
         string cpu_affinity="unknown",status_line;ifstream status("/proc/self/status");
         while (getline(status,status_line)) if (status_line.rfind("Cpus_allowed_list:",0)==0) { istringstream affinity(status_line.substr(18));affinity>>cpu_affinity; }
         research_gate("cuda-range-v2",N,count,k,gpu,argv[1],argv[2],
-            ",\"batch_size\":1,\"query_argument_bytes\":"+to_string(sizeof(QueryArgs))+",\"vocab\":"+to_string(index.vocab)+",\"nnz\":"+to_string(index.impacts.size())+",\"score_accumulator_bits\":"+to_string(sizeof(uint32_t)*8)+",\"returned_score_bits\":"+to_string(sizeof(GpuCandidate{}.score)*8)+",\"score_limit_exclusive\":"+to_string(uint64_t(UINT32_MAX))+",\"max_conservative_score_bound\":"+to_string(max_score_bound)+",\"max_slots_per_thread\":"+to_string(RBP_MAX_SLOTS)+",\"variant\":5,\"range_size\":"+to_string(W)+",\"postings_cap\":"+to_string(index.postings_cap)+",\"ranges\":"+to_string(R)+",\"blocks\":"+to_string(index.blocks())+",\"score_threads\":"+to_string(threads)+",\"merge_threads\":"+to_string(merge_threads)+",\"max_supported_k\":"+to_string(RBP_MAX_K)+",\"max_query_terms\":"+to_string(max_terms)+",\"max_supported_terms\":"+to_string(RBP_MAX_TERMS)+",\"max_term_document_multiplicity\":"+to_string(multiplicity)+",\"slots_per_thread\":"+to_string(slots)+",\"warp_list_capacity\":"+to_string(list_cap)+",\"shared_bytes\":"+to_string(shared_bytes)+",\"index_posting_bytes\":"+to_string(index.posting_bytes())+",\"tie_rank_bytes\":"+to_string((tie_rank.count+rank_slot.count)*2)+",\"verify_scores\":"+to_string(verify)+",\"warmup_rounds\":"+to_string(warmups)+",\"repeats\":"+to_string(rounds)+",\"cpu_affinity\":"+research_quote(cpu_affinity)+",\"index_sha256\":"+research_quote(sha_hex(index.file_sha))+",\"source_gsp_sha256\":"+research_quote(sha_hex(index.source_sha)),
+            ",\"batch_size\":1,\"query_argument_bytes\":"+to_string(sizeof(QueryArgs))+",\"vocab\":"+to_string(index.vocab)+",\"nnz\":"+to_string(index.impacts.size())+",\"score_accumulator_bits\":"+to_string(sizeof(uint32_t)*8)+",\"returned_score_bits\":"+to_string(sizeof(GpuCandidate{}.score)*8)+",\"score_limit_exclusive\":"+to_string(uint64_t(UINT32_MAX))+",\"max_conservative_score_bound\":"+to_string(max_score_bound)+",\"max_slots_per_thread\":"+to_string(RBP_MAX_SLOTS)+",\"v3_lookup\":"+to_string(RBP_V3_LOOKUP)+",\"v3_theta\":"+to_string(RBP_V3_THETA)+",\"v3_radix\":"+to_string(RBP_V3_RADIX)+",\"radix_min_k\":"+to_string(radix_min_k)+",\"selection_path\":"+string(radix ? "\"radix\"" : "\"warp-lists\"")+",\"variant\":5,\"range_size\":"+to_string(W)+",\"postings_cap\":"+to_string(index.postings_cap)+",\"ranges\":"+to_string(R)+",\"blocks\":"+to_string(index.blocks())+",\"score_threads\":"+to_string(threads)+",\"merge_threads\":"+to_string(merge_threads)+",\"max_supported_k\":"+to_string(RBP_MAX_K)+",\"max_query_terms\":"+to_string(max_terms)+",\"max_supported_terms\":"+to_string(RBP_MAX_TERMS)+",\"max_term_document_multiplicity\":"+to_string(multiplicity)+",\"slots_per_thread\":"+to_string(slots)+",\"warp_list_capacity\":"+to_string(list_cap)+",\"shared_bytes\":"+to_string(shared_bytes)+",\"index_posting_bytes\":"+to_string(index.posting_bytes())+",\"tie_rank_bytes\":"+to_string((tie_rank.count+rank_slot.count)*2)+",\"verify_scores\":"+to_string(verify)+",\"warmup_rounds\":"+to_string(warmups)+",\"repeats\":"+to_string(rounds)+",\"cpu_affinity\":"+research_quote(cpu_affinity)+",\"index_sha256\":"+research_quote(sha_hex(index.file_sha))+",\"source_gsp_sha256\":"+research_quote(sha_hex(index.source_sha)),
             ",\"layout\":\"range-split-bitpacked-positions-term-major\",\"schedule\":\"exhaustive-all-ranges\",\"ranges\":\"boundaries-from-index;uniform-or-postings-capped\",\"decode\":\"combined-work-list;direct-positions;no-decode-barriers\",\"accumulator\":\"uint32-shared-gated-below-2^32-1-widened-to-uint64\",\"selection\":\"thread-sorted-slots;warp-shuffle-select;one-barrier-rank-scatter;merge-in-last-finishing-block-threadfence-atomic-ticket\",\"tie_keys\":\"per-range-original-id-rank-uint16\",\"query_transfer\":\"kernel-argument-by-value\",\"result_transfer\":\"topk-only\"",
             "uint32-guarded-exact-widened-uint64", "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1");
         require(!filesystem::exists(argv[3])&&!filesystem::exists(argv[4]),"Refusing to overwrite results");
@@ -697,6 +863,19 @@ int main(int argc,char** argv) {
 #if RBP_V3_STATS
                     cuda_checked(cudaMemset(stats.ptr,0,16));
 #endif
+#if RBP_V3_RADIX
+                    if (radix) range_scores<true><<<R,threads,shared_bytes>>>(view,args,k,winner_cap,candidates.ptr,finished.ptr,heads.ptr,scratch.ptr,merged.ptr,theta.ptr,lengths.ptr
+#if RBP_V3_STATS
+                        ,stats.ptr
+#endif
+                        );
+                    else range_scores<false><<<R,threads,shared_bytes>>>(view,args,k,list_cap,candidates.ptr,finished.ptr,heads.ptr,scratch.ptr,merged.ptr,theta.ptr,lengths.ptr
+#if RBP_V3_STATS
+                        ,stats.ptr
+#endif
+                        );
+                    cuda_checked(cudaGetLastError());
+#else
                     range_scores<<<R,threads,shared_bytes>>>(view,args,k,list_cap,candidates.ptr,finished.ptr,heads.ptr,scratch.ptr,merged.ptr
 #if RBP_V3_THETA
                         ,theta.ptr,lengths.ptr
@@ -705,6 +884,7 @@ int main(int argc,char** argv) {
 #endif
 #endif
                         );cuda_checked(cudaGetLastError());
+#endif
                 }
                 cuda_checked(cudaEventRecord(end.event));
                 if (wanted) cuda_checked(cudaMemcpy(winners.data(),merged.ptr,size_t(wanted)*sizeof(GpuCandidate),cudaMemcpyDeviceToHost));

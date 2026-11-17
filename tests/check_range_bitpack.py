@@ -356,7 +356,7 @@ def run_v3_suite(args, tool, scorer, root):
                 results.append(dict(record, outcome="skipped: k above the scorer's maximum")); continue
             merge = threads if args.single_kernel else 256
             stem = out / ("%s-w%d-k%d-t%d" % (name, w, k, threads))
-            command = [scorer, rbp, query_file, str(stem) + ".csv", str(stem) + ".tsv", len(case["queries"]), k, args.gpu, 1, 1, 1, threads, merge, gsp]
+            command = [scorer, rbp, query_file, str(stem) + ".csv", str(stem) + ".tsv", len(case["queries"]), k, args.gpu, 1, 1, 1, threads, merge, gsp] + args.scorer_arg
             proc = subprocess.run([str(c) for c in command], capture_output=True, text=True)
             expect = case.get("expect", "match")
             if expect.startswith("reject:"):
@@ -408,6 +408,7 @@ def main():
     parser.add_argument("--v3-cases", default="off", choices=["off", "report", "enforce"],
                         help="version-3 cases (%s): report = run and record outcomes; enforce = any non-pass fails" % PENDING)
     parser.add_argument("--only-v3", action="store_true", help="run only the version-3 cases")
+    parser.add_argument("--scorer-arg", action="append", default=[], help="extra trailing scorer argument for every scoring run (e.g. a selection crossover)")
     args = parser.parse_args()
     assert not args.only_v3 or args.v3_cases != "off", "--only-v3 needs --v3-cases report or enforce"
     tool, scorer = Path(args.tool).resolve(), Path(args.scorer).resolve()
@@ -457,7 +458,7 @@ def main():
                 if args.single_kernel:
                     merge_threads = threads
                 run([scorer, rbp, query_file, str(stem) + ".csv", top, len(queries), k, args.gpu, 1, 1, 1,
-                     threads, merge_threads, gsp])
+                     threads, merge_threads, gsp] + args.scorer_arg)
                 summary["scorer_runs"] += 1
                 actual = {}
                 with top.open(newline="") as f:
