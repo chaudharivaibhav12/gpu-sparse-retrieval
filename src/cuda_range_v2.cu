@@ -55,13 +55,13 @@ static const char* RBP_BLOCK_NAMES[RBP_NB]={"gt_start","clk_start","gt_rank_writ
 #define RBP_V3_LOOKUP 1   // warp-cooperative block lookup (change 1)
 #endif
 #ifndef RBP_V3_THETA
-#define RBP_V3_THETA 0    // theta-filtered merge candidates (change 2)
+#define RBP_V3_THETA 1    // theta-filtered merge candidates (change 2)
 #endif
 #ifndef RBP_V3_STATS
 #define RBP_V3_STATS 0    // per-query candidate counts (change 2 diagnostics; off for timing)
 #endif
 #ifndef RBP_V3_RADIX
-#define RBP_V3_RADIX 0    // radix-select local top-k for large k (change 3; requires theta)
+#define RBP_V3_RADIX 1    // radix-select local top-k for large k (change 3; requires theta)
 #endif
 #if RBP_V3_RADIX && !RBP_V3_THETA
 #error "RBP_V3_RADIX writes its winners through the theta filter (RBP_V3_THETA=1)"
