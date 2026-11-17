@@ -116,5 +116,18 @@
     "fp32_native_core_bytes": 8536070804,
     "qualification": "Core estimates exclude context/allocator/librarytransients. Actual upload/correctness required; contentionguard does not reserveGPU."
   },
-  "next_if_complete": "Independently replay all raw/provenance/statistics and inspect actual generatedFP32atomic code before publishing. Select fourth adaptive study from result."
+  "next_if_complete": "Independently replay all raw/provenance/statistics and inspect actual generatedFP32atomic code before publishing. Select fourth adaptive study from result.",
+  "monitoring_repair": {
+    "treatment_id": "repair01-conservative-exited-process-monitor",
+    "original_source": "c73822766723e3f3ab001e8d07e85a191584ec6a",
+    "failed_run": "20261116-cuda5-fp32-01",
+    "diagnosis": "Observed foreign GPU contexts and one unseen PID exiting before os.getpgid caused inherited sampler to raise unresolved-process error. Original contaminated timing remains ineligible.",
+    "delta": "An unseen exited PID is retained with null PGID, classified conservatively unowned, included in external_pids and unclassified_exited_pids; timing remains ineligible and existing bounded resource replacement applies. Actual sampling failures still stop. Pre-gate contended-OOM recovery is forbidden when unclassified PID evidence exists.",
+    "invariants": [
+      "No CUDA/scoring/selection/query/dtype/input/clock/batch/repetition change",
+      "Zero unknown-interference acceptance",
+      "Original failure and all partial outputs preserved",
+      "Fresh full correctness/performance protocol, fresh run root and exact new source commit"
+    ]
+  }
 }

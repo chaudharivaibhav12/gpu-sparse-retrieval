@@ -1,0 +1,85 @@
+{
+  "status": "PASS",
+  "kind": "Separate final source/protocol/pre-CIMS review",
+  "question": "Bounded exactFP32baselinecost with fresh fullcorpus controls",
+  "checks": {
+    "fp32-core-review.json": {
+      "status": "PASS",
+      "domain_invalid_cases_rejected": 14,
+      "random_exact_fp32_permutations": 1500,
+      "actual_cfg_AST_matches_independent_expected": "PASS",
+      "actual_behavior_AST_matches_expected": "PASS",
+      "all_file_guard_before_upload_and_limit": "PASS",
+      "upstream_scoring_source_checked": "ef298aba741b6fe86a31021369b808549fa465c7011444cb98770808bcf79fd0",
+      "selector_input_runtime_helpers_byte_identical": "PASS",
+      "limits": [
+        "No local CUDA compiler/device execution; target runtime/fixtures/full golden validation mandatory.",
+        "Cfg AST evaluated on synthetic CPU state; this is not an actual runtime report or research measurement.",
+        "Controller orchestration/statistical/certificate review still pending."
+      ]
+    },
+    "fp32-comparison-review.json": {
+      "status": "PASS",
+      "canonical_arithmetic_pairs_accepted": 3,
+      "unsafe_cases_rejected": 17,
+      "source_sha256": "097b5b5326737dd3c6f69345a6fb00ff549bbbc24dda8e417f118539eecfd657",
+      "limits": [
+        "Synthetic engineering gate checks only; not physical execution or actual full-data evidence.",
+        "Actual same-build full500query reports, inputs, source and datatype/JIT evidence remain required."
+      ]
+    },
+    "fp32-controller-review.json": {
+      "status": "PASS",
+      "inherited_safety_functions_AST_identical": 6,
+      "actual_native_dispatch_routes": 2,
+      "FP32_dtype_and_memory_dispatch": "PASS",
+      "strict_FP32_resource_OOM_cases": "PASS",
+      "independent_nonconstant_bootstrap_draws": 200,
+      "complete_three_contrast_analysis_10000draws": "PASS",
+      "balanced_order_and_fixed_scope": "PASS",
+      "limits": [
+        "CPU engineering simulations, not actual GPU runtime snapshots or performance.",
+        "Real target fixtures/gate/full exactness and JITdtype inspection remain mandatory."
+      ]
+    }
+  },
+  "source_files": {
+    "code/analyze_full_baselines.py": "448bfcc7679b1503cf18aadc438de196b82078aa0b8482498b32cbed86a8ef7f",
+    "code/compare_exact.py": "097b5b5326737dd3c6f69345a6fb00ff549bbbc24dda8e417f118539eecfd657",
+    "code/expected_baselines.py": "cea53178becd8306621667bd336dec9ffadbb982cb81ea68e5c458b6170f8062",
+    "code/guarded_domain.py": "f1f924868c19481efb374ddbb8df85b55a4b962caf5d8cacc4673926ab35415b",
+    "code/reference_checks.py": "a8854075b242924e335fc2d05e476ca6a7e0adb77ec66209691c6c63938b24f9",
+    "code/run_fp32_study.py": "d21cddc29e97d6eeb96fd890d18a6ee4057e206de577072ff1a610842a10fa1b",
+    "code/validate_baseline_outputs.py": "2f39a428e314d98b664d8cf4fe561a87955467919128c94fdd65ad9cc0fd5262",
+    "code/fp32/canonical_baseline.py": "0da6f055feb99888ac12c86257e09f77dd0fec771e2d88aa8655976e0245a60e",
+    "code/fp32/expected_config.py": "74284d89cae63407ce4a276126a42df581617702df364d343546995ed0aba3a0",
+    "code/fp32/fp32_monolithic.py": "7f7637b8d95ea517da2fecce2d1bd44610b9657a2269866b417d806633459710",
+    "code/fp32/gsp_input.py": "a58462a957cb6522a5de2d3cc385329bf53864e3e27943a116652416d9ceebd6",
+    "code/fp32/runtime_gate.py": "6f151ff4f7266b2d8b05bc93dedc5570d13d535286141cad681b9b6919e4c450",
+    "code/fp32/u64_monolithic.py": "5d88a452fb4e9f32613b36b3dac6e38ce22028645ef4e0c2b01de36b9eec32d4",
+    "configs/protocol.json": "e71bc54d2c10bdcdcb0d22c1d881ea3ec3a3505fcdd4d6281797da991dcf1555",
+    "configs/guarded-contract.json": "71740f56ccdf383dcc8a057d462a2e156a07fdd03167450b35e115ed435320e2"
+  },
+  "reviewed": [
+    "Unchanged pinned originalFP32scatter callable, no unspecified-tie originaltopk call.",
+    "Exact parent canonical selector and hostwrapper, except scoring target and scorebufferdtype; no added perquerychecks biasing comparison.",
+    "All-file cap32/unique/max128/integerbounds beforeupload; actualeffectiveguardLIMIT and dtypes reported beforecompute.",
+    "Independent expectedCFG/behavior matched actualAST; stalewideaccumulator expectedlabel caught/fixed locally.",
+    "Original blocked arithmetic comparisons retained; only fullsamebuildcanonicalU32/U64/guardedFP32domain qualifies, with source/oracle/split binding.",
+    "Inherited sampler/processgroups/idle/checkpoint/retry safety code identical; recognizedFP32resourceOOM remains strict.",
+    "Three fresh rotatedcontrols, actualGPUidentity andmemoryguard; primaryFP32/U64 plus two rangecontrasts, same20round medians/10000crosseddraws.",
+    "No shared CUDA/scoring/input/tie/heldout change; source committed beforetarget builds/measurements."
+  ],
+  "findings_fixed": [
+    "Local generator quoting/schema errors beforeCIMS; no GPUrun affected.",
+    "ExpectedF32accumulator metadata originally retainedU64; corrected andactualCFGASTchecked.",
+    "ExpandedFP32guard toall-file rows beforelimit.",
+    "Report actualguardLIMIT rather than an independently guessedliteral.",
+    "Reuse exactparenthostwrapper toexclude redundant perquerydtypechecks fromtreatment."
+  ],
+  "limits": [
+    "No local CUDAdevice execution; actualtarget compile/gate/synthetic/fullCPUgolden success mandatory beforetiming.",
+    "GeneratedPTX/TTIRphysicalFP32atomic evidence and independentraw/provenance/statistics replay required beforepublication.",
+    "SharedGPUcan change afteridle; sampledabsence doesnot proveexclusiveGPU."
+  ]
+}

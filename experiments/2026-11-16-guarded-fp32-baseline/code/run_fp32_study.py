@@ -23,7 +23,7 @@ def retryable_contended_oom(payload,summary,stderr,allocation,total_bytes,output
     if label not in ['range','f32','mono'] or docs!=8841823 or outputs_present:return False
     if payload.get('status')!='SPEC_VIOLATION' or payload.get('runtime') is not None:return False
     if payload.get('exit_code',0)==0 or payload.get('error')!='Missing runtime report; compute is unverified':return False
-    if not summary.get('external_pids') or summary.get('sampling_errors') or not summary.get('samples') or not summary.get('owned_context_seen'):return False
+    if not summary.get('external_pids') or summary.get('sampling_errors') or summary.get('unclassified_exited_pids') or not summary.get('samples') or not summary.get('owned_context_seen'):return False
     # Subtract our maximum sampled usage conservatively; sampled board/context
     # values are evidence of interference, not exact simultaneous physical peaks.
     non_own_estimate=max(0,summary.get('sampled_board_peak_mib',0)-summary.get('sampled_own_peak_mib',0))*1024**2
@@ -74,7 +74,7 @@ def main():
             status('waiting','target-GPU-idle-and-memory',required_bytes=required,observed_free_bytes=state['free_bytes'],compute_context_count=len(state['contexts']))
             time.sleep(600)
     def sampler(stop,path,pgid,summary):
-        os.sched_setaffinity(0,{monitor_cpu});seen={};frames=0;external=set();errors=[];own_peak=0;board_peak=0;owned_seen=False
+        os.sched_setaffinity(0,{monitor_cpu});seen={};frames=0;external=set();unclassified=set();errors=[];own_peak=0;board_peak=0;owned_seen=False
         with path.open('x') as f:
             while not stop.is_set():
                 frame={'utc':datetime.datetime.now(datetime.timezone.utc).isoformat()}
@@ -92,15 +92,15 @@ def main():
                         pid=int(row[1]);memory=int(row[2])
                         try:group=os.getpgid(pid);seen[pid]=group
                         except ProcessLookupError:group=seen.get(pid)
-                        if group is None:raise RuntimeError('unresolved sampled compute process')
+                        if group is None:unclassified.add(pid) # Conservatively unowned; never certify this timing.
                         owned=group==pgid;owned_seen|=owned
                         if owned:owned_memory+=memory
                         else:external.add(pid)
-                        contexts.append(dict(pid=pid,pgid=group,used_mib=memory,owned=owned))
+                        contexts.append(dict(pid=pid,pgid=group,used_mib=memory,owned=owned,classification='unclassified-exited' if group is None else 'resolved-process-group'))
                     own_peak=max(own_peak,owned_memory);frame['contexts']=contexts;frames+=1
                 except Exception as error:frame['error']=type(error).__name__+': '+str(error);errors.append(frame['error'])
                 f.write(json.dumps(frame)+'\n');f.flush();stop.wait(1)
-        summary.update(samples=frames,owned_context_seen=owned_seen,external_pids=sorted(external),sampling_errors=errors,sampled_own_peak_mib=own_peak,sampled_board_peak_mib=board_peak,qualification='One-second sampled peaks, not exact physical peaks; no sampled foreign context is not an exclusivity proof.')
+        summary.update(samples=frames,owned_context_seen=owned_seen,external_pids=sorted(external),unclassified_exited_pids=sorted(unclassified),sampling_errors=errors,sampled_own_peak_mib=own_peak,sampled_board_peak_mib=board_peak,qualification='One-second sampled peaks, not exact physical peaks. External pids include conservatively unowned unclassified-exited processes, which invalidate timing. No sampled interference is not an exclusivity proof.')
     def checkpoint(tag):
         events=l.events();fresh=[e for e in events if e['id'] not in known_events];paths={}
         for event in fresh:
