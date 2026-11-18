@@ -1,6 +1,6 @@
 {
   "experiment_id": "2026-11-18-prune-term-bounds",
-  "status": "DRAFT: not registered; no recorded run",
+  "status": "REGISTERED 2026-11-18 before any recorded run; after tests/check_range_prune.py passed on cuda_range_prune_tb (864 runs) and smoke test dev-tb-01 (DEV=1, no fixtures or correctness, 1 process, 1 warm-up + 1 round) passed every stage. No latency from this experiment was read before registration",
   "recording": "self-contained runtime gate (code/gate.py, a copy of experiments/2026-11-18-range-pruning/code/gate.py (amendments 1 and 3)) and self-recorded manifests; not recorded by the team runtime",
   "question": "Does computing the range bounds term-major (coalesced reads, atomic adds) instead of per range (binary search per term) make the seeded range-bound pruning scorer faster, with a bit-identical schedule and identical answers?",
   "hypothesis": "The full-collection profile (experiments/2026-11-18-full-profile, run 20261118-cuda5-profile-01) measured the per-range bounds kernel at 100-114 us of a 443/370 us GPU span (range size 1024/256), memory-latency bound at 3-14% of SM peak. A term-major kernel reads each query term's contiguous block list once and should take a small fraction of that, so prune-tb should be faster than prune at both sizes, more so at 256",
