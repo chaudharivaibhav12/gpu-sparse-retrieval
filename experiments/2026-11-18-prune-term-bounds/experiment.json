@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-18-prune-term-bounds",
+  "title": "Term-major range bounds for the seeded range-bound pruning scorer",
+  "owner": "parva",
+  "branch": "exp/parva/2026-11-18-prune-term-bounds",
+  "status": "completed 2026-11-18: recorded run 20261118-cuda5-tb-01; prunetb adopted by the decision rule",
+  "parent_experiment": "2026-11-18-full-profile",
+  "parent_source_commit": "c891196",
+  "question": "Does computing the range bounds term-major make the pruned scorer faster, with an identical schedule and answers?",
+  "hypothesis": "Yes at both range sizes, more at 256, from the profiled 100-114 us bounds kernel.",
+  "motivation": "Profile-driven: per-range bounds kernel 23% of pruned kernel time, memory-latency bound.",
+  "code_paths": [
+    "src/cuda_range_prune_tb.cu",
+    "experiments/2026-11-18-prune-term-bounds/code/run.sh",
+    "experiments/2026-11-18-prune-term-bounds/code/expect.py",
+    "experiments/2026-11-18-prune-term-bounds/code/gate.py",
+    "experiments/2026-11-18-prune-term-bounds/analysis/analyze.py"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-18-prune-term-bounds/configs/protocol.json",
+    "experiments/2026-11-18-prune-term-bounds/configs/configs.tsv"
+  ],
+  "declared_changes": {
+    "new_scorer": "src/cuda_range_prune_tb.cu (term-major bounds; 44-line diff from cuda_range_prune.cu)",
+    "control": "src/cuda_range_prune.cu and src/cuda_range_v2.cu unchanged",
+    "shared_files": "none modified"
+  },
+  "scoring_contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "query_split": "calibration-500 only; held-out untouched",
+  "correctness_rule": "Every configuration's top-10 equals the CPU reference for every query; prunetb's schedule equals the host recomputation (VERIFY=1).",
+  "success_rule": "A complete run under the registered protocol; reported whatever the ratios are.",
+  "failure_rule": "Any mismatch or rejected expected run; ineligible processes are replaced.",
+  "recording_ids": [],
+  "runs": [
+    {
+      "run_id": "20261118-cuda5-tb-01",
+      "kind": "recorded",
+      "host": "cuda5",
+      "source_commit": "bffb7ec",
+      "status": "completed",
+      "readme": "experiments/2026-11-18-prune-term-bounds/runs/20261118-cuda5-tb-01/README.md",
+      "results": "results/2026-11-18-prune-term-bounds/20261118-cuda5-tb-01",
+      "correctness": "20 of 20 comparisons equal the CPU reference; prunetb VERIFY=1 schedules equal the host recomputation",
+      "ineligible_processes": 1,
+      "median_ms": {
+        "v2-w1024": 0.691,
+        "prune-w1024-s64": 0.478,
+        "prunetb-w1024-s64": 0.377,
+        "prune-w256-s64": 0.389,
+        "prunetb-w256-s64": 0.28
+      },
+      "primary": {
+        "prune-w1024-s64 / prunetb-w1024-s64": {
+          "ratio": 1.274,
+          "interval_95": [
+            1.266,
+            1.282
+          ]
+        },
+        "prune-w256-s64 / prunetb-w256-s64": {
+          "ratio": 1.355,
+          "interval_95": [
+            1.341,
+            1.369
+          ]
+        }
+      },
+      "secondary": {
+        "v2-w1024 / prunetb-w1024-s64": {
+          "ratio": 1.927,
+          "interval_95": [
+            1.864,
+            1.989
+          ]
+        },
+        "v2-w1024 / prunetb-w256-s64": {
+          "ratio": 2.311,
+          "interval_95": [
+            2.209,
+            2.417
+          ]
+        }
+      }
+    },
+    {
+      "run_id": "dev",
+      "kind": "development",
+      "status": "fixtures and smoke test dev-tb-01; not results",
+      "readme": "experiments/2026-11-18-prune-term-bounds/runs/dev/README.md"
+    }
+  ]
+}
