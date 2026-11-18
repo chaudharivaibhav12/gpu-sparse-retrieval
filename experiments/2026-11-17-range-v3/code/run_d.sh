@@ -30,6 +30,9 @@ if [ "$DRY" != 1 ]; then
     [ "$NQ" = 500 ] && [ "$ROUNDS" = 20 ] && [ "$WARMUPS" = 3 ] || { echo "Registered settings only (500 queries, 3 + 20 rounds)"; exit 1; }
     test -z "$(git status --porcelain --untracked-files=no)" || { echo "Commit source changes before a recorded run"; exit 1; }
 fi
+# CONTENDED=1: exploratory run on a shared GPU (code/session_lib.sh); run ID must say "contended";
+# never used for the registered decision rules.
+[ "${CONTENDED:-0}" != 1 ] || [[ "$RUN_ID" == *contended* ]] || { echo "CONTENDED=1 needs a run ID containing 'contended'"; exit 1; }
 test ! -e "$RUN" || { echo "Refusing to reuse $RUN"; exit 1; }
 mkdir -p "$RUN/logs" "$RUN/raw" "$RUN/analysis"
 stage() { echo "$(date -u +%FT%TZ) STAGE $*" | tee -a "$RUN/logs/stages.txt"; }
@@ -108,14 +111,16 @@ stage analysis
 python3 "$X/analysis/analyze_d.py" "$RUN" --protocol "$X/configs/protocol.json" --queries "$NQ" --rounds "$ROUNDS" --warmups "$WARMUPS" \
     --output "$RUN/analysis/paired-statistics.json" > "$RUN/logs/analyze.log" 2>&1 || fail analysis
 python3 "$X/analysis/stats_d.py" "$RUN" --output "$RUN/analysis/stats.json" > "$RUN/logs/stats.log" 2>&1 || fail "stats analysis"
+python3 "$X/analysis/contention_d.py" "$RUN" --output "$RUN/analysis/contention.json" > "$RUN/logs/contention.log" 2>&1 || fail "contention analysis"
 [ "$DRY" = 1 ] && { echo "DRY_RUN_COMPLETE $RUN"; exit 0; }
 stage manifest
-python3 experiments/2026-11-13-range-bitpack/code/write_manifest.py "$RUN" --status completed-measurement-D \
-    --scope "Measurement D (configs/protocol.json): cuda5; 1M documents; {ctrl, v3-2, v3-3r} x W {1024, 4096} x k {10, 16, 32, 100, 1000}; 256 threads; 500 calibration queries; batch 1; 3 rotating processes per cell; 3 warm-up + 20 measured rounds; stats set (v3-all stats build, W 1024/4096, k 10/100/1000, untimed); CPU theta reference; not recorded by the team runtime" \
+if [ "${CONTENDED:-0}" = 1 ]; then STATUS=exploratory-contended; SCOPE="EXPLORATORY, not registered, GPU shared with other users (CONTENDED=1: no idle wait, overlaps recorded, not replaced); same matrix as Measurement D:"; else STATUS=completed-measurement-D; SCOPE="Measurement D (configs/protocol.json):"; fi
+python3 experiments/2026-11-13-range-bitpack/code/write_manifest.py "$RUN" --status "$STATUS" \
+    --scope "$SCOPE cuda5; 1M documents; {ctrl, v3-2, v3-3r} x W {1024, 4096} x k {10, 16, 32, 100, 1000}; 256 threads; 500 calibration queries; batch 1; 3 rotating processes per cell; 3 warm-up + 20 measured rounds; stats set (v3-all stats build, W 1024/4096, k 10/100/1000, untimed); CPU theta reference; not recorded by the team runtime" \
     --flags "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6), build_variants.sh; stats build -DRBP_V3_STATS=1; v3-3r = v3-3 with crossover argument 1" \
     --input "$Q" --input "$GSP" --input "$(index 1024)" --input "$(index 4096)" --input "$O/cpu-top10-1000000.tsv" --input "$O/cpu-top100-1000000.tsv" --input "$O/cpu-top1000-1000000.tsv" \
     --binary "$BIN_ROOT/ctrl/scorer" --binary "$BIN_ROOT/v3-2/scorer" --binary "$BIN_ROOT/v3-3/scorer" --binary "$STATS_ROOT/v3-all/scorer" \
     --source "$X/configs/protocol.json" --source "$X/code/run_d.sh" --source "$X/code/session_lib.sh" --source "$X/code/overlap.py" \
-    --source "$X/analysis/analyze_d.py" --source "$X/analysis/stats_d.py" --source "$X/analysis/theta_cpu.cpp" --source "$COMPARE" > /dev/null
+    --source "$X/analysis/analyze_d.py" --source "$X/analysis/stats_d.py" --source "$X/analysis/contention_d.py" --source "$X/analysis/theta_cpu.cpp" --source "$COMPARE" > /dev/null
 stage done
 echo "RUN_COMPLETE $RUN"

@@ -178,6 +178,13 @@
       "after": "Measurements A and B reported; owner decisions: change 1 dropped, uniform v3-3 preferred",
       "change": "Measurement D registered (measurement_D): W=4096 is added for this measurement only (not_in_this_registration listed other range sizes); v3-3 with crossover argument 1 is timed as v3-3r at k=10/16/32/100/1000; v3-1 and v3-all are not timed again (the v3-all stats build is used for counts only).",
       "reason": "Owner questions Q1-Q3 (measurement_D.questions)."
+    },
+    {
+      "date": "2026-11-18 UTC",
+      "after": "Measurement D session 1 (20261117-cuda5-measureD-01) stopped by the overlap rule in the k=16 set (another user's short GPU processes); k=10 complete, not analysed",
+      "change": "Owner decisions: (1) Measurement D is rerun in full and unchanged as 20261117-cuda5-measureD-02 behind a 5-minute quiet-GPU pre-launch wait; session 1 is kept as a failed attempt and its data are not combined with session 2. (2) Before that, an EXPLORATORY run 20261117-cuda5-contendedD-01 of the same matrix with CONTENDED=1 (code/session_lib.sh: no idle wait for other users' processes, overlaps recorded but not replaced; our own jobs still serialised), with per-process GPU-sharing summaries (analysis/contention_d.py from the poll and pmon monitors). It is not a registered measurement: R1-R3 are decided only from session 2; the contended run is reported separately as diagnostic, alongside session 2 to show how sharing affects the ratios.",
+      "reason": "cuda5 is shared and was busy (another user's ~10 GB job and bursts of short GPU processes). Nsight Systems GPU metrics could not be used to observe other users' work (the GPU was already under another profiling session), so sharing is measured from the per-process monitors.",
+      "gpu_time": "contended run about 19 minutes, session 2 about 19 minutes; owner approved going over the earlier 30-minute estimate"
     }
   ],
   "measurement_D": {
@@ -256,6 +263,6 @@
     "gpu_time_estimate": "gates used about 11.5 minutes of wall time (mostly fixtures); remaining for the session about 19 minutes of GPU process time (90 timed processes about 18 minutes from Measurement A process durations and the gate durations at W=4096; stats set about 1 minute); idle waits and CPU-side oracle checks come on top. Within the owner's 30-minute go-ahead.",
     "stopping": "as stopping; a gate failure stops Measurement D and is reported (no kernel fix in this measurement)",
     "report": "a 'Measurement D' section appended to report.md; the Measurement A and B sections are unchanged",
-    "launch": "the session is started only once the GPU has no compute process (a pre-launch wait on cuda5); within the session gpu_policy applies unchanged"
+    "launch": "session 2 (20261117-cuda5-measureD-02, the registered measurement) starts only after the GPU has had no compute process for 5 consecutive minutes (checked every 30 s; the launcher gives up after 12 hours); within the session gpu_policy applies unchanged"
   }
 }

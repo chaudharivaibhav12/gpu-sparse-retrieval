@@ -8,6 +8,8 @@
 #  - a process overlaps if a GPU process not owned by our user is seen between its start and
 #    end (1 s margin); it is preserved as <tag>-overlap-<n> and its slot is rerun, at most 3
 #    replacements per slot, then the session stops.
+#  - CONTENDED=1 (exploratory, never a registered measurement): no wait for other users'
+#    processes and no replacement; every overlap is still recorded per process.
 UID_SELF=$(id -u)
 REPLACEMENTS_MAX=${REPLACEMENTS_MAX:-3}
 
@@ -18,6 +20,8 @@ wait_idle() {   # $1 tag
         ours=$(pgrep -u "$UID_SELF" -fc "[/]scorer |[n]sys profile|[n]cu " || true)
         echo "$(date -u +%FT%T.%3NZ) $tag compute_apps=$apps our_gpu_jobs=$ours gpu=[$(nvidia-smi --query-gpu=memory.used,utilization.gpu,clocks.sm,temperature.gpu,pstate --format=csv,noheader)]" >> "$RUN/logs/idle-checks.txt"
         [ "$apps" = 0 ] && [ "$ours" = 0 ] && return 0
+        # CONTENDED=1 (exploratory runs only): other users' processes are logged, not waited for.
+        [ "${CONTENDED:-0}" = 1 ] && [ "$ours" = 0 ] && return 0
         [ "$waited" -ge 1800 ] && fail "GPU not idle for 30 minutes before $tag"
         sleep 30; waited=$((waited+30))
     done
@@ -68,6 +72,8 @@ run_slot() {
         if python3 "$X/code/overlap.py" "$RUN" --tag "$tag" --attempt "$n" --pid "$pid" --start "$start" --end "$end" >> "$RUN/logs/overlap-checks.jsonl"; then
             SLOT_ATTEMPTS=$((n+1)); return 0
         fi
+        # CONTENDED=1: an overlap is recorded (overlap-checks.jsonl) and kept, not replaced.
+        if [ "${CONTENDED:-0}" = 1 ]; then SLOT_ATTEMPTS=$((n+1)); return 0; fi
         n=$((n+1))
         for f in "$RUN/raw/$tag".*; do mv "$f" "$RUN/raw/$tag-overlap-$n.${f#"$RUN/raw/$tag".}"; done
         echo "$(date -u +%FT%TZ) OVERLAP $tag preserved as $tag-overlap-$n" | tee -a "$RUN/logs/stages.txt"
