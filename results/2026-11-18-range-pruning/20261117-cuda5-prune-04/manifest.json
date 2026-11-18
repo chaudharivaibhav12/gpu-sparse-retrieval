@@ -1,0 +1,2152 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-18-range-pruning",
+  "run_id": "20261117-cuda5-prune-04",
+  "status": "completed-timing",
+  "scope": "host cuda5; GPU GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7; 8841823 documents; 500 calibration queries; k=10; configurations v2-w1024 v2-w512 v2-w256 prune-w1024-s0 prune-w1024-s64 prune-w512-s0 prune-w512-s64 prune-w256-s0 prune-w256-s64; fixtures, gate and correctness checks then 3 processes each in rotating order; 3 warm-up + 20 measured rounds; CPU_LIMIT 4.0 cores; replacements v2-w1024=0 v2-w512=0 v2-w256=1 prune-w1024-s0=1 prune-w1024-s64=0 prune-w512-s0=1 prune-w512-s64=0 prune-w256-s0=0 prune-w256-s64=2 ; binaries, fixtures and correctness reused from 20261117-cuda5-prune-03 (logs/reuse.txt)",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "0dc7b3bbf796f64e6efc81b10e230b84ac3e5399",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17; g++ -O3 -std=c++17 -pthread",
+    "source_sha256": {
+      "src/cuda_range_v2.cu": "9515dfe1addeb1eea6a4b65b8144190ec32ec5909870d8ba2508df3d2560af2e",
+      "src/cuda_range_prune.cu": "1c5e3ebb88358c697ab9c75f5c8834f734742820b647cdee1f0fc9e0121f82b1",
+      "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+      "src/range_bitpack.h": "98fb4ae1e2f3a01bc214d749c47eaa59dbeb17ad0726cc2a18fd1125d9c9c37c",
+      "src/range_bitpack_tool.cpp": "efbe1d3d0fb0627246c338903ace4d80b84e7937796ee309b71b48e86ea2e41f",
+      "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+      "src/research_runtime.h": "949757134d97142fa1f5d6e56a79cc61b596d706c0c0ea1577485ca0325d1c59",
+      "tests/check_range_bitpack.py": "12c65d6e53e901ead26a412d59860de48fe51b1225a03239832b4d66ac77f7de",
+      "tests/check_range_prune.py": "0150fa88d171577e748a682200c445ea8259aeae92be951e4161d8a1a6695b9b",
+      "experiments/2026-11-18-range-pruning/configs/configs.tsv": "8b9fb182325972efb7db816550086efbbd361c13fc2596c18f43ade2219c93dc",
+      "experiments/2026-11-18-range-pruning/code/gate.py": "016982e4c3d386c6228dbef4a88e63124e73001bbe8302264a04ebee3a9d866e",
+      "experiments/2026-11-18-range-pruning/code/expect.py": "d33151968fa014af6c24563d2720e8476a0266652a3d7c7f39e2388424512412",
+      "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py": "ca43fb45ed74e0fc8d24c14898ac8ae3d32c7ebd3f805b55f6d59db87378d18e",
+      "experiments/2026-11-18-range-pruning/analysis/analyze.py": "6bb8479570d3bfc120e0f8f17a850ed30f3d7618017b309427e5aa1b3ac47078",
+      "experiments/2026-11-18-range-pruning/code/run.sh": "c14f62196e23eeaa9c902361572342935c2d8f98f437607800dc3c034d95e0be"
+    },
+    "binary_sha256": {
+      "build/20261117-cuda5-prune-04/cuda_range_v2": "c86a43c1bd773b8830344c2a0d43840934123b5aed62dc322854294ea1933afd",
+      "build/20261117-cuda5-prune-04/cuda_range_prune": "8263e363ba540c5539269b5353e85cca8b11ecf7dba5d2548126ff9e54fa9b55",
+      "build/20261117-cuda5-prune-04/range_bitpack_tool": "9ce426d0a07cb8a3bc7ecf9816376f355060ea09f622de92e1b885145b4760e6"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "/scratch/psp8502/full/full-8841823.gsp": {
+      "sha256": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac",
+      "bytes": 5388181537
+    },
+    "/scratch/psp8502/full/full-8841823-w1024.rbp": {
+      "sha256": "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab",
+      "bytes": 3638491070
+    },
+    "/scratch/psp8502/full/full-8841823-w512.rbp": {
+      "sha256": "d35a69909ea2507e29ac6c27edc96b4ca259e69614f9aca5029c6801d3f408a0",
+      "bytes": 4078820119
+    },
+    "/scratch/psp8502/full/full-8841823-w256.rbp": {
+      "sha256": "0ad6531c7698c7541fd9f6d62fb4fa34619e4b765656cccfa3d13fdc64202892",
+      "bytes": 4705954185
+    },
+    "/scratch/psp8502/full/oracle/cpu-top10-8841823.tsv": {
+      "sha256": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed",
+      "bytes": 116558
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_12.6.r12.6/compiler.35059454_0"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w1024-s64 --rounds 1 --warmups 0 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --seeds 16 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/reject-prune-seeds.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/reject-prune-seeds.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/reject-prune-seeds.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/reject-prune-seeds.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/reject-prune-seeds.tsv 500 10 0 0 1 0 256 256 - 64",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py v2-w1024 --rounds 1 --warmups 0 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/reject-v2-threads.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/reject-v2-threads.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/reject-v2-threads.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 build/20261117-cuda5-prune-04/cuda_range_v2 /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/reject-v2-threads.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/reject-v2-threads.tsv 500 10 0 0 1 0 128 128 -",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py v2-w1024 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-v2-w1024.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-v2-w1024.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w1024.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_v2 /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w1024.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w1024.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w1024.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r0-v2-w1024.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py v2-w512 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w512.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-v2-w512.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-v2-w512.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w512.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_v2 /scratch/psp8502/full/full-8841823-w512.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w512.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w512.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w512.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r0-v2-w512.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py v2-w256 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-v2-w256.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-v2-w256.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w256.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_v2 /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w256.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w256.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w256.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r0-v2-w256.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w1024-s0 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-prune-w1024-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-prune-w1024-s0.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w1024-s0.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w1024-s0.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w1024-s0.tsv 500 10 0 0 20 3 256 256 - 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w1024-s0.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r0-prune-w1024-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w1024-s64 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-prune-w1024-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-prune-w1024-s64.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w1024-s64.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w1024-s64.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w1024-s64.tsv 500 10 0 0 20 3 256 256 - 64",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w1024-s64.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r0-prune-w1024-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w512-s0 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w512.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-prune-w512-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-prune-w512-s0.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w512-s0.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w512.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w512-s0.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w512-s0.tsv 500 10 0 0 20 3 256 256 - 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w512-s0.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r0-prune-w512-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w512-s64 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w512.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-prune-w512-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-prune-w512-s64.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w512-s64.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w512.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w512-s64.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w512-s64.tsv 500 10 0 0 20 3 256 256 - 64",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w512-s64.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r0-prune-w512-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w256-s0 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-prune-w256-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-prune-w256-s0.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w256-s0.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w256-s0.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w256-s0.tsv 500 10 0 0 20 3 256 256 - 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w256-s0.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r0-prune-w256-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w256-s64 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-prune-w256-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r0-prune-w256-s64.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w256-s64.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w256-s64.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w256-s64.tsv 500 10 0 0 20 3 256 256 - 64",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w256-s64.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r0-prune-w256-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w1024-s0 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w1024-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w1024-s0.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w1024-s0.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w1024-s0.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w1024-s0.tsv 500 10 0 0 20 3 256 256 - 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w1024-s0.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r1-prune-w1024-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w1024-s64 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w1024-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w1024-s64.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w1024-s64.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w1024-s64.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w1024-s64.tsv 500 10 0 0 20 3 256 256 - 64",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w1024-s64.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r1-prune-w1024-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w512-s0 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w512.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w512-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w512-s0.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w512-s0.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w512.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w512-s0.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w512-s0.tsv 500 10 0 0 20 3 256 256 - 0",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w512-s0 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w512.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w512-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w512-s0.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w512-s0.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w512.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w512-s0.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w512-s0.tsv 500 10 0 0 20 3 256 256 - 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w512-s0.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r1-prune-w512-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w512-s64 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w512.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w512-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w512-s64.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w512-s64.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w512.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w512-s64.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w512-s64.tsv 500 10 0 0 20 3 256 256 - 64",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w512-s64.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r1-prune-w512-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w256-s0 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w256-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w256-s0.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w256-s0.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w256-s0.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w256-s0.tsv 500 10 0 0 20 3 256 256 - 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w256-s0.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r1-prune-w256-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w256-s64 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w256-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-prune-w256-s64.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w256-s64.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w256-s64.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w256-s64.tsv 500 10 0 0 20 3 256 256 - 64",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w256-s64.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r1-prune-w256-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py v2-w1024 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-v2-w1024.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-v2-w1024.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w1024.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_v2 /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w1024.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w1024.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w1024.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r1-v2-w1024.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py v2-w512 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w512.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-v2-w512.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-v2-w512.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w512.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_v2 /scratch/psp8502/full/full-8841823-w512.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w512.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w512.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w512.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r1-v2-w512.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py v2-w256 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-v2-w256.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r1-v2-w256.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w256.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_v2 /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w256.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w256.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w256.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r1-v2-w256.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w512-s64 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w512.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w512-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w512-s64.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w512-s64.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w512.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w512-s64.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w512-s64.tsv 500 10 0 0 20 3 256 256 - 64",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w512-s64.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r2-prune-w512-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w256-s0 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w256-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w256-s0.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s0.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s0.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s0.tsv 500 10 0 0 20 3 256 256 - 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s0.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r2-prune-w256-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w256-s64 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w256-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w256-s64.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s64.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s64.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s64.tsv 500 10 0 0 20 3 256 256 - 64",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w256-s64 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w256-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w256-s64.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s64.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s64.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s64.tsv 500 10 0 0 20 3 256 256 - 64",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w256-s64 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w256-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w256-s64.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s64.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s64.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s64.tsv 500 10 0 0 20 3 256 256 - 64",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s64.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r2-prune-w256-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py v2-w1024 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-v2-w1024.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-v2-w1024.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w1024.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_v2 /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w1024.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w1024.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w1024.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r2-v2-w1024.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py v2-w512 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w512.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-v2-w512.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-v2-w512.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w512.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_v2 /scratch/psp8502/full/full-8841823-w512.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w512.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w512.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w512.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r2-v2-w512.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py v2-w256 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-v2-w256.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-v2-w256.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w256.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_v2 /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w256.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w256.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py v2-w256 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-v2-w256.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-v2-w256.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w256.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_v2 /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w256.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w256.tsv 500 10 0 0 20 3 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w256.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r2-v2-w256.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w1024-s0 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w1024-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w1024-s0.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w1024-s0.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w1024-s0.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w1024-s0.tsv 500 10 0 0 20 3 256 256 - 0",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w1024-s0 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w1024-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w1024-s0.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w1024-s0.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w1024-s0.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w1024-s0.tsv 500 10 0 0 20 3 256 256 - 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w1024-s0.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r2-prune-w1024-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w1024-s64 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w1024-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w1024-s64.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w1024-s64.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w1024-s64.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w1024-s64.tsv 500 10 0 0 20 3 256 256 - 64",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w1024-s64.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r2-prune-w1024-s64.json",
+    "python3 experiments/2026-11-18-range-pruning/code/expect.py prune-w512-s0 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w512.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w512-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/expect/timing-r2-prune-w512-s0.json --receipt /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w512-s0.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261117-cuda5-prune-04/cuda_range_prune /scratch/psp8502/full/full-8841823-w512.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w512-s0.csv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w512-s0.tsv 500 10 0 0 20 3 256 256 - 0",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w512-s0.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/compare-timing-r2-prune-w512-s0.json",
+    "python3 experiments/2026-11-18-range-pruning/analysis/analyze.py /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04 --processes 3 --warmups 3 --rounds 20 --cpu-limit 4.0 --output /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04/analysis/statistics.json"
+  ],
+  "artifacts": {
+    "analysis/compare-timing-r0-prune-w1024-s0.json": {
+      "sha256": "efb713271579648b550c81c1acf9375fc40a792babfe0ff9824f1565d2cfd8f1",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r0-prune-w1024-s64.json": {
+      "sha256": "f5524925581128c78e25f84921853502eeec8c33e5632979d77d4ff475d9459a",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r0-prune-w256-s0.json": {
+      "sha256": "a69fa5c9226462f42566509bc73b7b6dea1c2145d78ad1a3c094b8a73403f96b",
+      "bytes": 366
+    },
+    "analysis/compare-timing-r0-prune-w256-s64.json": {
+      "sha256": "620e208f2fdf39fb3f06feb07643b95b80f2bf10436a8d3272af9e35648b03fb",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r0-prune-w512-s0.json": {
+      "sha256": "95ec4237629f3b836c34772614382f8c07283f7ae95af9e12caf7fa20a65313d",
+      "bytes": 366
+    },
+    "analysis/compare-timing-r0-prune-w512-s64.json": {
+      "sha256": "990e2aa14d01414315fcd6c99b46bd4ba6e3693a23c179ce66a8c9970f8327b9",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r0-v2-w1024.json": {
+      "sha256": "c801a30d485fc76dc2d2cfa50d30f74d703b0daaa4fb626e5e4f062ce676d0f4",
+      "bytes": 361
+    },
+    "analysis/compare-timing-r0-v2-w256.json": {
+      "sha256": "3c8a03cd9cd21e251718b7bbd4f39c3c2162a58beb55a09093e107bd2b37f24c",
+      "bytes": 360
+    },
+    "analysis/compare-timing-r0-v2-w512.json": {
+      "sha256": "73d686702837270a27d3ccdda423cba3ae60f1672087cf7c7e2d185257ccc7e5",
+      "bytes": 360
+    },
+    "analysis/compare-timing-r1-prune-w1024-s0.json": {
+      "sha256": "fe2406129882cc48717aa618dea6f1da4b70bb8d2bf4cb2aa3d451ebdc466a52",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r1-prune-w1024-s64.json": {
+      "sha256": "c1b7540772605863318e7165b4aff0ef9c953362d9c5a0f0025d7ca5086fc732",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r1-prune-w256-s0.json": {
+      "sha256": "b0f831d4d321f3fea60b4b154d9f4e229144767a9266d802603ef333df903f53",
+      "bytes": 366
+    },
+    "analysis/compare-timing-r1-prune-w256-s64.json": {
+      "sha256": "6346d4411463e0c34629ec7669ad887858ad65c8a881fdf96164ace107dc317d",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r1-prune-w512-s0.json": {
+      "sha256": "1ba98ba0f2cf7371809f48972c3b509d02bd594f1d534fe2015b964a8d8dcf69",
+      "bytes": 366
+    },
+    "analysis/compare-timing-r1-prune-w512-s64.json": {
+      "sha256": "96dca38fd4de82523840573729dd8d285ae65ade9c6778218f15f499239cce93",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r1-v2-w1024.json": {
+      "sha256": "ea99e1fa41004b7431ecabf27fc1c0e1b1cadb123b92f46ef094780e184bccf9",
+      "bytes": 361
+    },
+    "analysis/compare-timing-r1-v2-w256.json": {
+      "sha256": "0c832e1c47a80100cc2bd86398ba5db776346d201b09567c02e91b3fd4d919f6",
+      "bytes": 360
+    },
+    "analysis/compare-timing-r1-v2-w512.json": {
+      "sha256": "e9bb8b5ba9c45b9718320898400338a0194d6b356222ff561de6cef1ba58d63a",
+      "bytes": 360
+    },
+    "analysis/compare-timing-r2-prune-w1024-s0.json": {
+      "sha256": "acf3575f84c5ba1718b60f35b4bdd875b65693211b3c26f9dd1ad527e79a23c8",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r2-prune-w1024-s64.json": {
+      "sha256": "933f3fd5d3685f0c78400b7e2c4e5a02a71ddeab25b2ec6a0510c232169d2efa",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r2-prune-w256-s0.json": {
+      "sha256": "1096d69e90ebb02b1857e668ae37490a39a4072577a7c808fe8566f07476176a",
+      "bytes": 366
+    },
+    "analysis/compare-timing-r2-prune-w256-s64.json": {
+      "sha256": "e35eae57a2365b8c623afe087baa9bdbe6a94c08fe1b90c13a031c8fdbacb475",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r2-prune-w512-s0.json": {
+      "sha256": "ba96cfee930b5501a020efab1baaef3ac7ce0d6a512c2a00f60795f4f2d10d31",
+      "bytes": 366
+    },
+    "analysis/compare-timing-r2-prune-w512-s64.json": {
+      "sha256": "f2674ffea72db1b4b83504a2ce5b8515fcb8e7f53f839ba26ef5e5c7ea7a6446",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r2-v2-w1024.json": {
+      "sha256": "a52ed5812f7921dc1388db0855c4e74d4c1760877cc1661834561ca54efea092",
+      "bytes": 361
+    },
+    "analysis/compare-timing-r2-v2-w256.json": {
+      "sha256": "1b8006137622a7b1909c0d5b88f76af0ab67f0646fabcb2e50fe0990c22ec06a",
+      "bytes": 360
+    },
+    "analysis/compare-timing-r2-v2-w512.json": {
+      "sha256": "a5425ff7224a717d0931a66f300775642e41c47b992a852a11957b40a692543d",
+      "bytes": 360
+    },
+    "analysis/statistics.json": {
+      "sha256": "3ca059ae9b9dd585a63cf5b1744097435570291eebc1919e03765ffd18c95110",
+      "bytes": 8439
+    },
+    "configs.tsv": {
+      "sha256": "8b9fb182325972efb7db816550086efbbd361c13fc2596c18f43ade2219c93dc",
+      "bytes": 362
+    },
+    "expect/reject-prune-seeds.json": {
+      "sha256": "90a2ee2ad2a4d282c2cdea3a975ff601fc439fed1a08e77186dc86c5aa2b60f8",
+      "bytes": 1219
+    },
+    "expect/reject-v2-threads.json": {
+      "sha256": "f8b3eeba18d4ea70fbeb065bd270ffe99e1525c418fbd03ff6b3b08e85b5870c",
+      "bytes": 1037
+    },
+    "expect/timing-r0-prune-w1024-s0.json": {
+      "sha256": "964be28aa9008104db1e68987abf6b0e460e8610a58a6ca924999b031b04d1dd",
+      "bytes": 1219
+    },
+    "expect/timing-r0-prune-w1024-s64.json": {
+      "sha256": "6b4722e063ca91ee4992622d91a01d648cb5aedc04d7af90b64603651e3ef073",
+      "bytes": 1220
+    },
+    "expect/timing-r0-prune-w256-s0.json": {
+      "sha256": "f30f0add3316ca92e2db9ea367579c195035a8b0eff7df95ce3106d851e29eea",
+      "bytes": 1218
+    },
+    "expect/timing-r0-prune-w256-s64.json": {
+      "sha256": "b4d7cb29cb76448073c4e9a80c4f815caafbff80f67e24fb5d310e7f464e00d3",
+      "bytes": 1219
+    },
+    "expect/timing-r0-prune-w512-s0.json": {
+      "sha256": "39c4684d18c35ecda3c9b4fb212763c911b9d3a1d1a082d1b9b9e7752b7a668a",
+      "bytes": 1218
+    },
+    "expect/timing-r0-prune-w512-s64.json": {
+      "sha256": "dc34f7c5f25dfe0bff2bd64b7acf9c2e350c8957dcad29018ced3f5062457242",
+      "bytes": 1219
+    },
+    "expect/timing-r0-v2-w1024.json": {
+      "sha256": "91b3d8dcec60a57095ccf472d2bde3cc35e02b8591fdb9c61dbed6c00b351c30",
+      "bytes": 1038
+    },
+    "expect/timing-r0-v2-w256.json": {
+      "sha256": "616697d0945bb239af3cdf75fc45f691cd281819c0a259b54e2fb88ab498e099",
+      "bytes": 1037
+    },
+    "expect/timing-r0-v2-w512.json": {
+      "sha256": "889f9865b9ee68ae8fcc5b7c88b35a735a9591f26cdb90ed260260c76dfdd7b7",
+      "bytes": 1037
+    },
+    "expect/timing-r1-prune-w1024-s0.json": {
+      "sha256": "964be28aa9008104db1e68987abf6b0e460e8610a58a6ca924999b031b04d1dd",
+      "bytes": 1219
+    },
+    "expect/timing-r1-prune-w1024-s64.json": {
+      "sha256": "6b4722e063ca91ee4992622d91a01d648cb5aedc04d7af90b64603651e3ef073",
+      "bytes": 1220
+    },
+    "expect/timing-r1-prune-w256-s0.json": {
+      "sha256": "f30f0add3316ca92e2db9ea367579c195035a8b0eff7df95ce3106d851e29eea",
+      "bytes": 1218
+    },
+    "expect/timing-r1-prune-w256-s64.json": {
+      "sha256": "b4d7cb29cb76448073c4e9a80c4f815caafbff80f67e24fb5d310e7f464e00d3",
+      "bytes": 1219
+    },
+    "expect/timing-r1-prune-w512-s0.json": {
+      "sha256": "39c4684d18c35ecda3c9b4fb212763c911b9d3a1d1a082d1b9b9e7752b7a668a",
+      "bytes": 1218
+    },
+    "expect/timing-r1-prune-w512-s64.json": {
+      "sha256": "dc34f7c5f25dfe0bff2bd64b7acf9c2e350c8957dcad29018ced3f5062457242",
+      "bytes": 1219
+    },
+    "expect/timing-r1-v2-w1024.json": {
+      "sha256": "91b3d8dcec60a57095ccf472d2bde3cc35e02b8591fdb9c61dbed6c00b351c30",
+      "bytes": 1038
+    },
+    "expect/timing-r1-v2-w256.json": {
+      "sha256": "616697d0945bb239af3cdf75fc45f691cd281819c0a259b54e2fb88ab498e099",
+      "bytes": 1037
+    },
+    "expect/timing-r1-v2-w512.json": {
+      "sha256": "889f9865b9ee68ae8fcc5b7c88b35a735a9591f26cdb90ed260260c76dfdd7b7",
+      "bytes": 1037
+    },
+    "expect/timing-r2-prune-w1024-s0.json": {
+      "sha256": "964be28aa9008104db1e68987abf6b0e460e8610a58a6ca924999b031b04d1dd",
+      "bytes": 1219
+    },
+    "expect/timing-r2-prune-w1024-s64.json": {
+      "sha256": "6b4722e063ca91ee4992622d91a01d648cb5aedc04d7af90b64603651e3ef073",
+      "bytes": 1220
+    },
+    "expect/timing-r2-prune-w256-s0.json": {
+      "sha256": "f30f0add3316ca92e2db9ea367579c195035a8b0eff7df95ce3106d851e29eea",
+      "bytes": 1218
+    },
+    "expect/timing-r2-prune-w256-s64.json": {
+      "sha256": "b4d7cb29cb76448073c4e9a80c4f815caafbff80f67e24fb5d310e7f464e00d3",
+      "bytes": 1219
+    },
+    "expect/timing-r2-prune-w512-s0.json": {
+      "sha256": "39c4684d18c35ecda3c9b4fb212763c911b9d3a1d1a082d1b9b9e7752b7a668a",
+      "bytes": 1218
+    },
+    "expect/timing-r2-prune-w512-s64.json": {
+      "sha256": "dc34f7c5f25dfe0bff2bd64b7acf9c2e350c8957dcad29018ced3f5062457242",
+      "bytes": 1219
+    },
+    "expect/timing-r2-v2-w1024.json": {
+      "sha256": "91b3d8dcec60a57095ccf472d2bde3cc35e02b8591fdb9c61dbed6c00b351c30",
+      "bytes": 1038
+    },
+    "expect/timing-r2-v2-w256.json": {
+      "sha256": "616697d0945bb239af3cdf75fc45f691cd281819c0a259b54e2fb88ab498e099",
+      "bytes": 1037
+    },
+    "expect/timing-r2-v2-w512.json": {
+      "sha256": "889f9865b9ee68ae8fcc5b7c88b35a735a9591f26cdb90ed260260c76dfdd7b7",
+      "bytes": 1037
+    },
+    "logs/analyze.log": {
+      "sha256": "585d078904319bd6b5f1dcca2844b6dd65e6d6f57ea4addc8b3fef7e1bd19cff",
+      "bytes": 1620
+    },
+    "logs/binaries-sha256.txt": {
+      "sha256": "4004755e5d3bc04a6b873d3b9f029bd7758846989848135b9e716c5462f85160",
+      "bytes": 338
+    },
+    "logs/busy-timing-r2-prune-w1024-s0.txt": {
+      "sha256": "a85acf0ac5150fa23359c2ba25f7d2cbb934765b5a1613a162bb61970b93ff15",
+      "bytes": 76
+    },
+    "logs/busy-timing-r2-prune-w1024-s64.txt": {
+      "sha256": "24de593d20e6cf94815b53731fef2b3ab39c071a1d5c3b5bde903f655cb55919",
+      "bytes": 76
+    },
+    "logs/busy-timing-r2-prune-w256-s0.txt": {
+      "sha256": "525fc97a60ac996d760920f1c5e99569a9f73ca4489265ee7be684ffa1cf650f",
+      "bytes": 76
+    },
+    "logs/busy-timing-r2-prune-w256-s64.txt": {
+      "sha256": "a1beaa8d0f334380e06686252840fe375b74c9b8f5821946afa68370ab7d7ed8",
+      "bytes": 152
+    },
+    "logs/busy-timing-r2-v2-w256.txt": {
+      "sha256": "aec088a4d3b4ddc51d7015ef73c8933a48bf71ca083734fcc1638e22cfba651c",
+      "bytes": 76
+    },
+    "logs/busy-timing-r2-v2-w512.txt": {
+      "sha256": "880b3d970434a56ce873ede65a8b5920bcfac391c62357fd10e9df86c799d83a",
+      "bytes": 76
+    },
+    "logs/commands.txt": {
+      "sha256": "1f475051b2c9fb707b5b3863248cea3aabeb16366b32aa2edf77351016995862",
+      "bytes": 49991
+    },
+    "logs/commit.txt": {
+      "sha256": "4de8c4a9329d1931f0dcf3b051031ec8666c69664508f51e59552f5e83712565",
+      "bytes": 41
+    },
+    "logs/environment.txt": {
+      "sha256": "b3f7865f2562ade8cf8ed768384387638f6298f7632505e404387d27a5796809",
+      "bytes": 988
+    },
+    "logs/gate.txt": {
+      "sha256": "1e849f6e1d0dc0ae1ff1265ac7c1ac892e96f63599201efb41141961cdff9c5e",
+      "bytes": 2081
+    },
+    "logs/inputs-sha256.txt": {
+      "sha256": "7fd29e93cde7dc879e7d0108b657712c895694bcb00c50f9239fd4cfe40b6963",
+      "bytes": 652
+    },
+    "logs/order.txt": {
+      "sha256": "d9cb7ed8a5befc5bfbde4b0bdce696e9f53d5f73c54602de34c8503ed631e84a",
+      "bytes": 660
+    },
+    "logs/quiet-timing-r0-prune-w1024-s0.txt": {
+      "sha256": "ef6280091e03af9ecfa7a37e26b2d5dbde15d4df059b63a65bfdf0dacf7f77ff",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r0-prune-w1024-s64.txt": {
+      "sha256": "491e0e38b306bc994918aa927be86438e2e4a01201944d1478c3ff8d603a5e39",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r0-prune-w256-s0.txt": {
+      "sha256": "4f955c9417642b56ba0bc38f2092d3afb8854c492ac679436b9a2d25896907d4",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r0-prune-w256-s64.txt": {
+      "sha256": "2962f5e5eca7d02d17378e4de345025ea919748394b72ae926b64b8a7f152277",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r0-prune-w512-s0.txt": {
+      "sha256": "b3e72dac03f1bfb70813a01d29d65ef83a479367f37dd2800e321edafb041b17",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r0-prune-w512-s64.txt": {
+      "sha256": "3eef3af609a134b04e7e7f885e0475e82d2e066d6a4c36d93de5cb33ce3d3836",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r0-v2-w1024.txt": {
+      "sha256": "18e5e86666a99805631e0bc4126ab7a083ca922517c646844abcbad38db9fd37",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r0-v2-w256.txt": {
+      "sha256": "4d5534ded362e0c04d0ab8bdcf098d1605e72e1484faf06574a4a968231418e7",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r0-v2-w512.txt": {
+      "sha256": "a73597860075ad5325e7362d6ab89ee1028bdd065d97a020281431940a508ae4",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r1-prune-w1024-s0.txt": {
+      "sha256": "d8b29be322ca6280dd231b91faa724c379e72ec5eba7bb03a60c09bc4fa8a013",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r1-prune-w1024-s64.txt": {
+      "sha256": "2390d08911c4489f270b45efff1795c97537410ed27a25c9c098696eb8e55aba",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r1-prune-w256-s0.txt": {
+      "sha256": "fe858dfb8fa290aa3b6a3e24158e930d0a9534ad7d4a0a5fb97d852010d77c54",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r1-prune-w256-s64.txt": {
+      "sha256": "d0e9979714a1cf623d771446afde475e04434a58542e1173ec2921965fa8995f",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r1-prune-w512-s0.txt": {
+      "sha256": "5997790850fdf40952caaca59977e726b7eea9d942be2a986ee34e2632820006",
+      "bytes": 154
+    },
+    "logs/quiet-timing-r1-prune-w512-s64.txt": {
+      "sha256": "a7f1b082e1e74a9b5f62e73603e8fc09d12d6bf82f05ad6d16edaef2616cc6a5",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r1-v2-w1024.txt": {
+      "sha256": "6967df466bc88f78edd19752d4cc5705ba06e39b66608d2d9a2255bf00f0810e",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r1-v2-w256.txt": {
+      "sha256": "ec9446177eebf2ce4125d636c2df03cd0ed50c0ec06fcd9ce12da1df98db3d5c",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r1-v2-w512.txt": {
+      "sha256": "9b32e7a361da2c06d36e97b5f9d7bf23cad61e10da749cdf2d6e4c48942b4f9d",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r2-prune-w1024-s0.txt": {
+      "sha256": "b499c0b22824180eaa459b0bbf5f47b92bfacfc8877ab35ca0199d67e81b15c1",
+      "bytes": 154
+    },
+    "logs/quiet-timing-r2-prune-w1024-s64.txt": {
+      "sha256": "bc3a95b1a95c350a18520060d52f9775a34ad5855db2f01dd1354c7457959af1",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r2-prune-w256-s0.txt": {
+      "sha256": "aac0b638147e8e67718375da3eb0e10cb839a639479771b0bc205fdcfa0c08a1",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r2-prune-w256-s64.txt": {
+      "sha256": "147be17dea282099f8c083479491a156480cc7f9124d7a7458f0e2a2ca6155ea",
+      "bytes": 231
+    },
+    "logs/quiet-timing-r2-prune-w512-s0.txt": {
+      "sha256": "874bfeb3a28c1cca60b50777949cdcb5e72d6b9db62e7c147d17a4bff72590ee",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r2-prune-w512-s64.txt": {
+      "sha256": "418ecfc9eb16dbe4b8492b93d49660331ca47731e9cf2235b5729b53a04717da",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r2-v2-w1024.txt": {
+      "sha256": "2c85bd7115e98a11027b806d7264f68e154357974a194c1289047cf556ed3388",
+      "bytes": 77
+    },
+    "logs/quiet-timing-r2-v2-w256.txt": {
+      "sha256": "13d920609cce17bc1e155a386e436637e45689ac4906f196390979e5d05a655b",
+      "bytes": 154
+    },
+    "logs/quiet-timing-r2-v2-w512.txt": {
+      "sha256": "7c0aa97f558435feec09a9132836b58f67d13163c2959548bfd399f1bdc0c33c",
+      "bytes": 77
+    },
+    "logs/reuse.txt": {
+      "sha256": "2cd3c3842344af504809e004eb1a9d8a2381e5f4a273fac76ddbb36fbc240dae",
+      "bytes": 2487
+    },
+    "logs/stages.txt": {
+      "sha256": "00cd084d88bb7c0f019f4ddf21a794dbcc3656660858c452c1caf4202997413e",
+      "bytes": 2431
+    },
+    "logs/started-epoch.txt": {
+      "sha256": "bd13985d69b36b1a6136882f5d8d798f9284426beb814d02e1e675ca24f4c4bd",
+      "bytes": 11
+    },
+    "raw/ineligible/timing-r1-prune-w512-s0-attempt1/expect.json": {
+      "sha256": "39c4684d18c35ecda3c9b4fb212763c911b9d3a1d1a082d1b9b9e7752b7a668a",
+      "bytes": 1218
+    },
+    "raw/ineligible/timing-r1-prune-w512-s0-attempt1/timing-r1-prune-w512-s0.csv": {
+      "sha256": "64d17d2e9ecaa7ec980d97cebd83ec3479daa1958e3b724e4d01bfcccb72fd73",
+      "bytes": 1751716
+    },
+    "raw/ineligible/timing-r1-prune-w512-s0-attempt1/timing-r1-prune-w512-s0.receipt.json": {
+      "sha256": "69012cef9617ab044dfc6fc22f4d296f9339c76fe64523f6e7894445cdf9e89d",
+      "bytes": 5496
+    },
+    "raw/ineligible/timing-r1-prune-w512-s0-attempt1/timing-r1-prune-w512-s0.receipt.log": {
+      "sha256": "1bdd91cd5a82887e368e218a6da4bdebc0a9e2f926566626611217d10bf148fc",
+      "bytes": 922
+    },
+    "raw/ineligible/timing-r1-prune-w512-s0-attempt1/timing-r1-prune-w512-s0.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/ineligible/timing-r1-prune-w512-s0-attempt1/timing-r1-prune-w512-s0.receipt.runtime/runtime.json": {
+      "sha256": "33aae12b76ed66d07a0c30750017009344d47da60b40ccadd283b37ae5ffb2b7",
+      "bytes": 2050
+    },
+    "raw/ineligible/timing-r1-prune-w512-s0-attempt1/timing-r1-prune-w512-s0.receipt.sampler.log": {
+      "sha256": "9dd3b2375a949cdc5050af1fa06f459fde469626bb849ba3e1835c2c6e4851e0",
+      "bytes": 16714
+    },
+    "raw/ineligible/timing-r1-prune-w512-s0-attempt1/top-sha256.txt": {
+      "sha256": "6cd4e30066cb12b32c1dbf3ba4b07c279d3f9a2b319b72ddfd7474611c50a5de",
+      "bytes": 169
+    },
+    "raw/ineligible/timing-r2-prune-w1024-s0-attempt1/expect.json": {
+      "sha256": "964be28aa9008104db1e68987abf6b0e460e8610a58a6ca924999b031b04d1dd",
+      "bytes": 1219
+    },
+    "raw/ineligible/timing-r2-prune-w1024-s0-attempt1/timing-r2-prune-w1024-s0.csv": {
+      "sha256": "818fd28f9a2c9612886a954025d7ea926c09f5680cdefe2dc7d3f3b312a7b00f",
+      "bytes": 1755912
+    },
+    "raw/ineligible/timing-r2-prune-w1024-s0-attempt1/timing-r2-prune-w1024-s0.receipt.json": {
+      "sha256": "3fe584cf4843a5418b61f1583ec665fc273650b99ac76aca7250ea5d49bb76c5",
+      "bytes": 5504
+    },
+    "raw/ineligible/timing-r2-prune-w1024-s0-attempt1/timing-r2-prune-w1024-s0.receipt.log": {
+      "sha256": "9eda049f87d22dc9a23ba5d1868af6de702d36d645ac1a58f94151fc293a4287",
+      "bytes": 923
+    },
+    "raw/ineligible/timing-r2-prune-w1024-s0-attempt1/timing-r2-prune-w1024-s0.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/ineligible/timing-r2-prune-w1024-s0-attempt1/timing-r2-prune-w1024-s0.receipt.runtime/runtime.json": {
+      "sha256": "3444414298c0d4e0c701adc1541854f30d59d976f9ec5d8c2a34332a08042c46",
+      "bytes": 2051
+    },
+    "raw/ineligible/timing-r2-prune-w1024-s0-attempt1/timing-r2-prune-w1024-s0.receipt.sampler.log": {
+      "sha256": "6cd4c16a445e3eb3820b0a893f837e03baa8dbc9349f3ed52e677af154b16be2",
+      "bytes": 19590
+    },
+    "raw/ineligible/timing-r2-prune-w1024-s0-attempt1/top-sha256.txt": {
+      "sha256": "09cf28ef3941939e856d4c455e924ffb91fb56ddc5c714ae2620ed6f1389cdc5",
+      "bytes": 170
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt1/expect.json": {
+      "sha256": "b4d7cb29cb76448073c4e9a80c4f815caafbff80f67e24fb5d310e7f464e00d3",
+      "bytes": 1219
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt1/timing-r2-prune-w256-s64.csv": {
+      "sha256": "45cadb3a897ae28faaa8b253a813160c32dd4b8fb7ac6e47f940cffd177a949b",
+      "bytes": 1802069
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt1/timing-r2-prune-w256-s64.receipt.json": {
+      "sha256": "4d7cadc2d6f93dec425a85b56c1e63597e17f1ff878c93c68ca7daf8b5df6ff2",
+      "bytes": 5507
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt1/timing-r2-prune-w256-s64.receipt.log": {
+      "sha256": "02b8996bd2adfa368bb06d7a66da44fb8c51cbe14922660913b3eeeba2a4a995",
+      "bytes": 924
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt1/timing-r2-prune-w256-s64.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt1/timing-r2-prune-w256-s64.receipt.runtime/runtime.json": {
+      "sha256": "9759159b031d37ef536ab0ebb0dd826cd8a4478955dd575118fbd9e1782c078f",
+      "bytes": 2053
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt1/timing-r2-prune-w256-s64.receipt.sampler.log": {
+      "sha256": "3322ea8eeed2965429c92b7c453e72b44204c2f1b1d06cd0d8d4efcba53d53d7",
+      "bytes": 17926
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt1/top-sha256.txt": {
+      "sha256": "1aa449762fba8ef6e34e013e5edd42afefc14ace04370cea74b853afae52df77",
+      "bytes": 170
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt2/expect.json": {
+      "sha256": "b4d7cb29cb76448073c4e9a80c4f815caafbff80f67e24fb5d310e7f464e00d3",
+      "bytes": 1219
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt2/timing-r2-prune-w256-s64.csv": {
+      "sha256": "901b993d57e9c12c64c585cce1646f749934c6a095c67f97142630058ea3971f",
+      "bytes": 1802048
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt2/timing-r2-prune-w256-s64.receipt.json": {
+      "sha256": "073fe7d7f294c83c6644b53777870c20396a4ca342717d5206ae7a66ebe9ed8d",
+      "bytes": 5506
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt2/timing-r2-prune-w256-s64.receipt.log": {
+      "sha256": "02b8996bd2adfa368bb06d7a66da44fb8c51cbe14922660913b3eeeba2a4a995",
+      "bytes": 924
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt2/timing-r2-prune-w256-s64.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt2/timing-r2-prune-w256-s64.receipt.runtime/runtime.json": {
+      "sha256": "9759159b031d37ef536ab0ebb0dd826cd8a4478955dd575118fbd9e1782c078f",
+      "bytes": 2053
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt2/timing-r2-prune-w256-s64.receipt.sampler.log": {
+      "sha256": "384530a180449c49e2ffc323ec736ff34b235f0a0881f62885f4f594760daaff",
+      "bytes": 18180
+    },
+    "raw/ineligible/timing-r2-prune-w256-s64-attempt2/top-sha256.txt": {
+      "sha256": "1aa449762fba8ef6e34e013e5edd42afefc14ace04370cea74b853afae52df77",
+      "bytes": 170
+    },
+    "raw/ineligible/timing-r2-v2-w256-attempt1/expect.json": {
+      "sha256": "616697d0945bb239af3cdf75fc45f691cd281819c0a259b54e2fb88ab498e099",
+      "bytes": 1037
+    },
+    "raw/ineligible/timing-r2-v2-w256-attempt1/timing-r2-v2-w256.csv": {
+      "sha256": "2c92a673ea917b195ed3343e29a084cfd22f27d8abcc4218b1f2179358f14f5d",
+      "bytes": 1394471
+    },
+    "raw/ineligible/timing-r2-v2-w256-attempt1/timing-r2-v2-w256.receipt.json": {
+      "sha256": "8cadda9a6f75f6e5de45c71715914ea200f2754db3305c830fd163e025535257",
+      "bytes": 5007
+    },
+    "raw/ineligible/timing-r2-v2-w256-attempt1/timing-r2-v2-w256.receipt.log": {
+      "sha256": "e52da9e80be36314092bd5f149784989c6ac848b4fd21d2aa78ff7511a79afc2",
+      "bytes": 916
+    },
+    "raw/ineligible/timing-r2-v2-w256-attempt1/timing-r2-v2-w256.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/ineligible/timing-r2-v2-w256-attempt1/timing-r2-v2-w256.receipt.runtime/runtime.json": {
+      "sha256": "667f3f7d5a14efe5c4bb7f6f1ce433f8ce7995a79d5696ea525076ceee6be62d",
+      "bytes": 1809
+    },
+    "raw/ineligible/timing-r2-v2-w256-attempt1/timing-r2-v2-w256.receipt.sampler.log": {
+      "sha256": "d8353fcaa218b9ec09fe7221ae45fb87798f4eb924a664f90b03ae7f94889c03",
+      "bytes": 23115
+    },
+    "raw/ineligible/timing-r2-v2-w256-attempt1/top-sha256.txt": {
+      "sha256": "2fae0fc42ea04ef87bdeb7b73dcfe5dd73cf244e6b5fac2b015527f2a22e4c1f",
+      "bytes": 163
+    },
+    "raw/reject-prune-seeds.receipt.json": {
+      "sha256": "cfcbbf5793a703d13483654a839e2b7add7fdd41f42bf961b2b3d20a60f45a03",
+      "bytes": 5570
+    },
+    "raw/reject-prune-seeds.receipt.log": {
+      "sha256": "8bd69e1c3eacf3b98b432d263883ae37b4f5ec7af1d229fd8009cb5f6681638a",
+      "bytes": 38
+    },
+    "raw/reject-prune-seeds.receipt.runtime/reject": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/reject-prune-seeds.receipt.runtime/runtime.json": {
+      "sha256": "5ed6440a482a9ce7019ce9471051637c0804cea29c4e821fdab9d96280c59869",
+      "bytes": 2051
+    },
+    "raw/reject-prune-seeds.receipt.sampler.log": {
+      "sha256": "616cd77305914ea9a85613f1d38e6e90f8685098424fe0e5ecace87a7c7e93a9",
+      "bytes": 10137
+    },
+    "raw/reject-v2-threads.receipt.json": {
+      "sha256": "dd79721b5e08fa8d86238142ff38f20c3035fa0613010a63215404d686b38101",
+      "bytes": 5165
+    },
+    "raw/reject-v2-threads.receipt.log": {
+      "sha256": "8bd69e1c3eacf3b98b432d263883ae37b4f5ec7af1d229fd8009cb5f6681638a",
+      "bytes": 38
+    },
+    "raw/reject-v2-threads.receipt.runtime/reject": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/reject-v2-threads.receipt.runtime/runtime.json": {
+      "sha256": "c8b16f242613b5bedb7d7144ef436294634582c45e61484ba94cd10d4cbbf5cf",
+      "bytes": 1808
+    },
+    "raw/reject-v2-threads.receipt.sampler.log": {
+      "sha256": "5450a4b107810ad03b78f1d32e494f373de7c3ace305cfe1d952f6e6be39054d",
+      "bytes": 9642
+    },
+    "raw/timing-r0-prune-w1024-s0.csv": {
+      "sha256": "fd8a6f0a203c652b356dd6fe38666c5cd78988437ca8c03e9ea07ec578a02301",
+      "bytes": 1756050
+    },
+    "raw/timing-r0-prune-w1024-s0.receipt.json": {
+      "sha256": "57aa183e1fcf3d78e8d6382784ffa344f274804f9b8d22d0b4bf3d664425bee9",
+      "bytes": 5493
+    },
+    "raw/timing-r0-prune-w1024-s0.receipt.log": {
+      "sha256": "9eda049f87d22dc9a23ba5d1868af6de702d36d645ac1a58f94151fc293a4287",
+      "bytes": 923
+    },
+    "raw/timing-r0-prune-w1024-s0.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-prune-w1024-s0.receipt.runtime/runtime.json": {
+      "sha256": "3444414298c0d4e0c701adc1541854f30d59d976f9ec5d8c2a34332a08042c46",
+      "bytes": 2051
+    },
+    "raw/timing-r0-prune-w1024-s0.receipt.sampler.log": {
+      "sha256": "080f97865e61d87fb9a25ec96f7f24cf112b5f5c258039958ce004ba19af5626",
+      "bytes": 12676
+    },
+    "raw/timing-r0-prune-w1024-s0.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-prune-w1024-s64.csv": {
+      "sha256": "03cc2b09e90e06ba8f658859d20aff0d205dbf49a919c5081a04da06f3041e7c",
+      "bytes": 1809307
+    },
+    "raw/timing-r0-prune-w1024-s64.receipt.json": {
+      "sha256": "3715868d47d26cbcd485be17929349243d4fcc47f8ed68851e390226e038f162",
+      "bytes": 5496
+    },
+    "raw/timing-r0-prune-w1024-s64.receipt.log": {
+      "sha256": "8d27e7fcd22bf76ca162d46efe50f2715902608ab0b82e5f3af9a2527c570fc2",
+      "bytes": 925
+    },
+    "raw/timing-r0-prune-w1024-s64.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-prune-w1024-s64.receipt.runtime/runtime.json": {
+      "sha256": "96aff88b6733f8753a01b6598bffb5ad3a12d3fe1e21cbe081b971ebfc02b8a1",
+      "bytes": 2052
+    },
+    "raw/timing-r0-prune-w1024-s64.receipt.sampler.log": {
+      "sha256": "832f2b8ae5b84aa6820d4b87a6add87990502c734a5d917b1c88bae5e47886f2",
+      "bytes": 11871
+    },
+    "raw/timing-r0-prune-w1024-s64.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-prune-w256-s0.csv": {
+      "sha256": "a3d1dce615b8d43a707d0f84bd862e8454f8efb069f1f1fd45485d3a0aa17e3d",
+      "bytes": 1748700
+    },
+    "raw/timing-r0-prune-w256-s0.receipt.json": {
+      "sha256": "a3182ca8cffd80f8e9082b4524e446c0e7f094df68905c55a1152a9f5febd85e",
+      "bytes": 5490
+    },
+    "raw/timing-r0-prune-w256-s0.receipt.log": {
+      "sha256": "12c0de2d4eb47295ec3d6da032e853086440b34e8eb94fbf56748fffd0bfa291",
+      "bytes": 922
+    },
+    "raw/timing-r0-prune-w256-s0.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-prune-w256-s0.receipt.runtime/runtime.json": {
+      "sha256": "ad877cda842514d70da1b4073737400e68a3ee84aeff1ea47f0ad1ed1160f94e",
+      "bytes": 2052
+    },
+    "raw/timing-r0-prune-w256-s0.receipt.sampler.log": {
+      "sha256": "f65db9be348420f5b6d47a00d4304b25143ca317f85031f8b27bead61e1aa91f",
+      "bytes": 20339
+    },
+    "raw/timing-r0-prune-w256-s0.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-prune-w256-s64.csv": {
+      "sha256": "972e4da698b435d02be6e4af859ae6fe09a016caed790411eff90af4287984ac",
+      "bytes": 1801994
+    },
+    "raw/timing-r0-prune-w256-s64.receipt.json": {
+      "sha256": "983a321868fc7328fd79714c6c1df9409b53a9cc03038a97e5cd9659683de48c",
+      "bytes": 5494
+    },
+    "raw/timing-r0-prune-w256-s64.receipt.log": {
+      "sha256": "02b8996bd2adfa368bb06d7a66da44fb8c51cbe14922660913b3eeeba2a4a995",
+      "bytes": 924
+    },
+    "raw/timing-r0-prune-w256-s64.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-prune-w256-s64.receipt.runtime/runtime.json": {
+      "sha256": "9759159b031d37ef536ab0ebb0dd826cd8a4478955dd575118fbd9e1782c078f",
+      "bytes": 2053
+    },
+    "raw/timing-r0-prune-w256-s64.receipt.sampler.log": {
+      "sha256": "ef0d7ef73e02d24ddc11ab1b7918dbac5e01b358745fa142e644658f8de295e9",
+      "bytes": 15635
+    },
+    "raw/timing-r0-prune-w256-s64.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-prune-w512-s0.csv": {
+      "sha256": "354d2be53713d9a805318519bf3d6a3539f8995688ef1f16325864a97ca918f0",
+      "bytes": 1751891
+    },
+    "raw/timing-r0-prune-w512-s0.receipt.json": {
+      "sha256": "4465b3bc3893c0f8410e97d81e085789e0fb38404e49be8f4f2c001c1878e28d",
+      "bytes": 5487
+    },
+    "raw/timing-r0-prune-w512-s0.receipt.log": {
+      "sha256": "1bdd91cd5a82887e368e218a6da4bdebc0a9e2f926566626611217d10bf148fc",
+      "bytes": 922
+    },
+    "raw/timing-r0-prune-w512-s0.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-prune-w512-s0.receipt.runtime/runtime.json": {
+      "sha256": "33aae12b76ed66d07a0c30750017009344d47da60b40ccadd283b37ae5ffb2b7",
+      "bytes": 2050
+    },
+    "raw/timing-r0-prune-w512-s0.receipt.sampler.log": {
+      "sha256": "be68da1d598d1e6e0bd0044ff637919ac07a1fd8b35004d3ca6b0a1711e65ff4",
+      "bytes": 15437
+    },
+    "raw/timing-r0-prune-w512-s0.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-prune-w512-s64.csv": {
+      "sha256": "92c335b4dad0da4a69ce4302a49290792648f76b9594e3d21f448a186da08e70",
+      "bytes": 1805815
+    },
+    "raw/timing-r0-prune-w512-s64.receipt.json": {
+      "sha256": "46f187e227b63a23025e984f78a8b489499db5b34722e8057f46d658e31198c8",
+      "bytes": 5491
+    },
+    "raw/timing-r0-prune-w512-s64.receipt.log": {
+      "sha256": "9c8650c30ae8e480b16f3d96e1d8a08347d4a07d0be3a94ba23b49610d503e13",
+      "bytes": 924
+    },
+    "raw/timing-r0-prune-w512-s64.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-prune-w512-s64.receipt.runtime/runtime.json": {
+      "sha256": "7824a81947879bb2109e60abefeb6403c587897671a46c33057c65faf8a44c05",
+      "bytes": 2051
+    },
+    "raw/timing-r0-prune-w512-s64.receipt.sampler.log": {
+      "sha256": "f9796a0eb2be5dcb70759a8dc904ecefe78620a7e55aacecde408ebd37665e73",
+      "bytes": 13151
+    },
+    "raw/timing-r0-prune-w512-s64.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-v2-w1024.csv": {
+      "sha256": "fb633661863c2fcfc9ec066c6935cbdf5cf24b2705c17f22376d1df0309be3dc",
+      "bytes": 1415280
+    },
+    "raw/timing-r0-v2-w1024.receipt.json": {
+      "sha256": "a94331be6b7a60cb0b74535a5da483b8b706ca1d8696feecf14615df54ecc8a7",
+      "bytes": 4999
+    },
+    "raw/timing-r0-v2-w1024.receipt.log": {
+      "sha256": "d3761472625dcebaf6cf1685cee506bd1f1500309d7239e7bc7e8f5b5e4129f4",
+      "bytes": 917
+    },
+    "raw/timing-r0-v2-w1024.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-v2-w1024.receipt.runtime/runtime.json": {
+      "sha256": "dafc73d0c3f585fcb6c457cb7e4a9c7b26e47c39332070cbca7e4b2764f4bba4",
+      "bytes": 1809
+    },
+    "raw/timing-r0-v2-w1024.receipt.sampler.log": {
+      "sha256": "ee00e166561a082574ca0c0778e77a8590b7c3a0aa4542ca11199d038ad5c8d2",
+      "bytes": 11800
+    },
+    "raw/timing-r0-v2-w1024.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-v2-w256.csv": {
+      "sha256": "d4c5624d9a9fedca17e21df3af261dc8193e8c654674e7fd7218925f24e6d6ed",
+      "bytes": 1394544
+    },
+    "raw/timing-r0-v2-w256.receipt.json": {
+      "sha256": "de254829c9babb8d9a67755b6dd3bb7a5d085a763439f30aed59e62aa8366db3",
+      "bytes": 4997
+    },
+    "raw/timing-r0-v2-w256.receipt.log": {
+      "sha256": "e52da9e80be36314092bd5f149784989c6ac848b4fd21d2aa78ff7511a79afc2",
+      "bytes": 916
+    },
+    "raw/timing-r0-v2-w256.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-v2-w256.receipt.runtime/runtime.json": {
+      "sha256": "667f3f7d5a14efe5c4bb7f6f1ce433f8ce7995a79d5696ea525076ceee6be62d",
+      "bytes": 1809
+    },
+    "raw/timing-r0-v2-w256.receipt.sampler.log": {
+      "sha256": "9f73001f3d24937e1eae849ea6241367be339321533ec2ce0fa7a52223d39f2b",
+      "bytes": 19593
+    },
+    "raw/timing-r0-v2-w256.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-v2-w512.csv": {
+      "sha256": "be8cd49dc933f0273ea372e3ee8618d210dce51d2136be9278feb225b0c2089f",
+      "bytes": 1399917
+    },
+    "raw/timing-r0-v2-w512.receipt.json": {
+      "sha256": "a875c05bd7ba01453bc9fb1f0219e79f03e490e538cd5b2d4e5c08968a2a785e",
+      "bytes": 4997
+    },
+    "raw/timing-r0-v2-w512.receipt.log": {
+      "sha256": "559a2c5a123c383b366efccc9e6a2b999907c289817d13f67d98608949dc7a5b",
+      "bytes": 916
+    },
+    "raw/timing-r0-v2-w512.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-v2-w512.receipt.runtime/runtime.json": {
+      "sha256": "e14d1b30492c1e8739025bf065ecfbdef9cca50e96ac1b93a6ce5631580eab5f",
+      "bytes": 1808
+    },
+    "raw/timing-r0-v2-w512.receipt.sampler.log": {
+      "sha256": "eaf587b73c1f4f7672378e690cac4b1fd17e6563df2a0dca9a3b57492b009ec5",
+      "bytes": 14439
+    },
+    "raw/timing-r0-v2-w512.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-prune-w1024-s0.csv": {
+      "sha256": "855211cb00186931e964a3546728175839f0dbff51b46aff814a89a70b524e0c",
+      "bytes": 1755818
+    },
+    "raw/timing-r1-prune-w1024-s0.receipt.json": {
+      "sha256": "01250b520f7cc1f3b0edde6bdd6d5364812ec6bd6bc60bbf7899a8cabdce006b",
+      "bytes": 5492
+    },
+    "raw/timing-r1-prune-w1024-s0.receipt.log": {
+      "sha256": "9eda049f87d22dc9a23ba5d1868af6de702d36d645ac1a58f94151fc293a4287",
+      "bytes": 923
+    },
+    "raw/timing-r1-prune-w1024-s0.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-prune-w1024-s0.receipt.runtime/runtime.json": {
+      "sha256": "3444414298c0d4e0c701adc1541854f30d59d976f9ec5d8c2a34332a08042c46",
+      "bytes": 2051
+    },
+    "raw/timing-r1-prune-w1024-s0.receipt.sampler.log": {
+      "sha256": "8dc00e1f5810aca3253ad846c62d26975d2a6b1edf742367880f4b2e325b349c",
+      "bytes": 13174
+    },
+    "raw/timing-r1-prune-w1024-s0.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-prune-w1024-s64.csv": {
+      "sha256": "9c8477874afb3a637c5ad99a4d70d604801147b2503592a9a19534f38e1a00a8",
+      "bytes": 1809405
+    },
+    "raw/timing-r1-prune-w1024-s64.receipt.json": {
+      "sha256": "64bd344148f0887684f202d104a30b4e4b3326454f87ce34ee3b010ba0546f83",
+      "bytes": 5503
+    },
+    "raw/timing-r1-prune-w1024-s64.receipt.log": {
+      "sha256": "8d27e7fcd22bf76ca162d46efe50f2715902608ab0b82e5f3af9a2527c570fc2",
+      "bytes": 925
+    },
+    "raw/timing-r1-prune-w1024-s64.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-prune-w1024-s64.receipt.runtime/runtime.json": {
+      "sha256": "96aff88b6733f8753a01b6598bffb5ad3a12d3fe1e21cbe081b971ebfc02b8a1",
+      "bytes": 2052
+    },
+    "raw/timing-r1-prune-w1024-s64.receipt.sampler.log": {
+      "sha256": "87f4bf36159d4e5ba7199e90218c3496335414df0c7dee2aeeb83d1d32384704",
+      "bytes": 12446
+    },
+    "raw/timing-r1-prune-w1024-s64.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-prune-w256-s0.csv": {
+      "sha256": "2672fd4d6d9c3e284ff65a18c2e1fe91ef505c117bafa2495cfc254bc4fadcd4",
+      "bytes": 1748583
+    },
+    "raw/timing-r1-prune-w256-s0.receipt.json": {
+      "sha256": "914aa1696c7cf0d28cb3feb43eebb1e36e1790954e019b06b5571732c52af47c",
+      "bytes": 5488
+    },
+    "raw/timing-r1-prune-w256-s0.receipt.log": {
+      "sha256": "12c0de2d4eb47295ec3d6da032e853086440b34e8eb94fbf56748fffd0bfa291",
+      "bytes": 922
+    },
+    "raw/timing-r1-prune-w256-s0.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-prune-w256-s0.receipt.runtime/runtime.json": {
+      "sha256": "ad877cda842514d70da1b4073737400e68a3ee84aeff1ea47f0ad1ed1160f94e",
+      "bytes": 2052
+    },
+    "raw/timing-r1-prune-w256-s0.receipt.sampler.log": {
+      "sha256": "6f7406c6cd24713f7714f71dcca23d008e8869473830df2a79f166d99b449236",
+      "bytes": 21830
+    },
+    "raw/timing-r1-prune-w256-s0.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-prune-w256-s64.csv": {
+      "sha256": "360963ae22e1a9b95d0ec0c9cf821130d0ad898b0d7e1e1fd83aedb725939c3f",
+      "bytes": 1802018
+    },
+    "raw/timing-r1-prune-w256-s64.receipt.json": {
+      "sha256": "325b3021eb33e8a771cc168b9822a9667f8bea13d7ecc9e9fbb55da12b530ad0",
+      "bytes": 5494
+    },
+    "raw/timing-r1-prune-w256-s64.receipt.log": {
+      "sha256": "02b8996bd2adfa368bb06d7a66da44fb8c51cbe14922660913b3eeeba2a4a995",
+      "bytes": 924
+    },
+    "raw/timing-r1-prune-w256-s64.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-prune-w256-s64.receipt.runtime/runtime.json": {
+      "sha256": "9759159b031d37ef536ab0ebb0dd826cd8a4478955dd575118fbd9e1782c078f",
+      "bytes": 2053
+    },
+    "raw/timing-r1-prune-w256-s64.receipt.sampler.log": {
+      "sha256": "db067019c0259fe787f543a1a9fe0226e4bb4dcf8409a1be5f1ec58900e61025",
+      "bytes": 17131
+    },
+    "raw/timing-r1-prune-w256-s64.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-prune-w512-s0.csv": {
+      "sha256": "01c4846fae4eec2d14fdb3123b4b1a027491a2189e9c459b5984109a26d7a992",
+      "bytes": 1751983
+    },
+    "raw/timing-r1-prune-w512-s0.receipt.json": {
+      "sha256": "eda4459c0e5ece7c2ef697ff0dfaf4e8589a421cb2fabfd0d2a5850a1db47015",
+      "bytes": 5491
+    },
+    "raw/timing-r1-prune-w512-s0.receipt.log": {
+      "sha256": "1bdd91cd5a82887e368e218a6da4bdebc0a9e2f926566626611217d10bf148fc",
+      "bytes": 922
+    },
+    "raw/timing-r1-prune-w512-s0.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-prune-w512-s0.receipt.runtime/runtime.json": {
+      "sha256": "33aae12b76ed66d07a0c30750017009344d47da60b40ccadd283b37ae5ffb2b7",
+      "bytes": 2050
+    },
+    "raw/timing-r1-prune-w512-s0.receipt.sampler.log": {
+      "sha256": "a1cb481e1a815b9445f118f11c6ef36b8c6ca53e301931f030846cbd13182df8",
+      "bytes": 16959
+    },
+    "raw/timing-r1-prune-w512-s0.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-prune-w512-s64.csv": {
+      "sha256": "dced48e625155142ba2bb1e60fe01311c3ac92df27fbdd1bf32c16e64126f280",
+      "bytes": 1805953
+    },
+    "raw/timing-r1-prune-w512-s64.receipt.json": {
+      "sha256": "f3eb8c11f4c1bc794b38578c64f32883b06286ccf6675faf9e4107bc639a96be",
+      "bytes": 5493
+    },
+    "raw/timing-r1-prune-w512-s64.receipt.log": {
+      "sha256": "9c8650c30ae8e480b16f3d96e1d8a08347d4a07d0be3a94ba23b49610d503e13",
+      "bytes": 924
+    },
+    "raw/timing-r1-prune-w512-s64.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-prune-w512-s64.receipt.runtime/runtime.json": {
+      "sha256": "7824a81947879bb2109e60abefeb6403c587897671a46c33057c65faf8a44c05",
+      "bytes": 2051
+    },
+    "raw/timing-r1-prune-w512-s64.receipt.sampler.log": {
+      "sha256": "3df11ae861f7b96f87fab388ac7dae9d2e18078a8e68cb35006ef045dee2a475",
+      "bytes": 14643
+    },
+    "raw/timing-r1-prune-w512-s64.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-v2-w1024.csv": {
+      "sha256": "48e858f693343478f58a7451261aa6484ba4368f8a108f97e7d9c66244020b22",
+      "bytes": 1415300
+    },
+    "raw/timing-r1-v2-w1024.receipt.json": {
+      "sha256": "f8bd0f864312e1a60e4f0c3bd2f5646c2f6f7df68c0bae28fb05e23264130df6",
+      "bytes": 5002
+    },
+    "raw/timing-r1-v2-w1024.receipt.log": {
+      "sha256": "d3761472625dcebaf6cf1685cee506bd1f1500309d7239e7bc7e8f5b5e4129f4",
+      "bytes": 917
+    },
+    "raw/timing-r1-v2-w1024.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-v2-w1024.receipt.runtime/runtime.json": {
+      "sha256": "dafc73d0c3f585fcb6c457cb7e4a9c7b26e47c39332070cbca7e4b2764f4bba4",
+      "bytes": 1809
+    },
+    "raw/timing-r1-v2-w1024.receipt.sampler.log": {
+      "sha256": "35af7d7f003bddc0164e0f462e05d63507dd4474c1a7a5d1f9f8f189cc7aa02d",
+      "bytes": 13793
+    },
+    "raw/timing-r1-v2-w1024.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-v2-w256.csv": {
+      "sha256": "a0b7f38a9caaa493d49b70054f116db4797f65d0dc0f8b36b0238295284da1f8",
+      "bytes": 1394578
+    },
+    "raw/timing-r1-v2-w256.receipt.json": {
+      "sha256": "0dfeb9f1bc21887c3a7e0befadce510c0fc96a80a790bd5d03187bc42f2191f0",
+      "bytes": 5009
+    },
+    "raw/timing-r1-v2-w256.receipt.log": {
+      "sha256": "e52da9e80be36314092bd5f149784989c6ac848b4fd21d2aa78ff7511a79afc2",
+      "bytes": 916
+    },
+    "raw/timing-r1-v2-w256.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-v2-w256.receipt.runtime/runtime.json": {
+      "sha256": "667f3f7d5a14efe5c4bb7f6f1ce433f8ce7995a79d5696ea525076ceee6be62d",
+      "bytes": 1809
+    },
+    "raw/timing-r1-v2-w256.receipt.sampler.log": {
+      "sha256": "838129872e6d164351c5ce9d467f0d8949bc20237f0c035ef7f3c61544ab2e34",
+      "bytes": 21505
+    },
+    "raw/timing-r1-v2-w256.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-v2-w512.csv": {
+      "sha256": "03d094912ecbed2d6b7cd0abdbd3fdb752020ff177c81dfebc950c82ae0f0b9a",
+      "bytes": 1399897
+    },
+    "raw/timing-r1-v2-w512.receipt.json": {
+      "sha256": "1064de2a78c3cac6e0c196ac6dad0f564a2655ebf83dfe020baa4ec108e178eb",
+      "bytes": 4996
+    },
+    "raw/timing-r1-v2-w512.receipt.log": {
+      "sha256": "559a2c5a123c383b366efccc9e6a2b999907c289817d13f67d98608949dc7a5b",
+      "bytes": 916
+    },
+    "raw/timing-r1-v2-w512.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-v2-w512.receipt.runtime/runtime.json": {
+      "sha256": "e14d1b30492c1e8739025bf065ecfbdef9cca50e96ac1b93a6ce5631580eab5f",
+      "bytes": 1808
+    },
+    "raw/timing-r1-v2-w512.receipt.sampler.log": {
+      "sha256": "3dbc0793bea07448ba1829cc9647c070fd161db4d59ec9333f6121c27077d2d9",
+      "bytes": 16555
+    },
+    "raw/timing-r1-v2-w512.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-prune-w1024-s0.csv": {
+      "sha256": "3990268e2cec9600d5f47092ce5877846159940070fd344920dc6f49e8f882a6",
+      "bytes": 1755905
+    },
+    "raw/timing-r2-prune-w1024-s0.receipt.json": {
+      "sha256": "024ce692bd5ae03f176c42734fa857d300e563f45059518040d592d1c9f54664",
+      "bytes": 5503
+    },
+    "raw/timing-r2-prune-w1024-s0.receipt.log": {
+      "sha256": "9eda049f87d22dc9a23ba5d1868af6de702d36d645ac1a58f94151fc293a4287",
+      "bytes": 923
+    },
+    "raw/timing-r2-prune-w1024-s0.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-prune-w1024-s0.receipt.runtime/runtime.json": {
+      "sha256": "3444414298c0d4e0c701adc1541854f30d59d976f9ec5d8c2a34332a08042c46",
+      "bytes": 2051
+    },
+    "raw/timing-r2-prune-w1024-s0.receipt.sampler.log": {
+      "sha256": "d7f033f8677e5ba6744ad3a3ef7139ff8b0051ca68461e00ebf3e95b7b848a26",
+      "bytes": 14764
+    },
+    "raw/timing-r2-prune-w1024-s0.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-prune-w1024-s64.csv": {
+      "sha256": "9aeaefb046df208f7956d2b75795bc474fb3c37713ef287ec7d0dcb32f9b8d4a",
+      "bytes": 1809329
+    },
+    "raw/timing-r2-prune-w1024-s64.receipt.json": {
+      "sha256": "4bb3eadcc06dbf7d899548a0d93717d76735ef2d4045e8815dcd34ccc89934cf",
+      "bytes": 5508
+    },
+    "raw/timing-r2-prune-w1024-s64.receipt.log": {
+      "sha256": "8d27e7fcd22bf76ca162d46efe50f2715902608ab0b82e5f3af9a2527c570fc2",
+      "bytes": 925
+    },
+    "raw/timing-r2-prune-w1024-s64.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-prune-w1024-s64.receipt.runtime/runtime.json": {
+      "sha256": "96aff88b6733f8753a01b6598bffb5ad3a12d3fe1e21cbe081b971ebfc02b8a1",
+      "bytes": 2052
+    },
+    "raw/timing-r2-prune-w1024-s64.receipt.sampler.log": {
+      "sha256": "493e657650e044d5f7ed70678c63de1c168057ecae48008db986bf927d2b3914",
+      "bytes": 13728
+    },
+    "raw/timing-r2-prune-w1024-s64.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-prune-w256-s0.csv": {
+      "sha256": "77ff59bc3508e259ff9325c5f358fd0c21ce280957c3425f5096f2309add2f1d",
+      "bytes": 1748755
+    },
+    "raw/timing-r2-prune-w256-s0.receipt.json": {
+      "sha256": "b62ae2c5156ee876f38cb4a0d38b86e0612d481632d76f80c0fbaade36f78522",
+      "bytes": 5498
+    },
+    "raw/timing-r2-prune-w256-s0.receipt.log": {
+      "sha256": "12c0de2d4eb47295ec3d6da032e853086440b34e8eb94fbf56748fffd0bfa291",
+      "bytes": 922
+    },
+    "raw/timing-r2-prune-w256-s0.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-prune-w256-s0.receipt.runtime/runtime.json": {
+      "sha256": "ad877cda842514d70da1b4073737400e68a3ee84aeff1ea47f0ad1ed1160f94e",
+      "bytes": 2052
+    },
+    "raw/timing-r2-prune-w256-s0.receipt.sampler.log": {
+      "sha256": "1d467ea19ea09ae7acf47b5d4211c54c5cf14f27ab9ba911c17d1139a1008eac",
+      "bytes": 22743
+    },
+    "raw/timing-r2-prune-w256-s0.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-prune-w256-s64.csv": {
+      "sha256": "e6b7492e99f2962242a8f8218f3e256a2b4bb8c62a3088322e90a6ff8bda6ebc",
+      "bytes": 1801957
+    },
+    "raw/timing-r2-prune-w256-s64.receipt.json": {
+      "sha256": "cd3c3ed9e16e4fbb0c6cf4723a724565f065624a4b7fc62230cf7f0090e95519",
+      "bytes": 5506
+    },
+    "raw/timing-r2-prune-w256-s64.receipt.log": {
+      "sha256": "02b8996bd2adfa368bb06d7a66da44fb8c51cbe14922660913b3eeeba2a4a995",
+      "bytes": 924
+    },
+    "raw/timing-r2-prune-w256-s64.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-prune-w256-s64.receipt.runtime/runtime.json": {
+      "sha256": "9759159b031d37ef536ab0ebb0dd826cd8a4478955dd575118fbd9e1782c078f",
+      "bytes": 2053
+    },
+    "raw/timing-r2-prune-w256-s64.receipt.sampler.log": {
+      "sha256": "e0799233eac05ade37d16277cfde1bac3159c9eab6fdaf65b75bdb450c2b9fc3",
+      "bytes": 17926
+    },
+    "raw/timing-r2-prune-w256-s64.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-prune-w512-s0.csv": {
+      "sha256": "22fd6ff9e09b9588bd8ced595308259242c2718f2113126edb1ddb02195a661a",
+      "bytes": 1751850
+    },
+    "raw/timing-r2-prune-w512-s0.receipt.json": {
+      "sha256": "1d2963565479d2a7dec9a4cba05792e08d5d655d8774a53f9d1c112e566230d0",
+      "bytes": 5499
+    },
+    "raw/timing-r2-prune-w512-s0.receipt.log": {
+      "sha256": "1bdd91cd5a82887e368e218a6da4bdebc0a9e2f926566626611217d10bf148fc",
+      "bytes": 922
+    },
+    "raw/timing-r2-prune-w512-s0.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-prune-w512-s0.receipt.runtime/runtime.json": {
+      "sha256": "33aae12b76ed66d07a0c30750017009344d47da60b40ccadd283b37ae5ffb2b7",
+      "bytes": 2050
+    },
+    "raw/timing-r2-prune-w512-s0.receipt.sampler.log": {
+      "sha256": "dab4e71938a8a349b327ab1b3b7c250df4a6495dbe104fb4d62124f00bd09b99",
+      "bytes": 24451
+    },
+    "raw/timing-r2-prune-w512-s0.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-prune-w512-s64.csv": {
+      "sha256": "eb21be59d3df9161dab75ccf415b2a102686cf2719d8c0c37a75cb826d000143",
+      "bytes": 1805886
+    },
+    "raw/timing-r2-prune-w512-s64.receipt.json": {
+      "sha256": "eb19466189f57fdb0fda01c74fb43681b08c3eb350f540d17c983713c2e4f79b",
+      "bytes": 5504
+    },
+    "raw/timing-r2-prune-w512-s64.receipt.log": {
+      "sha256": "9c8650c30ae8e480b16f3d96e1d8a08347d4a07d0be3a94ba23b49610d503e13",
+      "bytes": 924
+    },
+    "raw/timing-r2-prune-w512-s64.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-prune-w512-s64.receipt.runtime/runtime.json": {
+      "sha256": "7824a81947879bb2109e60abefeb6403c587897671a46c33057c65faf8a44c05",
+      "bytes": 2051
+    },
+    "raw/timing-r2-prune-w512-s64.receipt.sampler.log": {
+      "sha256": "5bfa85bf793ee19522460f3512a1fedebde40e237e8429aa50c5ee06906c464c",
+      "bytes": 15511
+    },
+    "raw/timing-r2-prune-w512-s64.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-v2-w1024.csv": {
+      "sha256": "163895e1c6f3f384181bedd7b1d12f18e2103d0783c040e97ac6464c1766fa59",
+      "bytes": 1415265
+    },
+    "raw/timing-r2-v2-w1024.receipt.json": {
+      "sha256": "cd80ca32cb9c577418c8699fe24541dd732d5cbbcf481aa00f95ffa740b49c79",
+      "bytes": 5013
+    },
+    "raw/timing-r2-v2-w1024.receipt.log": {
+      "sha256": "d3761472625dcebaf6cf1685cee506bd1f1500309d7239e7bc7e8f5b5e4129f4",
+      "bytes": 917
+    },
+    "raw/timing-r2-v2-w1024.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-v2-w1024.receipt.runtime/runtime.json": {
+      "sha256": "dafc73d0c3f585fcb6c457cb7e4a9c7b26e47c39332070cbca7e4b2764f4bba4",
+      "bytes": 1809
+    },
+    "raw/timing-r2-v2-w1024.receipt.sampler.log": {
+      "sha256": "5a6929a683a3781181b3442ffe85b8d86127569e9148a26914ffd53b92d04905",
+      "bytes": 13999
+    },
+    "raw/timing-r2-v2-w1024.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-v2-w256.csv": {
+      "sha256": "e690339c86ed4597ffb1a914f9484ba1c6f3413c8a4328f91434d2ca6e98c22e",
+      "bytes": 1394472
+    },
+    "raw/timing-r2-v2-w256.receipt.json": {
+      "sha256": "1842a2acd08ffefbce71b2498ec8ac4a89588037c196b3af16d8be74458eb0dd",
+      "bytes": 5008
+    },
+    "raw/timing-r2-v2-w256.receipt.log": {
+      "sha256": "e52da9e80be36314092bd5f149784989c6ac848b4fd21d2aa78ff7511a79afc2",
+      "bytes": 916
+    },
+    "raw/timing-r2-v2-w256.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-v2-w256.receipt.runtime/runtime.json": {
+      "sha256": "667f3f7d5a14efe5c4bb7f6f1ce433f8ce7995a79d5696ea525076ceee6be62d",
+      "bytes": 1809
+    },
+    "raw/timing-r2-v2-w256.receipt.sampler.log": {
+      "sha256": "6744e68e60a9a5be381149166a4bf17728aa3c31cef3aab550025c05a12e11f6",
+      "bytes": 21425
+    },
+    "raw/timing-r2-v2-w256.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-v2-w512.csv": {
+      "sha256": "f14a63401b5aca26f226c9b73dd1a683d12305e051282e447f768f87393ad086",
+      "bytes": 1399869
+    },
+    "raw/timing-r2-v2-w512.receipt.json": {
+      "sha256": "2a37be7b3af77cbd1435098687b60bdf0a1d18635dd773bba08abae93ab277eb",
+      "bytes": 5006
+    },
+    "raw/timing-r2-v2-w512.receipt.log": {
+      "sha256": "559a2c5a123c383b366efccc9e6a2b999907c289817d13f67d98608949dc7a5b",
+      "bytes": 916
+    },
+    "raw/timing-r2-v2-w512.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-v2-w512.receipt.runtime/runtime.json": {
+      "sha256": "e14d1b30492c1e8739025bf065ecfbdef9cca50e96ac1b93a6ce5631580eab5f",
+      "bytes": 1808
+    },
+    "raw/timing-r2-v2-w512.receipt.sampler.log": {
+      "sha256": "13d49987e1ecacb4644e8e101c37fa75c411fc07bef63bd3cfeb297e151924e8",
+      "bytes": 16400
+    },
+    "raw/timing-r2-v2-w512.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/top-sha256.txt": {
+      "sha256": "db688827fd4725f7b21f50c65d179b3e73ce822b9556e871567b5854d5a1935d",
+      "bytes": 4527
+    }
+  },
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [
+      {
+        "original": "raw/ineligible/timing-r1-prune-w512-s0-attempt1/timing-r1-prune-w512-s0.csv",
+        "sha256": "64d17d2e9ecaa7ec980d97cebd83ec3479daa1958e3b724e4d01bfcccb72fd73",
+        "bytes": 1751716,
+        "public": "raw/ineligible/timing-r1-prune-w512-s0-attempt1/timing-r1-prune-w512-s0.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/ineligible/timing-r2-prune-w1024-s0-attempt1/timing-r2-prune-w1024-s0.csv",
+        "sha256": "818fd28f9a2c9612886a954025d7ea926c09f5680cdefe2dc7d3f3b312a7b00f",
+        "bytes": 1755912,
+        "public": "raw/ineligible/timing-r2-prune-w1024-s0-attempt1/timing-r2-prune-w1024-s0.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/ineligible/timing-r2-prune-w256-s64-attempt1/timing-r2-prune-w256-s64.csv",
+        "sha256": "45cadb3a897ae28faaa8b253a813160c32dd4b8fb7ac6e47f940cffd177a949b",
+        "bytes": 1802069,
+        "public": "raw/ineligible/timing-r2-prune-w256-s64-attempt1/timing-r2-prune-w256-s64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/ineligible/timing-r2-prune-w256-s64-attempt2/timing-r2-prune-w256-s64.csv",
+        "sha256": "901b993d57e9c12c64c585cce1646f749934c6a095c67f97142630058ea3971f",
+        "bytes": 1802048,
+        "public": "raw/ineligible/timing-r2-prune-w256-s64-attempt2/timing-r2-prune-w256-s64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/ineligible/timing-r2-v2-w256-attempt1/timing-r2-v2-w256.csv",
+        "sha256": "2c92a673ea917b195ed3343e29a084cfd22f27d8abcc4218b1f2179358f14f5d",
+        "bytes": 1394471,
+        "public": "raw/ineligible/timing-r2-v2-w256-attempt1/timing-r2-v2-w256.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-prune-w1024-s0.csv",
+        "sha256": "fd8a6f0a203c652b356dd6fe38666c5cd78988437ca8c03e9ea07ec578a02301",
+        "bytes": 1756050,
+        "public": "raw/timing-r0-prune-w1024-s0.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-prune-w1024-s0.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-prune-w1024-s0.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-prune-w1024-s0.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-prune-w1024-s64.csv",
+        "sha256": "03cc2b09e90e06ba8f658859d20aff0d205dbf49a919c5081a04da06f3041e7c",
+        "bytes": 1809307,
+        "public": "raw/timing-r0-prune-w1024-s64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-prune-w1024-s64.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-prune-w1024-s64.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-prune-w1024-s64.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-prune-w256-s0.csv",
+        "sha256": "a3d1dce615b8d43a707d0f84bd862e8454f8efb069f1f1fd45485d3a0aa17e3d",
+        "bytes": 1748700,
+        "public": "raw/timing-r0-prune-w256-s0.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-prune-w256-s0.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-prune-w256-s0.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-prune-w256-s0.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-prune-w256-s64.csv",
+        "sha256": "972e4da698b435d02be6e4af859ae6fe09a016caed790411eff90af4287984ac",
+        "bytes": 1801994,
+        "public": "raw/timing-r0-prune-w256-s64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-prune-w256-s64.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-prune-w256-s64.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-prune-w256-s64.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-prune-w512-s0.csv",
+        "sha256": "354d2be53713d9a805318519bf3d6a3539f8995688ef1f16325864a97ca918f0",
+        "bytes": 1751891,
+        "public": "raw/timing-r0-prune-w512-s0.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-prune-w512-s0.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-prune-w512-s0.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-prune-w512-s0.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-prune-w512-s64.csv",
+        "sha256": "92c335b4dad0da4a69ce4302a49290792648f76b9594e3d21f448a186da08e70",
+        "bytes": 1805815,
+        "public": "raw/timing-r0-prune-w512-s64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-prune-w512-s64.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-prune-w512-s64.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-prune-w512-s64.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-v2-w1024.csv",
+        "sha256": "fb633661863c2fcfc9ec066c6935cbdf5cf24b2705c17f22376d1df0309be3dc",
+        "bytes": 1415280,
+        "public": "raw/timing-r0-v2-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-v2-w1024.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-v2-w1024.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-v2-w1024.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-v2-w256.csv",
+        "sha256": "d4c5624d9a9fedca17e21df3af261dc8193e8c654674e7fd7218925f24e6d6ed",
+        "bytes": 1394544,
+        "public": "raw/timing-r0-v2-w256.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-v2-w256.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-v2-w256.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-v2-w256.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-v2-w512.csv",
+        "sha256": "be8cd49dc933f0273ea372e3ee8618d210dce51d2136be9278feb225b0c2089f",
+        "bytes": 1399917,
+        "public": "raw/timing-r0-v2-w512.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-v2-w512.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-v2-w512.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-v2-w512.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-prune-w1024-s0.csv",
+        "sha256": "855211cb00186931e964a3546728175839f0dbff51b46aff814a89a70b524e0c",
+        "bytes": 1755818,
+        "public": "raw/timing-r1-prune-w1024-s0.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-prune-w1024-s0.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-prune-w1024-s0.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-prune-w1024-s0.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-prune-w1024-s64.csv",
+        "sha256": "9c8477874afb3a637c5ad99a4d70d604801147b2503592a9a19534f38e1a00a8",
+        "bytes": 1809405,
+        "public": "raw/timing-r1-prune-w1024-s64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-prune-w1024-s64.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-prune-w1024-s64.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-prune-w1024-s64.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-prune-w256-s0.csv",
+        "sha256": "2672fd4d6d9c3e284ff65a18c2e1fe91ef505c117bafa2495cfc254bc4fadcd4",
+        "bytes": 1748583,
+        "public": "raw/timing-r1-prune-w256-s0.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-prune-w256-s0.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-prune-w256-s0.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-prune-w256-s0.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-prune-w256-s64.csv",
+        "sha256": "360963ae22e1a9b95d0ec0c9cf821130d0ad898b0d7e1e1fd83aedb725939c3f",
+        "bytes": 1802018,
+        "public": "raw/timing-r1-prune-w256-s64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-prune-w256-s64.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-prune-w256-s64.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-prune-w256-s64.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-prune-w512-s0.csv",
+        "sha256": "01c4846fae4eec2d14fdb3123b4b1a027491a2189e9c459b5984109a26d7a992",
+        "bytes": 1751983,
+        "public": "raw/timing-r1-prune-w512-s0.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-prune-w512-s0.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-prune-w512-s0.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-prune-w512-s0.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-prune-w512-s64.csv",
+        "sha256": "dced48e625155142ba2bb1e60fe01311c3ac92df27fbdd1bf32c16e64126f280",
+        "bytes": 1805953,
+        "public": "raw/timing-r1-prune-w512-s64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-prune-w512-s64.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-prune-w512-s64.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-prune-w512-s64.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-v2-w1024.csv",
+        "sha256": "48e858f693343478f58a7451261aa6484ba4368f8a108f97e7d9c66244020b22",
+        "bytes": 1415300,
+        "public": "raw/timing-r1-v2-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-v2-w1024.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-v2-w1024.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-v2-w1024.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-v2-w256.csv",
+        "sha256": "a0b7f38a9caaa493d49b70054f116db4797f65d0dc0f8b36b0238295284da1f8",
+        "bytes": 1394578,
+        "public": "raw/timing-r1-v2-w256.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-v2-w256.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-v2-w256.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-v2-w256.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-v2-w512.csv",
+        "sha256": "03d094912ecbed2d6b7cd0abdbd3fdb752020ff177c81dfebc950c82ae0f0b9a",
+        "bytes": 1399897,
+        "public": "raw/timing-r1-v2-w512.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-v2-w512.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-v2-w512.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-v2-w512.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-prune-w1024-s0.csv",
+        "sha256": "3990268e2cec9600d5f47092ce5877846159940070fd344920dc6f49e8f882a6",
+        "bytes": 1755905,
+        "public": "raw/timing-r2-prune-w1024-s0.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-prune-w1024-s0.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-prune-w1024-s0.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-prune-w1024-s0.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-prune-w1024-s64.csv",
+        "sha256": "9aeaefb046df208f7956d2b75795bc474fb3c37713ef287ec7d0dcb32f9b8d4a",
+        "bytes": 1809329,
+        "public": "raw/timing-r2-prune-w1024-s64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-prune-w1024-s64.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-prune-w1024-s64.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-prune-w1024-s64.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-prune-w256-s0.csv",
+        "sha256": "77ff59bc3508e259ff9325c5f358fd0c21ce280957c3425f5096f2309add2f1d",
+        "bytes": 1748755,
+        "public": "raw/timing-r2-prune-w256-s0.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-prune-w256-s0.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-prune-w256-s0.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-prune-w256-s0.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-prune-w256-s64.csv",
+        "sha256": "e6b7492e99f2962242a8f8218f3e256a2b4bb8c62a3088322e90a6ff8bda6ebc",
+        "bytes": 1801957,
+        "public": "raw/timing-r2-prune-w256-s64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-prune-w256-s64.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-prune-w256-s64.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-prune-w256-s64.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-prune-w512-s0.csv",
+        "sha256": "22fd6ff9e09b9588bd8ced595308259242c2718f2113126edb1ddb02195a661a",
+        "bytes": 1751850,
+        "public": "raw/timing-r2-prune-w512-s0.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-prune-w512-s0.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-prune-w512-s0.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-prune-w512-s0.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-prune-w512-s64.csv",
+        "sha256": "eb21be59d3df9161dab75ccf415b2a102686cf2719d8c0c37a75cb826d000143",
+        "bytes": 1805886,
+        "public": "raw/timing-r2-prune-w512-s64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-prune-w512-s64.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-prune-w512-s64.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-prune-w512-s64.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-v2-w1024.csv",
+        "sha256": "163895e1c6f3f384181bedd7b1d12f18e2103d0783c040e97ac6464c1766fa59",
+        "bytes": 1415265,
+        "public": "raw/timing-r2-v2-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-v2-w1024.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-v2-w1024.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-v2-w1024.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-v2-w256.csv",
+        "sha256": "e690339c86ed4597ffb1a914f9484ba1c6f3413c8a4328f91434d2ca6e98c22e",
+        "bytes": 1394472,
+        "public": "raw/timing-r2-v2-w256.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-v2-w256.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-v2-w256.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-v2-w256.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-v2-w512.csv",
+        "sha256": "f14a63401b5aca26f226c9b73dd1a683d12305e051282e447f768f87393ad086",
+        "bytes": 1399869,
+        "public": "raw/timing-r2-v2-w512.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-v2-w512.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-v2-w512.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-v2-w512.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      }
+    ],
+    "excluded": [
+      {
+        "original": "raw/timing-r0-prune-w1024-s0.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w1024-s0.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-prune-w1024-s64.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w1024-s64.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-prune-w256-s0.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w256-s0.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-prune-w256-s64.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w256-s64.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-prune-w512-s0.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w512-s0.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-prune-w512-s64.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-prune-w512-s64.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-v2-w1024.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w1024.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-v2-w256.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w256.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-v2-w512.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r0-v2-w512.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-prune-w1024-s0.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w1024-s0.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-prune-w1024-s64.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w1024-s64.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-prune-w256-s0.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w256-s0.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-prune-w256-s64.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w256-s64.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-prune-w512-s0.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w512-s0.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-prune-w512-s64.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-prune-w512-s64.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-v2-w1024.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w1024.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-v2-w256.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w256.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-v2-w512.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r1-v2-w512.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-prune-w1024-s0.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w1024-s0.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-prune-w1024-s64.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w1024-s64.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-prune-w256-s0.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s0.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-prune-w256-s64.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w256-s64.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-prune-w512-s0.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w512-s0.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-prune-w512-s64.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-prune-w512-s64.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-v2-w1024.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w1024.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-v2-w256.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w256.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-v2-w512.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-range-pruning/20261117-cuda5-prune-04/raw/timing-r2-v2-w512.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      }
+    ],
+    "recorded_artifacts_not_in_public_tree_or_lists": []
+  }
+}
