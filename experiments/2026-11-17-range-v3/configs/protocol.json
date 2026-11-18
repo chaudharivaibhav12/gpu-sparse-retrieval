@@ -189,8 +189,9 @@
     {
       "date": "2026-11-18 UTC",
       "after": "Measurement D session 2 (20261117-cuda5-measureD-02) started 08:11 UTC after the 5-minute quiet-GPU wait and was stopped by the overlap rule in the k=10 set (slot timing-k10-r2-v3-2-w1024, 4 overlaps with another user's short GPU processes, 08:15-08:22 UTC); 14 processes complete, not analysed",
-      "change": "None yet. Session 2 is kept as a failed attempt; its data are not combined with any other session. R1-R3 remain undecided pending the owner's choice of how to proceed.",
-      "reason": "The other user's short GPU processes start during our roughly 7 s processes after an idle check has passed, so neither the pre-launch quiet wait nor the per-process idle check prevents overlaps."
+      "change": "Owner decision (2026-11-18 ~15:25 UTC): run the full Measurement D matrix immediately with no idle checks, as 20261117-cuda5-contendedD-02 (run_d.sh CONTENDED=1: no wait for other users' GPU processes, overlaps recorded per process but not replaced; our own jobs still serialised). Sessions 1 and 2 are kept as failed attempts and not combined with it. Its manifest status is exploratory-contended; whether its ratios are used for R1-R3 is the owner's decision, and the report will state that it ran without idle checks, with the per-process sharing summaries.",
+      "reason": "The other user's short GPU processes start during our roughly 7 s processes after an idle check has passed, so neither the pre-launch quiet wait nor the per-process idle check prevents overlaps.",
+      "gpu_time": "about 60 minutes (contendedD-01 took 03:00-04:03 UTC)"
     }
   ],
   "measurement_D": {
