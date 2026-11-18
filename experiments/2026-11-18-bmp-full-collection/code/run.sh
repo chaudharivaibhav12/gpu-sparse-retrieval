@@ -7,7 +7,7 @@
 # Stages:
 #   1. GPU binaries: the exact cuda_range_v2 / cuda_range_prune binaries of GPU_RUN (a completed run
 #      of experiments/2026-11-18-range-pruning), copied from GPU_BUILD and checked against GPU_RUN's
-#      recorded hashes; src/ and tests/ must be unchanged since GPU_RUN's commit. BMP: cloned at the
+#      recorded hashes (later changes to their source files are recorded in logs/reuse.txt). BMP: cloned at the
 #      pinned revision, the reviewed canonical and resident-context patches applied, project_benchmark
 #      added together with this experiment's single-index adapter (code/project_benchmark_single.rs: the
 #      validated adapter's timed query() unchanged, one raw-bound index resident), built with the pinned
@@ -189,11 +189,14 @@ if ! done_stage build-done; then
     grep -q "^STAGE timing-complete " "$GPU_RUN/logs/stages.txt" && grep -q "^RUN_COMPLETE" "$GPU_RUN/logs/run.out" 2>/dev/null \
         || grep -q "^STAGE manifest " "$GPU_RUN/logs/stages.txt" || fail "GPU_RUN is not a completed run"
     gpu_commit=$(cat "$GPU_RUN/logs/commit.txt")
-    git diff --quiet "$gpu_commit" "$COMMIT" -- src tests || fail "src/ or tests/ changed since $gpu_commit"
     for b in cuda_range_v2 cuda_range_prune; do cp "$GPU_BUILD/$b" "$BUILD/$b" || fail "copy $b"; done
     binaries_match "$BUILD" "$GPU_RUN/logs/binaries-sha256.txt" cuda_range_v2 cuda_range_prune || fail "GPU binaries differ from $GPU_RUN's record"
-    { echo "gpu_binaries_from $GPU_RUN (commit $gpu_commit), copied from $GPU_BUILD; hashes equal to its logs/binaries-sha256.txt";
-      echo "src_and_tests_unchanged_to $COMMIT"; cat "$GPU_RUN/logs/reuse.txt" 2>/dev/null; } > "$RUN/logs/reuse.txt"
+    # The timed GPU programs are these exact binaries; their source is GPU_RUN's commit. Any later change
+    # to the files they compile from is recorded here (not a failure: it cannot reach the copied binaries).
+    { echo "gpu_binaries_from $GPU_RUN (source commit $gpu_commit), copied from $GPU_BUILD; hashes equal to its logs/binaries-sha256.txt";
+      echo "--- diff of the GPU binaries' source files, $gpu_commit .. $COMMIT:";
+      git diff "$gpu_commit" "$COMMIT" -- src/cuda_range_v2.cu src/cuda_range_prune.cu src/cpu_pilot.cpp src/range_bitpack.h src/cuda_topk.cuh src/research_runtime.h;
+      echo "--- reuse record of $GPU_RUN:"; cat "$GPU_RUN/logs/reuse.txt" 2>/dev/null; } > "$RUN/logs/reuse.txt"
     log git clone -q https://github.com/pisa-engine/BMP "$BUILD/BMP" || fail "clone BMP"
     (cd "$BUILD/BMP" && git checkout -q "$BMP_REV" && [ "$(git rev-parse HEAD)" = "$BMP_REV" ]) || fail "BMP revision"
     (cd "$BUILD/BMP" && git apply "../../../experiments/2026-11-10-bmp-correctness-fixes/code/bmp-canonical.patch" \
