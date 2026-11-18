@@ -22,6 +22,7 @@
 #      BMP_FREE_GIB of host memory is available. Ineligible processes (active foreign GPU process in
 #      the released phase, or other CPU use above CPU_LIMIT) are kept under raw/ineligible/ and
 #      replaced without a count limit; the run stops at DEADLINE_HOURS and can be resumed (RESUME=1).
+#      Gate rejections and correctness wait only for room to start (7000 MiB GPU / BMP_FREE_GIB host).
 #   5. analysis and manifest.
 set -u
 RUN_ID=$1
@@ -91,6 +92,19 @@ sys.exit(0 if not active and free >= 7000 else 1)
 PY
 }
 host_free_gib() { awk '/^MemAvailable:/ {printf "%d", $2/1048576}' /proc/meminfo; }
+gpu_free_mib() { nvidia-smi -i "$UUID" --query-gpu=memory.free --format=csv,noheader,nounits | tr -d ' '; }
+# Steps that do not depend on contention (gate rejections, correctness) still need room to start:
+# wait until 7000 MiB of device memory (GPU) or BMP_FREE_GIB of host memory (BMP) is free.
+wait_resources() {  # wait_resources TAG KIND
+    local tag=$1 kind=$2
+    while true; do
+        past_deadline && fail "deadline reached waiting for resources before $tag"
+        if [ "$kind" = bmp ]; then [ "$(host_free_gib)" -ge "$BMP_FREE_GIB" ] && return 0
+        else [ "$(gpu_free_mib)" -ge 7000 ] && return 0; fi
+        echo "$(date -u +%FT%TZ) waiting for resources host_free_gib=$(host_free_gib) gpu_free_mib=$(gpu_free_mib)" >> "$RUN/logs/resources-$tag.txt"
+        sleep 30
+    done
+}
 wait_quiet() {  # wait_quiet TAG KIND
     local tag=$1 kind=$2 g c ok
     [ "$DEV" = 1 ] && [ "${QUIET:-1}" = 0 ] && return 0
@@ -227,6 +241,7 @@ reject() {  # reject TAG NAME FIELD
     local out=$RUN/raw/reject-$1 status=0
     done_stage "reject-$1-passed" && return 0
     hold "$out" "reject-$1" "$RUN/raw/interrupted/reject-$1-$(date +%s)"
+    wait_resources "reject-$1" "${KIND[$2]}"
     if [ "$1" = bmp-cpu ]; then
         # Expect CPU 1 but launch on CPU 0 (valid; only the gate can stop it).
         run_cfg "$out" "$2" 1 0 1 || status=$?
@@ -251,6 +266,7 @@ if ! done_stage correctness-passed; then
     out=$RUN/raw/correct-bmp-b32
     if [ ! -e "$RUN/analysis/checked-correct-bmp-b32" ]; then
         hold "$out" correct-bmp-b32 "$RUN/raw/interrupted/correct-bmp-b32-$(date +%s)"
+        wait_resources correct-bmp-b32 bmp
         run_cfg "$out" bmp-b32 1 0 || fail correct-bmp-b32
         checked "$out" bmp-b32 1
     fi
