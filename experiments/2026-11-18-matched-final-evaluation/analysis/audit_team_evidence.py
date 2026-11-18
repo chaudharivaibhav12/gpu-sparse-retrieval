@@ -1,7 +1,9 @@
 import csv,gzip,lzma,hashlib,json,math,statistics,subprocess,zipfile,io
 from pathlib import Path
-R=Path(r'C:/Users/babbe/OneDrive/Desktop/NYU/Github/gpu-sparse-retrieval')
-OUT=Path(__file__).resolve().parent/'team-audit';OUT.mkdir(exist_ok=True)
+R=Path(__file__).resolve().parents[3]
+import argparse
+parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
+OUT=args.output;OUT.mkdir(parents=True,exist_ok=False)
 def read(p):return json.loads(p.read_text())
 def sha(b):return hashlib.sha256(b).hexdigest()
 def stream(p):
@@ -33,6 +35,19 @@ for e,rid in studies:
  for p in sorted((run/'raw').rglob('*')):
   if not p.is_file():continue
   if any(x in p.parts for x in ('ineligible','interrupted')):continue
+  if p.suffixes[-2:]==['.answers','.json']:
+   receipt=read(p);h=hashlib.sha256(b'phase\tround\tquery_id\trank\toriginal_id\tscore\n');total=0
+   for group in receipt['groups']:
+    body=gzip.decompress((run/'raw/answers'/(group['body_sha256']+'.tsv.gz')).read_bytes())
+    assert sha(body)==group['body_sha256'];lines=body.decode().splitlines(keepends=True);assert len(lines)==group['rows']
+    groups={}
+    for line in lines:
+     q,rank,doc,score=line.split();v=groups.setdefault(q,[]);assert int(rank)==len(v)+1;v.append((int(doc),int(score)))
+     full=(str(group['phase'])+'\t'+str(group['round'])+'\t'+line).encode();h.update(full);total+=len(full)
+    assert set(groups)==set(gold)
+    for q,values in groups.items():assert values==gold[q],(p,q)
+    report['ranking_groups']+=len(groups)
+   assert h.hexdigest()==receipt['top_sha256'] and total+len(b'phase\tround\tquery_id\trank\toriginal_id\tscore\n')==receipt['top_bytes'],p
   if p.name.endswith(('.tsv.xz','.tsv.gz')) and not 'ineligible' in p.parts and not 'interrupted' in p.parts:
    with stream(p) as f:
     reader=csv.DictReader(f,delimiter='\t');fields=reader.fieldnames
@@ -62,6 +77,12 @@ for e,rid in studies:
     assert all(runtime[kind].get(k)==v for k,v in expected.items()),p
    report['runtime_gate_qualification']='Author gate validates expected subset; extra resolved fields are retained but not rejected. Future team-runtime runs must freeze complete state.'
    name=stem.split('-',2)[2];timing.setdefault(name,[]).append({q:statistics.median(v) for q,v in data.items()})
+  if p.name=='samples.tsv' and p.parent.name.startswith('timing-r') and p.parent.name.endswith('bmp-b32.bmp'):
+   data={}
+   for row in csv.DictReader(p.open(newline=''),delimiter='\t'):
+    if row['phase']=='measured':data.setdefault(row['query_id'],[]).append(int(row['elapsed_ns'])/1e6)
+   assert set(data)==set(gold) and all(len(v)==20 for v in data.values())
+   timing.setdefault('bmp-b32',[]).append({q:statistics.median(v) for q,v in data.items()})
  for name,ps in timing.items():report['timing_medians'][name]=statistics.median(v for d in ps for v in d.values())
  if 'v2-w1024' in timing:
   for name,ps in timing.items():

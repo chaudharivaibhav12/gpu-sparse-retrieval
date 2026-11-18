@@ -1,5 +1,5 @@
 {
-  "status": "DRAFT: validation and complete controller required before any retrieval submission; NOT a heldout freeze",
+  "status": "Registered calibration design; complete source review and CPU-only build/live monitor checks precede measurement. NOT a heldout freeze.",
   "parent_experiment": "2026-11-17-gpusparse-u8-storage",
   "parent_merge": "b31ff7a57b3283884d637a8f8480e85640ae9242",
   "question": "How do the final exact pruned GPU scorers compare with the stronger compact GPUSparse and CPU-BMP controls under a fresh matched full-collection protocol, and do the frozen choices generalize to heldout queries?",
@@ -35,7 +35,9 @@
     "Independent CPU uint64 oracle for every query, all rounds/processes",
     "Fresh full-score/schedule checks and existing synthetic boundary/tie/large-score fixtures",
     "Complete actual-runtime config/behavior match before measured compute through scripts/research.py run",
-    "Deliberate pre-compute runtime rejection checks for every new adapter path"
+    "Deliberate pre-compute runtime rejection checks for every new adapter path",
+    "Compare every BMP original-ID entry, in order, with the 8,841,823 GSP IDs before any scoring; pinned index and GSP hashes bind this preparation observation.",
+    "Compare every BMP original-ID entry, in order, with the 8,841,823 GSP IDs before any scoring; pinned index and GSP hashes bind this preparation observation."
   ],
   "resources": {
     "host_free_gib_before_BMP": 34,
@@ -45,7 +47,10 @@
     "own_process_swap_stop_gib": 1,
     "poll_seconds": 120,
     "deadline_hours": 24,
-    "retry_rule": "Preserve failed attempts; inspect, repair and separately review; max three reviewed technical repairs. Do not tune away a valid slower/null result."
+    "retry_rule": "Preserve failed attempts; inspect, repair and separately review; max three reviewed technical repairs. Do not tune away a valid slower/null result.",
+    "resource_replacements": "At most three fresh attempts for a timing stage rejected solely by resource eligibility. Preserve all attempts; technical/output failures stop for reviewed repair rather than unchanged automatic retry.",
+    "gpu_free_mib_before_every_stage": 10000,
+    "numa": "numactl --physcpubind=0 --localalloc for every measured process"
   },
   "schedule": "Rotating process-block order; sequential systems, no concurrency; all five configurations measured fresh in the same study. Wait for resources between stages outside timing. Preserve excluded attempts.",
   "analysis": {
@@ -70,9 +75,9 @@
     "No change to underlying BMP pruning, arithmetic, eligibility or canonical tie selection"
   ],
   "pending": [
-    "Compile and run adapter tests, fixtures and exact-weight export consistency checks",
-    "Complete instrumented controller, runtime expectations and independent analysis for all five systems",
-    "Record pre-CIMS review of each code iteration and exact source commit",
-    "Run accepted calibration, then freeze; no heldout measurement currently authorized by a completed freeze"
+    "CPU-only build/helper fixtures/live Linux monitor validation for the exact final controller source",
+    "Fresh full calibration with all fifteen eligible timing processes",
+    "Independent raw/statistical/claim-time review",
+    "Final immutable method/analysis/split freeze, then6480-query heldout evaluation"
   ]
 }
