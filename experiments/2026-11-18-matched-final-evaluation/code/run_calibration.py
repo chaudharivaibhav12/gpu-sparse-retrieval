@@ -20,13 +20,16 @@ def module(name,path):
     spec=importlib.util.spec_from_file_location(name,path);result=importlib.util.module_from_spec(spec);spec.loader.exec_module(result);return result
 def utc():return datetime.datetime.now(datetime.timezone.utc).isoformat()
 def gpu_state():
-    p=subprocess.run(['nvidia-smi','--query-gpu=uuid,memory.free','--format=csv,noheader,nounits'],capture_output=True,text=True,check=True,timeout=20)
-    rows=list(csv.reader(p.stdout.splitlines()));assert len(rows)==1 and rows[0][0].strip()==TARGET
+    p=subprocess.run(['nvidia-smi','--query-gpu=uuid,memory.free,clocks.sm,pstate,power.draw,utilization.gpu,temperature.gpu','--format=csv,noheader,nounits'],capture_output=True,text=True,check=True,timeout=20)
+    rows=list(csv.reader(p.stdout.splitlines()));assert len(rows)==1 and len(rows[0])==7 and rows[0][0].strip()==TARGET
     p=subprocess.run(['nvidia-smi','--query-compute-apps=gpu_uuid,pid,used_memory','--format=csv,noheader,nounits'],capture_output=True,text=True,check=True,timeout=20)
-    return dict(free_mib=int(rows[0][1]),contexts=[(int(r[1]),int(r[2])) for r in csv.reader(p.stdout.splitlines()) if r and r[0].strip()==TARGET])
+    return dict(telemetry=dict(zip(['sm_clock_mhz','pstate','power_w','utilization_percent','temperature_c'],[v.strip() for v in rows[0][2:]])),free_mib=int(rows[0][1]),contexts=[(int(r[1]),int(r[2])) for r in csv.reader(p.stdout.splitlines()) if r and r[0].strip()==TARGET])
 def available_kib():return int(next(x.split()[1] for x in Path('/proc/meminfo').read_text().splitlines() if x.startswith('MemAvailable:')))
 def busy_ticks():
     v=list(map(int,Path('/proc/stat').read_text().splitlines()[0].split()[1:9]));return sum(v)-v[3]-v[4]
+def cpu0_ticks():
+    values=list(map(int,next(x for x in Path('/proc/stat').read_text().splitlines() if x.startswith('cpu0 ')).split()[1:9]));assert len(values)==8
+    return sum(values)-values[3]-values[4]
 def own_ticks(group,seen):
     swap=0
     for p in Path('/proc').iterdir():
@@ -42,12 +45,13 @@ def monitor(stop,path,group,result,process):
     seen={};last=None;samples=0;own_context=False;foreign=set();errors=[];cpu=[];peak=0;swapped=False;ticks=os.sysconf('SC_CLK_TCK')
     with path.open('x') as output:
         while not stop.is_set():
-            frame={'utc':utc()}
+            frame={'utc':utc(),'run_process_group':group,'ticks_per_second':ticks}
             try:
-                state=gpu_state();frame['gpu']=state;memory=0
+                state=gpu_state();frame['gpu']=state;frame['context_ownership']=[];memory=0
                 for pid,mib in state['contexts']:
-                    try:owned=os.getpgid(pid)==group
-                    except ProcessLookupError:owned=False
+                    try:pgid=os.getpgid(pid);owned=pgid==group
+                    except ProcessLookupError:pgid=None;owned=False
+                    frame['context_ownership'].append(dict(pid=pid,pgid=pgid,owned=owned,used_mib=mib,classification='resolved-process-group' if pgid is not None else 'unclassified-exited'))
                     if owned:memory+=mib;own_context=True
                     else:foreign.add(pid)
                 peak=max(peak,memory);own,swap=own_ticks(group,seen);frame['own_swap_kib']=swap
@@ -58,13 +62,15 @@ def monitor(stop,path,group,result,process):
                     if process.poll() is None:
                         try:os.killpg(group,signal.SIGTERM)
                         except ProcessLookupError:pass
-                current=(time.monotonic(),busy_ticks(),own)
+                current=(time.monotonic(),busy_ticks(),own);frame.update(sample_monotonic=current[0],machine_busy_ticks=current[1],own_group_cpu_ticks=own,cpu0_busy_ticks=cpu0_ticks())
+                try:frame['cpu0_frequency_khz']=Path('/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq').read_text().strip()
+                except OSError:frame['cpu0_frequency_khz']=None
                 if last:
                     dt=current[0]-last[0];other=max(0.0,((current[1]-last[1])-(current[2]-last[2]))/ticks/dt);cpu.append(other);frame['other_cpu_cores']=other
                 last=current;samples+=1
             except Exception as error:errors.append(repr(error));frame['error']=repr(error)
             output.write(json.dumps(frame)+'\n');output.flush();stop.wait(1)
-    result.update(samples=samples,own_gpu_context_seen=own_context,foreign_pids=sorted(foreign),errors=errors,other_cpu_cores_mean=statistics.fmean(cpu) if cpu else None,sampled_own_peak_mib=peak,own_swap_limit_exceeded=swapped,qualification='One-second observations are sampled evidence, not proof of exclusive access or exact memory peaks. CPU estimate conservatively includes controller and monitoring costs.')
+    result.update(run_process_group=group,ticks_per_second=ticks,samples=samples,own_gpu_context_seen=own_context,foreign_pids=sorted(foreign),errors=errors,other_cpu_cores_mean=statistics.fmean(cpu) if cpu else None,sampled_own_peak_mib=peak,own_swap_limit_exceeded=swapped,qualification='One-second observations are sampled evidence, not proof of exclusive access or exact memory peaks. CPU estimate conservatively includes controller and monitoring costs.')
 def validate_outputs(label,paths,gold,qids,repeats,warmups,verify=0,config=None):
     delimiter='\t' if label=='bmp' else ','
     with paths['csv'].open(newline='') as f:rows=list(csv.DictReader(f,delimiter=delimiter))
@@ -147,7 +153,7 @@ def main():
     try:
         source_check()
         question=L.event('question',dict(title='Strict matched full-collection calibration comparison',motivation='Close cross-session and CPU-formatting boundary gaps using strongest audited exact controls before heldout freeze',source_commit=inputs['source_commit'],parent_merge='b31ff7a57b3283884d637a8f8480e85640ae9242',protocol=read(root/'experiments'/E/'configs/protocol-draft.json'),artifacts=[L.blob(a.inputs),L.blob(root/'deployment-receipt.json')]),[])
-        wait_resources('before-large-input-hash-and-setup')
+        wait_resources('before-large-input-hash-and-setup');status('validating-full-input-hashes')
         # Calibration paths/hashes are fixed explicitly. Never substitute another query file.
         assert inputs['queries']['sha256']=='150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091'
         for item in [inputs['gsp'],inputs['queries'],inputs['oracle'],inputs['bmp_index'],inputs['rbp256'],inputs['rbp1024']]:assert digest(item['path'])==item['sha256'],item['path']
@@ -184,7 +190,7 @@ def main():
             assert digest(log['path'])==log['sha256']
         L.event('observation',dict(title='Reviewed prebuilt exact-source binaries and compiler evidence',motivation='Reuse CPU-only compilation at this exact source commit; keep build and measurement identities distinct',build=prepared,artifacts=[L.blob(inputs['build_manifest']['path'])]+[L.blob(x['path']) for x in prepared['logs']]),[question['id']])
         inputs['bmp_binary']=dict(prepared['binaries']['bmp'],adapter_sha256=prepared['adapter_sha256'])
-        wait_resources('full-original-passage-ID-sequence-check')
+        wait_resources('full-original-passage-ID-sequence-check');status('validating-full-original-ID-sequence')
         observed(['numactl','--physcpubind=0','--localalloc',prepared['binaries']['verify_ids']['path'],inputs['bmp_index']['path'],gsp['path']],'full-id-sequence',True)
         ids=read(out/'logs/full-id-sequence.stdout');assert ids==dict(documents=8841823,ordered_original_ids_equal=True,gsp_vocab=28679,gsp_nnz=1049282186)
         adapter=root/'experiments/2026-11-17-gpusparse-u8-storage/code/fp32/canonical_baseline.py'
@@ -214,13 +220,16 @@ def main():
             for name,path in paths.items():
                 if name!='cpu_monitor' or label=='bmp':command+=['--output',path]
             if label=='compact':command+=['--output',directory/'native-validation.json','--output',directory/'jit-manifest.json']
-            command+=['--command',*argv];stop=threading.Event();summary={}
-            wait_resources(tag+'-final-admission')
+            command+=['--command',*argv];stop=threading.Event();summary={};observer=None
+            wait_resources(tag+'-final-admission');status('starting-instrumented-run',stage=tag,experiment=spec['id'],timing_requested=tag.startswith('timing-'))
             with (directory/'runner.stdout').open('xb') as so,(directory/'runner.stderr').open('xb') as se:
                 launch=['numactl','--physcpubind=0','--localalloc',*map(str,command)];write_new(directory/'runner-command.json',dict(argv=launch,cwd=str(root),environment_overrides=dict(CUDA_VISIBLE_DEVICES='0',OMP_NUM_THREADS='1',RAYON_NUM_THREADS='1',CUDA_MODULE_LOADING='LAZY',TRITON_CACHE_DIR=str(out/'jit'/tag),CUDA_CACHE_PATH=str(out/'cuda-cache'/tag))))
                 p=subprocess.Popen(launch,cwd=root,env=dict(os.environ,CUDA_VISIBLE_DEVICES='0',OMP_NUM_THREADS='1',RAYON_NUM_THREADS='1',CUDA_MODULE_LOADING='LAZY',TRITON_CACHE_DIR=str(out/'jit'/tag),CUDA_CACHE_PATH=str(out/'cuda-cache'/tag)),stdout=so,stderr=se,start_new_session=True)
-                observer=threading.Thread(target=monitor,args=(stop,directory/'monitor.jsonl',p.pid,summary,p),daemon=True);observer.start()
-                try:rc=p.wait(timeout=7200)
+                try:
+                    write_new(directory/'process-identity.json',dict(runner_pid=p.pid,expected_process_group=p.pid,parent_controller_pid=os.getpid(),created_at_utc=utc(),source_commit=inputs['source_commit'],stage=tag))
+                    status('instrumented-run-active',stage=tag,runner_pid=p.pid,experiment=spec['id'],timing_requested=tag.startswith('timing-'))
+                    observer=threading.Thread(target=monitor,args=(stop,directory/'monitor.jsonl',p.pid,summary,p),daemon=True);observer.start()
+                    rc=p.wait(timeout=7200)
                 except BaseException:
                     if p.poll() is None:
                         try:os.killpg(p.pid,signal.SIGTERM)
@@ -231,7 +240,9 @@ def main():
                         except ProcessLookupError:pass
                         p.wait()
                     raise
-                finally:stop.set();observer.join(timeout=45)
+                finally:
+                    stop.set()
+                    if observer is not None and observer.ident is not None:observer.join(timeout=45)
             assert not observer.is_alive();write_new(directory/'monitor-summary.json',summary);event=read(directory/'runner.stdout');done=event['id']
             if negative:
                 valid=event['payload']['status']=='SPEC_VIOLATION' and set(event['payload'].get('runtime_delta',{}))=={'config.seed_ranges'} and not paths['csv'].exists() and not paths['top'].exists();lat={};validation={'deliberate_rejection':valid}

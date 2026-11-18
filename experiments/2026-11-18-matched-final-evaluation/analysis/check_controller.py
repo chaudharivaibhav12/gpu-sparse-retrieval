@@ -50,13 +50,14 @@ with tempfile.TemporaryDirectory() as d:
   def group(_):
    if exited:raise ProcessLookupError()
    return 123 if owned else 999
-  with patch.object(m,'gpu_state',return_value={'free_mib':10000,'contexts':[(777,7)]}),patch.object(m,'own_ticks',return_value=(0,2*1024**2 if swapped else 0)),patch.object(m,'busy_ticks',return_value=0),patch.object(m.os,'sysconf',create=True,return_value=100),patch.object(m.os,'getpgid',create=True,side_effect=group),patch.object(m.os,'killpg',create=True,side_effect=lambda g,s:kills.append((g,s))):
+  with patch.object(m,'gpu_state',return_value={'free_mib':10000,'contexts':[(777,7)]}),patch.object(m,'own_ticks',return_value=(0,2*1024**2 if swapped else 0)),patch.object(m,'busy_ticks',return_value=0),patch.object(m,'cpu0_ticks',return_value=0),patch.object(m.os,'sysconf',create=True,return_value=100),patch.object(m.os,'getpgid',create=True,side_effect=group),patch.object(m.os,'killpg',create=True,side_effect=lambda g,s:kills.append((g,s))):
    m.monitor(Stop(),d/('monitor-'+str(checks)+'.jsonl'),123,result,Process(None if alive else 0))
+  frame=json.loads((d/('monitor-'+str(checks)+'.jsonl')).read_text());assert frame['run_process_group']==123 and frame['context_ownership'][0]['owned']==owned and frame['context_ownership'][0]['pgid']==(None if exited else 123 if owned else 999)
   assert result['foreign_pids']==([] if owned else [777]) and result['own_gpu_context_seen']==owned
   assert kills==([(123,signal.SIGTERM)] if swapped and alive else []) and all(g!=777 for g,_ in kills);checks+=1
  def command(argv,**_):
-  return types.SimpleNamespace(stdout=m.TARGET+', 11000\n' if '--query-gpu=uuid,memory.free' in argv else '',returncode=0)
- with patch.object(m.subprocess,'run',side_effect=command):assert m.gpu_state()==dict(free_mib=11000,contexts=[]);checks+=1
+  return types.SimpleNamespace(stdout=m.TARGET+', 11000, 2505, P0, 30, 0, 45\n' if any(x.startswith('--query-gpu=') for x in argv) else '',returncode=0)
+ with patch.object(m.subprocess,'run',side_effect=command):assert m.gpu_state()==dict(free_mib=11000,contexts=[],telemetry=dict(sm_clock_mhz='2505',pstate='P0',power_w='30',utilization_percent='0',temperature_c='45'));checks+=1
  calls=[]
  def transient(label,tag,*_):
   calls.append(tag)

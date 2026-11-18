@@ -1,0 +1,33 @@
+{
+  "status": "PASS separate source review and local checks; fresh Linux build/smoke required",
+  "parent_source": "c73c5509dd6aafbdd4666e0152c8224b58268629",
+  "reason": "Preventive monitoring/provenance repair before accepting timing: context ownership was computed live but raw samples lacked PGIDs and runner identity; operational status could remain waiting after a final admission wait had ended.",
+  "changes": [
+    "Persist each GPU PID, PGID, owned flag, classification and run process-group ID",
+    "Persist runner/controller identity and explicit active state after final admission",
+    "Capture SM clock/pstate/power/utilization/temperature through existing query call",
+    "Capture raw global/CPU0/own-group CPU counters and optional CPU0 frequency for independent replay and scoped contention interpretation",
+    "Protect own child cleanup if identity/status writing or monitor startup fails"
+  ],
+  "unchanged": [
+    "All scoring, kernels, query weights and IDs, exactness guards, k/batch, seed/range/thread settings, repetitions/warmups, data split and eligibility thresholds",
+    "Two-minute resource wait and at-most-three resource-only replacements",
+    "Foreign processes are only observed; own live process-group cleanup remains bounded"
+  ],
+  "review": [
+    "Read actual parent config/code and retained original source identity",
+    "CSV field parsing requires exact7-field GPU row; unsupported numeric metadata preserved as strings",
+    "Unknown/exited context remains conservatively unowned",
+    "No new kernel or GPU sampling subprocess calls beyond the existing two per frame",
+    "No heldout content access or parameter tuning"
+  ],
+  "source_sha256": "2671b6f9b67987c3e0cef1ea24750bc93d365f6a6483cf9bbe913262abe78186",
+  "limits": [
+    "Initial attempt retained; no accepted timing results to pool",
+    "Fresh local and Linux smoke/build checks remain necessary"
+  ],
+  "checks": {
+    "controller_checks": 15,
+    "runtime_checks": 24
+  }
+}
