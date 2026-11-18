@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-18-prune-seed-select",
+  "title": "Fast seed selection for the term-major pruned scorer",
+  "owner": "parva",
+  "branch": "exp/parva/2026-11-18-prune-seed-select",
+  "status": "registered 2026-11-18; recorded run 20261118-cuda5-ts-01 pending",
+  "parent_experiment": "2026-11-18-prune-term-bounds",
+  "parent_source_commit": "24b390e",
+  "question": "Does a faster seed selection make the term-major pruned scorer faster, with the same seeds, schedule and answers?",
+  "hypothesis": "Yes at both range sizes, more at 256, from the profiled 22-48 us select_seeds kernel; the gain is bounded by that time.",
+  "motivation": "Profile-driven: select_seeds is the largest remaining pruning overhead, one thread block stalled on barriers and uncoalesced loads.",
+  "code_paths": [
+    "src/cuda_range_prune_ts.cu",
+    "tests/check_seed_select.cu",
+    "experiments/2026-11-18-prune-seed-select/code/run.sh",
+    "experiments/2026-11-18-prune-seed-select/code/expect.py",
+    "experiments/2026-11-18-prune-seed-select/code/gate.py",
+    "experiments/2026-11-18-prune-seed-select/analysis/analyze.py"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-18-prune-seed-select/configs/protocol.json",
+    "experiments/2026-11-18-prune-seed-select/configs/configs.tsv"
+  ],
+  "declared_changes": {
+    "new_scorer": "src/cuda_range_prune_ts.cu (select_seeds replaced; RBP_NO_MAIN guard)",
+    "new_test": "tests/check_seed_select.cu",
+    "control": "src/cuda_range_prune_tb.cu and src/cuda_range_v2.cu unchanged",
+    "shared_files": "none modified"
+  },
+  "scoring_contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "query_split": "calibration-500 only; held-out untouched",
+  "correctness_rule": "Every configuration's top-10 equals the CPU reference for every query; prunets' schedule equals the host recomputation (VERIFY=1) and prunetb's.",
+  "success_rule": "A complete run under the registered protocol; reported whatever the ratios are.",
+  "failure_rule": "Any mismatch or rejected expected run; ineligible processes are replaced.",
+  "recording_ids": [],
+  "runs": [
+    {
+      "run_id": "dev",
+      "kind": "development",
+      "status": "unit test, fixtures, VERIFY smoke and harness smoke; not results",
+      "readme": "experiments/2026-11-18-prune-seed-select/runs/dev/README.md"
+    }
+  ]
+}

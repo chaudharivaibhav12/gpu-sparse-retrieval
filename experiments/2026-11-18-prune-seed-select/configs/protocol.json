@@ -1,6 +1,6 @@
 {
   "experiment_id": "2026-11-18-prune-seed-select",
-  "status": "DRAFT 2026-11-18: not yet registered",
+  "status": "REGISTERED 2026-11-18 before any recorded run; after tests/check_seed_select.cu (6,000 cases; two mutants rejected), tests/check_range_prune.py on cuda_range_prune_ts, a full-collection VERIFY=1 check of 10 queries at range sizes 256 and 1024, and smoke test dev-ts-01 (DEV=1, no fixtures or correctness, 1 process, 1 warm-up + 1 round) passed every stage. No latency from this experiment was read before registration",
   "recording": "self-contained runtime gate (code/gate.py, a copy of experiments/2026-11-18-range-pruning/code/gate.py (amendments 1 and 3)) and self-recorded manifests; not recorded by the team runtime",
   "question": "Does a faster seed selection (fewer radix passes, warp-aggregated histograms, block scans, coalesced tiled placement) make the term-major pruned scorer faster, with the same seeds, schedule and answers?",
   "hypothesis": "The full-collection profile (run 20261118-cuda5-profile-01) measured select_seeds at 21.9 / 48.3 us per query (range size 1024 / 256) in one thread block, stalled on barriers (thread 0 walks 256 bins in each of four passes) and on uncoalesced loads (contiguous per-thread chunks in the placement pass). The new kernel needs two 12-bit histogram passes for typical queries and one coalesced placement pass, so prunets should be faster than prunetb at both sizes, more so at 256",
