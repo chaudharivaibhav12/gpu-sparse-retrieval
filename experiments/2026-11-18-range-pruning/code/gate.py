@@ -51,6 +51,26 @@ def process_ticks(pid):
         return None
 
 
+def activity(gpu_uuid, pids):
+    """Foreign pids that are active: pmon shows SM or memory utilisation > 0, or does not list them.
+    pmon prints '-' when a process ran nothing in its sampling window; that counts as idle."""
+    text = subprocess.run(["nvidia-smi", "pmon", "-i", gpu_uuid, "-c", "1", "-s", "u"], capture_output=True, text=True,
+                          timeout=20, check=True).stdout
+    seen, active = set(), set()
+    for row in text.splitlines():
+        if row.startswith("#") or not row.strip():
+            continue
+        fields = row.split()
+        if not fields[1].isdigit():
+            continue
+        pid = int(fields[1])
+        seen.add(pid)
+        sm, mem = fields[3], fields[4]
+        if any(x not in ("-", "0") for x in (sm, mem)):
+            active.add(pid)
+    return {p for p in pids if p in active or p not in seen}
+
+
 class Sampler(threading.Thread):
     def __init__(self, pid, gpu_uuid):
         super().__init__(daemon=True)
@@ -59,7 +79,8 @@ class Sampler(threading.Thread):
         self.released = threading.Event()
         self.lines = []
         self.gpu = dict(samples=0, own_samples=0, other_samples=0, own_max_mib=0, other_max_mib=0, errors=0,
-                        released_samples=0, released_own_samples=0, released_other_samples=0, released_other_max_mib=0)
+                        released_samples=0, released_own_samples=0, released_other_samples=0, released_other_max_mib=0,
+                        other_active_samples=0, released_other_active_samples=0, released_other_idle_samples=0)
         self.cpu = dict(samples=0, other_cores_sum=0.0, other_cores_max=0.0, own_cores_sum=0.0, errors=0)
 
     def run(self):
@@ -73,20 +94,27 @@ class Sampler(threading.Thread):
                                            "--format=csv,noheader,nounits"], capture_output=True, text=True,
                                           timeout=20, check=True).stdout
                     own = other = 0
+                    others = set()
                     for row in text.splitlines():
                         pid, used = [x.strip() for x in row.split(",")]
                         if int(pid) == self.pid:
                             own += int(used)
                         else:
-                            other += int(used)
+                            other += int(used); others.add(int(pid))
+                    # Amendment 3: per-process activity. A foreign process is active if pmon reports any SM
+                    # or memory utilisation for it, or if it is listed but pmon does not report it.
+                    active = activity(self.gpu_uuid, others) if others else set()
                     g = self.gpu
                     g["samples"] += 1; g["own_samples"] += own > 0; g["other_samples"] += other > 0
                     g["own_max_mib"] = max(g["own_max_mib"], own); g["other_max_mib"] = max(g["other_max_mib"], other)
+                    g["other_active_samples"] += bool(active)
                     released = self.released.is_set()  # read after nvidia-smi returned
                     if released:
                         g["released_samples"] += 1; g["released_own_samples"] += own > 0; g["released_other_samples"] += other > 0
                         g["released_other_max_mib"] = max(g["released_other_max_mib"], other)
-                    line += " gpu_own_mib=%d gpu_other_mib=%d released=%d" % (own, other, released)
+                        g["released_other_active_samples"] += bool(active)
+                        g["released_other_idle_samples"] += bool(others) and not active
+                    line += " gpu_own_mib=%d gpu_other_mib=%d other_active=%d released=%d" % (own, other, len(active), released)
                 except Exception as error:
                     self.gpu["errors"] += 1
                     line += " GPU_ERROR %r" % error
@@ -166,7 +194,7 @@ def main():
                own_cores_mean=c["own_cores_sum"] / c["samples"] if c["samples"] else None,
                note="whole-run averages over the process's life, including index loading; machine busy time minus this scorer and this sampler")
     gpu = dict(g, interval_seconds=SAMPLE_SECONDS) if a.gpu_uuid else None
-    gpu_eligible = (g["released_own_samples"] > 0 and g["released_other_samples"] == 0 and g["errors"] == 0) if a.gpu_uuid else None
+    gpu_eligible = (g["released_own_samples"] > 0 and g["released_other_active_samples"] == 0 and g["errors"] == 0) if a.gpu_uuid else None
     receipt = dict(started_utc=started, ended_utc=now(), argv=command, expected=expected, actual=actual, differences=diff,
                    verdict=verdict, exit_code=process.returncode, gpu_uuid=a.gpu_uuid, gpu_sampling=gpu,
                    gpu_eligible=gpu_eligible, cpu_sampling=cpu)

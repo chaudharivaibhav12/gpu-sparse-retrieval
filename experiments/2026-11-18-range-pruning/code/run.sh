@@ -88,17 +88,33 @@ def busy():
     v=[int(x) for x in open("/proc/stat").readline().split()[1:9]]; return sum(v)-v[3]-v[4]
 import os; t=os.sysconf("SC_CLK_TCK"); a=busy(); time.sleep(5); print("%.2f"%((busy()-a)/t/5))'; }
 past_deadline() { [ "$(date +%s)" -ge "$DEADLINE" ]; }
+# Amendment 3: the GPU is quiet when no foreign compute process is active (code/gate.py activity())
+# and at least 7000 MiB of device memory is free. Prints "active=N free_mib=M listed=L"; exit 0 if quiet.
+gpu_quiet() {
+    python3 - "$UUID" "$GATE" <<'PY'
+import importlib.util, subprocess, sys
+uuid, gate = sys.argv[1], sys.argv[2]
+spec = importlib.util.spec_from_file_location("gate", gate); g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
+apps = subprocess.run(["nvidia-smi", "-i", uuid, "--query-compute-apps=pid", "--format=csv,noheader"], capture_output=True, text=True, timeout=20, check=True).stdout
+pids = {int(x) for x in apps.split()}
+free = int(subprocess.run(["nvidia-smi", "-i", uuid, "--query-gpu=memory.free", "--format=csv,noheader,nounits"], capture_output=True, text=True, timeout=20, check=True).stdout.strip())
+active = g.activity(uuid, pids) if pids else set()
+print("active=%d free_mib=%d listed=%d" % (len(active), free, len(pids)))
+sys.exit(0 if not active and free >= 7000 else 1)
+PY
+}
 wait_quiet() {  # timing processes only; waits until quiet or the deadline
     local tag=$1 g c
     # Development only: QUIET=0 skips the wait (a recorded run always waits).
     [ "$DEV" = 1 ] && [ "${QUIET:-1}" = 0 ] && return 0
     while true; do
         past_deadline && fail "deadline reached waiting before $tag (resume with RESUME=1 and a later DEADLINE_HOURS)"
-        g=$(gpu_others); c=$(cpu_others)
-        if [ -z "$g" ] && python3 -c "import sys; sys.exit(0 if $c <= $CPU_LIMIT else 1)"; then
-            echo "$(date -u +%FT%TZ) quiet other_cores=$c" >> "$RUN/logs/quiet-$tag.txt"; return 0
+        local gq=0
+        g=$(gpu_quiet) || gq=1; c=$(cpu_others)
+        if [ "$gq" = 0 ] && python3 -c "import sys; sys.exit(0 if $c <= $CPU_LIMIT else 1)"; then
+            echo "$(date -u +%FT%TZ) quiet other_cores=$c $g" >> "$RUN/logs/quiet-$tag.txt"; return 0
         fi
-        echo "$(date -u +%FT%TZ) busy other_cores=$c gpu_processes=$(echo "$g" | grep -c .)" >> "$RUN/logs/busy-$tag.txt"
+        echo "$(date -u +%FT%TZ) busy other_cores=$c $g" >> "$RUN/logs/busy-$tag.txt"
         sleep 30
     done
 }
