@@ -1,5 +1,28 @@
 # Current project status
 
+November 18: four more studies were merged (#21-#24) on the full collection (8,841,823 passages, 500 calibration queries, k=10, RTX 4070 on cuda5). All answers equal the CPU reference.
+
+| Study | Result | Evidence |
+|---|---|---|
+| [BMP on the same host](../experiments/2026-11-18-bmp-full-collection/README.md) (#21) | BMP (SIGIR '24, exact, one thread, b=32 raw bounds) takes **11.904 ms median** (13.470 mean). The GPU scorers are **16.8× [16.3, 17.5]** (range scorer v2) and **25.5× / 28.8×** (the #19 pruned scorer, range size 1024 / 256) faster. BMP's top-10 equals the reference on all 500 queries, its first full-collection check. GPU timings come from run `20261117-cuda5-prune-04` (same host and binaries, another session) | run `20261118-cuda5-bmp-02`; failed attempt `bmp-01` preserved |
+| [Hardware profile](../experiments/2026-11-18-full-profile/README.md) (#22) | The range scorer is **latency-bound**: 99% busy, 98% achieved occupancy, but DRAM at 70 GB/s (14% of the 504 GB/s peak) and an 87% L2 hit rate. In the pruned scorer, computing bounds (100-114 µs) and selecting seeds (22-48 µs) took **28% / 44%** of each query at range size 1024 / 256 | run `20261118-cuda5-profile-01` (Nsight Systems and Compute, 25 queries) |
+| [Term-major bounds](../experiments/2026-11-18-prune-term-bounds/README.md) (#23) | Computing the bounds per query term (coalesced reads, integer atomic adds) makes the pruned scorer **1.27× [1.27, 1.28] / 1.36× [1.34, 1.37]** faster at 1024 / 256, with a bit-identical schedule and answers | run `20261118-cuda5-tb-01` |
+| [Fast seed selection](../experiments/2026-11-18-prune-seed-select/README.md) (#24) | A rewritten seed selection (fewer radix passes, block scans, coalesced placement) adds **1.024× [1.022, 1.027] / 1.027× [1.025, 1.029]**, with the same seeds and answers. The gain (7-8 µs per query) is well below the profiled kernel time; seed selection is no longer worth optimising | run `20261118-cuda5-ts-01` |
+
+The project's exact scorers now stand as follows (run `20261118-cuda5-ts-01`):
+
+| Scorer | Median ms | p99 ms | Over the range scorer v2 |
+|---|---:|---:|---|
+| `cuda_range_v2`, range size 1024 (exhaustive) | 0.690 | 1.085 | 1 |
+| `cuda_range_prune_ts`, range size 1024, 64 seeds | 0.368 | **1.001** | **1.98× [1.91, 2.05]** |
+| `cuda_range_prune_ts`, range size 256, 64 seeds | **0.272** | 1.910 | **2.38× [2.27, 2.49]** |
+
+At range size 1024 the pruned scorer's p99 is below the exhaustive scorer's; at 256 its median is lower but its tail is heavier. Against BMP's 11.904 ms median these are about 32× and 44× (median over median). That comparison is indicative only, because the BMP and `prunets` timings come from different sessions; the registered BMP comparison is the one in #21.
+
+Literature: no prior GPU implementation of exact block-bound or block-max pruning for learned sparse retrieval was found ("to our knowledge"; the search was not exhaustive). GPUSparse (arXiv 2606.26441) argues that dynamic pruning does not transfer to GPUs because its decisions are sequential and divergent. Our pruning avoids both: a parallel seed pass fixes the threshold once, and the decision is made per range, not per document.
+
+Still open: choose and freeze the configuration, then the 6,480-query held-out evaluation; whether the baselines (GPUSparse, BMP) also run on the held-out queries; k > 10; report section owners. The status text below is historical.
+
 November 17 (evening): three studies were merged on the full collection (8,841,823 passages, 500 calibration queries, k=10, RTX 4070 on cuda5). All answers equal the CPU reference.
 
 | Study | Result | Evidence |
