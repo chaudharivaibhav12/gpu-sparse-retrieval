@@ -1,6 +1,6 @@
 {
   "experiment_id": "2026-11-18-bmp-full-collection",
-  "status": "DRAFT: not registered; no recorded run",
+  "status": "REGISTERED 2026-11-17 before any recorded run; after a full-collection BMP correctness check (all 500 queries equal to the CPU reference) and smoke tests dev-bmp-01/02 (stopped by harness fixes: reuse-source rule, resource waits) and dev-bmp-03 (the design registered here). One development latency was seen (see development_disclosure)",
   "recording": "self-contained runtime gate (code/gate.py, a copy of experiments/2026-11-18-range-pruning/code/gate.py at 0dc7b3b, amendments 1 and 3) and self-recorded manifests; not recorded by the team runtime",
   "question": "How does BMP, the exact state-of-the-art CPU method, compare with the exact GPU scorers (range v2 and seeded range-bound pruning) on the same host (cuda5), index, queries and answers, at full scale?",
   "hypothesis": "None about the size of the gap. Published single-thread BMP reports 10.5 ms mean for this collection at k=10 on other hardware; our GPU scorers measured 0.49-0.72 ms mean on cuda5. This run replaces that cross-paper indication with a same-host measurement",

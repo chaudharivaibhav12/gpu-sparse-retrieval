@@ -6,15 +6,18 @@ How do the exact GPU scorers compare with BMP, the exact state-of-the-art CPU me
 
 ## Design
 
-[configs/protocol.json](configs/protocol.json). Four configurations in one session on cuda5, 3 processes each in rotating order, 3 warm-up + 20 measured rounds over the 500 calibration queries:
+[configs/protocol.json](configs/protocol.json), registered before any recorded run. BMP is timed on cuda5: `67ad8c68` with the team's reviewed canonical patch and resident-context overlay, block size 32, raw block bounds, exact (alpha = beta = 1), one thread on CPU 0 and memory node 0. There are 3 processes, each with 3 warm-up and 20 measured rounds over the 500 calibration queries. It uses `code/project_benchmark_single.rs`, the validated adapter with its timed `query()` byte-identical and only the second (compressed) index removed. One 13.4 GB index (about 26 GB resident) fits on the shared host; two did not.
 
-| configuration | what |
-|---|---|
-| `bmp-b32` | BMP `67ad8c68` with the team's reviewed canonical patch, resident-context overlay and `project_benchmark` adapter; block size 32; exact (alpha = beta = 1). One thread pinned to CPU 0, memory node 0. Raw and compressed bounds are timed in alternating order in each process |
-| `v2-w1024` | the exact range scorer (the project's earlier best) |
-| `prune-w1024-s64`, `prune-w256-s64` | seeded range-bound pruning, balanced and fastest configurations |
+The GPU side is not re-timed. It is the recorded timing of range-pruning run `20261117-cuda5-prune-04`: same host, verified binaries, queries and reference, from another session. Its files are checked against that run's manifest. The GPU control was consistent across five sessions (0.686-0.690 ms median), and re-timing would need a quiet GPU, the scarce resource. Primary contrasts: `bmp-b32 / v2-w1024`, `/ prune-w1024-s64` and `/ prune-w256-s64`, paired by query and process index.
 
-The GPU binaries are the verified binaries of range-pruning run `20261117-cuda5-prune-04`, reused by hash. BMP is built in the run from the pinned revision and patches, and its unit tests run. BMP's answers for both layouts are checked against the CPU reference on all 500 queries, once before timing and then in every timing process. The primary contrast is raw-bound BMP (its faster layout at 1M) over each GPU scorer, paired by process and query.
+Fairness to BMP:
+- A process starts only with 34 GiB of host memory free.
+- A process is ineligible if its CPU spent more than 1% of the measured rounds waiting for I/O. A paged-out index would make the timing measure the disk, not BMP; a cold development round on a swapping machine spent 321 s waiting for I/O against 22 s computing.
+- BMP's timing boundary also includes query-text parsing and TREC output, which slightly favours the GPU.
+
+## Correctness so far
+
+On the full collection, BMP's top-10 equals the CPU reference on all 500 calibration queries. This is the first such check beyond 1M passages.
 
 ## Inputs
 
