@@ -1,0 +1,69 @@
+{
+  "experiment_id": "2026-11-18-prune-term-bounds",
+  "status": "REGISTERED 2026-11-18 before any recorded run; after tests/check_range_prune.py passed on cuda_range_prune_tb (864 runs) and smoke test dev-tb-01 (DEV=1, no fixtures or correctness, 1 process, 1 warm-up + 1 round) passed every stage. No latency from this experiment was read before registration",
+  "recording": "self-contained runtime gate (code/gate.py, a copy of experiments/2026-11-18-range-pruning/code/gate.py (amendments 1 and 3)) and self-recorded manifests; not recorded by the team runtime",
+  "question": "Does computing the range bounds term-major (coalesced reads, atomic adds) instead of per range (binary search per term) make the seeded range-bound pruning scorer faster, with a bit-identical schedule and identical answers?",
+  "hypothesis": "The full-collection profile (experiments/2026-11-18-full-profile, run 20261118-cuda5-profile-01) measured the per-range bounds kernel at 100-114 us of a 443/370 us GPU span (range size 1024/256), memory-latency bound at 3-14% of SM peak. A term-major kernel reads each query term's contiguous block list once and should take a small fraction of that, so prune-tb should be faster than prune at both sizes, more so at 256",
+  "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1; uint8 impacts, prepared integer query weights, uint32 accumulation under the conservative-bound guard, reported as uint64; ties by original numeric passage ID; all passages eligible",
+  "exactness": "The bounds are the same integer sums (atomic integer addition is order-independent, and the host guard keeps every bound below 2^32 - 1), so seeds, theta and the scored set are identical to cuda_range_prune; the range-pruning experiment's exactness argument applies unchanged",
+  "inputs": {
+    "rule": "checked by whole-file SHA-256 before any scoring",
+    "gsp": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac",
+    "rbp_w1024": "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab (pinned in experiments/2026-11-15-full-collection-baselines; content hash 482cb80e9e0830275fb9e9c4a56341a8965c565e31045677a8f1bf822cdd6b25)",
+    "rbp_w512": "d35a69909ea2507e29ac6c27edc96b4ca259e69614f9aca5029c6801d3f408a0 (content hash b5a23d269b58f29eaca1b1960db683f9b0064d3c6d5e71d7193f7017357cd3df)",
+    "rbp_w256": "0ad6531c7698c7541fd9f6d62fb4fa34619e4b765656cccfa3d13fdc64202892 (content hash 90b86a651aa0be4cc45094e9f1891df184c2d93718dc71f081a74072248cd328)",
+    "queries": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091 (500 calibration queries)",
+    "cpu_reference_top10": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed",
+    "provenance": "W512 and W256 built on cuda5 from the pinned GSP by range_bitpack_tool (`build GSP OUT SIZE positions`, uniform ranges), compiled from src/range_bitpack_tool.cpp and src/range_bitpack.h as last changed in 223cf4b; the same binary regenerated the pinned W1024 index with an equal hash"
+  },
+  "fixed": {
+    "documents": 8841823,
+    "k": 10,
+    "query_count": 500,
+    "score_threads": 256,
+    "host": "cuda5 (RTX 4070, UUID GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7; host thread on CPU 0, local allocation)"
+  },
+  "implementations": {
+    "v2": "src/cuda_range_v2.cu unchanged (variant 5): one block per range, exhaustive",
+    "prune": "src/cuda_range_prune.cu, unchanged: the scorer measured in range-pruning run 20261117-cuda5-prune-04",
+    "prunetb": "src/cuda_range_prune_tb.cu: cuda_range_prune.cu with step 1 replaced by term_bounds (blockIdx.y = query term, chunks stride over its contiguous blocks, atomicAdd into the zeroed bound array; about 4 thread blocks per SM in total); everything else identical (44-line diff)",
+    "build": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6)"
+  },
+  "configurations": [
+    "v2-w1024",
+    "prune-w1024-s64",
+    "prunetb-w1024-s64",
+    "prune-w256-s64",
+    "prunetb-w256-s64"
+  ],
+  "control": "v2-w1024",
+  "timing_boundary": "Per query, host wall clock from building the query argument from its parsed (term, weight) pairs to the ordered top-k (original IDs and scores) in host memory, including every kernel launch, synchronisation and the result transfer (query_wall_ms, unchanged from v2). The pruned scorer's schedule statistics are copied after the boundary. Index loading, block maxima, tie ranks, the gate, output writes and checks are outside it",
+  "timing": {
+    "processes": 3,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "order": "every configuration once per pass, three passes with rotation offsets 0, ceil(n/3), ceil(2n/3)",
+    "before_each_process": "timing processes only: wait (30 s polls, bounded by the deadline) until no foreign GPU process is active, 7000 MiB of device memory are free and other users' CPU use is at most CPU_LIMIT cores",
+    "sampling": "every 0.5 s during each process: nvidia-smi compute processes on the GPU and machine CPU time from /proc minus the scorer and the sampler; sampler on CPU 15",
+    "eligibility": "a timing process is ineligible if a foreign GPU process was active (per-process SM or memory utilisation above 0, or listed but not reported) in its released phase, its own was not sampled, or other users' CPU use averaged more than CPU_LIMIT cores; a non-zero exit while another GPU process was sampled is a contended failure (ineligible); any other failure stops the run",
+    "replacement": "ineligible processes are kept under raw/ineligible/ and replaced without a count limit; the run stops at a 12-hour deadline and can be resumed from the same commit",
+    "cpu_limit_cores": 4.0,
+    "cpu_limit_rationale": "Every configuration is a GPU scorer with one host thread on CPU 0 (sampler on CPU 15, 14 other cores). The earlier GPU experiments (range batching, full-collection baselines) had no CPU rule. The CPU-baseline experiment's 1.0 core was first adopted here, but in dry-run dev-prune-01 another user's single-threaded job kept other CPU use at 1.1-2.7 cores for over 15 minutes with no GPU process, which would stall or fail the run without bearing on GPU timing. 4.0 cores is a quarter of the machine. It was set before registration and before any latency from this experiment was read; other users' CPU use is recorded for every process. The GPU rule (no other GPU process sampled) is unchanged",
+    "rules_source": "the range-pruning experiment's rules with its amendments 1-3 in force from the start"
+  },
+  "correctness_gate": "From the timed source and binaries on the timed host: tests/check_range_bitpack.py for v2 and tests/check_range_prune.py for both pruned scorers (answers and the independent schedule model); two deliberate gate rejections; every configuration once against the CPU reference, with VERIFY=1 (host recomputation of every answer and of the whole schedule) for the two prunetb configurations; every timing process's answers against the CPU reference. Any mismatch stops the run",
+  "analysis": {
+    "per_process_query": "median of the 20 measured rounds",
+    "primary": "prune-w<size>-s64 / prunetb-w<size>-s64 for size 1024 and 256: geometric mean over (process, query) pairs; above 1 means term-major bounds are faster",
+    "secondary": "v2-w1024 / prunetb-w<size>-s64 (overall speedup over the exact range scorer); replication of the range-pruning primary contrasts v2-w1024 / prune-w<size>-s64",
+    "descriptive": "median, mean, p95, p99 of the query-process medians; scored range fraction and postings per query of each prune configuration (deterministic; checked identical across rounds and processes)",
+    "interval": "crossed process/query bootstrap, 10,000 draws, seed 20261118, percentile 2.5/97.5; conditional on this session and the calibration queries",
+    "script": "analysis/analyze.py"
+  },
+  "decision_rule": "prunetb replaces prune as the project's pruned scorer if a primary interval lies wholly above 1 (identical schedule and answers, so no other trade-off); otherwise prune is kept and the result reported as negative",
+  "limits": [
+    "one host, one GPU (RTX 4070), k=10, batch 1",
+    "the change was motivated by a profile of the same calibration queries; the held-out evaluation is the unbiased test",
+    "shared machine; calibration queries only; held-out untouched"
+  ]
+}

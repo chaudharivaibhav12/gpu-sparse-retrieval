@@ -1,0 +1,201 @@
+{
+  "run": "/scratch/psp8502/runs/2026-11-18-prune-term-bounds/20261118-cuda5-tb-01",
+  "processes": 3,
+  "warmups": 3,
+  "rounds": 20,
+  "queries": 500,
+  "development": false,
+  "cpu_limit_cores": 4.0,
+  "control": "v2-w1024",
+  "estimator": "per (process, query) median of the measured rounds; paired ratios by process index and query; geometric mean; crossed process/query bootstrap, 10000 draws, seed 20261118",
+  "reading": "'A / B' is how many times longer A takes than B: above 1, B is faster",
+  "configurations": {
+    "v2-w1024": {
+      "query_process_medians_ms": {
+        "median": 0.69146925,
+        "mean": 0.7222292356666666,
+        "p95": 0.9641945999999997,
+        "p99": 1.08696395,
+        "max": 1.1755200000000001
+      },
+      "per_process_median_ms": [
+        0.69129525,
+        0.69126425,
+        0.69172075
+      ],
+      "other_cpu_cores_mean_per_process": [
+        1.1226384972872023,
+        1.1543885139397891,
+        1.1178102516525872
+      ]
+    },
+    "prune-w1024-s64": {
+      "query_process_medians_ms": {
+        "median": 0.47792650000000003,
+        "mean": 0.520964412,
+        "p95": 0.9966999249999994,
+        "p99": 1.2076711999999998,
+        "max": 1.297685
+      },
+      "per_process_median_ms": [
+        0.4763985,
+        0.478533,
+        0.47792650000000003
+      ],
+      "other_cpu_cores_mean_per_process": [
+        1.140308745204688,
+        1.0977515089248342,
+        1.106732808787087
+      ],
+      "scored_range_fraction": {
+        "median": 0.3451650260567458,
+        "mean": 0.3795715112912565,
+        "p90": 0.7085350318471338
+      },
+      "scored_postings_per_query": {
+        "median": 8866593.0,
+        "mean": 10445338.16
+      }
+    },
+    "prunetb-w1024-s64": {
+      "query_process_medians_ms": {
+        "median": 0.37729450000000003,
+        "mean": 0.41435786866666663,
+        "p95": 0.8203015499999999,
+        "p99": 1.0101798499999999,
+        "max": 1.067235
+      },
+      "per_process_median_ms": [
+        0.3781215,
+        0.37713275,
+        0.37762075
+      ],
+      "other_cpu_cores_mean_per_process": [
+        1.196173333144299,
+        1.170571038237773,
+        1.1212784545219299
+      ],
+      "scored_range_fraction": {
+        "median": 0.3451650260567458,
+        "mean": 0.3795715112912565,
+        "p90": 0.7085350318471338
+      },
+      "scored_postings_per_query": {
+        "median": 8866593.0,
+        "mean": 10445338.16
+      }
+    },
+    "prune-w256-s64": {
+      "query_process_medians_ms": {
+        "median": 0.3888315,
+        "mean": 0.49414936333333337,
+        "p95": 1.199459,
+        "p99": 2.14952225,
+        "max": 2.3888499999999997
+      },
+      "per_process_median_ms": [
+        0.388925,
+        0.3907565,
+        0.388382
+      ],
+      "other_cpu_cores_mean_per_process": [
+        1.1578227622858572,
+        1.1588544382912358,
+        1.0807528486926148
+      ],
+      "scored_range_fraction": {
+        "median": 0.06276962274530241,
+        "mean": 0.09764260690813284,
+        "p90": 0.22374706853122558
+      },
+      "scored_postings_per_query": {
+        "median": 3127767.5,
+        "mean": 4344529.738
+      }
+    },
+    "prunetb-w256-s64": {
+      "query_process_medians_ms": {
+        "median": 0.27955925,
+        "mean": 0.3836645616666666,
+        "p95": 1.025179749999999,
+        "p99": 1.92296925,
+        "max": 2.1652
+      },
+      "per_process_median_ms": [
+        0.27982625,
+        0.27933074999999996,
+        0.27931475
+      ],
+      "other_cpu_cores_mean_per_process": [
+        1.165099882654594,
+        1.1354566263357613,
+        1.1844144690848455
+      ],
+      "scored_range_fraction": {
+        "median": 0.06276962274530241,
+        "mean": 0.09764260690813284,
+        "p90": 0.22374706853122558
+      },
+      "scored_postings_per_query": {
+        "median": 3127767.5,
+        "mean": 4344529.738
+      }
+    }
+  },
+  "contrasts": {
+    "prune-w1024-s64 / prunetb-w1024-s64": {
+      "ratio": 1.2741107452238574,
+      "interval_95": [
+        1.26622422212011,
+        1.2820596041473709
+      ],
+      "pairs": 1500,
+      "group": "primary"
+    },
+    "prune-w256-s64 / prunetb-w256-s64": {
+      "ratio": 1.3546275447470946,
+      "interval_95": [
+        1.3407599496729512,
+        1.3690294198989705
+      ],
+      "pairs": 1500,
+      "group": "primary"
+    },
+    "v2-w1024 / prunetb-w1024-s64": {
+      "ratio": 1.9266360236251057,
+      "interval_95": [
+        1.864470024377315,
+        1.9893690959049113
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024 / prune-w1024-s64": {
+      "ratio": 1.512141727748009,
+      "interval_95": [
+        1.4693127704962599,
+        1.5562762157344014
+      ],
+      "pairs": 1500,
+      "group": "replication"
+    },
+    "v2-w1024 / prunetb-w256-s64": {
+      "ratio": 2.3110222221185643,
+      "interval_95": [
+        2.209400635919131,
+        2.4170103084415437
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024 / prune-w256-s64": {
+      "ratio": 1.7060203973262815,
+      "interval_95": [
+        1.6415910252119188,
+        1.7718810926671118
+      ],
+      "pairs": 1500,
+      "group": "replication"
+    }
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "started_utc": "2026-11-17T09:42:06.096292Z",
+  "ended_utc": "2026-11-17T09:48:00.624903Z",
+  "argv": [
+    "env",
+    "OMP_PROC_BIND=close",
+    "OMP_PLACES=cores",
+    "numactl",
+    "--physcpubind=0,2,4,6,8,10,12,14",
+    "--membind=0",
+    "build/20261117-cuda5-cpu-01/cpu_exhaustive",
+    "/scratch/psp8502/full/full-8841823.gsp",
+    "data/derived/calibration-500.tsv",
+    "/scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t8.csv",
+    "/scratch/psp8502/runs/2026-11-17-cpu-baselines/20261117-cuda5-cpu-01/raw/timing-r2-cpu-t8.tsv",
+    "500",
+    "10",
+    "8",
+    "20",
+    "3"
+  ],
+  "expected": {
+    "config": {
+      "docs": 8841823,
+      "query_count": 500,
+      "k": 10,
+      "index_path": "/scratch/psp8502/full/full-8841823.gsp",
+      "queries_path": "data/derived/calibration-500.tsv",
+      "mode": "cpu-exhaustive",
+      "gpu_id": -1,
+      "threads": 8,
+      "warmup_rounds": 3,
+      "repeats": 20,
+      "nnz": 1049282186,
+      "vocab": 28679
+    },
+    "behavior": {
+      "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+      "arithmetic": "uint32-guarded-exact-widened-uint64",
+      "document_impacts": "uint8-exact",
+      "query_policy": "BMP-f32-ceil-cap32",
+      "tie_order": "score_desc_original_numeric_id_asc",
+      "eligibility": "all_documents",
+      "layout": "term-major-inverted-in-memory",
+      "schedule": "exhaustive-term-at-a-time",
+      "parallelism": "openmp-document-parts-by-posting-count",
+      "selection": "per-part-heap-then-merge",
+      "accumulator": "uint32-gated-below-2^32-1-widened-to-uint64"
+    }
+  },
+  "actual": {
+    "config": {
+      "mode": "cpu-exhaustive",
+      "docs": 8841823,
+      "query_count": 500,
+      "k": 10,
+      "gpu_id": -1,
+      "index_path": "/scratch/psp8502/full/full-8841823.gsp",
+      "queries_path": "data/derived/calibration-500.tsv",
+      "threads": 8,
+      "warmup_rounds": 3,
+      "repeats": 20,
+      "nnz": 1049282186,
+      "vocab": 28679,
+      "largest_part_docs": 1237761
+    },
+    "behavior": {
+      "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+      "arithmetic": "uint32-guarded-exact-widened-uint64",
+      "document_impacts": "uint8-exact",
+      "query_policy": "BMP-f32-ceil-cap32",
+      "tie_order": "score_desc_original_numeric_id_asc",
+      "eligibility": "all_documents",
+      "layout": "term-major-inverted-in-memory",
+      "schedule": "exhaustive-term-at-a-time",
+      "parallelism": "openmp-document-parts-by-posting-count",
+      "selection": "per-part-heap-then-merge",
+      "accumulator": "uint32-gated-below-2^32-1-widened-to-uint64"
+    }
+  },
+  "differences": [],
+  "verdict": "accepted",
+  "exit_code": 0,
+  "gpu_uuid": null,
+  "gpu_sampling": null,
+  "gpu_eligible": null,
+  "cpu_sampling": {
+    "interval_seconds": 0.5,
+    "samples": 708,
+    "errors": 0,
+    "other_cores_mean": 0.24404676407041534,
+    "other_cores_max": 1.6191931523589584,
+    "own_cores_mean": 5.648676808912058,
+    "note": "whole-run averages over the process's life, including index loading; machine busy time minus this scorer and this sampler"
+  }
+}

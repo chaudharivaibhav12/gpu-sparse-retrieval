@@ -1,0 +1,3 @@
+# dev-cuda2-iso-01
+
+Development attempt, not a record (`DEV=1`, uncommitted source based on `97b9ee5` plus the driver later committed as `8afe62f`; identical kernel). Same script and GPU as `20261115-cuda2-iso-01`. 25 of 32 configurations passed, then the driver stopped with `ERROR: out of memory` at 1M, k=1000, sequential, batch 4. Cause: other users' jobs held about 9.5 GB of the 11 GB on each GPU; the driver needs about 0.45 GB for the 1M index plus 24 MB per slot at k=1000. A probe on GPU 1 (64 queries, streams, batch 32, k=1000) failed the same way. No code change followed; the recorded run passed once GPU 0 was free. Files are kept on cuda2 scratch, outside Git.

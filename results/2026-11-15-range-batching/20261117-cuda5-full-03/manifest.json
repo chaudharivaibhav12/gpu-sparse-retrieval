@@ -1,0 +1,2543 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-15-range-batching",
+  "run_id": "20261117-cuda5-full-03",
+  "status": "completed-timing",
+  "scope": "GPU GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7; 8841823 documents; 500 calibration queries; configurations sequential-b1-k10 streams-b1-k10 batched-b1-k10 sequential-b4-k10 streams-b4-k10 batched-b4-k10 sequential-b16-k10 streams-b16-k10 batched-b16-k10 sequential-b32-k10 streams-b32-k10 batched-b32-k10; correctness and gate checks then 3 processes each in rotating order; 3 warm-up + 20 measured rounds; range 1024 positions; 256 threads; ineligible processes replaced: 2",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "902278f36ddd623a1838a7c31ea69c9d78711641",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17; g++ -O3 -Wall -Wextra -Wpedantic -std=c++17",
+    "source_sha256": {
+      "experiments/2026-11-15-range-batching/configs/timing-full.tsv": "2c54a4310753ebbad3072b9cab714b7489eec38a64073d7441627f08b0695bb5",
+      "src/cuda_range_batch.cu": "8e6561b84de314bd9c85d78503865ba39c5e5ecbf7d928c463b562e73b7c7cf4",
+      "src/cuda_range_v2.cu": "a8058952b7dbfe5b810183fbe708838464b11e82995f09d98cf06d28564e6e56",
+      "src/range_bitpack.h": "98fb4ae1e2f3a01bc214d749c47eaa59dbeb17ad0726cc2a18fd1125d9c9c37c",
+      "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+      "src/research_runtime.h": "949757134d97142fa1f5d6e56a79cc61b596d706c0c0ea1577485ca0325d1c59",
+      "tests/check_batched_kernel_sync.py": "3b09ff710309c6e091055ec6dc76649b687ce083fb8b9a9fd7d42a1d78ff0d3f",
+      "tests/check_range_batch.py": "61aca820f8ccf98a4c82566641bb6cbd934863b6fed5a73f2e2f0f5a74e67070",
+      "tests/check_range_bitpack.py": "12c65d6e53e901ead26a412d59860de48fe51b1225a03239832b4d66ac77f7de",
+      "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py": "ca43fb45ed74e0fc8d24c14898ac8ae3d32c7ebd3f805b55f6d59db87378d18e",
+      "experiments/2026-11-15-range-batching/analysis/analyze_batching.py": "ac40faa3e3644388941b27e028bed2e33852f280369277c6f0beb12f08e0b056",
+      "experiments/2026-11-15-range-batching/code/gated_run.py": "78e51c957d1593f6e2909b7c88e5c22d3aa6d92cf9ddb32402610ee5dd3c3e3c",
+      "experiments/2026-11-15-range-batching/code/pack_answers.py": "c0eed43f5f2ea29a55a2ec04f0cb0d7c4fb94e36508b9f0b5a8a77132a2b2c91",
+      "experiments/2026-11-15-range-worker-sweep/code/expected.py": "4699bf16e871118a81d0cab944dc0f6fb79dc150e1c793895be75bb4561cfe28",
+      "experiments/2026-11-15-range-batching/code/run_timing.sh": "a7ffb05ba9d9788e2c7a24697575708d03cd3d6a45ef5ac5babfb0fc68f0cc22"
+    },
+    "binary_sha256": {
+      "build/20261117-cuda5-full-03/range_bitpack_tool": "9ce426d0a07cb8a3bc7ecf9816376f355060ea09f622de92e1b885145b4760e6",
+      "build/20261117-cuda5-full-03/cuda_range_batch": "a8f1a963fb8113d6818ef20d0ff87dae14e2f557688ee6619f4328eea190ded9"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "/scratch/psp8502/full/full-8841823.gsp": {
+      "sha256": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac",
+      "bytes": 5388181537
+    },
+    "/scratch/psp8502/full/full-8841823-w1024.rbp": {
+      "sha256": "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab",
+      "bytes": 3638491070
+    },
+    "/scratch/psp8502/full/oracle/cpu-top10-8841823.tsv": {
+      "sha256": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed",
+      "bytes": 116558
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_12.6.r12.6/compiler.35059454_0"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "python3 tests/check_batched_kernel_sync.py",
+    "g++ -O3 -Wall -Wextra -Wpedantic -std=c++17 src/range_bitpack_tool.cpp -o build/20261117-cuda5-full-03/range_bitpack_tool",
+    "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 src/cuda_range_batch.cu -o build/20261117-cuda5-full-03/cuda_range_batch",
+    "./build/20261117-cuda5-full-03/range_bitpack_tool verify /scratch/psp8502/full/full-8841823.gsp /scratch/psp8502/full/full-8841823-w1024.rbp",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py prepare --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --gsp /scratch/psp8502/full/full-8841823.gsp --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json",
+    "python3 tests/check_range_batch.py build/20261117-cuda5-full-03/range_bitpack_tool build/20261117-cuda5-full-03/cuda_range_batch --gpu 0",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/reject-mode.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/reject-mode.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/reject-mode.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 16 --rounds 1 --warmups 0 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641 --launch-mode streams",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/reject-batch.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/reject-batch.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/reject-batch.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 16 --rounds 1 --warmups 0 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641 --launch-batch 4",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/reject-threads.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/reject-threads.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/reject-threads.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 16 --rounds 1 --warmups 0 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641 --launch-threads 128",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b1-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b1-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b1-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 1 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b1-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-sequential-b1-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b1-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b1-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b1-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b1-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b1-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 1 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b1-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-streams-b1-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b1-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b1-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b1-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b1-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b1-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 1 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b1-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-batched-b1-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b1-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b1-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b4-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b4-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b4-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 4 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b4-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-sequential-b4-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b4-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b4-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b4-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b4-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b4-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 4 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b4-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-streams-b4-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b4-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b4-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b4-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b4-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b4-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 4 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b4-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-batched-b4-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b4-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b4-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b16-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b16-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b16-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 16 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b16-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-sequential-b16-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b16-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b16-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b16-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b16-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b16-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 16 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b16-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-streams-b16-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b16-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b16-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b16-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b16-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b16-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 16 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b16-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-batched-b16-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b16-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b16-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b32-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b32-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b32-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 32 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b32-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-sequential-b32-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b32-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-sequential-b32-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b32-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b32-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b32-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 32 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b32-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-streams-b32-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b32-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-streams-b32-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b32-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b32-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b32-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 32 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b32-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-batched-b32-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b32-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-batched-b32-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-batched-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-batched-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-batched-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 7 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-batched-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-partial-batched-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-batched-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-batched-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-sequential-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-sequential-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-sequential-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 7 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-sequential-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-partial-sequential-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-sequential-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-sequential-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-streams-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-streams-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-streams-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 7 --rounds 1 --warmups 1 --verify 2 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-streams-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-correct-partial-streams-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-streams-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/correct-partial-streams-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b1-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b1-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b1-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 1 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b1-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r0-sequential-b1-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b1-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b1-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b1-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b1-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b1-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 1 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b1-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r0-streams-b1-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b1-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b1-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b1-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b1-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b1-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 1 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b1-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r0-batched-b1-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b1-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b1-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b4-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b4-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b4-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 4 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b4-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r0-sequential-b4-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b4-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b4-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b4-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b4-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b4-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 4 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b4-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r0-streams-b4-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b4-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b4-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b4-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b4-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b4-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 4 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b4-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r0-batched-b4-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b4-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b4-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b16-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b16-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b16-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 16 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b16-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r0-sequential-b16-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b16-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b16-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b16-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b16-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b16-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 16 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b16-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r0-streams-b16-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b16-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b16-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b16-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b16-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b16-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 16 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b16-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r0-batched-b16-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b16-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b16-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b32-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b32-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b32-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 32 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b32-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r0-sequential-b32-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b32-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-sequential-b32-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b32-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b32-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b32-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 32 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b32-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r0-streams-b32-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b32-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-streams-b32-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b32-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b32-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b32-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 32 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b32-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r0-batched-b32-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b32-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r0-batched-b32-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b4-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b4-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b4-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 4 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b4-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r1-streams-b4-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b4-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b4-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b4-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b4-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b4-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 4 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b4-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r1-batched-b4-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b4-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b4-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b16-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b16-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b16-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 16 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b16-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r1-sequential-b16-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b16-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b16-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b16-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b16-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b16-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 16 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b16-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r1-streams-b16-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b16-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b16-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b16-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b16-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b16-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 16 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b16-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r1-batched-b16-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b16-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b16-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b32-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b32-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b32-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 32 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b32-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r1-sequential-b32-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b32-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b32-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b32-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b32-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b32-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 32 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b32-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b32-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b32-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 32 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b32-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r1-streams-b32-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b32-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b32-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b32-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b32-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b32-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 32 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b32-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r1-batched-b32-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b32-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b32-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b1-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b1-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b1-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 1 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b1-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b1-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b1-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 1 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b1-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r1-sequential-b1-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b1-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b1-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b1-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b1-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b1-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 1 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b1-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r1-streams-b1-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b1-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-streams-b1-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b1-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b1-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b1-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 1 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b1-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r1-batched-b1-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b1-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-batched-b1-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b4-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b4-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b4-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 4 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b4-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r1-sequential-b4-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b4-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r1-sequential-b4-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b16-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b16-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b16-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 16 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b16-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r2-batched-b16-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b16-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b16-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b32-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b32-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b32-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 32 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b32-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r2-sequential-b32-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b32-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b32-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b32-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b32-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b32-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 32 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b32-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r2-streams-b32-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b32-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b32-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b32-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b32-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b32-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 32 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b32-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r2-batched-b32-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b32-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b32-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b1-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b1-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b1-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 1 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b1-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r2-sequential-b1-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b1-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b1-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b1-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b1-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b1-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 1 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b1-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r2-streams-b1-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b1-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b1-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b1-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b1-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b1-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 1 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b1-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r2-batched-b1-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b1-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b1-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b4-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b4-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b4-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 4 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b4-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r2-sequential-b4-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b4-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b4-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b4-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b4-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b4-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 4 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b4-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r2-streams-b4-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b4-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b4-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b4-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b4-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b4-k10.tsv --limit 500 --k 10 --threads 256 --mode batched --batch 4 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b4-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r2-batched-b4-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b4-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-batched-b4-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b16-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b16-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b16-k10.tsv --limit 500 --k 10 --threads 256 --mode sequential --batch 16 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b16-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r2-sequential-b16-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b16-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-sequential-b16-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/code/gated_run.py run --inputs /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/inputs.json --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b16-k10.receipt.json --binary build/20261117-cuda5-full-03/cuda_range_batch --rbp /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --csv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b16-k10.csv --top /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b16-k10.tsv --limit 500 --k 10 --threads 256 --mode streams --batch 16 --rounds 20 --warmups 3 --verify 0 --gsp - --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --cpu 0 --sampler-cpu 1 --source-commit 902278f36ddd623a1838a7c31ea69c9d78711641",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b16-k10.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/compare-timing-r2-streams-b16-k10.json",
+    "python3 experiments/2026-11-15-range-batching/code/pack_answers.py pack /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b16-k10.tsv --store /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/answers --receipt /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/raw/timing-r2-streams-b16-k10.answers.json",
+    "python3 experiments/2026-11-15-range-batching/analysis/analyze_batching.py /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03 --processes 3 --warmups 3 --rounds 20 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261117-cuda5-full-03/analysis/batching-statistics.json"
+  ],
+  "artifacts": {
+    "analysis/batching-statistics.json": {
+      "sha256": "26b7db3513aef855e5e10d2b6fd867d1cdf5bf886a4f711ca416301b5524fdef",
+      "bytes": 18108
+    },
+    "analysis/compare-correct-batched-b1-k10.json": {
+      "sha256": "0a11e1ea5f35c40d1c6bbb8ecae627a8b1c20704e3bf3d3cac35c1a48f2ef4e9",
+      "bytes": 363
+    },
+    "analysis/compare-correct-batched-b16-k10.json": {
+      "sha256": "787c1e33f125f5b5fa204022a16b691e3189834e3f03f7978f99a21d89fbc0b3",
+      "bytes": 364
+    },
+    "analysis/compare-correct-batched-b32-k10.json": {
+      "sha256": "824cd0bd59d206e29b47d0ff6ef86bab8e8b6ec4e5925752e15d4707306514e7",
+      "bytes": 364
+    },
+    "analysis/compare-correct-batched-b4-k10.json": {
+      "sha256": "61519f085588c9f35e9b022fba270c06766c3330a2fa4f97a951ff5e550ef4db",
+      "bytes": 363
+    },
+    "analysis/compare-correct-partial-batched-k10.json": {
+      "sha256": "3de788b7d844970ea628ce6f7a9fdfc2c10768475325ce7aa363809c4b5138b7",
+      "bytes": 368
+    },
+    "analysis/compare-correct-partial-sequential-k10.json": {
+      "sha256": "0d8b45b67ff291f3de9fa56756c7bf811f5fee2f859a784bfffe69d44981d163",
+      "bytes": 371
+    },
+    "analysis/compare-correct-partial-streams-k10.json": {
+      "sha256": "ce502f237d8fe2585d7090c3ddcd10cfe95e02656e3301ee1bf02f1ff174dcdb",
+      "bytes": 368
+    },
+    "analysis/compare-correct-sequential-b1-k10.json": {
+      "sha256": "a76bf17952f65bc438632fb6787e8ab10c24faef0e920ccf39de6b52a432c8ee",
+      "bytes": 366
+    },
+    "analysis/compare-correct-sequential-b16-k10.json": {
+      "sha256": "7aa4084ec9dc1724247b4eebec04920deb0d7c0b5e5ecb8b26596e827e92f37a",
+      "bytes": 367
+    },
+    "analysis/compare-correct-sequential-b32-k10.json": {
+      "sha256": "43f681b24a9465d178b3589a9b019c34d5348d6a9c4dfd3e7d19580d7cf5d6f2",
+      "bytes": 367
+    },
+    "analysis/compare-correct-sequential-b4-k10.json": {
+      "sha256": "25d1a5b884cb80b652e671f8b2f3c7f66ef29e8a123389ecb0e854452366ca64",
+      "bytes": 366
+    },
+    "analysis/compare-correct-streams-b1-k10.json": {
+      "sha256": "9fc757585f7dacb8620846cc4c34ba10ef99d5dbd775d969a8202222d0c06d4c",
+      "bytes": 363
+    },
+    "analysis/compare-correct-streams-b16-k10.json": {
+      "sha256": "7193e47f740b73d66ea2c33e273179730935d22c1777eaccac1e43bc7e88ff86",
+      "bytes": 364
+    },
+    "analysis/compare-correct-streams-b32-k10.json": {
+      "sha256": "3c874846f9103927cb0b8a19efe709bb17fa8c7bc958837134b6954a6f1e2720",
+      "bytes": 364
+    },
+    "analysis/compare-correct-streams-b4-k10.json": {
+      "sha256": "55868585dcbfcc62f23cb35ff1606cad4447799a248bfeb9d85c67f89acd22ea",
+      "bytes": 363
+    },
+    "analysis/compare-timing-r0-batched-b1-k10.json": {
+      "sha256": "1b98c3f10db6866462c0ce3d2c4cfe453dbe8e8b62e5cbbc711caa767d2083c8",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r0-batched-b16-k10.json": {
+      "sha256": "ba24cee51f491b6d0fe040d69380920e4500b2d9fb97e0dddb02d267841f449d",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r0-batched-b32-k10.json": {
+      "sha256": "87950e48b1873ef6c7217cf561deca8e803d30345d375cd22620093e73a9da6e",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r0-batched-b4-k10.json": {
+      "sha256": "e1905f2f6702b6a5a407947cce9456f3338a6206d3daee404d282ff011b0d358",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r0-sequential-b1-k10.json": {
+      "sha256": "471cd9680cdb959bc2473d6df43dc79208124af496f890e031fe6798f22fb83e",
+      "bytes": 370
+    },
+    "analysis/compare-timing-r0-sequential-b16-k10.json": {
+      "sha256": "a8b6bcb2c063b5cfb7b5bc47fdf98ab2fd9119ee3e0d75e28f13eb96501a9e5a",
+      "bytes": 371
+    },
+    "analysis/compare-timing-r0-sequential-b32-k10.json": {
+      "sha256": "f0aaa04883e1456462f51e9039eb3c0cd3e2cce4fe5f1ed8b4f2fbc1c720a666",
+      "bytes": 371
+    },
+    "analysis/compare-timing-r0-sequential-b4-k10.json": {
+      "sha256": "ef25a18b4e4c122ca63078c36b372e0183e43c8f62bb39b6d8f24ee084194711",
+      "bytes": 370
+    },
+    "analysis/compare-timing-r0-streams-b1-k10.json": {
+      "sha256": "6c3f1a622197d3dbd720ae81f63f87f5216d1f2e9e56e8b3355cb3be080f7a4a",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r0-streams-b16-k10.json": {
+      "sha256": "82c2bca19527a0081fc464bf46393500af862b331987ececabce6da132a66f4b",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r0-streams-b32-k10.json": {
+      "sha256": "7071ed578d94a5829870a1895e50567e8f600f6a6bc699f8afb19b6deadddfa0",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r0-streams-b4-k10.json": {
+      "sha256": "cd0c22ad687ac296a82c8ddbed388331558121c18e8334c9c429fef7ed224b17",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r1-batched-b1-k10.json": {
+      "sha256": "ce38ac3c355ddd9572a7fa50bd24474d56c0330191f10b7a8bd8508ddcd8578b",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r1-batched-b16-k10.json": {
+      "sha256": "51f0fe95867e446f2b739c8c9bc8767e5830d7cfe74ddc69f42d1fd140aa7647",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r1-batched-b32-k10.json": {
+      "sha256": "0bdd3b39bd9112d2de5e45f554ffb1a8c56b3b8589c4b673be6da3358047d6d6",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r1-batched-b4-k10.json": {
+      "sha256": "dcc2f1bff433753e0178e95ede3db1ebad42ddf61f899b454640996e0cec6bca",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r1-sequential-b1-k10.json": {
+      "sha256": "ac0ad9822ecca81d47989b910491b1431613045675e8f2b08299b4c10f5c2e94",
+      "bytes": 370
+    },
+    "analysis/compare-timing-r1-sequential-b16-k10.json": {
+      "sha256": "c65384e3434133e66e927d52b9d00b1465694bfbf708b86a5ab4915e5cc2f400",
+      "bytes": 371
+    },
+    "analysis/compare-timing-r1-sequential-b32-k10.json": {
+      "sha256": "ad7cf9a948e00456f17217e6eaf3ea0271aa0e10d98990caaea4aba9ffa6284e",
+      "bytes": 371
+    },
+    "analysis/compare-timing-r1-sequential-b4-k10.json": {
+      "sha256": "e21a444f513ef9f00cfcc84245021203b79a0532d7a6617a0bcbe0a60a8a3709",
+      "bytes": 370
+    },
+    "analysis/compare-timing-r1-streams-b1-k10.json": {
+      "sha256": "6a5d62b05f634b1f05f33132afff9562750cfa3f62522de2b1d8eb4d43587056",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r1-streams-b16-k10.json": {
+      "sha256": "0808b8a96cd04c4a702fd9ecfe69a5242cdafd6329ea9f54d5afea9fef5b42fa",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r1-streams-b32-k10.json": {
+      "sha256": "fb7e3710f1f1517b375fa84cb4e5147e7121f16cfd5f25324d44abd02d9d1bfe",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r1-streams-b4-k10.json": {
+      "sha256": "5efea19342e099554f885e6599b0c419f6f27f7f392aab7a16212e312ce13e5e",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r2-batched-b1-k10.json": {
+      "sha256": "400902fbac6c0203cb475c5d331852a32d50d799896d865c3255f6c65a70bb7a",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r2-batched-b16-k10.json": {
+      "sha256": "e9e8ac54fdab74af3993ef3e21694294ada90086e9c4280f6e5e0719147b28a0",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r2-batched-b32-k10.json": {
+      "sha256": "5da553d9d2252e72724cc8f9974f1b3b713b541b427ed5b2cc400f4353c2ab83",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r2-batched-b4-k10.json": {
+      "sha256": "69d3027de044bda403f081d0ac76f75baa599a4e12b02d539ed4b2f2e5d58b1a",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r2-sequential-b1-k10.json": {
+      "sha256": "f3f478dfd36580e4dacf246ce217f4a715c5a083948ab4df160015d1c505e106",
+      "bytes": 370
+    },
+    "analysis/compare-timing-r2-sequential-b16-k10.json": {
+      "sha256": "929d18cfdb75f3558b8aaa9b40c93a239a4302d51bb14781577b6976ab068920",
+      "bytes": 371
+    },
+    "analysis/compare-timing-r2-sequential-b32-k10.json": {
+      "sha256": "cf4873628277a96749eb734e7f28c7b7fd5cfa7d46f9f9de1d48b741f08ef84e",
+      "bytes": 371
+    },
+    "analysis/compare-timing-r2-sequential-b4-k10.json": {
+      "sha256": "fc2b7f6832d28e4d3a9e054fa0264421f77e6b2fab5537430adbb413d5e173c6",
+      "bytes": 370
+    },
+    "analysis/compare-timing-r2-streams-b1-k10.json": {
+      "sha256": "ee8cef73420772115e6a3a4b57d7fbc540fb73ec7157d9c2ff81826eff137513",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r2-streams-b16-k10.json": {
+      "sha256": "459c0a4800b0aa77c01b2afcff60075103302d47342d894a783459d34c364845",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r2-streams-b32-k10.json": {
+      "sha256": "df56b98e49f94f78fac7e3e34ef9ff2f6ef9000e8831337bc1223bf479f723aa",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r2-streams-b4-k10.json": {
+      "sha256": "05ce5636d341bc0969f43c46d2fbde68132331606ca6add6e47fa9b093dffce4",
+      "bytes": 367
+    },
+    "analysis/inputs.json": {
+      "sha256": "c12447f50c3520d01f9162cb4cfc049e0b76c5f0f481ede0373c11052d21aa2e",
+      "bytes": 630
+    },
+    "logs/analyze.log": {
+      "sha256": "dcac97a535be688cefd308ff697f51826d009fbe3656387a89913bce0fe54763",
+      "bytes": 2822
+    },
+    "logs/commands.txt": {
+      "sha256": "9fea8dfdcaeb16baaef5a797ed9dc98320dbabe0e4082b8d4e0bff3b9a2d2621",
+      "bytes": 91716
+    },
+    "logs/environment.txt": {
+      "sha256": "7261e0005c0444ba577a589b4279cb345d98f06cf3eb7575e7ebd450bbe62078",
+      "bytes": 627
+    },
+    "logs/fixtures.log": {
+      "sha256": "1b6ed2030cd6c670f5add4257270d7b03c1b5bc5906343cac0158da0088d2cbd",
+      "bytes": 833
+    },
+    "logs/gate.txt": {
+      "sha256": "ab1185b03c43004add86360b00c80a977c5df69bf39b823d9b0358d158bdd5f7",
+      "bytes": 3814
+    },
+    "logs/gpu-busy-timing-r1-sequential-b1-k10.txt": {
+      "sha256": "5bd897326542151a1d9a6261798da5e6743bde0ed08503d6d8e201d444f49650",
+      "bytes": 37
+    },
+    "logs/gpu-idle-correct-batched-b1-k10.txt": {
+      "sha256": "131703aa72d9ab7a8ae5bb76a3711b5b407663a444df7d3108f00b4ceb020a68",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-batched-b16-k10.txt": {
+      "sha256": "70d1f747ece2b0a2ad3c9b01972bc3cb2e4e8ed5b094cd2ab7cdf6f90dfb66b9",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-batched-b32-k10.txt": {
+      "sha256": "2015cb11769170bf2552e031004f1ce17e834e3d1caedeb252f3762c106b303b",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-batched-b4-k10.txt": {
+      "sha256": "97a9ea5a92c613578b18f5c15d571dafd297d2884bf9c607ffeca20cff7a72de",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-partial-batched-k10.txt": {
+      "sha256": "4e340f65a3adac1cc9071e55d0694f46b00ba37fb4ed4ff7f3b194e17cd5a699",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-partial-sequential-k10.txt": {
+      "sha256": "4726f1b2947fe26599b428a4303338bb6061f3453d079d0058b8cdad7b6c742f",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-partial-streams-k10.txt": {
+      "sha256": "5c541bf723d7c5bd680dd5516be4be2d31bfa2671c8e8c0920d6392185107148",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-sequential-b1-k10.txt": {
+      "sha256": "3699818c172fce6fa93f3edec193accafc424af83183c3aaf7d083135fb60f0d",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-sequential-b16-k10.txt": {
+      "sha256": "9a8494a436a8327f1d8ee51190c91c665fd667b7d619286b051f8d7c71a17bc9",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-sequential-b32-k10.txt": {
+      "sha256": "9449b82a49f83699b21ad949e04ba38726a9ea3c08aa01e42681bbb2a42f6a71",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-sequential-b4-k10.txt": {
+      "sha256": "df821662bdcd7b6c50db000acf386ddea381a44f3915530dd8d706be87e079be",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-streams-b1-k10.txt": {
+      "sha256": "692eed0ade6741cc247edf4c0b858c6c023872e37a5a7928d6458cb583a28ea0",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-streams-b16-k10.txt": {
+      "sha256": "f4698aba0e07165ca6b718e8753a041c3af4fd41089055d894dbd9c85a436f64",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-streams-b32-k10.txt": {
+      "sha256": "483fa35177b8e3f1b7bfc99b2b73d69ce7423250cd9b9257d7d1d17f0fab125c",
+      "bytes": 107
+    },
+    "logs/gpu-idle-correct-streams-b4-k10.txt": {
+      "sha256": "d997610fb45ab278f71a8d63c699c406a2929fdeaf4bdde8fd6494c80ac44334",
+      "bytes": 107
+    },
+    "logs/gpu-idle-fixtures.txt": {
+      "sha256": "050557f5f4bf771d4c1869e6984fe7f9a09e5c9077151e98ddd190a2f8c2634d",
+      "bytes": 107
+    },
+    "logs/gpu-idle-reject-batch.txt": {
+      "sha256": "a42e2a877ee22f6fd2afb534a755c63b64680d955307c88e505d9c6481c04508",
+      "bytes": 107
+    },
+    "logs/gpu-idle-reject-mode.txt": {
+      "sha256": "aea7c7618c5a821fece3df2dafd44506834d84812efb91b400a5af66a240d1a9",
+      "bytes": 107
+    },
+    "logs/gpu-idle-reject-threads.txt": {
+      "sha256": "5a7f80160e89b510c5bf8b1a394bfb122453449e2b8fe2eb51ed663004bcdca3",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r0-batched-b1-k10.txt": {
+      "sha256": "27d9e1809e73707125d93ada9adcec29f9afaf51f749f2d2dcc4a9f0892b7054",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r0-batched-b16-k10.txt": {
+      "sha256": "9ad815a03c201d523a9ea3570e1ba8c8847b7ca419982ac3de4143d0c0eca212",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r0-batched-b32-k10.txt": {
+      "sha256": "b7781a5c2e55f1735f45e7a94f0bd4f1111053188c672609cbe2231bcb7d162f",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r0-batched-b4-k10.txt": {
+      "sha256": "ab23f662ea86ef16e7758074d6657793a1e47ed96d7935923d07a4abec874098",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r0-sequential-b1-k10.txt": {
+      "sha256": "27b593211442ffaf216f708a126577c1a39f8761689658b6fe38b4c0c362d8ba",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r0-sequential-b16-k10.txt": {
+      "sha256": "e110b092f656869baaf1119bd0c0a6ab2f3576aabece938a239ba1622858ea78",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r0-sequential-b32-k10.txt": {
+      "sha256": "f853f7db396203b293e40bd884e6c2d2c1c7bcf1701af7b99bdfd2533f0c47ed",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r0-sequential-b4-k10.txt": {
+      "sha256": "c0e4af4047c35faa84658df99e4299be5d56f7e3e4ed397b1fa41c1af989af63",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r0-streams-b1-k10.txt": {
+      "sha256": "0dda169436c5f7f3d2dbb3cf4ae4e81c1419b66bba57d978b18a1c2429eed959",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r0-streams-b16-k10.txt": {
+      "sha256": "183c55a2557de12ef1a5a1351e9d66a044fa20555683c630c62700788fd85afb",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r0-streams-b32-k10.txt": {
+      "sha256": "c658b13ae3ed7dd07c654314dd995b3a605b0d208f00e339cca780eadb4f53cb",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r0-streams-b4-k10.txt": {
+      "sha256": "3b0b50c5b0cf1d21bad778432b8debfd9eb14add3782622c2d1ac610e74c83a5",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r1-batched-b1-k10.txt": {
+      "sha256": "6f60ba935ce53b74185fcb3547da08d9f77a3ce17288d87204fb7d4a451da702",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r1-batched-b16-k10.txt": {
+      "sha256": "5f82a69bcaec4af368e70191fd9b72b9664b957188a3d0210e9750b0ab995ca2",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r1-batched-b32-k10.txt": {
+      "sha256": "3cc544abd89de8ad7f0e745160e7cabaf9afb20e56e9d762345b40d823aa124b",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r1-batched-b4-k10.txt": {
+      "sha256": "8eaf76145f512dee83d2b613e81ce727da3fb4b7bcd60f4297a8a92fbb0e9afd",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r1-sequential-b1-k10.txt": {
+      "sha256": "271773d42c37c9e1bacf70fc56c2b5b987210b8594327c46513fc583b5af823a",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r1-sequential-b16-k10.txt": {
+      "sha256": "6ac3bd91c1c77d89da7691b0d68165ba50e6f4bed973298f9f8af87e77709366",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r1-sequential-b32-k10.txt": {
+      "sha256": "e6d994e68b0963047086bd7595676c8b2cbd87a89044638359ffd2ab82e919cc",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r1-sequential-b4-k10.txt": {
+      "sha256": "79dad25387da361fbb85318a030bfadeda00599e776060726323a6c83e70081e",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r1-streams-b1-k10.txt": {
+      "sha256": "1b44647ed858dd19d05bd9336717e9357154d67c7bb30303084aeebcc6a23eb2",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r1-streams-b16-k10.txt": {
+      "sha256": "35900a0d3cc28162a6b88dcdd61c21009b6a0940fc511371c02a59a068b8d1b3",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r1-streams-b32-k10.txt": {
+      "sha256": "eafbcce0260eb40d9b09cf0f2dcf6aace5650d7374ff2dedcd06349c7e834948",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r1-streams-b4-k10.txt": {
+      "sha256": "f013bf30a59d20404945c4289d5138c44fd29150e7b873761af57a2492185559",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r2-batched-b1-k10.txt": {
+      "sha256": "ee5a62a8476282f809dbee52bd5e1cda7de61cfaee60d82721a71d3ec1fe3961",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r2-batched-b16-k10.txt": {
+      "sha256": "bafc5b916be78a27134e85844fef44eefc5b45a76ba83de2c11d8fdcd31e4897",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r2-batched-b32-k10.txt": {
+      "sha256": "21eaa65f9a8146e3de192c089619d0d5a40cf94cdbb41c9769683509009bd430",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r2-batched-b4-k10.txt": {
+      "sha256": "fa54021eb9404a88589924629f83e7217b578fd4f826a0e66ca786461d7cd754",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r2-sequential-b1-k10.txt": {
+      "sha256": "2f881abfb86483eeda127c82054bb3f093641b32d4665bb23b0774c5380c70a8",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r2-sequential-b16-k10.txt": {
+      "sha256": "a59f3738287378bca9f15573225051381f86c712432764987d86f266f47b176e",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r2-sequential-b32-k10.txt": {
+      "sha256": "1742fe9b3dad4b5b0325962dd20f0ff90ef462e579f857c18ee38be903b7aa5d",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r2-sequential-b4-k10.txt": {
+      "sha256": "80a58b5fdf9f4af07f9989bafcf72057865600b88d9e11e5886f73f9d42c2e0c",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r2-streams-b1-k10.txt": {
+      "sha256": "4ad52f3a83ae7c775e9d5ff852dac05ee9ddf3dc0a32f65c53324d4ff0c3f21a",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r2-streams-b16-k10.txt": {
+      "sha256": "820c20fe6501735404105de22d46f10f319a762041a3a5bce8d3da6cc96d6645",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r2-streams-b32-k10.txt": {
+      "sha256": "61dce7b0e5c4397b13743f765a92f8b2d30eedb88ea7934d1c95fa6daac1195e",
+      "bytes": 107
+    },
+    "logs/gpu-idle-timing-r2-streams-b4-k10.txt": {
+      "sha256": "c7429be5d7d9ec2b3f17cedf8654febd984dd8f96786c0464aaaaa952aa0f42e",
+      "bytes": 107
+    },
+    "logs/index-verify.log": {
+      "sha256": "ab785ce79d8f20cc67392c247ffb870d481e225867227ed08870fa93d5fb6401",
+      "bytes": 916
+    },
+    "logs/kernel-sync.log": {
+      "sha256": "1450e4d40711b5df45465e76c0eefcac0acd157d8f53008a0498cf8976578b6d",
+      "bytes": 30
+    },
+    "logs/nvcc-batch.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/order.txt": {
+      "sha256": "c479932bb96a5792d292e8b25b7cbb5923919dc8311255df23e31dc7f8bd9455",
+      "bytes": 981
+    },
+    "logs/pack.txt": {
+      "sha256": "cc05a898345870abc8f728a72e30fddf61928eaabbe74cce03a7f3d0bae7c765",
+      "bytes": 2952
+    },
+    "logs/prepare.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/stages.txt": {
+      "sha256": "5d492761cccfa404960be3129d7548ba91378a52038cccc2ee7cabea6b745e85",
+      "bytes": 2492
+    },
+    "raw/answers/57e229ca1f3c39a95a770e8bcd282c4b4b215ee3a425b4b3817fce84119d3381.tsv.gz": {
+      "sha256": "544bdf7e2f4b56dc6896ece58f6a98b357bb1b9b67a7cd7c90470ba799b52bbe",
+      "bytes": 45060
+    },
+    "raw/correct-batched-b1-k10.answers.json": {
+      "sha256": "8751a8783092d5cdb63a2f085fa0bd8bc146e9d4b3d00c0ef3f8024d53d5dbc2",
+      "bytes": 583
+    },
+    "raw/correct-batched-b1-k10.csv": {
+      "sha256": "7b8813825dacd699690ce9044c451c0a3b44ce0d21d236e826396d6520ede24d",
+      "bytes": 151631
+    },
+    "raw/correct-batched-b1-k10.receipt.json": {
+      "sha256": "568d4acf91ae8867c9d34bc16fb88a9bd704d8e92b618727f89864b4d3964df3",
+      "bytes": 6086
+    },
+    "raw/correct-batched-b1-k10.receipt.log": {
+      "sha256": "fc09cddf8c3255793dad0586347e3b8253af052f0849248b6f828407b2d8e709",
+      "bytes": 561
+    },
+    "raw/correct-batched-b1-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-batched-b1-k10.receipt.runtime/runtime.json": {
+      "sha256": "4b2c3d6f4569fd353c43b763530cd9008e1d33fc2545b1ca2d865d5f635aefb7",
+      "bytes": 1801
+    },
+    "raw/correct-batched-b1-k10.receipt.sampler.log": {
+      "sha256": "d38d0268919f80df44854243aa791cb7c429c9c23d1b5cfb267f6297ee37904b",
+      "bytes": 9288
+    },
+    "raw/correct-batched-b16-k10.answers.json": {
+      "sha256": "9e93a6a86d87ffc0dbd220be9f18f5955ba5e89198ead1bf88289e71c03b4641",
+      "bytes": 584
+    },
+    "raw/correct-batched-b16-k10.csv": {
+      "sha256": "31696778308606c498fdcfee86e0cda031bef211773e44100ca33e9c0ccdd76a",
+      "bytes": 151203
+    },
+    "raw/correct-batched-b16-k10.receipt.json": {
+      "sha256": "29fec6892714ef25c28543dc5b25b320e30a4bff20355290fe034cca162c08ee",
+      "bytes": 6093
+    },
+    "raw/correct-batched-b16-k10.receipt.log": {
+      "sha256": "209e9867961fd9dc36cf7bb5e58c229a5860381bfb7497c0c664a44cdb1141f4",
+      "bytes": 563
+    },
+    "raw/correct-batched-b16-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-batched-b16-k10.receipt.runtime/runtime.json": {
+      "sha256": "a27166b23265d03a356a8ff0dcb717152217e97193d194ae3cb02b615500173b",
+      "bytes": 1802
+    },
+    "raw/correct-batched-b16-k10.receipt.sampler.log": {
+      "sha256": "bb0a6c319c1b6f14ef77f66432717f3770f8bd9da86cf9d48b62b56e4539517e",
+      "bytes": 9186
+    },
+    "raw/correct-batched-b32-k10.answers.json": {
+      "sha256": "51a04ad48cc2a4b7238cedfce222e1354f0c3bfc871d25fe198d2bc920edd83a",
+      "bytes": 584
+    },
+    "raw/correct-batched-b32-k10.csv": {
+      "sha256": "4e7fe5b8b4b0833d19b24f7e471b5b355f9b04110ad74aa04f16e969ade3b55c",
+      "bytes": 151150
+    },
+    "raw/correct-batched-b32-k10.receipt.json": {
+      "sha256": "5275fbb2565a711a840e89c6786c10135f6c33db78be2064830e888f86decd7a",
+      "bytes": 6093
+    },
+    "raw/correct-batched-b32-k10.receipt.log": {
+      "sha256": "c028ab6b3525286e51b0bc841cdd5ebc2d5846e64d1736d6ea3cfccb9b374ec9",
+      "bytes": 563
+    },
+    "raw/correct-batched-b32-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-batched-b32-k10.receipt.runtime/runtime.json": {
+      "sha256": "745a93795eea73518c62dab82a73bb61c56573cb933d426b58565a90a2bee680",
+      "bytes": 1802
+    },
+    "raw/correct-batched-b32-k10.receipt.sampler.log": {
+      "sha256": "517318f19ccbb4d8c9d960f0194df10a7cb6fc3ae9a56ee9384a08ca0dffc030",
+      "bytes": 9237
+    },
+    "raw/correct-batched-b4-k10.answers.json": {
+      "sha256": "b48145aaa34baeb01d57536dfe704861fbe70c4f2128b43d83030cac95fda1b3",
+      "bytes": 583
+    },
+    "raw/correct-batched-b4-k10.csv": {
+      "sha256": "a16cc3c7488d0a6b5736b203934ff258ef469911c5a59d0b0a26b57a78b39b85",
+      "bytes": 149044
+    },
+    "raw/correct-batched-b4-k10.receipt.json": {
+      "sha256": "7c36bba64de4985d79c15be1d2d555c3b83838a1c532156108555541f03e1447",
+      "bytes": 6086
+    },
+    "raw/correct-batched-b4-k10.receipt.log": {
+      "sha256": "143169503be4012adfbf840afb2848715c8dab063d6bb8980459852c4f532fdf",
+      "bytes": 561
+    },
+    "raw/correct-batched-b4-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-batched-b4-k10.receipt.runtime/runtime.json": {
+      "sha256": "29561a05a2d8cab3d84f435bfa33622f246a6d3dc490eaf3d15eb3b4d7e34af1",
+      "bytes": 1801
+    },
+    "raw/correct-batched-b4-k10.receipt.sampler.log": {
+      "sha256": "9463a04a2875e556781510a903d4e056fe046b400ab432cc30400aa1db88994e",
+      "bytes": 9239
+    },
+    "raw/correct-partial-batched-k10.answers.json": {
+      "sha256": "637023043342c9351fc03944e9ee8f6988e7e50246f6e56ce3f7ef474eca8e48",
+      "bytes": 588
+    },
+    "raw/correct-partial-batched-k10.csv": {
+      "sha256": "d9576a8be1b2b74c35a21a7061f516e69317b84782ad225953834b8edd3a789f",
+      "bytes": 148836
+    },
+    "raw/correct-partial-batched-k10.receipt.json": {
+      "sha256": "a0b216c6391519db7197c9a321a8ab8609745627fb89885579044df844ea427a",
+      "bytes": 6106
+    },
+    "raw/correct-partial-batched-k10.receipt.log": {
+      "sha256": "559c963a6e5ae204c9e9bf3566c6646aa24bcd60c6ce0764993d1d1b4262afa0",
+      "bytes": 561
+    },
+    "raw/correct-partial-batched-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-partial-batched-k10.receipt.runtime/runtime.json": {
+      "sha256": "9c2d8ce56c0524f265174812d5572af150296d608f49df454ba47af1a40beb1c",
+      "bytes": 1801
+    },
+    "raw/correct-partial-batched-k10.receipt.sampler.log": {
+      "sha256": "52d20e9676c7c1245495f59483963e99d650bfec2581e4deb4110f861cad4e21",
+      "bytes": 9289
+    },
+    "raw/correct-partial-sequential-k10.answers.json": {
+      "sha256": "05bb539f21ac9156406fed1a3d5cc9ab6c97263abad71478671957f88b093060",
+      "bytes": 591
+    },
+    "raw/correct-partial-sequential-k10.csv": {
+      "sha256": "a145b7cc0de0c9eb82f53806efb03e4b65714b2eaed88bfa3413dc8b0a1cea09",
+      "bytes": 152258
+    },
+    "raw/correct-partial-sequential-k10.receipt.json": {
+      "sha256": "3f69b5690d37709318c7c149c9fb0262c1e8688e3ae71a11759905291fc4c68c",
+      "bytes": 6093
+    },
+    "raw/correct-partial-sequential-k10.receipt.log": {
+      "sha256": "9abae334bb996b4c135b8f876823ece8dd56cb3b9d33548432d3b9fe2319fb99",
+      "bytes": 567
+    },
+    "raw/correct-partial-sequential-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-partial-sequential-k10.receipt.runtime/runtime.json": {
+      "sha256": "94d7c962afe4a2c7ac908dc5afea8ca978a7d4649be4065b015c49d014df8904",
+      "bytes": 1787
+    },
+    "raw/correct-partial-sequential-k10.receipt.sampler.log": {
+      "sha256": "348cd88ec3d4205ee146af906e0356b0f0edfd7f990fa4e9f7a050e370c46bd5",
+      "bytes": 9238
+    },
+    "raw/correct-partial-streams-k10.answers.json": {
+      "sha256": "94c188d18f2ab5bc6949a3ac0774ed21d2148e4059ad9c9095f998c4bc88400e",
+      "bytes": 588
+    },
+    "raw/correct-partial-streams-k10.csv": {
+      "sha256": "61820755ea727b22c1379b4a3bfc92dbdc4cd4f359a70ba3b7884e4c82ddf291",
+      "bytes": 149068
+    },
+    "raw/correct-partial-streams-k10.receipt.json": {
+      "sha256": "866752cea94a0b244b64fe3dfda14615ed881744cafdeb625df996c77369f889",
+      "bytes": 6094
+    },
+    "raw/correct-partial-streams-k10.receipt.log": {
+      "sha256": "7b7f1e86e2c568b2e124d3e2c0ba48ac22d78db68bc41fb1e87172c71f877202",
+      "bytes": 561
+    },
+    "raw/correct-partial-streams-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-partial-streams-k10.receipt.runtime/runtime.json": {
+      "sha256": "68750ce48bdb0ddd593749b845e40eb23f828ac26f2acf2c8edf3e5a031556e9",
+      "bytes": 1795
+    },
+    "raw/correct-partial-streams-k10.receipt.sampler.log": {
+      "sha256": "d3953644e3b3d2c01b49ec5e37260b52afc5abd0f91c2c03a7c220ce789569bf",
+      "bytes": 9187
+    },
+    "raw/correct-sequential-b1-k10.answers.json": {
+      "sha256": "525e2e6078020be83dd15b7be4995a27bb19312ea8b7ab5e36967b2847ba6207",
+      "bytes": 586
+    },
+    "raw/correct-sequential-b1-k10.csv": {
+      "sha256": "2325b8efcd40abaf50b636e1bfcd0b9036ad9f526285bbd8da6e3a10d74fe660",
+      "bytes": 154543
+    },
+    "raw/correct-sequential-b1-k10.receipt.json": {
+      "sha256": "57887294977ff4d2ad41696d14f1aa9b61ce39780b811e9ecc460dedfb5f1ec6",
+      "bytes": 6073
+    },
+    "raw/correct-sequential-b1-k10.receipt.log": {
+      "sha256": "a34638e27767a274b46b608d8cf3c947455b951033cae9164f309aca12dcdea7",
+      "bytes": 567
+    },
+    "raw/correct-sequential-b1-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-sequential-b1-k10.receipt.runtime/runtime.json": {
+      "sha256": "b0c5770ca1827979b7d2d25bf50d28db80020726c186641a46295df1280fc3c4",
+      "bytes": 1787
+    },
+    "raw/correct-sequential-b1-k10.receipt.sampler.log": {
+      "sha256": "9a77fe131cbb351c539363385fa2ef86b15d714a784eb11c7c87aede8ec67f0a",
+      "bytes": 9387
+    },
+    "raw/correct-sequential-b16-k10.answers.json": {
+      "sha256": "196b396cbd23896d30ec3523e8590d3d58feb5242c2ce898ae91f5a112e0f93f",
+      "bytes": 587
+    },
+    "raw/correct-sequential-b16-k10.csv": {
+      "sha256": "84b2c75ab5d0527317728649276438ee607e470fffa7a19137b383a2ced56bbc",
+      "bytes": 154207
+    },
+    "raw/correct-sequential-b16-k10.receipt.json": {
+      "sha256": "41aba98ee487fac8d2064dc0d2c0b427bf7a4e7a7dbd738a5882f62d9fb52145",
+      "bytes": 6080
+    },
+    "raw/correct-sequential-b16-k10.receipt.log": {
+      "sha256": "8f1b76d08b8a9af46977e5802897ea969b96cd7730edde799d8222e09e0218bb",
+      "bytes": 569
+    },
+    "raw/correct-sequential-b16-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-sequential-b16-k10.receipt.runtime/runtime.json": {
+      "sha256": "a7e95b8c284889b205dd2db75c1b66266f9750a07eb621dd6627103406bab60b",
+      "bytes": 1788
+    },
+    "raw/correct-sequential-b16-k10.receipt.sampler.log": {
+      "sha256": "c425cbb26edcfd4e3c67312025b37a1510d51e2f66d36a12ce74e93e9cbbe016",
+      "bytes": 9288
+    },
+    "raw/correct-sequential-b32-k10.answers.json": {
+      "sha256": "97c0fce7b5f38e90b2784db9dc15651c2ae634be1aa8642bc49af35a3bfd7f67",
+      "bytes": 587
+    },
+    "raw/correct-sequential-b32-k10.csv": {
+      "sha256": "1102a39133eb605cd09e2043182b6c79a8a078168ccbe5301a597e76dc56cc67",
+      "bytes": 154069
+    },
+    "raw/correct-sequential-b32-k10.receipt.json": {
+      "sha256": "63f951225de4189773e3c42f851cd6767eafcf7d897500ed2ccf0476e180f03f",
+      "bytes": 6080
+    },
+    "raw/correct-sequential-b32-k10.receipt.log": {
+      "sha256": "01ce9f3a877081363f2b1a37cfc034b6414f3f81a80187e16d49a38d8b02977c",
+      "bytes": 569
+    },
+    "raw/correct-sequential-b32-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-sequential-b32-k10.receipt.runtime/runtime.json": {
+      "sha256": "ed4f4c90e3bb09713ad6d6ea0e8f851e9ab497e35dad4e50e695db456279b4a0",
+      "bytes": 1788
+    },
+    "raw/correct-sequential-b32-k10.receipt.sampler.log": {
+      "sha256": "90be396284bc65fd0dad06c73b5f39b43ba6c144e0da7f0d2f4eb8f4e536d2e2",
+      "bytes": 9238
+    },
+    "raw/correct-sequential-b4-k10.answers.json": {
+      "sha256": "1114e9dfd05d47d171f0c80baf4618cc91499abdbc6856ebfd651af7318e667d",
+      "bytes": 586
+    },
+    "raw/correct-sequential-b4-k10.csv": {
+      "sha256": "805fa90ee29c1fae96f6ed18499bf201a08edbe5a0ea9a85838d98c162a4329e",
+      "bytes": 152546
+    },
+    "raw/correct-sequential-b4-k10.receipt.json": {
+      "sha256": "9f027001d597414bdeb4c173d50b2784b0b694c8a0114b5544ff8f64cf544d90",
+      "bytes": 6073
+    },
+    "raw/correct-sequential-b4-k10.receipt.log": {
+      "sha256": "34b0d2ce7a93f58ec560415b8785534a108e14512a16d7fb09d8617f49da5b0e",
+      "bytes": 567
+    },
+    "raw/correct-sequential-b4-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-sequential-b4-k10.receipt.runtime/runtime.json": {
+      "sha256": "1fbec707418eed79dedae68b1dbc91633ebb867fe039e5bd069d3ac62a020a6b",
+      "bytes": 1787
+    },
+    "raw/correct-sequential-b4-k10.receipt.sampler.log": {
+      "sha256": "24570d22e984994a2c0e2e40d81444aea4d4958e4a8791b4eea2ac537cbf534e",
+      "bytes": 9340
+    },
+    "raw/correct-streams-b1-k10.answers.json": {
+      "sha256": "1e0f0d108eb5db38fd7bb337524d79fc6284959988c34160d3709fd8b8c4bc1b",
+      "bytes": 583
+    },
+    "raw/correct-streams-b1-k10.csv": {
+      "sha256": "4c58b7fbdfea0429f5dd8ed81f301597aa164dba0998bea127c5816619a18671",
+      "bytes": 151482
+    },
+    "raw/correct-streams-b1-k10.receipt.json": {
+      "sha256": "48403967a7a40b28a4c77e1f44a8424021b26ac8176dd6d9c79d3ebeda9404e0",
+      "bytes": 6074
+    },
+    "raw/correct-streams-b1-k10.receipt.log": {
+      "sha256": "5997b44080c07ba40b51cc29ab87b4184ce3f7064d7593fcd6deaf8b893acd6d",
+      "bytes": 561
+    },
+    "raw/correct-streams-b1-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-streams-b1-k10.receipt.runtime/runtime.json": {
+      "sha256": "7274fa6459160ac4afab244e12be2f178805753c17e7d2c5762affec4fe91132",
+      "bytes": 1795
+    },
+    "raw/correct-streams-b1-k10.receipt.sampler.log": {
+      "sha256": "64c68223d50d56722c69ed94bbd8e77777a1f0f45f440e0741611a7e0679156a",
+      "bytes": 9340
+    },
+    "raw/correct-streams-b16-k10.answers.json": {
+      "sha256": "83ac1e1cf4a7e48fd2fa8fe1c04d46be55837967d246310e8eafee2e58f3f3c4",
+      "bytes": 584
+    },
+    "raw/correct-streams-b16-k10.csv": {
+      "sha256": "9722dcb6ea01f28592d9c4d47b807a3ecd2397ce098f97df32b76911eab3dcee",
+      "bytes": 151263
+    },
+    "raw/correct-streams-b16-k10.receipt.json": {
+      "sha256": "0bc923b2359c530ab42be326c6d739ece04e3b5ee5b180e84318c793d080fe6b",
+      "bytes": 6081
+    },
+    "raw/correct-streams-b16-k10.receipt.log": {
+      "sha256": "089158f435264beb8c00799d7ce86395ee0830da36121ac65843c84c274c5172",
+      "bytes": 563
+    },
+    "raw/correct-streams-b16-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-streams-b16-k10.receipt.runtime/runtime.json": {
+      "sha256": "7c4bdc1bf9e87ab14de05b5c967ac8009805ac99dedec73f4e76b996683e5cf0",
+      "bytes": 1796
+    },
+    "raw/correct-streams-b16-k10.receipt.sampler.log": {
+      "sha256": "4471793869af9193c63f272ab0aa948ac0a16b12fd0e1336bc90c321f9a8fb1e",
+      "bytes": 9286
+    },
+    "raw/correct-streams-b32-k10.answers.json": {
+      "sha256": "b5e9ed3e153b4d2fc5d80a9080704ac23551f7ea768b138627b4c1dd0629ef38",
+      "bytes": 584
+    },
+    "raw/correct-streams-b32-k10.csv": {
+      "sha256": "51c62ef8433ae27c0034e256294aa0da4aa63ec4b6547e015f4f4b32ffc669fa",
+      "bytes": 151155
+    },
+    "raw/correct-streams-b32-k10.receipt.json": {
+      "sha256": "9dd8fe5137ca94eb7444e10a7ee79ace1a94cfe8211112b861557cf339ad8d0a",
+      "bytes": 6081
+    },
+    "raw/correct-streams-b32-k10.receipt.log": {
+      "sha256": "018ab649e95d2a8534d4b980b3fb848565f2091c4b6d8a7f058090a0791eb27a",
+      "bytes": 563
+    },
+    "raw/correct-streams-b32-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-streams-b32-k10.receipt.runtime/runtime.json": {
+      "sha256": "d86c8468ea6373e33df57600cb204107f6cd1db94fc4edf4cba30d723bcdc71f",
+      "bytes": 1796
+    },
+    "raw/correct-streams-b32-k10.receipt.sampler.log": {
+      "sha256": "88c39dec8dbf09fc0448991e40b025d8ad10d0188dd2c0b9ec9269a49d83edbd",
+      "bytes": 9236
+    },
+    "raw/correct-streams-b4-k10.answers.json": {
+      "sha256": "f75980547d269827d04971a93591bfbcdcaaa7377ab4ab2084a6c38d9493a345",
+      "bytes": 583
+    },
+    "raw/correct-streams-b4-k10.csv": {
+      "sha256": "f19a45a7cde87867c381843e7a698b6b8e5b3b9493f349bd804df6cd4c33817d",
+      "bytes": 149360
+    },
+    "raw/correct-streams-b4-k10.receipt.json": {
+      "sha256": "2729a1be6ecacfee0be26c9ba415588f22bc52d17979a82c2c9149788795f286",
+      "bytes": 6074
+    },
+    "raw/correct-streams-b4-k10.receipt.log": {
+      "sha256": "24a86b1a32d2dbeab2affe0d64b196ee14e1aab7c6145b4f77761d03e55bba5b",
+      "bytes": 561
+    },
+    "raw/correct-streams-b4-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-streams-b4-k10.receipt.runtime/runtime.json": {
+      "sha256": "9c6e047f79bcdf6dcd47840cd7f41429197da1ebf0ec813b19cfd461c366682b",
+      "bytes": 1795
+    },
+    "raw/correct-streams-b4-k10.receipt.sampler.log": {
+      "sha256": "0e6a55960238cf803900a34c735d0b1200b20701e6f67c606e77d5682951078d",
+      "bytes": 9394
+    },
+    "raw/ineligible/timing-r1-sequential-b1-k10-attempt2/timing-r1-sequential-b1-k10.csv": {
+      "sha256": "234eb49453425af2811bbff640b8eca19463632e654255c70bb111d132b98b49",
+      "bytes": 1786561
+    },
+    "raw/ineligible/timing-r1-sequential-b1-k10-attempt2/timing-r1-sequential-b1-k10.receipt.json": {
+      "sha256": "73cde42e4a3234be6659d206fad92d60e613d03b9a3dad66b3c42d7de1a5502a",
+      "bytes": 6088
+    },
+    "raw/ineligible/timing-r1-sequential-b1-k10-attempt2/timing-r1-sequential-b1-k10.receipt.log": {
+      "sha256": "de1d102fb41b0009aac1aa53d812beb823bcae8888777ba5415d97e38e384c0e",
+      "bytes": 1119
+    },
+    "raw/ineligible/timing-r1-sequential-b1-k10-attempt2/timing-r1-sequential-b1-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/ineligible/timing-r1-sequential-b1-k10-attempt2/timing-r1-sequential-b1-k10.receipt.runtime/runtime.json": {
+      "sha256": "0ba59a7b5875fe29e24229404f936b7fdd5265ac1ebba7f5877d9879f0d60e1d",
+      "bytes": 1788
+    },
+    "raw/ineligible/timing-r1-sequential-b1-k10-attempt2/timing-r1-sequential-b1-k10.receipt.sampler.log": {
+      "sha256": "dd3eb5ff38fba287b7c0bbe662904a9de809bbf92b8ef8c68908afb74fc323e6",
+      "bytes": 11195
+    },
+    "raw/ineligible/timing-r1-sequential-b1-k10-attempt2/top-sha256.txt": {
+      "sha256": "00cea511507da90f4351eef216e0607a6db7c6ddfa9a12ba46ed9f16de91404d",
+      "bytes": 173
+    },
+    "raw/ineligible/timing-r1-streams-b32-k10-attempt1/timing-r1-streams-b32-k10.csv": {
+      "sha256": "c28f2f043bfec1ba717c157f1792272e9e10187665104ff9f744b139ff10639d",
+      "bytes": 1749255
+    },
+    "raw/ineligible/timing-r1-streams-b32-k10-attempt1/timing-r1-streams-b32-k10.receipt.json": {
+      "sha256": "07d3bbc416f1aac91e2b3b5e797937599d509a06e83db5b58cc51574febb0452",
+      "bytes": 6095
+    },
+    "raw/ineligible/timing-r1-streams-b32-k10-attempt1/timing-r1-streams-b32-k10.receipt.log": {
+      "sha256": "36a047c00122904017440a462a638fc5f2d5ea61b69b11f4a31838ef2f0c96ff",
+      "bytes": 1115
+    },
+    "raw/ineligible/timing-r1-streams-b32-k10-attempt1/timing-r1-streams-b32-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/ineligible/timing-r1-streams-b32-k10-attempt1/timing-r1-streams-b32-k10.receipt.runtime/runtime.json": {
+      "sha256": "a58184cba0b2de4e757019987a11a99b830d8609648a83f5dd3c1f7f4e5ee1ad",
+      "bytes": 1797
+    },
+    "raw/ineligible/timing-r1-streams-b32-k10-attempt1/timing-r1-streams-b32-k10.receipt.sampler.log": {
+      "sha256": "2155bcce2c544138fff2857ce8f76466bc158720036d173f2435492af9180f4f",
+      "bytes": 10921
+    },
+    "raw/ineligible/timing-r1-streams-b32-k10-attempt1/top-sha256.txt": {
+      "sha256": "a91eea9af82f76bddba626e0a5086e35c32a292dbb908a8ca9b1e7f891086024",
+      "bytes": 171
+    },
+    "raw/reject-batch.receipt.json": {
+      "sha256": "5f174f56770e446116394756b83c46da1b5a5e3772b7fb6eb2238de45f26c36f",
+      "bytes": 6059
+    },
+    "raw/reject-batch.receipt.log": {
+      "sha256": "8bd69e1c3eacf3b98b432d263883ae37b4f5ec7af1d229fd8009cb5f6681638a",
+      "bytes": 38
+    },
+    "raw/reject-batch.receipt.runtime/reject": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/reject-batch.receipt.runtime/runtime.json": {
+      "sha256": "30ba3285522cf53066b3d1b4ba7c4301aac44bf26343c0137b6bae4ea725265c",
+      "bytes": 1801
+    },
+    "raw/reject-batch.receipt.sampler.log": {
+      "sha256": "33b7667889872242ad552164070944dc1605f2fd31c15797e14b84ae431bad97",
+      "bytes": 8826
+    },
+    "raw/reject-mode.receipt.json": {
+      "sha256": "fd1d9a254d57602aa80f37360848b5db50e33f363fc3b83df5b538ce343d029c",
+      "bytes": 6796
+    },
+    "raw/reject-mode.receipt.log": {
+      "sha256": "8bd69e1c3eacf3b98b432d263883ae37b4f5ec7af1d229fd8009cb5f6681638a",
+      "bytes": 38
+    },
+    "raw/reject-mode.receipt.runtime/reject": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/reject-mode.receipt.runtime/runtime.json": {
+      "sha256": "66de249064454d411d703df930f47368b2aad639476245df708e74ae9bdab85a",
+      "bytes": 1796
+    },
+    "raw/reject-mode.receipt.sampler.log": {
+      "sha256": "4f6d0bc09b598dfb9d2b07314abd79279b494f10fa94e538cb5fb9d67fd7493a",
+      "bytes": 9030
+    },
+    "raw/reject-threads.receipt.json": {
+      "sha256": "50c4c0750bd932e42e96669cd963e53bfe596bf53e27a8d5d927d823db57c6bc",
+      "bytes": 6368
+    },
+    "raw/reject-threads.receipt.log": {
+      "sha256": "8bd69e1c3eacf3b98b432d263883ae37b4f5ec7af1d229fd8009cb5f6681638a",
+      "bytes": 38
+    },
+    "raw/reject-threads.receipt.runtime/reject": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/reject-threads.receipt.runtime/runtime.json": {
+      "sha256": "583688b1a5aa0e99a7c09c28212dfdb572cfe22642e3f4d8a14ee98b407f23b4",
+      "bytes": 1802
+    },
+    "raw/reject-threads.receipt.sampler.log": {
+      "sha256": "50ec735357ef4d935ee3520dd37dc26433561016e5d540ec606b7ece267c659c",
+      "bytes": 9233
+    },
+    "raw/timing-r0-batched-b1-k10.answers.json": {
+      "sha256": "8cdef9b75c2715df85f77bea0ab51ce52a82b3c5ac244d5cd20adbf739d33ee2",
+      "bytes": 3784
+    },
+    "raw/timing-r0-batched-b1-k10.csv": {
+      "sha256": "562ec831756c977eaf26e78e0c47dd41a10868dc3bce152b77d434ba8a3cb541",
+      "bytes": 1751362
+    },
+    "raw/timing-r0-batched-b1-k10.receipt.json": {
+      "sha256": "ff56cd0fa9e2419018f16ba5580c83e6d8d01766d2c45cde76ef1e6cde9c411f",
+      "bytes": 6097
+    },
+    "raw/timing-r0-batched-b1-k10.receipt.log": {
+      "sha256": "d781e937ea6ea8505e84d25877597ecb8daa7f4dbc99c6584f3ab0e8b9003ce4",
+      "bytes": 1113
+    },
+    "raw/timing-r0-batched-b1-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-batched-b1-k10.receipt.runtime/runtime.json": {
+      "sha256": "a9f07e453b64c548b3a987214c7505d7261b3ba175b1b4f4c5f9f2f30a8c1ae9",
+      "bytes": 1802
+    },
+    "raw/timing-r0-batched-b1-k10.receipt.sampler.log": {
+      "sha256": "495f9003d97c87380d2170e07c1d88b63989edc85fe4d66328fb267f64b79926",
+      "bytes": 11032
+    },
+    "raw/timing-r0-batched-b16-k10.answers.json": {
+      "sha256": "6551dd25b4a0e63c71d133dbe5585f6381d6d537fb3f3802cc4bbc7905bc9452",
+      "bytes": 3785
+    },
+    "raw/timing-r0-batched-b16-k10.csv": {
+      "sha256": "23d8ef6ff26b33644a77ce2d3dbb563b2daa4ca054266e539605bf290041f8bd",
+      "bytes": 1748416
+    },
+    "raw/timing-r0-batched-b16-k10.receipt.json": {
+      "sha256": "f38573f044a83264deed827d936aba6d0ad1c332002101246a70db869fe374f9",
+      "bytes": 6104
+    },
+    "raw/timing-r0-batched-b16-k10.receipt.log": {
+      "sha256": "cb190c379ea94e2d2242d7f04d47515fcc35d7f24c416396242d2e7ad50337fc",
+      "bytes": 1115
+    },
+    "raw/timing-r0-batched-b16-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-batched-b16-k10.receipt.runtime/runtime.json": {
+      "sha256": "98d0f5855c5e25534fa1e1104caec3c989897def6a3fb23e0c90934127844b89",
+      "bytes": 1803
+    },
+    "raw/timing-r0-batched-b16-k10.receipt.sampler.log": {
+      "sha256": "1ff65fc0603ecb9dedd74ed523548a36e787083da853ba3f2ff66d85c0ca6254",
+      "bytes": 10562
+    },
+    "raw/timing-r0-batched-b32-k10.answers.json": {
+      "sha256": "bbe61695652ca4a2fc64d214899ba96b2d8f85d2776097bd306e2a321acddadf",
+      "bytes": 3785
+    },
+    "raw/timing-r0-batched-b32-k10.csv": {
+      "sha256": "87d7969701447afb27a27d0b2b899bda1b0781608191334b059a375717370265",
+      "bytes": 1748349
+    },
+    "raw/timing-r0-batched-b32-k10.receipt.json": {
+      "sha256": "6f1f7606059d35e3b14f34d96e3ee2dc9226f1ce5dba2fb43d2eb227d39a1329",
+      "bytes": 6104
+    },
+    "raw/timing-r0-batched-b32-k10.receipt.log": {
+      "sha256": "9457d7a58f95a9dafe6a53083fd90c4e285c505e72658a2c663db3cc55708983",
+      "bytes": 1115
+    },
+    "raw/timing-r0-batched-b32-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-batched-b32-k10.receipt.runtime/runtime.json": {
+      "sha256": "7132e576144a5d0029525ccefaf52063e583ca7c3027b9bdeeffb3b0181293ca",
+      "bytes": 1803
+    },
+    "raw/timing-r0-batched-b32-k10.receipt.sampler.log": {
+      "sha256": "0996d4a0ce2731e2c92558fa854ef732ea612b6b88bf71d7f1cdd0ee0cd6f2ba",
+      "bytes": 10671
+    },
+    "raw/timing-r0-batched-b4-k10.answers.json": {
+      "sha256": "e2c6e58c09f9f6a7677f15e97d8ea77e02e2ee42b24bfe0999d19943347be0a6",
+      "bytes": 3784
+    },
+    "raw/timing-r0-batched-b4-k10.csv": {
+      "sha256": "20ec699ce67fbdf272005c6f3a27f1f638e688074619e43db5d84db42a381214",
+      "bytes": 1722283
+    },
+    "raw/timing-r0-batched-b4-k10.receipt.json": {
+      "sha256": "a8e9d1f03bad79d8b608fbd5edeae7c8426cf5438174fc8ec3dad31f14fa3656",
+      "bytes": 6097
+    },
+    "raw/timing-r0-batched-b4-k10.receipt.log": {
+      "sha256": "eec357619aca7ea46426dd113be1ea1f7813963252f4736f60dc1d9060b0e103",
+      "bytes": 1113
+    },
+    "raw/timing-r0-batched-b4-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-batched-b4-k10.receipt.runtime/runtime.json": {
+      "sha256": "e4dbcc50ab41da1b40f93c520b6963ec4a426f650627a040ef9d0c9bae466a5e",
+      "bytes": 1802
+    },
+    "raw/timing-r0-batched-b4-k10.receipt.sampler.log": {
+      "sha256": "a429a118082b2829e188b4c154bab1a214e2f586d441ce2d0366d02567afd5ee",
+      "bytes": 10967
+    },
+    "raw/timing-r0-sequential-b1-k10.answers.json": {
+      "sha256": "4d529a8fc1e2f762dc126718098dfe74067a39135b7c49abed5f778ec4082419",
+      "bytes": 3787
+    },
+    "raw/timing-r0-sequential-b1-k10.csv": {
+      "sha256": "1e177dc09c399a7b55362b280fbfe85eb289f1050620d959643b507d5cb13db7",
+      "bytes": 1787262
+    },
+    "raw/timing-r0-sequential-b1-k10.receipt.json": {
+      "sha256": "06ff4cf66d70e2566b39b5d31aa91fcad14696ef58649b7377ff0365b7a39385",
+      "bytes": 6084
+    },
+    "raw/timing-r0-sequential-b1-k10.receipt.log": {
+      "sha256": "551e1da9eb86383570027495d489a10d73c4c0f86d9209f4a4e9daa83978ee46",
+      "bytes": 1119
+    },
+    "raw/timing-r0-sequential-b1-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-sequential-b1-k10.receipt.runtime/runtime.json": {
+      "sha256": "0ba59a7b5875fe29e24229404f936b7fdd5265ac1ebba7f5877d9879f0d60e1d",
+      "bytes": 1788
+    },
+    "raw/timing-r0-sequential-b1-k10.receipt.sampler.log": {
+      "sha256": "fbda0ce87a0adccfff01d6d1f0d8b26c6dce23e49343d618d9f1378563596ace",
+      "bytes": 10932
+    },
+    "raw/timing-r0-sequential-b16-k10.answers.json": {
+      "sha256": "0e44b9b367cb011ae8f28289138814823476c3d3080be9c9bdcbde76762850b9",
+      "bytes": 3788
+    },
+    "raw/timing-r0-sequential-b16-k10.csv": {
+      "sha256": "615a160bf602b4347718070c2a70cda350c0acaa463482ad06b1a608ec4b740f",
+      "bytes": 1782708
+    },
+    "raw/timing-r0-sequential-b16-k10.receipt.json": {
+      "sha256": "22a25aa9b0335d2d466508c6cbaa4f2712deb0021519f9a8a736dace69140ca0",
+      "bytes": 6091
+    },
+    "raw/timing-r0-sequential-b16-k10.receipt.log": {
+      "sha256": "dc603822b45cb3a5f3743e3f3e163d3e4983140c7e685ac1cd1ad853b5a358f5",
+      "bytes": 1121
+    },
+    "raw/timing-r0-sequential-b16-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-sequential-b16-k10.receipt.runtime/runtime.json": {
+      "sha256": "d75e3e144a69447418259b76a99471b421704f9872749899c4536335413da699",
+      "bytes": 1789
+    },
+    "raw/timing-r0-sequential-b16-k10.receipt.sampler.log": {
+      "sha256": "bfb2c7be5598231f98da7e072598ce6f6522aa7cdc02f2a06eb041f5d3978244",
+      "bytes": 10928
+    },
+    "raw/timing-r0-sequential-b32-k10.answers.json": {
+      "sha256": "0d0bc7cbd68d269ec83faef1fa312ce9c6373bdd8c68981291b63714dbbee28c",
+      "bytes": 3788
+    },
+    "raw/timing-r0-sequential-b32-k10.csv": {
+      "sha256": "2e35e2bda4afd2e48bde4db3e8c79f733b3ee033dc48d6a945bec63b0eeea4c5",
+      "bytes": 1782060
+    },
+    "raw/timing-r0-sequential-b32-k10.receipt.json": {
+      "sha256": "d13eab436b9ff4b8dc50d160e2183154e59f07c4200f57dc8670c154e7192fc0",
+      "bytes": 6091
+    },
+    "raw/timing-r0-sequential-b32-k10.receipt.log": {
+      "sha256": "beb57a8dc280b51b166b463c07f372c7107c9566b11d096303606ed6261beaf0",
+      "bytes": 1121
+    },
+    "raw/timing-r0-sequential-b32-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-sequential-b32-k10.receipt.runtime/runtime.json": {
+      "sha256": "1b1dd91eb08aeb6f9bd33d12ec269e7d989da2cd7c7d0ad727fb1e7985adb988",
+      "bytes": 1789
+    },
+    "raw/timing-r0-sequential-b32-k10.receipt.sampler.log": {
+      "sha256": "527a97833beb1821faffdb0805c8b68757d199782114a55ea2a4f22c3ab446bb",
+      "bytes": 10679
+    },
+    "raw/timing-r0-sequential-b4-k10.answers.json": {
+      "sha256": "e0ad74d27dd469bed157bb3aa4d9dee9607f3e21a3e0ecec32ab70171fe672cb",
+      "bytes": 3787
+    },
+    "raw/timing-r0-sequential-b4-k10.csv": {
+      "sha256": "f88c249f24ce2a8b961e878bf48e692cc359015c3b43e3924b7b4267a69be878",
+      "bytes": 1764713
+    },
+    "raw/timing-r0-sequential-b4-k10.receipt.json": {
+      "sha256": "9b29308fd802cdee9dc917fd8752003e191189f161c2218dc25628faabf53306",
+      "bytes": 6084
+    },
+    "raw/timing-r0-sequential-b4-k10.receipt.log": {
+      "sha256": "9cf8ced1b0c1df4a0393f077eeeed2ec396273f793bf90f569cfadfdd0944fd8",
+      "bytes": 1119
+    },
+    "raw/timing-r0-sequential-b4-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-sequential-b4-k10.receipt.runtime/runtime.json": {
+      "sha256": "6581c912b083619bfc197658bcd98b08fb03335b0b5bee4fa4cdae04c64237a7",
+      "bytes": 1788
+    },
+    "raw/timing-r0-sequential-b4-k10.receipt.sampler.log": {
+      "sha256": "d1330234c6968660b91d0fccb0765702be5732c50b189263eb0b7b457409e8a8",
+      "bytes": 10829
+    },
+    "raw/timing-r0-streams-b1-k10.answers.json": {
+      "sha256": "ea16075f76dd45d24bd7007cf448e605fffe345e93b27d07c69d4ec586ebf04e",
+      "bytes": 3784
+    },
+    "raw/timing-r0-streams-b1-k10.csv": {
+      "sha256": "bb2bfc8ccc4d1c8b95ba2726ad437ee24c9d8b50830ccb9252567955ff7078b6",
+      "bytes": 1751705
+    },
+    "raw/timing-r0-streams-b1-k10.receipt.json": {
+      "sha256": "e32979fd15c8979768f832ae4b2b44590d83ffcb07b90456fc7ec32ec3bcad7e",
+      "bytes": 6085
+    },
+    "raw/timing-r0-streams-b1-k10.receipt.log": {
+      "sha256": "db2a51b330003fee1b04f7fdc728b90fc51f1a1d229bc4529ad8f76301ad54c4",
+      "bytes": 1113
+    },
+    "raw/timing-r0-streams-b1-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-streams-b1-k10.receipt.runtime/runtime.json": {
+      "sha256": "6ebf0f60bd124f6617321d3556ac912bad55ec6f8d1e4e806f93b0def651f99e",
+      "bytes": 1796
+    },
+    "raw/timing-r0-streams-b1-k10.receipt.sampler.log": {
+      "sha256": "a84d30e9268f941283ec95ae341c98eefc02f3035bc161a519ff931d0bec7b86",
+      "bytes": 10881
+    },
+    "raw/timing-r0-streams-b16-k10.answers.json": {
+      "sha256": "fc85884a16b49eb34f2741d6f07dea9fe3f947e563d0a54cf32adaaa1e0b910c",
+      "bytes": 3785
+    },
+    "raw/timing-r0-streams-b16-k10.csv": {
+      "sha256": "498562b4bb749b274bc836bc50e4bc13fdaec093a1c99dbd00234abc38775b4b",
+      "bytes": 1749614
+    },
+    "raw/timing-r0-streams-b16-k10.receipt.json": {
+      "sha256": "a3a5b9c20db7f582896c1e2c2086996ba4ccd4363f36c0b0f4d076c18bf3b2eb",
+      "bytes": 6092
+    },
+    "raw/timing-r0-streams-b16-k10.receipt.log": {
+      "sha256": "618bcebc7137365299babd3646eeff5df9d7ca0be8d8d3bc600bbc7d906ddf7c",
+      "bytes": 1115
+    },
+    "raw/timing-r0-streams-b16-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-streams-b16-k10.receipt.runtime/runtime.json": {
+      "sha256": "6b0c6e58105736f4b7ccc593a78ce416c9238e694d2e056a3be735e278610166",
+      "bytes": 1797
+    },
+    "raw/timing-r0-streams-b16-k10.receipt.sampler.log": {
+      "sha256": "e658ca0912eeb451684a07644e629830adb66769a674409c1ea1ebfed52db653",
+      "bytes": 10513
+    },
+    "raw/timing-r0-streams-b32-k10.answers.json": {
+      "sha256": "a13d3c6a38217afc95091182aef996dfb1c1cd4dcb29399e889e0524456f43a2",
+      "bytes": 3785
+    },
+    "raw/timing-r0-streams-b32-k10.csv": {
+      "sha256": "ed3bbbc1be85401d7792b2e08393b2a8ad8866bbb31e50e3779c42428bbde2c5",
+      "bytes": 1749259
+    },
+    "raw/timing-r0-streams-b32-k10.receipt.json": {
+      "sha256": "30cccfdb9dcf3aa1bf93acf2e509fbefa299b9a2829573d702a68877b05d46d1",
+      "bytes": 6092
+    },
+    "raw/timing-r0-streams-b32-k10.receipt.log": {
+      "sha256": "3cdd358558f0fc8ff4e9b16235821a639d2c0a83eb050a5836e8fa350508d7c6",
+      "bytes": 1115
+    },
+    "raw/timing-r0-streams-b32-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-streams-b32-k10.receipt.runtime/runtime.json": {
+      "sha256": "a58184cba0b2de4e757019987a11a99b830d8609648a83f5dd3c1f7f4e5ee1ad",
+      "bytes": 1797
+    },
+    "raw/timing-r0-streams-b32-k10.receipt.sampler.log": {
+      "sha256": "edb5f91cc68b9919755ce44da012f56c0f25a74212ef4824d2539ed9f259c311",
+      "bytes": 10412
+    },
+    "raw/timing-r0-streams-b4-k10.answers.json": {
+      "sha256": "7193ad3845ebab89daf65be0906d24e8074934115ee78b49de703e6f9d7d3257",
+      "bytes": 3784
+    },
+    "raw/timing-r0-streams-b4-k10.csv": {
+      "sha256": "4ec9a513e5333dabb9e65f0925b788720e52f64a10f6ce5873bbcff39e9632fb",
+      "bytes": 1728981
+    },
+    "raw/timing-r0-streams-b4-k10.receipt.json": {
+      "sha256": "589114f412d055d89fc59e146d5a4375f5a79eabaff2240ed9e0d252be94398f",
+      "bytes": 6085
+    },
+    "raw/timing-r0-streams-b4-k10.receipt.log": {
+      "sha256": "79ad127b9eca814fa7fb4f2ad3ba570d2d80325d721482344ae892e8c9232372",
+      "bytes": 1113
+    },
+    "raw/timing-r0-streams-b4-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-streams-b4-k10.receipt.runtime/runtime.json": {
+      "sha256": "2d387736c7d2319498422758cb2a2ef054ca315957e92c816050f000d50caa4f",
+      "bytes": 1796
+    },
+    "raw/timing-r0-streams-b4-k10.receipt.sampler.log": {
+      "sha256": "17f9638892b3ea8d15cd44ba6fb7a785367204e43bfe37bb3bfd18594202bfbe",
+      "bytes": 10670
+    },
+    "raw/timing-r1-batched-b1-k10.answers.json": {
+      "sha256": "511384413c11bc446eba6acc26e9f9c5c1983af491fbfe7b2cbeee062189025b",
+      "bytes": 3784
+    },
+    "raw/timing-r1-batched-b1-k10.csv": {
+      "sha256": "904d888766f5178f679dc0d52a7a80c652ba637c6cf949a22a5fa195c6b989bd",
+      "bytes": 1754485
+    },
+    "raw/timing-r1-batched-b1-k10.receipt.json": {
+      "sha256": "b132fe57c63770a741b78008a719fcdfc28b56d2788867767b5f1bc3a65fd03d",
+      "bytes": 6097
+    },
+    "raw/timing-r1-batched-b1-k10.receipt.log": {
+      "sha256": "d781e937ea6ea8505e84d25877597ecb8daa7f4dbc99c6584f3ab0e8b9003ce4",
+      "bytes": 1113
+    },
+    "raw/timing-r1-batched-b1-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-batched-b1-k10.receipt.runtime/runtime.json": {
+      "sha256": "a9f07e453b64c548b3a987214c7505d7261b3ba175b1b4f4c5f9f2f30a8c1ae9",
+      "bytes": 1802
+    },
+    "raw/timing-r1-batched-b1-k10.receipt.sampler.log": {
+      "sha256": "6ecc0db4ae528a40df7d566166d0062a2da6fdc35a1b8c10d6dea82c9b740625",
+      "bytes": 10881
+    },
+    "raw/timing-r1-batched-b16-k10.answers.json": {
+      "sha256": "f43baef055c6f7f189b334b50595af5dba9598b83bbfdc4bda9b623868955ca9",
+      "bytes": 3785
+    },
+    "raw/timing-r1-batched-b16-k10.csv": {
+      "sha256": "1c4af2aee8019f5bb287bbd34c60f410ed576c20f07fe502f21dc615ae178e69",
+      "bytes": 1748100
+    },
+    "raw/timing-r1-batched-b16-k10.receipt.json": {
+      "sha256": "cc9ffdba6e317ae650808da150ae28a0ac560c01c7abba14e55090e6b8ae2512",
+      "bytes": 6104
+    },
+    "raw/timing-r1-batched-b16-k10.receipt.log": {
+      "sha256": "cb190c379ea94e2d2242d7f04d47515fcc35d7f24c416396242d2e7ad50337fc",
+      "bytes": 1115
+    },
+    "raw/timing-r1-batched-b16-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-batched-b16-k10.receipt.runtime/runtime.json": {
+      "sha256": "98d0f5855c5e25534fa1e1104caec3c989897def6a3fb23e0c90934127844b89",
+      "bytes": 1803
+    },
+    "raw/timing-r1-batched-b16-k10.receipt.sampler.log": {
+      "sha256": "9e09bb3b76f72ec3ea7dfe83b67d7044d080c0238680296edf222f9ab3bcad91",
+      "bytes": 10762
+    },
+    "raw/timing-r1-batched-b32-k10.answers.json": {
+      "sha256": "d382a043a7b8ef13a78f095a0a01eaf493b94f83ec4b3e62250cf25157caf62b",
+      "bytes": 3785
+    },
+    "raw/timing-r1-batched-b32-k10.csv": {
+      "sha256": "61e0f03ed4699ffdd59d9c4e8d44cb76c85f966161d0492b0726e674db34573b",
+      "bytes": 1748257
+    },
+    "raw/timing-r1-batched-b32-k10.receipt.json": {
+      "sha256": "29b9a4c93ef4ab4a4c6b78630a3105294cf0afdaf3ebef7ffb17ca327d332407",
+      "bytes": 6104
+    },
+    "raw/timing-r1-batched-b32-k10.receipt.log": {
+      "sha256": "9457d7a58f95a9dafe6a53083fd90c4e285c505e72658a2c663db3cc55708983",
+      "bytes": 1115
+    },
+    "raw/timing-r1-batched-b32-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-batched-b32-k10.receipt.runtime/runtime.json": {
+      "sha256": "7132e576144a5d0029525ccefaf52063e583ca7c3027b9bdeeffb3b0181293ca",
+      "bytes": 1803
+    },
+    "raw/timing-r1-batched-b32-k10.receipt.sampler.log": {
+      "sha256": "ac41db92dc4e639559ea3ff87620090d90d02c8023fc7b78367fabf05a95b72e",
+      "bytes": 10461
+    },
+    "raw/timing-r1-batched-b4-k10.answers.json": {
+      "sha256": "4fd374458ce4d177bf9c471645367db6c5c112d80d5d7463fac9f0329addfbb9",
+      "bytes": 3784
+    },
+    "raw/timing-r1-batched-b4-k10.csv": {
+      "sha256": "31a9acd06806140571ce4d6b6347f1099bfd32d2f3eda188a80376e9f7a068a2",
+      "bytes": 1723484
+    },
+    "raw/timing-r1-batched-b4-k10.receipt.json": {
+      "sha256": "235aa7328aa975bda6e7546a7b1a0ed8fa68eef0808246a2372342f21ff46a24",
+      "bytes": 6097
+    },
+    "raw/timing-r1-batched-b4-k10.receipt.log": {
+      "sha256": "eec357619aca7ea46426dd113be1ea1f7813963252f4736f60dc1d9060b0e103",
+      "bytes": 1113
+    },
+    "raw/timing-r1-batched-b4-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-batched-b4-k10.receipt.runtime/runtime.json": {
+      "sha256": "e4dbcc50ab41da1b40f93c520b6963ec4a426f650627a040ef9d0c9bae466a5e",
+      "bytes": 1802
+    },
+    "raw/timing-r1-batched-b4-k10.receipt.sampler.log": {
+      "sha256": "d346755b1cac8f8ebb09429cadea83a3e8266f347bf6e1f271fcabbd13293aca",
+      "bytes": 10520
+    },
+    "raw/timing-r1-sequential-b1-k10.answers.json": {
+      "sha256": "9257606f73bd80730a9e56e7a5515bf0f0ac3a8bfa96a894f21a96211ce7f1c6",
+      "bytes": 3787
+    },
+    "raw/timing-r1-sequential-b1-k10.csv": {
+      "sha256": "6b34940fd087378271e11e36b7144d5c14ca027181cc125c98ceb5ab64aeff6e",
+      "bytes": 1786434
+    },
+    "raw/timing-r1-sequential-b1-k10.receipt.json": {
+      "sha256": "f2cc032ac58b97b47337fdb6dcf4b66c24ff5178a771a67128df543e9bf2e9cf",
+      "bytes": 6084
+    },
+    "raw/timing-r1-sequential-b1-k10.receipt.log": {
+      "sha256": "551e1da9eb86383570027495d489a10d73c4c0f86d9209f4a4e9daa83978ee46",
+      "bytes": 1119
+    },
+    "raw/timing-r1-sequential-b1-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-sequential-b1-k10.receipt.runtime/runtime.json": {
+      "sha256": "0ba59a7b5875fe29e24229404f936b7fdd5265ac1ebba7f5877d9879f0d60e1d",
+      "bytes": 1788
+    },
+    "raw/timing-r1-sequential-b1-k10.receipt.sampler.log": {
+      "sha256": "5445f8be0c4e0a0f3d456cd014b46356a460d59f145fcf228b5de428e8f57329",
+      "bytes": 10732
+    },
+    "raw/timing-r1-sequential-b16-k10.answers.json": {
+      "sha256": "bba607e4816b2d8bb4a07b52364f63ecc23c146df5bf4e86fa291d268d5def43",
+      "bytes": 3788
+    },
+    "raw/timing-r1-sequential-b16-k10.csv": {
+      "sha256": "599702e577f5f08e148b9f6d0a348ddccaa1b9ba9cbe45e61a033dc660ed1f1f",
+      "bytes": 1782969
+    },
+    "raw/timing-r1-sequential-b16-k10.receipt.json": {
+      "sha256": "e37127b729f04dea8d59ab8110777e69881a3010c372f490be64edf1ec7aadf3",
+      "bytes": 6091
+    },
+    "raw/timing-r1-sequential-b16-k10.receipt.log": {
+      "sha256": "dc603822b45cb3a5f3743e3f3e163d3e4983140c7e685ac1cd1ad853b5a358f5",
+      "bytes": 1121
+    },
+    "raw/timing-r1-sequential-b16-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-sequential-b16-k10.receipt.runtime/runtime.json": {
+      "sha256": "d75e3e144a69447418259b76a99471b421704f9872749899c4536335413da699",
+      "bytes": 1789
+    },
+    "raw/timing-r1-sequential-b16-k10.receipt.sampler.log": {
+      "sha256": "a8f56573c22b33b641c73658efe766b1f5cfc341a35746da2e216fe99d60d742",
+      "bytes": 10779
+    },
+    "raw/timing-r1-sequential-b32-k10.answers.json": {
+      "sha256": "77024d9d8446fbff96e1f985a265f1d6bce311a64e3154e4c1369353b2c8449d",
+      "bytes": 3788
+    },
+    "raw/timing-r1-sequential-b32-k10.csv": {
+      "sha256": "0188dac4cad9a8df27d0583a5bd42f17d095ec92bfafe093367858f7de8e58b2",
+      "bytes": 1782068
+    },
+    "raw/timing-r1-sequential-b32-k10.receipt.json": {
+      "sha256": "309aab2d4fc4c8c076d04af28f5f6b274c27dbc44eee6b01b50f8ca56d7d21b8",
+      "bytes": 6091
+    },
+    "raw/timing-r1-sequential-b32-k10.receipt.log": {
+      "sha256": "beb57a8dc280b51b166b463c07f372c7107c9566b11d096303606ed6261beaf0",
+      "bytes": 1121
+    },
+    "raw/timing-r1-sequential-b32-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-sequential-b32-k10.receipt.runtime/runtime.json": {
+      "sha256": "1b1dd91eb08aeb6f9bd33d12ec269e7d989da2cd7c7d0ad727fb1e7985adb988",
+      "bytes": 1789
+    },
+    "raw/timing-r1-sequential-b32-k10.receipt.sampler.log": {
+      "sha256": "8172e97c9eede969d7aa86d567f4f0cb2a118bdcd2163590529f2856b1ab38ac",
+      "bytes": 11034
+    },
+    "raw/timing-r1-sequential-b4-k10.answers.json": {
+      "sha256": "730a982c190b05ee6c10fb43d81a1de16249f4c7310375f87ed9061c6b69222a",
+      "bytes": 3787
+    },
+    "raw/timing-r1-sequential-b4-k10.csv": {
+      "sha256": "47875041ab5415f9b595f87b34414f70b0c8e2c3f5897b41594a96ec943a678c",
+      "bytes": 1765426
+    },
+    "raw/timing-r1-sequential-b4-k10.receipt.json": {
+      "sha256": "948a6629050340a5e6679d5f7d96c2a229971cbbef30e5dc703c9fd78f585618",
+      "bytes": 6084
+    },
+    "raw/timing-r1-sequential-b4-k10.receipt.log": {
+      "sha256": "9cf8ced1b0c1df4a0393f077eeeed2ec396273f793bf90f569cfadfdd0944fd8",
+      "bytes": 1119
+    },
+    "raw/timing-r1-sequential-b4-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-sequential-b4-k10.receipt.runtime/runtime.json": {
+      "sha256": "6581c912b083619bfc197658bcd98b08fb03335b0b5bee4fa4cdae04c64237a7",
+      "bytes": 1788
+    },
+    "raw/timing-r1-sequential-b4-k10.receipt.sampler.log": {
+      "sha256": "62018299637791c8ec8962aebfb52a13c92feb1d09ab20144343760a4ce63403",
+      "bytes": 10679
+    },
+    "raw/timing-r1-streams-b1-k10.answers.json": {
+      "sha256": "8b4f08bf9365f3711d2f35d0f9c519c3616ebc716cb86fd7d3a2b3c39c2624fa",
+      "bytes": 3784
+    },
+    "raw/timing-r1-streams-b1-k10.csv": {
+      "sha256": "f4315a3765ac4396e4fb64915a59360e45b63eb15073087cf6fe85808e51f8e8",
+      "bytes": 1753332
+    },
+    "raw/timing-r1-streams-b1-k10.receipt.json": {
+      "sha256": "471bb6c5480bf4c0456be5cefd99891705ac761ff86751b704d264ddbbe06580",
+      "bytes": 6085
+    },
+    "raw/timing-r1-streams-b1-k10.receipt.log": {
+      "sha256": "db2a51b330003fee1b04f7fdc728b90fc51f1a1d229bc4529ad8f76301ad54c4",
+      "bytes": 1113
+    },
+    "raw/timing-r1-streams-b1-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-streams-b1-k10.receipt.runtime/runtime.json": {
+      "sha256": "6ebf0f60bd124f6617321d3556ac912bad55ec6f8d1e4e806f93b0def651f99e",
+      "bytes": 1796
+    },
+    "raw/timing-r1-streams-b1-k10.receipt.sampler.log": {
+      "sha256": "108a617ad5c780e5f3f345af71059c074787bb62694327c691fa756f1f0f747e",
+      "bytes": 10683
+    },
+    "raw/timing-r1-streams-b16-k10.answers.json": {
+      "sha256": "d08d5932d0179a12419f3cf3d8f28337fcdde12b0311a0c4655ec631e67ebf12",
+      "bytes": 3785
+    },
+    "raw/timing-r1-streams-b16-k10.csv": {
+      "sha256": "772b9b13c70a16c1772f78f5840586030c2d1dc5d237003798919a5447b47dca",
+      "bytes": 1749271
+    },
+    "raw/timing-r1-streams-b16-k10.receipt.json": {
+      "sha256": "ccd5b02ae5aaa99ecfc0a43b86ace90d4cfbe3a46e1825675744280340b355fc",
+      "bytes": 6092
+    },
+    "raw/timing-r1-streams-b16-k10.receipt.log": {
+      "sha256": "618bcebc7137365299babd3646eeff5df9d7ca0be8d8d3bc600bbc7d906ddf7c",
+      "bytes": 1115
+    },
+    "raw/timing-r1-streams-b16-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-streams-b16-k10.receipt.runtime/runtime.json": {
+      "sha256": "6b0c6e58105736f4b7ccc593a78ce416c9238e694d2e056a3be735e278610166",
+      "bytes": 1797
+    },
+    "raw/timing-r1-streams-b16-k10.receipt.sampler.log": {
+      "sha256": "075088c38458c4ee3171c9f574ed0c9be2595ccecca73d59b6a7523548b1d08f",
+      "bytes": 10621
+    },
+    "raw/timing-r1-streams-b32-k10.answers.json": {
+      "sha256": "1bad35d250061c91e0b245cc6bede232b9b7fc151d394a637cdb25207fc8e661",
+      "bytes": 3785
+    },
+    "raw/timing-r1-streams-b32-k10.csv": {
+      "sha256": "f061f2c0bedcf1a362dbc2ee2d5f2efe3cfb966462cc2b8d836846133387aafc",
+      "bytes": 1748968
+    },
+    "raw/timing-r1-streams-b32-k10.receipt.json": {
+      "sha256": "d59b314bfec3f09d2fb405894eb1a7633789e160cededd9b137cd96ce74b81b9",
+      "bytes": 6092
+    },
+    "raw/timing-r1-streams-b32-k10.receipt.log": {
+      "sha256": "3cdd358558f0fc8ff4e9b16235821a639d2c0a83eb050a5836e8fa350508d7c6",
+      "bytes": 1115
+    },
+    "raw/timing-r1-streams-b32-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-streams-b32-k10.receipt.runtime/runtime.json": {
+      "sha256": "a58184cba0b2de4e757019987a11a99b830d8609648a83f5dd3c1f7f4e5ee1ad",
+      "bytes": 1797
+    },
+    "raw/timing-r1-streams-b32-k10.receipt.sampler.log": {
+      "sha256": "683e8f96fcd09fb20db914ce6a6243672c3aafdd59028cef95069fdb7b149e88",
+      "bytes": 10463
+    },
+    "raw/timing-r1-streams-b4-k10.answers.json": {
+      "sha256": "80fab9c1d2d9b8d07083d470e18a430b3cc53c020435c3f1dee51463d7139828",
+      "bytes": 3784
+    },
+    "raw/timing-r1-streams-b4-k10.csv": {
+      "sha256": "dfcad75da52de7d20fe7e3962b45fdb91020f9c1a2797df23a141a0e6cf72677",
+      "bytes": 1729038
+    },
+    "raw/timing-r1-streams-b4-k10.receipt.json": {
+      "sha256": "b67a7a01064427c6b60647a582caa998212ce3e5351f85eda3a0ec0486dd517a",
+      "bytes": 6085
+    },
+    "raw/timing-r1-streams-b4-k10.receipt.log": {
+      "sha256": "79ad127b9eca814fa7fb4f2ad3ba570d2d80325d721482344ae892e8c9232372",
+      "bytes": 1113
+    },
+    "raw/timing-r1-streams-b4-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-streams-b4-k10.receipt.runtime/runtime.json": {
+      "sha256": "2d387736c7d2319498422758cb2a2ef054ca315957e92c816050f000d50caa4f",
+      "bytes": 1796
+    },
+    "raw/timing-r1-streams-b4-k10.receipt.sampler.log": {
+      "sha256": "ce57350d73dafd6f2535fd7ab5648fe68f114f9e5ec9ee98d2a4268e35a0937e",
+      "bytes": 10822
+    },
+    "raw/timing-r2-batched-b1-k10.answers.json": {
+      "sha256": "b78c568499dc0fbea4b3ea261aad0dceedd5be3acefcc530340b8dd178dd37e8",
+      "bytes": 3784
+    },
+    "raw/timing-r2-batched-b1-k10.csv": {
+      "sha256": "df06f0deb62c77b8819aa6daa9ad756f86b3108c071baee65d7fc370da6a93af",
+      "bytes": 1754496
+    },
+    "raw/timing-r2-batched-b1-k10.receipt.json": {
+      "sha256": "2f769bbcd1010df7f30f68b92f08a94212fb963c4fa6a6b608a242ba31236271",
+      "bytes": 6097
+    },
+    "raw/timing-r2-batched-b1-k10.receipt.log": {
+      "sha256": "d781e937ea6ea8505e84d25877597ecb8daa7f4dbc99c6584f3ab0e8b9003ce4",
+      "bytes": 1113
+    },
+    "raw/timing-r2-batched-b1-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-batched-b1-k10.receipt.runtime/runtime.json": {
+      "sha256": "a9f07e453b64c548b3a987214c7505d7261b3ba175b1b4f4c5f9f2f30a8c1ae9",
+      "bytes": 1802
+    },
+    "raw/timing-r2-batched-b1-k10.receipt.sampler.log": {
+      "sha256": "11dbc3593e9caf6682faa4a29d6d2a5a67e5a3ff4319a23a59588f6879d17ee1",
+      "bytes": 10734
+    },
+    "raw/timing-r2-batched-b16-k10.answers.json": {
+      "sha256": "325c8c804d1501c7347f20fa14df929b00bd28322da96da89e5d10b18196875d",
+      "bytes": 3785
+    },
+    "raw/timing-r2-batched-b16-k10.csv": {
+      "sha256": "378827001f0b8069319c7ba45f1e9fbefde87064307b4bda001af93f325983f3",
+      "bytes": 1747754
+    },
+    "raw/timing-r2-batched-b16-k10.receipt.json": {
+      "sha256": "318d373b2241208682c78a8fc4bda818b2b815b9f96410d49f7b1af4be614c91",
+      "bytes": 6104
+    },
+    "raw/timing-r2-batched-b16-k10.receipt.log": {
+      "sha256": "cb190c379ea94e2d2242d7f04d47515fcc35d7f24c416396242d2e7ad50337fc",
+      "bytes": 1115
+    },
+    "raw/timing-r2-batched-b16-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-batched-b16-k10.receipt.runtime/runtime.json": {
+      "sha256": "98d0f5855c5e25534fa1e1104caec3c989897def6a3fb23e0c90934127844b89",
+      "bytes": 1803
+    },
+    "raw/timing-r2-batched-b16-k10.receipt.sampler.log": {
+      "sha256": "3f6b5c14c474292403980ff6067e32090a716eb2eacb8f9ec587935df2c6b4aa",
+      "bytes": 10463
+    },
+    "raw/timing-r2-batched-b32-k10.answers.json": {
+      "sha256": "b6dd7f31d2ab2b7dadc7f27f4ec1eeedc56d4aa48320e47bdb8b2700987f6ac1",
+      "bytes": 3785
+    },
+    "raw/timing-r2-batched-b32-k10.csv": {
+      "sha256": "785361e09ae2f55d861f11416f21d0dbfae5346af6c7e3aa53be86fff8e746fc",
+      "bytes": 1748829
+    },
+    "raw/timing-r2-batched-b32-k10.receipt.json": {
+      "sha256": "5c78b412f28b3fae2d8b2b4da93a55e40471755f610d64658da10bbab7e3e588",
+      "bytes": 6104
+    },
+    "raw/timing-r2-batched-b32-k10.receipt.log": {
+      "sha256": "9457d7a58f95a9dafe6a53083fd90c4e285c505e72658a2c663db3cc55708983",
+      "bytes": 1115
+    },
+    "raw/timing-r2-batched-b32-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-batched-b32-k10.receipt.runtime/runtime.json": {
+      "sha256": "7132e576144a5d0029525ccefaf52063e583ca7c3027b9bdeeffb3b0181293ca",
+      "bytes": 1803
+    },
+    "raw/timing-r2-batched-b32-k10.receipt.sampler.log": {
+      "sha256": "408f2bd206dc29c30d771ca47a51070db7213bc1d4ac9d1e2e131e2546df64a3",
+      "bytes": 10622
+    },
+    "raw/timing-r2-batched-b4-k10.answers.json": {
+      "sha256": "defb40d65233e4ef9d16964be7bc98a7318e036ad3d1befeb63dea31a7786464",
+      "bytes": 3784
+    },
+    "raw/timing-r2-batched-b4-k10.csv": {
+      "sha256": "c58b21f27e98e8b1a7cf760de48c868a733109a8744399311ce6fd6a20274bf2",
+      "bytes": 1723471
+    },
+    "raw/timing-r2-batched-b4-k10.receipt.json": {
+      "sha256": "c1d6b393b6206ff0087f7d9230c4f44d7c979844a302a64f2ea6c99f90eea5a2",
+      "bytes": 6097
+    },
+    "raw/timing-r2-batched-b4-k10.receipt.log": {
+      "sha256": "eec357619aca7ea46426dd113be1ea1f7813963252f4736f60dc1d9060b0e103",
+      "bytes": 1113
+    },
+    "raw/timing-r2-batched-b4-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-batched-b4-k10.receipt.runtime/runtime.json": {
+      "sha256": "e4dbcc50ab41da1b40f93c520b6963ec4a426f650627a040ef9d0c9bae466a5e",
+      "bytes": 1802
+    },
+    "raw/timing-r2-batched-b4-k10.receipt.sampler.log": {
+      "sha256": "d0032e666a19e26f137ba9fade481da8fa45d0d299e3edbe83520aa216002245",
+      "bytes": 10664
+    },
+    "raw/timing-r2-sequential-b1-k10.answers.json": {
+      "sha256": "b1242128f318574e315832b6a18c15b8155191ec2c0f247e0d3c1d7641c4d4e4",
+      "bytes": 3787
+    },
+    "raw/timing-r2-sequential-b1-k10.csv": {
+      "sha256": "9d1c40af31d9b8af88cf3cf9dcff2ce92d6acb87e7906a5613cba04517258f14",
+      "bytes": 1789747
+    },
+    "raw/timing-r2-sequential-b1-k10.receipt.json": {
+      "sha256": "5d9542a4d9df584ca7772dbeb44261d03cb2cfbc0165105abfff95e412d06409",
+      "bytes": 6084
+    },
+    "raw/timing-r2-sequential-b1-k10.receipt.log": {
+      "sha256": "551e1da9eb86383570027495d489a10d73c4c0f86d9209f4a4e9daa83978ee46",
+      "bytes": 1119
+    },
+    "raw/timing-r2-sequential-b1-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-sequential-b1-k10.receipt.runtime/runtime.json": {
+      "sha256": "0ba59a7b5875fe29e24229404f936b7fdd5265ac1ebba7f5877d9879f0d60e1d",
+      "bytes": 1788
+    },
+    "raw/timing-r2-sequential-b1-k10.receipt.sampler.log": {
+      "sha256": "2c6542bb635d33e14f7438f9322d31f0655fbf24edeae378ecb7f5e92171d692",
+      "bytes": 10790
+    },
+    "raw/timing-r2-sequential-b16-k10.answers.json": {
+      "sha256": "40f98f269b0bb00234feb41ab8eb888a7e56a4dbac7a4bd8caf0e71d663e8993",
+      "bytes": 3788
+    },
+    "raw/timing-r2-sequential-b16-k10.csv": {
+      "sha256": "6a4ef2201e6477ac14b4d683e5f21fa0505ed17e48fd1f64143ba90b9b93cc3e",
+      "bytes": 1783112
+    },
+    "raw/timing-r2-sequential-b16-k10.receipt.json": {
+      "sha256": "80e50c7a707e56a46ef7358e2f7839d454743c5e35e2d83c4a1a9d5acdad0728",
+      "bytes": 6091
+    },
+    "raw/timing-r2-sequential-b16-k10.receipt.log": {
+      "sha256": "dc603822b45cb3a5f3743e3f3e163d3e4983140c7e685ac1cd1ad853b5a358f5",
+      "bytes": 1121
+    },
+    "raw/timing-r2-sequential-b16-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-sequential-b16-k10.receipt.runtime/runtime.json": {
+      "sha256": "d75e3e144a69447418259b76a99471b421704f9872749899c4536335413da699",
+      "bytes": 1789
+    },
+    "raw/timing-r2-sequential-b16-k10.receipt.sampler.log": {
+      "sha256": "604bafc70bcc1dc17bbfb8f706b66c681c2b84d9cbae8ed69ee802693cd48a02",
+      "bytes": 10839
+    },
+    "raw/timing-r2-sequential-b32-k10.answers.json": {
+      "sha256": "4db1617312df77c5f9310fe2abc67f18ab4647e4b4a15959f93f896953285587",
+      "bytes": 3788
+    },
+    "raw/timing-r2-sequential-b32-k10.csv": {
+      "sha256": "26c7f22d1dde0fc79a2f962dd1158fe7dee69edd3a1ba5028bb66fe4709fb558",
+      "bytes": 1782330
+    },
+    "raw/timing-r2-sequential-b32-k10.receipt.json": {
+      "sha256": "f67f5266991eaecb52a289318c925246ed0c62970ed9b6226024135af841e876",
+      "bytes": 6091
+    },
+    "raw/timing-r2-sequential-b32-k10.receipt.log": {
+      "sha256": "beb57a8dc280b51b166b463c07f372c7107c9566b11d096303606ed6261beaf0",
+      "bytes": 1121
+    },
+    "raw/timing-r2-sequential-b32-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-sequential-b32-k10.receipt.runtime/runtime.json": {
+      "sha256": "1b1dd91eb08aeb6f9bd33d12ec269e7d989da2cd7c7d0ad727fb1e7985adb988",
+      "bytes": 1789
+    },
+    "raw/timing-r2-sequential-b32-k10.receipt.sampler.log": {
+      "sha256": "73b8a74144cbbf8b6baf14f0fe9b7c7f6426c4321201da999165e17ace80c4d1",
+      "bytes": 10629
+    },
+    "raw/timing-r2-sequential-b4-k10.answers.json": {
+      "sha256": "d942f99d1b247da6e309b2b5808b3fae17d1059ed7baab7c757c4bdcbd8ee566",
+      "bytes": 3787
+    },
+    "raw/timing-r2-sequential-b4-k10.csv": {
+      "sha256": "e5290a7e5348075649dacfde9cac005485e00908ff52252ef7187fb00936e7d6",
+      "bytes": 1764793
+    },
+    "raw/timing-r2-sequential-b4-k10.receipt.json": {
+      "sha256": "55ef443e7442c1331065d36afd71b62e0b81804294050b55f2625af75f0b4203",
+      "bytes": 6084
+    },
+    "raw/timing-r2-sequential-b4-k10.receipt.log": {
+      "sha256": "9cf8ced1b0c1df4a0393f077eeeed2ec396273f793bf90f569cfadfdd0944fd8",
+      "bytes": 1119
+    },
+    "raw/timing-r2-sequential-b4-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-sequential-b4-k10.receipt.runtime/runtime.json": {
+      "sha256": "6581c912b083619bfc197658bcd98b08fb03335b0b5bee4fa4cdae04c64237a7",
+      "bytes": 1788
+    },
+    "raw/timing-r2-sequential-b4-k10.receipt.sampler.log": {
+      "sha256": "33028ca6ce9b1a8ebf9a26747b352e1e5d1292db2781c5cd70e225e58544ba8e",
+      "bytes": 11091
+    },
+    "raw/timing-r2-streams-b1-k10.answers.json": {
+      "sha256": "a5150150dc068a9a982b4cebc27af9831b48748f348e6c29954b71da122bba77",
+      "bytes": 3784
+    },
+    "raw/timing-r2-streams-b1-k10.csv": {
+      "sha256": "c2fc7bbac3e93449b21f851b3a6f09db3f8cc3f8a922750c6a959b4c3c0524db",
+      "bytes": 1755597
+    },
+    "raw/timing-r2-streams-b1-k10.receipt.json": {
+      "sha256": "bbace8340036cd4bb9409d63e2ded4beb315115fdcec9398ae2f2f535b2be668",
+      "bytes": 6085
+    },
+    "raw/timing-r2-streams-b1-k10.receipt.log": {
+      "sha256": "db2a51b330003fee1b04f7fdc728b90fc51f1a1d229bc4529ad8f76301ad54c4",
+      "bytes": 1113
+    },
+    "raw/timing-r2-streams-b1-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-streams-b1-k10.receipt.runtime/runtime.json": {
+      "sha256": "6ebf0f60bd124f6617321d3556ac912bad55ec6f8d1e4e806f93b0def651f99e",
+      "bytes": 1796
+    },
+    "raw/timing-r2-streams-b1-k10.receipt.sampler.log": {
+      "sha256": "144d44bfcb3203903d56175da2cba2a78f90f7bb6ed5b2af199da892c18d4742",
+      "bytes": 10683
+    },
+    "raw/timing-r2-streams-b16-k10.answers.json": {
+      "sha256": "872fde4179fa6dfbf5e98384955cf133e90d0fbaf757d70dd4ca45cc061709bb",
+      "bytes": 3785
+    },
+    "raw/timing-r2-streams-b16-k10.csv": {
+      "sha256": "ccb35e91b98bac8461a21586256f1a93a97b6539a6fd497ba5ce122471e8bc1a",
+      "bytes": 1749342
+    },
+    "raw/timing-r2-streams-b16-k10.receipt.json": {
+      "sha256": "a3eefafa23f2301aab7b85ddee21ad3904413fcf059303743b6ae627b0e2e86c",
+      "bytes": 6092
+    },
+    "raw/timing-r2-streams-b16-k10.receipt.log": {
+      "sha256": "618bcebc7137365299babd3646eeff5df9d7ca0be8d8d3bc600bbc7d906ddf7c",
+      "bytes": 1115
+    },
+    "raw/timing-r2-streams-b16-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-streams-b16-k10.receipt.runtime/runtime.json": {
+      "sha256": "6b0c6e58105736f4b7ccc593a78ce416c9238e694d2e056a3be735e278610166",
+      "bytes": 1797
+    },
+    "raw/timing-r2-streams-b16-k10.receipt.sampler.log": {
+      "sha256": "d5e58b63ba449a7a84ee1c5763191c2194bf68da498de37def262e82b99dee72",
+      "bytes": 10661
+    },
+    "raw/timing-r2-streams-b32-k10.answers.json": {
+      "sha256": "5f931c53a176f624d9f82dbf6209c2f61a40dc06cfa4da5bb1f96bea8378fa25",
+      "bytes": 3785
+    },
+    "raw/timing-r2-streams-b32-k10.csv": {
+      "sha256": "89d9ca67b5b13ae778bab45bb96c5c08d69f2ab99a83b837d5fc06c6603ecf77",
+      "bytes": 1748804
+    },
+    "raw/timing-r2-streams-b32-k10.receipt.json": {
+      "sha256": "855d341d9c4f67f3274fb77b340a4d6ed65b874776ff8206310fdd0d591c163f",
+      "bytes": 6092
+    },
+    "raw/timing-r2-streams-b32-k10.receipt.log": {
+      "sha256": "3cdd358558f0fc8ff4e9b16235821a639d2c0a83eb050a5836e8fa350508d7c6",
+      "bytes": 1115
+    },
+    "raw/timing-r2-streams-b32-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-streams-b32-k10.receipt.runtime/runtime.json": {
+      "sha256": "a58184cba0b2de4e757019987a11a99b830d8609648a83f5dd3c1f7f4e5ee1ad",
+      "bytes": 1797
+    },
+    "raw/timing-r2-streams-b32-k10.receipt.sampler.log": {
+      "sha256": "2cc1852cafcf3291f5f308a79dabf6f2fe128f782f656709269bed2409074964",
+      "bytes": 10673
+    },
+    "raw/timing-r2-streams-b4-k10.answers.json": {
+      "sha256": "1464504cfc033d94346b61f4a2b26d4754ff350eda6ac8b1771fcfcb4372076d",
+      "bytes": 3784
+    },
+    "raw/timing-r2-streams-b4-k10.csv": {
+      "sha256": "b6f482fb232293e4f36e523e453043e7178457f28dc7a8244755eff8d508e59f",
+      "bytes": 1728581
+    },
+    "raw/timing-r2-streams-b4-k10.receipt.json": {
+      "sha256": "a5195dcf8703ce437e2db129914dd6fde45f7980611b35ece404f40324066bd6",
+      "bytes": 6085
+    },
+    "raw/timing-r2-streams-b4-k10.receipt.log": {
+      "sha256": "79ad127b9eca814fa7fb4f2ad3ba570d2d80325d721482344ae892e8c9232372",
+      "bytes": 1113
+    },
+    "raw/timing-r2-streams-b4-k10.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-streams-b4-k10.receipt.runtime/runtime.json": {
+      "sha256": "2d387736c7d2319498422758cb2a2ef054ca315957e92c816050f000d50caa4f",
+      "bytes": 1796
+    },
+    "raw/timing-r2-streams-b4-k10.receipt.sampler.log": {
+      "sha256": "e2f8a10bac01fe4478e659610b09cba0351cdda98f89fc6c9acbada37f4891de",
+      "bytes": 10716
+    },
+    "spec.tsv": {
+      "sha256": "2c54a4310753ebbad3072b9cab714b7489eec38a64073d7441627f08b0695bb5",
+      "bytes": 584
+    }
+  },
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [
+      {
+        "original": "raw/ineligible/timing-r1-sequential-b1-k10-attempt2/timing-r1-sequential-b1-k10.csv",
+        "sha256": "234eb49453425af2811bbff640b8eca19463632e654255c70bb111d132b98b49",
+        "bytes": 1786561,
+        "public": "raw/ineligible/timing-r1-sequential-b1-k10-attempt2/timing-r1-sequential-b1-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/ineligible/timing-r1-streams-b32-k10-attempt1/timing-r1-streams-b32-k10.csv",
+        "sha256": "c28f2f043bfec1ba717c157f1792272e9e10187665104ff9f744b139ff10639d",
+        "bytes": 1749255,
+        "public": "raw/ineligible/timing-r1-streams-b32-k10-attempt1/timing-r1-streams-b32-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-batched-b1-k10.csv",
+        "sha256": "562ec831756c977eaf26e78e0c47dd41a10868dc3bce152b77d434ba8a3cb541",
+        "bytes": 1751362,
+        "public": "raw/timing-r0-batched-b1-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-batched-b16-k10.csv",
+        "sha256": "23d8ef6ff26b33644a77ce2d3dbb563b2daa4ca054266e539605bf290041f8bd",
+        "bytes": 1748416,
+        "public": "raw/timing-r0-batched-b16-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-batched-b32-k10.csv",
+        "sha256": "87d7969701447afb27a27d0b2b899bda1b0781608191334b059a375717370265",
+        "bytes": 1748349,
+        "public": "raw/timing-r0-batched-b32-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-batched-b4-k10.csv",
+        "sha256": "20ec699ce67fbdf272005c6f3a27f1f638e688074619e43db5d84db42a381214",
+        "bytes": 1722283,
+        "public": "raw/timing-r0-batched-b4-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-sequential-b1-k10.csv",
+        "sha256": "1e177dc09c399a7b55362b280fbfe85eb289f1050620d959643b507d5cb13db7",
+        "bytes": 1787262,
+        "public": "raw/timing-r0-sequential-b1-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-sequential-b16-k10.csv",
+        "sha256": "615a160bf602b4347718070c2a70cda350c0acaa463482ad06b1a608ec4b740f",
+        "bytes": 1782708,
+        "public": "raw/timing-r0-sequential-b16-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-sequential-b32-k10.csv",
+        "sha256": "2e35e2bda4afd2e48bde4db3e8c79f733b3ee033dc48d6a945bec63b0eeea4c5",
+        "bytes": 1782060,
+        "public": "raw/timing-r0-sequential-b32-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-sequential-b4-k10.csv",
+        "sha256": "f88c249f24ce2a8b961e878bf48e692cc359015c3b43e3924b7b4267a69be878",
+        "bytes": 1764713,
+        "public": "raw/timing-r0-sequential-b4-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-streams-b1-k10.csv",
+        "sha256": "bb2bfc8ccc4d1c8b95ba2726ad437ee24c9d8b50830ccb9252567955ff7078b6",
+        "bytes": 1751705,
+        "public": "raw/timing-r0-streams-b1-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-streams-b16-k10.csv",
+        "sha256": "498562b4bb749b274bc836bc50e4bc13fdaec093a1c99dbd00234abc38775b4b",
+        "bytes": 1749614,
+        "public": "raw/timing-r0-streams-b16-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-streams-b32-k10.csv",
+        "sha256": "ed3bbbc1be85401d7792b2e08393b2a8ad8866bbb31e50e3779c42428bbde2c5",
+        "bytes": 1749259,
+        "public": "raw/timing-r0-streams-b32-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r0-streams-b4-k10.csv",
+        "sha256": "4ec9a513e5333dabb9e65f0925b788720e52f64a10f6ce5873bbcff39e9632fb",
+        "bytes": 1728981,
+        "public": "raw/timing-r0-streams-b4-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-batched-b1-k10.csv",
+        "sha256": "904d888766f5178f679dc0d52a7a80c652ba637c6cf949a22a5fa195c6b989bd",
+        "bytes": 1754485,
+        "public": "raw/timing-r1-batched-b1-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-batched-b16-k10.csv",
+        "sha256": "1c4af2aee8019f5bb287bbd34c60f410ed576c20f07fe502f21dc615ae178e69",
+        "bytes": 1748100,
+        "public": "raw/timing-r1-batched-b16-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-batched-b32-k10.csv",
+        "sha256": "61e0f03ed4699ffdd59d9c4e8d44cb76c85f966161d0492b0726e674db34573b",
+        "bytes": 1748257,
+        "public": "raw/timing-r1-batched-b32-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-batched-b4-k10.csv",
+        "sha256": "31a9acd06806140571ce4d6b6347f1099bfd32d2f3eda188a80376e9f7a068a2",
+        "bytes": 1723484,
+        "public": "raw/timing-r1-batched-b4-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-sequential-b1-k10.csv",
+        "sha256": "6b34940fd087378271e11e36b7144d5c14ca027181cc125c98ceb5ab64aeff6e",
+        "bytes": 1786434,
+        "public": "raw/timing-r1-sequential-b1-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-sequential-b16-k10.csv",
+        "sha256": "599702e577f5f08e148b9f6d0a348ddccaa1b9ba9cbe45e61a033dc660ed1f1f",
+        "bytes": 1782969,
+        "public": "raw/timing-r1-sequential-b16-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-sequential-b32-k10.csv",
+        "sha256": "0188dac4cad9a8df27d0583a5bd42f17d095ec92bfafe093367858f7de8e58b2",
+        "bytes": 1782068,
+        "public": "raw/timing-r1-sequential-b32-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-sequential-b4-k10.csv",
+        "sha256": "47875041ab5415f9b595f87b34414f70b0c8e2c3f5897b41594a96ec943a678c",
+        "bytes": 1765426,
+        "public": "raw/timing-r1-sequential-b4-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-streams-b1-k10.csv",
+        "sha256": "f4315a3765ac4396e4fb64915a59360e45b63eb15073087cf6fe85808e51f8e8",
+        "bytes": 1753332,
+        "public": "raw/timing-r1-streams-b1-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-streams-b16-k10.csv",
+        "sha256": "772b9b13c70a16c1772f78f5840586030c2d1dc5d237003798919a5447b47dca",
+        "bytes": 1749271,
+        "public": "raw/timing-r1-streams-b16-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-streams-b32-k10.csv",
+        "sha256": "f061f2c0bedcf1a362dbc2ee2d5f2efe3cfb966462cc2b8d836846133387aafc",
+        "bytes": 1748968,
+        "public": "raw/timing-r1-streams-b32-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r1-streams-b4-k10.csv",
+        "sha256": "dfcad75da52de7d20fe7e3962b45fdb91020f9c1a2797df23a141a0e6cf72677",
+        "bytes": 1729038,
+        "public": "raw/timing-r1-streams-b4-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-batched-b1-k10.csv",
+        "sha256": "df06f0deb62c77b8819aa6daa9ad756f86b3108c071baee65d7fc370da6a93af",
+        "bytes": 1754496,
+        "public": "raw/timing-r2-batched-b1-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-batched-b16-k10.csv",
+        "sha256": "378827001f0b8069319c7ba45f1e9fbefde87064307b4bda001af93f325983f3",
+        "bytes": 1747754,
+        "public": "raw/timing-r2-batched-b16-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-batched-b32-k10.csv",
+        "sha256": "785361e09ae2f55d861f11416f21d0dbfae5346af6c7e3aa53be86fff8e746fc",
+        "bytes": 1748829,
+        "public": "raw/timing-r2-batched-b32-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-batched-b4-k10.csv",
+        "sha256": "c58b21f27e98e8b1a7cf760de48c868a733109a8744399311ce6fd6a20274bf2",
+        "bytes": 1723471,
+        "public": "raw/timing-r2-batched-b4-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-sequential-b1-k10.csv",
+        "sha256": "9d1c40af31d9b8af88cf3cf9dcff2ce92d6acb87e7906a5613cba04517258f14",
+        "bytes": 1789747,
+        "public": "raw/timing-r2-sequential-b1-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-sequential-b16-k10.csv",
+        "sha256": "6a4ef2201e6477ac14b4d683e5f21fa0505ed17e48fd1f64143ba90b9b93cc3e",
+        "bytes": 1783112,
+        "public": "raw/timing-r2-sequential-b16-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-sequential-b32-k10.csv",
+        "sha256": "26c7f22d1dde0fc79a2f962dd1158fe7dee69edd3a1ba5028bb66fe4709fb558",
+        "bytes": 1782330,
+        "public": "raw/timing-r2-sequential-b32-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-sequential-b4-k10.csv",
+        "sha256": "e5290a7e5348075649dacfde9cac005485e00908ff52252ef7187fb00936e7d6",
+        "bytes": 1764793,
+        "public": "raw/timing-r2-sequential-b4-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-streams-b1-k10.csv",
+        "sha256": "c2fc7bbac3e93449b21f851b3a6f09db3f8cc3f8a922750c6a959b4c3c0524db",
+        "bytes": 1755597,
+        "public": "raw/timing-r2-streams-b1-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-streams-b16-k10.csv",
+        "sha256": "ccb35e91b98bac8461a21586256f1a93a97b6539a6fd497ba5ce122471e8bc1a",
+        "bytes": 1749342,
+        "public": "raw/timing-r2-streams-b16-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-streams-b32-k10.csv",
+        "sha256": "89d9ca67b5b13ae778bab45bb96c5c08d69f2ab99a83b837d5fc06c6603ecf77",
+        "bytes": 1748804,
+        "public": "raw/timing-r2-streams-b32-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-r2-streams-b4-k10.csv",
+        "sha256": "b6f482fb232293e4f36e523e453043e7178457f28dc7a8244755eff8d508e59f",
+        "bytes": 1728581,
+        "public": "raw/timing-r2-streams-b4-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      }
+    ],
+    "excluded": [],
+    "recorded_artifacts_not_in_public_tree_or_lists": []
+  }
+}

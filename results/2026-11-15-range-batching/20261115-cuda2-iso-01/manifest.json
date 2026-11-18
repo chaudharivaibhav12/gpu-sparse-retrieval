@@ -1,0 +1,703 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-15-range-batching",
+  "run_id": "20261115-cuda2-iso-01",
+  "status": "passed-correctness",
+  "scope": "per-query isolation: sizes 100000 1000000, all 500 calibration queries, k=10 and k=1000, sequential and streams, batch 1 4 16 32, range 1024 positions, 256 threads",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "8afe62f52ee16b79a53a5a17c098f77e82594d65",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_75 -std=c++17; g++ -O3 -Wall -Wextra -Wpedantic -std=c++17",
+    "source_sha256": {
+      "src/cuda_range_batch.cu": "9c4ef8f8a33ade4ff4fcdca440fdf92c737bf1240323be671cbb82afc2ee8e1a",
+      "src/cuda_range_v2.cu": "a8058952b7dbfe5b810183fbe708838464b11e82995f09d98cf06d28564e6e56",
+      "src/range_bitpack.h": "98fb4ae1e2f3a01bc214d749c47eaa59dbeb17ad0726cc2a18fd1125d9c9c37c",
+      "src/range_bitpack_tool.cpp": "efbe1d3d0fb0627246c338903ace4d80b84e7937796ee309b71b48e86ea2e41f",
+      "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+      "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+      "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py": "ca43fb45ed74e0fc8d24c14898ac8ae3d32c7ebd3f805b55f6d59db87378d18e",
+      "experiments/2026-11-15-range-batching/code/check_isolation.sh": "a03a2e30f645d463f244c8bb59382ea2d169469061a157792117971d8653575c"
+    },
+    "binary_sha256": {
+      "build/range_bitpack_tool": "9ce426d0a07cb8a3bc7ecf9816376f355060ea09f622de92e1b885145b4760e6",
+      "build/cuda_range_v2": "266b508deb9d90564f5ee60696202f68931e687982c61aa025ffba215368a84d",
+      "build/cuda_range_batch": "4decd30e6e20a24ba41bee5b2fee704ba16c23f63c8662dd62d120e1e5b1cdd5"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "data/derived/hash-100000.gsp": {
+      "sha256": "ee7ffdb9c527f3e486fe560426e27f4f02d2a61b42b8f138eaf7671a8aeb73ab",
+      "bytes": 61314734
+    },
+    "data/derived/hash-100000-w1024-pos.rbp": {
+      "sha256": "66457344c0e14e2ba729b5147be7060e9fd9898ae5848dab1cd6073aa5c8c9e3",
+      "bytes": 46639664
+    },
+    "data/derived/oracle/cpu-top10-100000.tsv": {
+      "sha256": "30d133c9b10af919fcc849a6a3d18d39ee9b142be58d9bb7a62aae0d1017167c",
+      "bytes": 114941
+    },
+    "data/derived/oracle/cpu-top1000-100000.tsv": {
+      "sha256": "ad53792a4e62ef12991918b6f8218894974e1a8fe8716e46b99ee22e9542153a",
+      "bytes": 12061282
+    },
+    "data/derived/hash-1000000.gsp": {
+      "sha256": "a7249ab0fafcfb1bff754e960063c5982f92e509f40d5ebbfda6a06cbb3e3c37",
+      "bytes": 609799364
+    },
+    "data/derived/hash-1000000-w1024-pos.rbp": {
+      "sha256": "3c653e914699ac9a6558d2889d0000aa29d573a5d045f43ea26d15fc2f6c68f5",
+      "bytes": 437105290
+    },
+    "data/derived/oracle/cpu-top10-1000000.tsv": {
+      "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860",
+      "bytes": 116302
+    },
+    "data/derived/oracle/cpu-top1000-1000000.tsv": {
+      "sha256": "ddb1bb73aeb4a100cadb6c1710a9790d7b473a204e8769f429cd835048bbc716",
+      "bytes": 12181625
+    }
+  },
+  "environment": {
+    "host": "cuda2.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 2080 Ti, 595.104.02, 11264 MiB, 7.5\nNVIDIA GeForce RTX 2080 Ti, 595.104.02, 11264 MiB, 7.5",
+    "nvcc": [
+      "Build cuda_12.6.r12.6/compiler.35059454_0"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "g++ -O3 -Wall -Wextra -Wpedantic -std=c++17 src/cpu_pilot.cpp -o build/cpu_pilot",
+    "g++ -O3 -Wall -Wextra -Wpedantic -std=c++17 src/range_bitpack_tool.cpp -o build/range_bitpack_tool",
+    "nvcc -O3 -lineinfo -arch=sm_75 -std=c++17 src/cuda_range_v2.cu -o build/cuda_range_v2",
+    "nvcc -O3 -lineinfo -arch=sm_75 -std=c++17 src/cuda_range_batch.cu -o build/cuda_range_batch",
+    "./build/range_bitpack_tool verify data/derived/hash-100000.gsp data/derived/hash-100000-w1024-pos.rbp",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-sequential-b1.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-sequential-b1.tsv 500 10 0 1 1 1 256 sequential 1 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-sequential-b1.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k10-sequential-b1.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-sequential-b4.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-sequential-b4.tsv 500 10 0 1 1 1 256 sequential 4 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-sequential-b4.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k10-sequential-b4.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-sequential-b16.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-sequential-b16.tsv 500 10 0 1 1 1 256 sequential 16 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-sequential-b16.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k10-sequential-b16.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-sequential-b32.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-sequential-b32.tsv 500 10 0 1 1 1 256 sequential 32 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-sequential-b32.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k10-sequential-b32.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-streams-b1.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-streams-b1.tsv 500 10 0 1 1 1 256 streams 1 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-streams-b1.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k10-streams-b1.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-streams-b4.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-streams-b4.tsv 500 10 0 1 1 1 256 streams 4 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-streams-b4.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k10-streams-b4.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-streams-b16.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-streams-b16.tsv 500 10 0 1 1 1 256 streams 16 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-streams-b16.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k10-streams-b16.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-streams-b32.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-streams-b32.tsv 500 10 0 1 1 1 256 streams 32 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k10-streams-b32.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k10-streams-b32.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-sequential-b1.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-sequential-b1.tsv 500 1000 0 1 1 1 256 sequential 1 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-sequential-b1.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k1000-sequential-b1.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-sequential-b4.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-sequential-b4.tsv 500 1000 0 1 1 1 256 sequential 4 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-sequential-b4.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k1000-sequential-b4.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-sequential-b16.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-sequential-b16.tsv 500 1000 0 1 1 1 256 sequential 16 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-sequential-b16.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k1000-sequential-b16.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-sequential-b32.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-sequential-b32.tsv 500 1000 0 1 1 1 256 sequential 32 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-sequential-b32.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k1000-sequential-b32.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-streams-b1.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-streams-b1.tsv 500 1000 0 1 1 1 256 streams 1 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-streams-b1.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k1000-streams-b1.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-streams-b4.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-streams-b4.tsv 500 1000 0 1 1 1 256 streams 4 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-streams-b4.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k1000-streams-b4.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-streams-b16.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-streams-b16.tsv 500 1000 0 1 1 1 256 streams 16 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-streams-b16.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k1000-streams-b16.json",
+    "./build/cuda_range_batch data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-streams-b32.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-streams-b32.tsv 500 1000 0 1 1 1 256 streams 32 data/derived/hash-100000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-100000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-100000-k1000-streams-b32.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-100000-k1000-streams-b32.json",
+    "./build/range_bitpack_tool verify data/derived/hash-1000000.gsp data/derived/hash-1000000-w1024-pos.rbp",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-sequential-b1.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-sequential-b1.tsv 500 10 0 1 1 1 256 sequential 1 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-sequential-b1.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k10-sequential-b1.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-sequential-b4.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-sequential-b4.tsv 500 10 0 1 1 1 256 sequential 4 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-sequential-b4.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k10-sequential-b4.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-sequential-b16.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-sequential-b16.tsv 500 10 0 1 1 1 256 sequential 16 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-sequential-b16.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k10-sequential-b16.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-sequential-b32.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-sequential-b32.tsv 500 10 0 1 1 1 256 sequential 32 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-sequential-b32.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k10-sequential-b32.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-streams-b1.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-streams-b1.tsv 500 10 0 1 1 1 256 streams 1 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-streams-b1.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k10-streams-b1.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-streams-b4.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-streams-b4.tsv 500 10 0 1 1 1 256 streams 4 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-streams-b4.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k10-streams-b4.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-streams-b16.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-streams-b16.tsv 500 10 0 1 1 1 256 streams 16 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-streams-b16.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k10-streams-b16.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-streams-b32.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-streams-b32.tsv 500 10 0 1 1 1 256 streams 32 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k10-streams-b32.tsv --queries 500 --k 10 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k10-streams-b32.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-sequential-b1.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-sequential-b1.tsv 500 1000 0 1 1 1 256 sequential 1 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-sequential-b1.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k1000-sequential-b1.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-sequential-b4.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-sequential-b4.tsv 500 1000 0 1 1 1 256 sequential 4 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-sequential-b4.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k1000-sequential-b4.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-sequential-b16.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-sequential-b16.tsv 500 1000 0 1 1 1 256 sequential 16 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-sequential-b16.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k1000-sequential-b16.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-sequential-b32.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-sequential-b32.tsv 500 1000 0 1 1 1 256 sequential 32 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-sequential-b32.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k1000-sequential-b32.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-streams-b1.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-streams-b1.tsv 500 1000 0 1 1 1 256 streams 1 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-streams-b1.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k1000-streams-b1.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-streams-b4.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-streams-b4.tsv 500 1000 0 1 1 1 256 streams 4 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-streams-b4.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k1000-streams-b4.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-streams-b16.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-streams-b16.tsv 500 1000 0 1 1 1 256 streams 16 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-streams-b16.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k1000-streams-b16.json",
+    "./build/cuda_range_batch data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-streams-b32.csv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-streams-b32.tsv 500 1000 0 1 1 1 256 streams 32 data/derived/hash-1000000.gsp",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-1000000.tsv /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/raw/iso-1000000-k1000-streams-b32.tsv --queries 500 --k 1000 --groups-per-query 2 --output /scratch/psp8502/runs/2026-11-15-range-batching/20261115-cuda2-iso-01/analysis/compare-1000000-k1000-streams-b32.json"
+  ],
+  "artifacts": {
+    "analysis/compare-100000-k10-sequential-b1.json": {
+      "sha256": "06daf559aead9b01245ca2b71b784933a3fd36a3b9df74088b495a829f616645",
+      "bytes": 358
+    },
+    "analysis/compare-100000-k10-sequential-b16.json": {
+      "sha256": "4245b7be87d69ba9b8edebeb1ecd5887134ed0d38018a4a2f3c2a60981936d59",
+      "bytes": 359
+    },
+    "analysis/compare-100000-k10-sequential-b32.json": {
+      "sha256": "182804913d5a269a01910884aed4e0fbd050a868215cedf089a1da408672d527",
+      "bytes": 359
+    },
+    "analysis/compare-100000-k10-sequential-b4.json": {
+      "sha256": "93e23f39a46e88aa8d2307c27ff633b09c9c98fde00c8939ca46a29804b657db",
+      "bytes": 358
+    },
+    "analysis/compare-100000-k10-streams-b1.json": {
+      "sha256": "5dff721fef3f80e0f31bae836142a293033d7232f0fb25b0e809254bb1dcfc4c",
+      "bytes": 355
+    },
+    "analysis/compare-100000-k10-streams-b16.json": {
+      "sha256": "d57c82b6373fea4210ad75216d98eccf5b2f858a5b862804293ece13c6a6026b",
+      "bytes": 356
+    },
+    "analysis/compare-100000-k10-streams-b32.json": {
+      "sha256": "7e21e7e81e4488bbf88c46678ad80996d703e9d8b9860ed5e8d399bdd7b541f4",
+      "bytes": 356
+    },
+    "analysis/compare-100000-k10-streams-b4.json": {
+      "sha256": "dc7dcc26be4fdb7cafe48ea846b0935c6e6ad00de53a3744b45e759c27fc1b18",
+      "bytes": 355
+    },
+    "analysis/compare-100000-k1000-sequential-b1.json": {
+      "sha256": "722a667a3a853d83512d0daece1d3dd6c4a807ce0e2ddcfd42d91994285a0da6",
+      "bytes": 366
+    },
+    "analysis/compare-100000-k1000-sequential-b16.json": {
+      "sha256": "eeae819c20362df9b32304c5ce787f8a7088b0b195b0cfecbca3994a5de5a404",
+      "bytes": 367
+    },
+    "analysis/compare-100000-k1000-sequential-b32.json": {
+      "sha256": "c60e0dd88c2a4902042fbf2eaea29fe8734a2b40d67ba11f3f026f1684c1a73f",
+      "bytes": 367
+    },
+    "analysis/compare-100000-k1000-sequential-b4.json": {
+      "sha256": "07fe335c543ec2ced9ce4e50492212768bbd287b8ebf822ffa35d6cd752e497b",
+      "bytes": 366
+    },
+    "analysis/compare-100000-k1000-streams-b1.json": {
+      "sha256": "d830525d20b05d559b2a6fd8b2b2792ec012bf2aa2f1a55851846a423cfccf74",
+      "bytes": 363
+    },
+    "analysis/compare-100000-k1000-streams-b16.json": {
+      "sha256": "0fafdea501e86c4c6b701023d189d4fe59789076802c8c383f42ed18b8f97703",
+      "bytes": 364
+    },
+    "analysis/compare-100000-k1000-streams-b32.json": {
+      "sha256": "a54274b234cb2c1998f938451dab5dc8787e688a86d26d7931a3867b8a57c9c5",
+      "bytes": 364
+    },
+    "analysis/compare-100000-k1000-streams-b4.json": {
+      "sha256": "e1bc410b4a36ee269dc925010cace5109427dc6110c24e8dbc78d80ac13548c0",
+      "bytes": 363
+    },
+    "analysis/compare-1000000-k10-sequential-b1.json": {
+      "sha256": "85786c80950cf9f8060b73e383e7bbbdea37c746e5accf10639cbf2e1941cc8e",
+      "bytes": 360
+    },
+    "analysis/compare-1000000-k10-sequential-b16.json": {
+      "sha256": "4052b3d39cdf2a2a457613db06023712cdb731106aea9a1ca9adce1e982e79f1",
+      "bytes": 361
+    },
+    "analysis/compare-1000000-k10-sequential-b32.json": {
+      "sha256": "8ca6ebd13898840ad80549b593336aa8a204d35209e0554011717d415b35a0e5",
+      "bytes": 361
+    },
+    "analysis/compare-1000000-k10-sequential-b4.json": {
+      "sha256": "4327a20487eb7ab19385896fd160dba6a1477e24da76c6e940cea19c2b3986d3",
+      "bytes": 360
+    },
+    "analysis/compare-1000000-k10-streams-b1.json": {
+      "sha256": "0119b31543745b6dbd2295ed85a0277f40e1e8877f05b931f7b9307494b71380",
+      "bytes": 357
+    },
+    "analysis/compare-1000000-k10-streams-b16.json": {
+      "sha256": "221f3847124961011ffbd69ef5376c2664dc7a3c29a749564ddf73b7b9855588",
+      "bytes": 358
+    },
+    "analysis/compare-1000000-k10-streams-b32.json": {
+      "sha256": "98a8d4f3615fd4b6cbe0588ce9db6a0446e87827c153f299fa83e245a8fb1a21",
+      "bytes": 358
+    },
+    "analysis/compare-1000000-k10-streams-b4.json": {
+      "sha256": "14fdcc524cd5aab2ee16c91a565884d9be93bd751a94b0859e0d8a46575cf8ad",
+      "bytes": 357
+    },
+    "analysis/compare-1000000-k1000-sequential-b1.json": {
+      "sha256": "7108768cc4a98c244e77753f0cab84a71c61af9dad86a137959a96dc104e32b9",
+      "bytes": 368
+    },
+    "analysis/compare-1000000-k1000-sequential-b16.json": {
+      "sha256": "2c639f955f61d4a84f98c0255e5847c12608d8d9e49cd474b38c60e72acd2480",
+      "bytes": 369
+    },
+    "analysis/compare-1000000-k1000-sequential-b32.json": {
+      "sha256": "f1eb5f9d7befbf7c0af77a1c36b697a8c6ae1b848d399a3304fb028b07f5664d",
+      "bytes": 369
+    },
+    "analysis/compare-1000000-k1000-sequential-b4.json": {
+      "sha256": "b0eb730459ac1587df08968fe9ba8fd4db6a13dfa2efae279f40f84270c2fc14",
+      "bytes": 368
+    },
+    "analysis/compare-1000000-k1000-streams-b1.json": {
+      "sha256": "f7869276a315de93e2aaf716be6ed8c81b9330172b2769a1a487703eb6fe250c",
+      "bytes": 365
+    },
+    "analysis/compare-1000000-k1000-streams-b16.json": {
+      "sha256": "3f4347eaac47acc1eabb35486e59961aafdaa6d9b82c3fceb73f6bf9c3f9b94e",
+      "bytes": 366
+    },
+    "analysis/compare-1000000-k1000-streams-b32.json": {
+      "sha256": "d8600e80bb234f4fa3574b9c93b25f6563d640182d092f6685e04a920857a6be",
+      "bytes": 366
+    },
+    "analysis/compare-1000000-k1000-streams-b4.json": {
+      "sha256": "b6d7d585ede5b91772dbaf156567ed3f7c6d8fb5a8924727127dfb012f89609a",
+      "bytes": 365
+    },
+    "logs/commands.txt": {
+      "sha256": "d493a4fdc1cb4303b001a9ea330c8d6b8f0697f0d39f07e89a9af09de775de24",
+      "bytes": 24996
+    },
+    "logs/gpu-before.txt": {
+      "sha256": "a18fe6ed031819e2c4df56f01778eada36e432c2ab717ecc45df26f3bd55cd38",
+      "bytes": 2433
+    },
+    "logs/index-verify-100000.log": {
+      "sha256": "a7e7943aa20ae9e96970a42c3cba9d4b421a2d257555e4299cd6200ca9df12d9",
+      "bytes": 870
+    },
+    "logs/index-verify-1000000.log": {
+      "sha256": "01cde5b75553732c6aa34db1991870fcd6283a755b1ae353ffdc4bee1145c390",
+      "bytes": 893
+    },
+    "logs/nvcc-batch.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/nvcc-v2.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/iso-100000-k10-sequential-b1.csv": {
+      "sha256": "b77257f51bdd5177966601f50df15f0030b081a10993afbc7324a16f94bccdc7",
+      "bytes": 124058
+    },
+    "raw/iso-100000-k10-sequential-b1.log": {
+      "sha256": "976e0b888265d0c8d0c57da76aaa7f094bf8488ce296eb7c5b35996f2552d435",
+      "bytes": 524
+    },
+    "raw/iso-100000-k10-sequential-b1.tsv.sha256": {
+      "sha256": "041be0c1a8e4231ebf9d1bd47597dc674aab38c5812af70c581a1a9615a72f74",
+      "bytes": 173
+    },
+    "raw/iso-100000-k10-sequential-b16.csv": {
+      "sha256": "3122fdf4c05b9e9f8b5d5b6a4302fb9beab2821db4aaa56fd096f9934b45c2ff",
+      "bytes": 124830
+    },
+    "raw/iso-100000-k10-sequential-b16.log": {
+      "sha256": "2e870e5fd8186d9d96a9bf0792eef352fc86a8a8cd34bc8187fd4d44ee14d771",
+      "bytes": 526
+    },
+    "raw/iso-100000-k10-sequential-b16.tsv.sha256": {
+      "sha256": "d6f198bb39dce52875585843d51933733a58987909471ffc665ea7caa111b550",
+      "bytes": 174
+    },
+    "raw/iso-100000-k10-sequential-b32.csv": {
+      "sha256": "5bbad29b338c0091042b81f42e5bdbb882c94daf9f03c66a59dfecaf1d26d166",
+      "bytes": 124120
+    },
+    "raw/iso-100000-k10-sequential-b32.log": {
+      "sha256": "bc90227736095d0478730fb9df7f978361b4ca962553e31028022bf3e33f3fa2",
+      "bytes": 526
+    },
+    "raw/iso-100000-k10-sequential-b32.tsv.sha256": {
+      "sha256": "68da5dd6176946f42c65da0dcea1e386c30cb3171b10f6114a26cf7b10a6b8bd",
+      "bytes": 174
+    },
+    "raw/iso-100000-k10-sequential-b4.csv": {
+      "sha256": "0290ec8a5b75853385e35562679491048a3d51f5627c554f1adac94f641c34ad",
+      "bytes": 123035
+    },
+    "raw/iso-100000-k10-sequential-b4.log": {
+      "sha256": "aaf30afa0603223d30b27155860b6861e8090ebe82b2872dafe38ee21e74d79c",
+      "bytes": 524
+    },
+    "raw/iso-100000-k10-sequential-b4.tsv.sha256": {
+      "sha256": "57ed6b24deb803b41a782fc6f596c949fe80325a98a5a640027f583a6daac3aa",
+      "bytes": 173
+    },
+    "raw/iso-100000-k10-streams-b1.csv": {
+      "sha256": "ab9b25f91cd631860eb96c5e6b9ce77903d41faec14b667e09e1d4279446e7d4",
+      "bytes": 120934
+    },
+    "raw/iso-100000-k10-streams-b1.log": {
+      "sha256": "0a5baf0283874d15f73a60323c71250ac14aa2b575a97bc6172a9503c7633a5a",
+      "bytes": 518
+    },
+    "raw/iso-100000-k10-streams-b1.tsv.sha256": {
+      "sha256": "975a1ff9b4a3e5275a86a49414613a831f04cacd0c12570a257d830bd09f661c",
+      "bytes": 170
+    },
+    "raw/iso-100000-k10-streams-b16.csv": {
+      "sha256": "bf042eb8c9f4e904e2c3fa1db2115edc57c8d26d517db22c9186dfa5ea1bf8a0",
+      "bytes": 122321
+    },
+    "raw/iso-100000-k10-streams-b16.log": {
+      "sha256": "3c9a485ba6ba0f7f8451ce063ce9f5941d8cd5935ef2ad09dbacebe82d25f5b9",
+      "bytes": 520
+    },
+    "raw/iso-100000-k10-streams-b16.tsv.sha256": {
+      "sha256": "dfb6d07187239f3a1e66e85da52c8e97c855c6c5673582d64b94233af500580a",
+      "bytes": 171
+    },
+    "raw/iso-100000-k10-streams-b32.csv": {
+      "sha256": "e13ac8474aa88c706084baf1e23602416dd691f4132906e81376682dec561dc5",
+      "bytes": 122579
+    },
+    "raw/iso-100000-k10-streams-b32.log": {
+      "sha256": "9fa1dda1a65e17cb2f075ab96a4da9028c457223ad74d8f0b30b1788a55bfe7a",
+      "bytes": 520
+    },
+    "raw/iso-100000-k10-streams-b32.tsv.sha256": {
+      "sha256": "09f8a05ab441e333a62986b53203e57237d0a4fc55a0b6ede32bf5e0f8fd81bc",
+      "bytes": 171
+    },
+    "raw/iso-100000-k10-streams-b4.csv": {
+      "sha256": "ab18dfb9af23e9665b27817579f08c4865f0858861221ed5158af953e2bb6fe8",
+      "bytes": 120339
+    },
+    "raw/iso-100000-k10-streams-b4.log": {
+      "sha256": "3e20ece7de711760b39fadeb77f3a5e047c165fe98501fa3c159ddbba7e84e62",
+      "bytes": 518
+    },
+    "raw/iso-100000-k10-streams-b4.tsv.sha256": {
+      "sha256": "f2bc42854a5209bb9c8c65fcf3a9b6f5c1b9b4cec2290c938e91a014db342d0b",
+      "bytes": 170
+    },
+    "raw/iso-100000-k1000-sequential-b1.csv": {
+      "sha256": "b3feabe16437157b2600a79f2dbec1e91c5c56a42fc0e653c59942283a88c681",
+      "bytes": 128199
+    },
+    "raw/iso-100000-k1000-sequential-b1.log": {
+      "sha256": "83e7cf576df8ffa80b4aa34f561ed92aed7d9251ea33e2e0b1cae20be9a67a3b",
+      "bytes": 529
+    },
+    "raw/iso-100000-k1000-sequential-b1.tsv.sha256": {
+      "sha256": "1e5dff3e724287e276d81318edba6976af413a60e5d9205b55ce3edddcf9ff6c",
+      "bytes": 175
+    },
+    "raw/iso-100000-k1000-sequential-b16.csv": {
+      "sha256": "4f27a7df8d63fbee1619642ccda0591ff9c6e75d740b07f20145b3374aa05e4a",
+      "bytes": 129292
+    },
+    "raw/iso-100000-k1000-sequential-b16.log": {
+      "sha256": "b983b024162cb7c3fedde828d5a376ab8eeafdb61555dc21a8ec0b16050c1440",
+      "bytes": 532
+    },
+    "raw/iso-100000-k1000-sequential-b16.tsv.sha256": {
+      "sha256": "d1b2c355d0d79dd1cb5ec81f5f025a4d4084ee604ccc898a17a700f1c8933f8a",
+      "bytes": 176
+    },
+    "raw/iso-100000-k1000-sequential-b32.csv": {
+      "sha256": "479060af98c3b9c19f10f346485e75cb1cd67dfa7854248b62ce2b536cec14af",
+      "bytes": 129259
+    },
+    "raw/iso-100000-k1000-sequential-b32.log": {
+      "sha256": "515521813c6ccbb62f32c3935fa8cf68c86f9050e8a6dd8c8bcbe67d7ab5b4cd",
+      "bytes": 532
+    },
+    "raw/iso-100000-k1000-sequential-b32.tsv.sha256": {
+      "sha256": "63073a22a26bcb332a67e1519ee5106a05bc87c80f5334710a8ed6726c6f323f",
+      "bytes": 176
+    },
+    "raw/iso-100000-k1000-sequential-b4.csv": {
+      "sha256": "7be68093ac57426937c6ce664d6d82a22778fdcb090c4ac2048e53e0365d0060",
+      "bytes": 126531
+    },
+    "raw/iso-100000-k1000-sequential-b4.log": {
+      "sha256": "20e2a4eeba52825ce59b87f8e3eb0b7395e4fda806bccf884a2495bb5e6105d4",
+      "bytes": 529
+    },
+    "raw/iso-100000-k1000-sequential-b4.tsv.sha256": {
+      "sha256": "9d39816eacc6599c99626ae1d9bddd7e21e03bf36678456419185ce8d484c606",
+      "bytes": 175
+    },
+    "raw/iso-100000-k1000-streams-b1.csv": {
+      "sha256": "abb786320b17ee6ab2b7fabac2c667e59dc84808cccd6afad87b7e614772885b",
+      "bytes": 125072
+    },
+    "raw/iso-100000-k1000-streams-b1.log": {
+      "sha256": "8282a12532c9f5c810624b5acb236e1108133f2ce3e68aea045348436e5e1175",
+      "bytes": 523
+    },
+    "raw/iso-100000-k1000-streams-b1.tsv.sha256": {
+      "sha256": "a88315cc401eb6c1d3e4503d79f26feb6c640e4e0519b25142dcfbaf2f35b0cf",
+      "bytes": 172
+    },
+    "raw/iso-100000-k1000-streams-b16.csv": {
+      "sha256": "713d66ee523618a1fa078857b5ed0d39d04920979806ceeb1c9e899fa541cda0",
+      "bytes": 127145
+    },
+    "raw/iso-100000-k1000-streams-b16.log": {
+      "sha256": "28ab7dddb368d71924f124a14a7fbab27915e36e7a588d5c1a216d372297bd96",
+      "bytes": 526
+    },
+    "raw/iso-100000-k1000-streams-b16.tsv.sha256": {
+      "sha256": "897aba4397ee4f404e1e51e30cea7a00b4a3320e0964a23d6ed86bc72bf94a77",
+      "bytes": 173
+    },
+    "raw/iso-100000-k1000-streams-b32.csv": {
+      "sha256": "ae9efb3c137449d897616ef02d8f28638bf841e8db5718c55ce5a8ba2af42a3e",
+      "bytes": 127287
+    },
+    "raw/iso-100000-k1000-streams-b32.log": {
+      "sha256": "329d0450ebb8eb99f0d343972e48fdffc4292923b633b53ec3bf06ba4d2b8ecb",
+      "bytes": 526
+    },
+    "raw/iso-100000-k1000-streams-b32.tsv.sha256": {
+      "sha256": "ea496ca226508df2556036d629874633a2799342d51b7ce08b154ae119df23ea",
+      "bytes": 173
+    },
+    "raw/iso-100000-k1000-streams-b4.csv": {
+      "sha256": "e01535c7d02a0537c01c2bd74d8fec42db023205da184ec15627ea0e8e46c732",
+      "bytes": 124124
+    },
+    "raw/iso-100000-k1000-streams-b4.log": {
+      "sha256": "1161674dd576318e7a776e81e1cf831d4af11b2c9a3a9ae7c17d55585a862e6b",
+      "bytes": 523
+    },
+    "raw/iso-100000-k1000-streams-b4.tsv.sha256": {
+      "sha256": "2b47444094e30e96759a23d9c9bcb094d441c41088959e0452bfbce6c44015d1",
+      "bytes": 172
+    },
+    "raw/iso-1000000-k10-sequential-b1.csv": {
+      "sha256": "50825fe8a22350ad9754b63b2032c39dbba789ec2a3869a4cfc312826dabe3da",
+      "bytes": 129069
+    },
+    "raw/iso-1000000-k10-sequential-b1.log": {
+      "sha256": "24fa2075ab01c5e540c46a6f3d6f2558b95d7c9c6379704d0a25614e9901998a",
+      "bytes": 530
+    },
+    "raw/iso-1000000-k10-sequential-b1.tsv.sha256": {
+      "sha256": "6a19d8cdb1ebac388dd9be74f7de5142399a481f6566d85e7957a964b1268ff8",
+      "bytes": 174
+    },
+    "raw/iso-1000000-k10-sequential-b16.csv": {
+      "sha256": "fc76588a9f0e778a13c8fa64e856b2fb2c6abd2149c27a8d783b0346585e9b3a",
+      "bytes": 129337
+    },
+    "raw/iso-1000000-k10-sequential-b16.log": {
+      "sha256": "30d51795c6fe172f19e89582043abffb75bff259f1350946dee0b3c66222308e",
+      "bytes": 532
+    },
+    "raw/iso-1000000-k10-sequential-b16.tsv.sha256": {
+      "sha256": "1e63d516be0428cdcf7de43d66a0cc766208cf225300eeaacf37852ef35bb45c",
+      "bytes": 175
+    },
+    "raw/iso-1000000-k10-sequential-b32.csv": {
+      "sha256": "ec86b8218c91637fd1bdb7240bc1dc9cda1aa61733d23512c95ecbd6b1123867",
+      "bytes": 129361
+    },
+    "raw/iso-1000000-k10-sequential-b32.log": {
+      "sha256": "48512134e71904cd0ca8766dcb6cfb411a001670c5ed6e5aaf5c583dfa5c687d",
+      "bytes": 532
+    },
+    "raw/iso-1000000-k10-sequential-b32.tsv.sha256": {
+      "sha256": "b6184d629cb463c807f8e8944ce7c3dd991e6bf5b8c93c1fcb714df37fad1f57",
+      "bytes": 175
+    },
+    "raw/iso-1000000-k10-sequential-b4.csv": {
+      "sha256": "aa5b61e19c1bca061df8abeb8c104995d6179169ab779cd3047dad648d26b778",
+      "bytes": 127808
+    },
+    "raw/iso-1000000-k10-sequential-b4.log": {
+      "sha256": "344aba1f48cec5b722cf4aded828154399992b22e2b860c515af58e2aab38ff7",
+      "bytes": 530
+    },
+    "raw/iso-1000000-k10-sequential-b4.tsv.sha256": {
+      "sha256": "d8014cba1590ffeb7eeb786fa28e7e4013e953d25bab200499f453432ac2d669",
+      "bytes": 174
+    },
+    "raw/iso-1000000-k10-streams-b1.csv": {
+      "sha256": "22cd9ac8b4d9704fe7ece7fcb3257b9bcbfc1af2a257979222e1ee6a7974e2b2",
+      "bytes": 126078
+    },
+    "raw/iso-1000000-k10-streams-b1.log": {
+      "sha256": "777b2a790cb9e888fde7cd2e57c8d8bac3c4f12300f8d38850cc749fe38ee106",
+      "bytes": 524
+    },
+    "raw/iso-1000000-k10-streams-b1.tsv.sha256": {
+      "sha256": "f2ac60a4c675e1353d1c18099dea644182e8e1dd0dec4388d4db262516181d1a",
+      "bytes": 171
+    },
+    "raw/iso-1000000-k10-streams-b16.csv": {
+      "sha256": "92862a856a11058852f58dca2644d08faa89008e4aa54710d1bd0374d374f14c",
+      "bytes": 127326
+    },
+    "raw/iso-1000000-k10-streams-b16.log": {
+      "sha256": "0ed335a272e29bb44f733dad1902b6ceb1ab8bb9cc918ce5f4cd8b3fdd4f3c24",
+      "bytes": 526
+    },
+    "raw/iso-1000000-k10-streams-b16.tsv.sha256": {
+      "sha256": "7f45d01111c68d561a2f6b2be05fc54775bac1b3d2d470b0927507450ca4e598",
+      "bytes": 172
+    },
+    "raw/iso-1000000-k10-streams-b32.csv": {
+      "sha256": "cde7c3bf7df2030a0042b86c8d06cf78fe439ce4dfd0ac6da58cc77b00e0c25a",
+      "bytes": 127202
+    },
+    "raw/iso-1000000-k10-streams-b32.log": {
+      "sha256": "024903f62134e43e3b719ccbfa92e45fbd405802210f5cb371a55c26acbcd6ec",
+      "bytes": 526
+    },
+    "raw/iso-1000000-k10-streams-b32.tsv.sha256": {
+      "sha256": "35c65af4533d3730b6c64ad06964be1fa6d250dc5c43b646417197402e7e331c",
+      "bytes": 172
+    },
+    "raw/iso-1000000-k10-streams-b4.csv": {
+      "sha256": "ef35c566514c8f824fe8c99a48199056831c3931201370d27faf8b5efdee2ac1",
+      "bytes": 125460
+    },
+    "raw/iso-1000000-k10-streams-b4.log": {
+      "sha256": "f23eabf494ebcf15aac45c568ebad3abf0cbfb04a96e0e5c3d7d7bebb8c827b7",
+      "bytes": 524
+    },
+    "raw/iso-1000000-k10-streams-b4.tsv.sha256": {
+      "sha256": "a9d46ad2b2e2fe4c9f1a785deb49b3d0c66b8a389383368ccd12afcb422ec5de",
+      "bytes": 171
+    },
+    "raw/iso-1000000-k1000-sequential-b1.csv": {
+      "sha256": "229362ba273f1c3b145cbbc5b94f5ef93cbaf5e5dc88ed88eb2e5a62a407faeb",
+      "bytes": 132825
+    },
+    "raw/iso-1000000-k1000-sequential-b1.log": {
+      "sha256": "9cf908c1fdb39859405334ff04489c153f9bab339fcf6a2b98d00e75f7df94c3",
+      "bytes": 535
+    },
+    "raw/iso-1000000-k1000-sequential-b1.tsv.sha256": {
+      "sha256": "d3131272104218cd49b9e2fe85e832e9327254140d0d336f309653d6936f292a",
+      "bytes": 176
+    },
+    "raw/iso-1000000-k1000-sequential-b16.csv": {
+      "sha256": "32f1120dddba31a87a9a60128ca5c25c79ec75145589458984be0e8d8e0c0829",
+      "bytes": 133178
+    },
+    "raw/iso-1000000-k1000-sequential-b16.log": {
+      "sha256": "35b456cafec91d27da159beaf031ba3e2ecf28ace979ba3d7c32de03ac218a4f",
+      "bytes": 537
+    },
+    "raw/iso-1000000-k1000-sequential-b16.tsv.sha256": {
+      "sha256": "1ae1503bb026cf754e76b8dc02ac16c7cfc8a96a27f879926321022796f469aa",
+      "bytes": 177
+    },
+    "raw/iso-1000000-k1000-sequential-b32.csv": {
+      "sha256": "8ff062489cf68bbf0c5c9afca4b402e37a39a22e7de1fbde1ca638fca87fc749",
+      "bytes": 134164
+    },
+    "raw/iso-1000000-k1000-sequential-b32.log": {
+      "sha256": "975cef177a6bad4ce94147a1ff0e2feb394eb2a55770b750e33543b3f70c2c2c",
+      "bytes": 538
+    },
+    "raw/iso-1000000-k1000-sequential-b32.tsv.sha256": {
+      "sha256": "ab118a6d6b9e023462706b21212d14d40c46da1c020acd863fcd45f365d7a428",
+      "bytes": 177
+    },
+    "raw/iso-1000000-k1000-sequential-b4.csv": {
+      "sha256": "1f810e360456b42c2b8a2b9f36ba913d5d9de0cf8e5e93f9559d831df8e745b6",
+      "bytes": 131456
+    },
+    "raw/iso-1000000-k1000-sequential-b4.log": {
+      "sha256": "ede29b9cc696f8b3e8ce555780343197396e7f738bf59cae49379bcbdfaadf5f",
+      "bytes": 535
+    },
+    "raw/iso-1000000-k1000-sequential-b4.tsv.sha256": {
+      "sha256": "d9127ca344ab26cb682a1c8bd753f8de5a439fe3448f04aa9a854fb0e5ac9368",
+      "bytes": 176
+    },
+    "raw/iso-1000000-k1000-streams-b1.csv": {
+      "sha256": "870162d7d0bd5bd224cd1277b3c26d600ab280a1fbaa4bb3d95299ecad1fedd3",
+      "bytes": 129856
+    },
+    "raw/iso-1000000-k1000-streams-b1.log": {
+      "sha256": "883f9b83db144508b610706ff6c40d8eb48c7a077226787d364ef54934abf115",
+      "bytes": 529
+    },
+    "raw/iso-1000000-k1000-streams-b1.tsv.sha256": {
+      "sha256": "d3cd2bea6e5d244be5d75c4e0257ea0b4cbb4b79a14916de87965b62e9af82d4",
+      "bytes": 173
+    },
+    "raw/iso-1000000-k1000-streams-b16.csv": {
+      "sha256": "9b9e789b9f37221e1a51b1ec794acc1c1a5780ab7a223b7a6ced3273180cd8de",
+      "bytes": 131216
+    },
+    "raw/iso-1000000-k1000-streams-b16.log": {
+      "sha256": "6a57715608df5b46d9c95da18b1ef420a49c41d3fbc2d062ecf9eba14985e2cc",
+      "bytes": 531
+    },
+    "raw/iso-1000000-k1000-streams-b16.tsv.sha256": {
+      "sha256": "82581c349ea5d8a884d8733a1e6d8482a2a09b944b6ba0347cc43bedc8bc0f6c",
+      "bytes": 174
+    },
+    "raw/iso-1000000-k1000-streams-b32.csv": {
+      "sha256": "f2c1c8beaf592d8473a017023b21685033658bec2817393d7065c569bee0d681",
+      "bytes": 132233
+    },
+    "raw/iso-1000000-k1000-streams-b32.log": {
+      "sha256": "1c3a6a566f3a1a6efc3ba789c28eedf8554c725199e63eb72930119527a349be",
+      "bytes": 532
+    },
+    "raw/iso-1000000-k1000-streams-b32.tsv.sha256": {
+      "sha256": "8cba3dfb75640194d56e85c249460ff1b0c187d88f8f99e9f3e8356e8fdc8a6b",
+      "bytes": 174
+    },
+    "raw/iso-1000000-k1000-streams-b4.csv": {
+      "sha256": "83fea2e81eafb6262215d8c37add1a6c95ad0d03f920f6762c2a2c3291e9b0d7",
+      "bytes": 129274
+    },
+    "raw/iso-1000000-k1000-streams-b4.log": {
+      "sha256": "80ad2fed9a15fddac47ddad2728c0818224bd70f6729f3effe298dc847a2a634",
+      "bytes": 529
+    },
+    "raw/iso-1000000-k1000-streams-b4.tsv.sha256": {
+      "sha256": "782b64738d9b6027ae37711be78dc804c2d598ec0a9083ab2d30ecce49ba6c0f",
+      "bytes": 173
+    }
+  },
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [
+      {
+        "original": "logs/gpu-before.txt",
+        "sha256": "a18fe6ed031819e2c4df56f01778eada36e432c2ab717ecc45df26f3bd55cd38",
+        "bytes": 2433,
+        "public": "logs/gpu-before.txt",
+        "transformation": "process names of other users' jobs replaced by '[other user process]' (they contained other students' account names); all other bytes unchanged; original kept on cuda2 scratch"
+      }
+    ],
+    "excluded": [],
+    "recorded_artifacts_not_in_public_tree_or_lists": []
+  }
+}

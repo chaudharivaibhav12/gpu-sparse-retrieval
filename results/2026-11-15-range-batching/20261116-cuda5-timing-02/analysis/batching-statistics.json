@@ -1,0 +1,1410 @@
+{
+  "run": "/scratch/psp8502/runs/2026-11-15-range-batching/20261116-cuda5-timing-02",
+  "processes": 3,
+  "warmups": 3,
+  "rounds": 20,
+  "queries": 500,
+  "development": false,
+  "source_commit": "8053d6f1696eb3368eec4b5157b137a78ad79e08",
+  "gpu_uuid": "GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7",
+  "binary_sha256": "01d7ca6ba73bb19454bef6348f262bcdeed1cee63bb2b1205800f1cd90dcb00c",
+  "memory_note": "tracked allocation bytes, the driver's device-used delta and the sampled process maximum are different quantities; none is an exact peak",
+  "estimator": "throughput ratio paired by process and measured round; geometric mean; crossed process/round bootstrap, 10000 draws, seed 20261117",
+  "note": "completion latency is measured from batch start with complete batches; batch-formation wait is not included",
+  "configurations": {
+    "sequential-b1-k10": {
+      "mode": "sequential",
+      "batch": 1,
+      "k": 10,
+      "throughput_qps": {
+        "median": 9204.78790604254,
+        "min": 8305.144565326009,
+        "max": 9253.802086528789,
+        "per_process_median": [
+          9043.374852207551,
+          9228.158827560446,
+          9199.961759546373
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 0.1060055,
+        "p95": 0.137093,
+        "p99": 0.14782332999999995,
+        "max": 1.56059,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 30000,
+        "median": 0.1060815,
+        "p95": 0.1371651,
+        "partial_batches": 0,
+        "partial_median": null
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 238598,
+        "total": 441347672
+      },
+      "device_used_delta_bytes_per_process": [
+        452984832,
+        452984832,
+        452984832
+      ],
+      "sampled_process_max_mib_per_process": [
+        586,
+        586,
+        586
+      ]
+    },
+    "streams-b1-k10": {
+      "mode": "streams",
+      "batch": 1,
+      "k": 10,
+      "throughput_qps": {
+        "median": 9213.96061924236,
+        "min": 9006.40348082363,
+        "max": 9257.696422952004,
+        "per_process_median": [
+          9210.750062011844,
+          9224.776936987255,
+          9208.204464577711
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 0.105016,
+        "p95": 0.1365015,
+        "p99": 0.14642308999999998,
+        "max": 1.50077,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 30000,
+        "median": 0.105048,
+        "p95": 0.13653349999999997,
+        "partial_batches": 0,
+        "partial_median": null
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 238598,
+        "total": 441347672
+      },
+      "device_used_delta_bytes_per_process": [
+        452984832,
+        452984832,
+        452984832
+      ],
+      "sampled_process_max_mib_per_process": [
+        586,
+        586,
+        586
+      ]
+    },
+    "batched-b1-k10": {
+      "mode": "batched",
+      "batch": 1,
+      "k": 10,
+      "throughput_qps": {
+        "median": 8839.556243934749,
+        "min": 8618.124128772288,
+        "max": 8879.563058723197,
+        "per_process_median": [
+          8839.556243934749,
+          8853.43846434442,
+          8828.85633427043
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 0.1091885,
+        "p95": 0.140101,
+        "p99": 0.15015305,
+        "max": 1.5817,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 30000,
+        "median": 0.109267,
+        "p95": 0.1401712,
+        "partial_batches": 0,
+        "partial_median": null
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 239626,
+        "total": 441348700
+      },
+      "device_used_delta_bytes_per_process": [
+        452984832,
+        452984832,
+        452984832
+      ],
+      "sampled_process_max_mib_per_process": [
+        586,
+        586,
+        586
+      ]
+    },
+    "sequential-b4-k10": {
+      "mode": "sequential",
+      "batch": 4,
+      "k": 10,
+      "throughput_qps": {
+        "median": 9385.428297568833,
+        "min": 8576.31094272954,
+        "max": 9413.468078468488,
+        "per_process_median": [
+          9394.051463903543,
+          8902.402646911078,
+          9387.603710000563
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 0.271453,
+        "p95": 0.45586375,
+        "p99": 0.48228105,
+        "max": 1.42046,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 7500,
+        "median": 0.42970200000000003,
+        "p95": 0.47976574999999994,
+        "partial_batches": 0,
+        "partial_median": null
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 238598,
+        "total": 442063466
+      },
+      "device_used_delta_bytes_per_process": [
+        452984832,
+        452984832,
+        452984832
+      ],
+      "sampled_process_max_mib_per_process": [
+        586,
+        586,
+        586
+      ]
+    },
+    "streams-b4-k10": {
+      "mode": "streams",
+      "batch": 4,
+      "k": 10,
+      "throughput_qps": {
+        "median": 14094.355429569103,
+        "min": 13054.784612502923,
+        "max": 14144.182343630477,
+        "per_process_median": [
+          14110.963674056678,
+          14078.135527684135,
+          14094.114285710217
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 0.21787,
+        "p95": 0.30237015,
+        "p99": 0.3277105699999999,
+        "max": 1.25698,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 7500,
+        "median": 0.28302499999999997,
+        "p95": 0.32391964999999995,
+        "partial_batches": 0,
+        "partial_median": null
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 238598,
+        "total": 442063466
+      },
+      "device_used_delta_bytes_per_process": [
+        452984832,
+        452984832,
+        452984832
+      ],
+      "sampled_process_max_mib_per_process": [
+        586,
+        586,
+        586
+      ]
+    },
+    "batched-b4-k10": {
+      "mode": "batched",
+      "batch": 4,
+      "k": 10,
+      "throughput_qps": {
+        "median": 13863.40911925934,
+        "min": 12833.175874543078,
+        "max": 13903.564874033707,
+        "per_process_median": [
+          13865.589371417616,
+          13886.289673706326,
+          13269.77961732254
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 0.29084200000000004,
+        "p95": 0.3321398,
+        "p99": 0.3502203399999998,
+        "max": 0.381927,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 7500,
+        "median": 0.2909425,
+        "p95": 0.3322517,
+        "partial_batches": 0,
+        "partial_median": null
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 239626,
+        "total": 442067578
+      },
+      "device_used_delta_bytes_per_process": [
+        452984832,
+        452984832,
+        452984832
+      ],
+      "sampled_process_max_mib_per_process": [
+        586,
+        586,
+        586
+      ]
+    },
+    "sequential-b16-k10": {
+      "mode": "sequential",
+      "batch": 16,
+      "k": 10,
+      "throughput_qps": {
+        "median": 9356.022369822042,
+        "min": 8761.047988149736,
+        "max": 9388.884105774043,
+        "per_process_median": [
+          9362.254117232671,
+          9355.116122747499,
+          9338.82357772881
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 0.9063695,
+        "p95": 1.685671,
+        "p99": 1.7642810999999998,
+        "max": 2.88975,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 1860,
+        "median": 1.7099199999999999,
+        "p95": 1.8108935,
+        "partial_batches": 60,
+        "partial_median": 0.40497649999999996
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 238598,
+        "total": 444926642
+      },
+      "device_used_delta_bytes_per_process": [
+        457179136,
+        457179136,
+        457179136
+      ],
+      "sampled_process_max_mib_per_process": [
+        590,
+        590,
+        590
+      ]
+    },
+    "streams-b16-k10": {
+      "mode": "streams",
+      "batch": 16,
+      "k": 10,
+      "throughput_qps": {
+        "median": 16194.049601583132,
+        "min": 14978.074495430606,
+        "max": 16251.544790590067,
+        "per_process_median": [
+          16223.635885049875,
+          16190.406995153759,
+          16175.073848393418
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 0.5759780000000001,
+        "p95": 0.98710375,
+        "p99": 1.0438507,
+        "max": 1.8674,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 1860,
+        "median": 0.992737,
+        "p95": 1.0720524999999999,
+        "partial_batches": 60,
+        "partial_median": 0.27724400000000005
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 238598,
+        "total": 444926642
+      },
+      "device_used_delta_bytes_per_process": [
+        457179136,
+        457179136,
+        457179136
+      ],
+      "sampled_process_max_mib_per_process": [
+        590,
+        590,
+        590
+      ]
+    },
+    "batched-b16-k10": {
+      "mode": "batched",
+      "batch": 16,
+      "k": 10,
+      "throughput_qps": {
+        "median": 16114.565225201597,
+        "min": 14895.373407647347,
+        "max": 16208.737417157141,
+        "per_process_median": [
+          16116.582077397772,
+          16174.810555975233,
+          16102.846976568311
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 0.996465,
+        "p95": 1.07121,
+        "p99": 1.10574,
+        "max": 1.78575,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 1860,
+        "median": 0.9966605,
+        "p95": 1.0712845,
+        "partial_batches": 60,
+        "partial_median": 0.281962
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 239626,
+        "total": 444943090
+      },
+      "device_used_delta_bytes_per_process": [
+        457179136,
+        457179136,
+        457179136
+      ],
+      "sampled_process_max_mib_per_process": [
+        590,
+        590,
+        590
+      ]
+    },
+    "sequential-b32-k10": {
+      "mode": "sequential",
+      "batch": 32,
+      "k": 10,
+      "throughput_qps": {
+        "median": 9362.438534637346,
+        "min": 9043.400000072346,
+        "max": 9393.53991230567,
+        "per_process_median": [
+          9365.497836117178,
+          9368.054827399294,
+          9350.171989595405
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 1.72003,
+        "p95": 3.3090040000000003,
+        "p99": 3.4663232999999996,
+        "max": 4.66352,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 900,
+        "median": 3.4226799999999997,
+        "p95": 3.54133,
+        "partial_batches": 60,
+        "partial_median": 2.05171
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 238598,
+        "total": 448744210
+      },
+      "device_used_delta_bytes_per_process": [
+        463470592,
+        463470592,
+        463470592
+      ],
+      "sampled_process_max_mib_per_process": [
+        596,
+        596,
+        596
+      ]
+    },
+    "streams-b32-k10": {
+      "mode": "streams",
+      "batch": 32,
+      "k": 10,
+      "throughput_qps": {
+        "median": 16599.122231100344,
+        "min": 15293.279215515951,
+        "max": 16683.59495434701,
+        "per_process_median": [
+          16638.697386787135,
+          16581.102665729915,
+          16594.937824911358
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 1.0194100000000001,
+        "p95": 1.8882905,
+        "p99": 1.9784501,
+        "max": 2.18679,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 900,
+        "median": 1.94063,
+        "p95": 2.039081999999999,
+        "partial_batches": 60,
+        "partial_median": 1.1593300000000002
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 238598,
+        "total": 448744210
+      },
+      "device_used_delta_bytes_per_process": [
+        463470592,
+        463470592,
+        463470592
+      ],
+      "sampled_process_max_mib_per_process": [
+        596,
+        596,
+        596
+      ]
+    },
+    "batched-b32-k10": {
+      "mode": "batched",
+      "batch": 32,
+      "k": 10,
+      "throughput_qps": {
+        "median": 16620.345898893363,
+        "min": 15336.176660486186,
+        "max": 16664.68912355734,
+        "per_process_median": [
+          16647.90172028465,
+          16580.6629308036,
+          16620.345898893363
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 1.93796,
+        "p95": 2.06722,
+        "p99": 2.16504,
+        "max": 2.25977,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 900,
+        "median": 1.9406050000000001,
+        "p95": 2.0694869999999996,
+        "partial_batches": 60,
+        "partial_median": 1.1604
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 239626,
+        "total": 448777106
+      },
+      "device_used_delta_bytes_per_process": [
+        461373440,
+        461373440,
+        461373440
+      ],
+      "sampled_process_max_mib_per_process": [
+        594,
+        594,
+        594
+      ]
+    },
+    "sequential-b1-k1000": {
+      "mode": "sequential",
+      "batch": 1,
+      "k": 1000,
+      "throughput_qps": {
+        "median": 591.7492088726876,
+        "min": 589.8408200118087,
+        "max": 593.4314778796163,
+        "per_process_median": [
+          591.7492088726876,
+          590.2899928885021,
+          593.0428484188344
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 1.69049,
+        "p95": 1.758011,
+        "p99": 1.7826308999999998,
+        "max": 2.30531,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 30000,
+        "median": 1.69058,
+        "p95": 1.75811,
+        "partial_batches": 0,
+        "partial_median": null
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 23665958,
+        "total": 464775032
+      },
+      "device_used_delta_bytes_per_process": [
+        478150656,
+        478150656,
+        478150656
+      ],
+      "sampled_process_max_mib_per_process": [
+        610,
+        610,
+        610
+      ]
+    },
+    "streams-b1-k1000": {
+      "mode": "streams",
+      "batch": 1,
+      "k": 1000,
+      "throughput_qps": {
+        "median": 590.7225452960845,
+        "min": 589.2667396862445,
+        "max": 593.4958176112332,
+        "per_process_median": [
+          592.8576944528961,
+          590.4688330125277,
+          590.210208746768
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 1.691285,
+        "p95": 1.75835,
+        "p99": 1.7820905999999999,
+        "max": 2.93384,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 30000,
+        "median": 1.69132,
+        "p95": 1.75838,
+        "partial_batches": 0,
+        "partial_median": null
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 23665958,
+        "total": 464775032
+      },
+      "device_used_delta_bytes_per_process": [
+        478150656,
+        478150656,
+        478150656
+      ],
+      "sampled_process_max_mib_per_process": [
+        610,
+        610,
+        610
+      ]
+    },
+    "batched-b1-k1000": {
+      "mode": "batched",
+      "batch": 1,
+      "k": 1000,
+      "throughput_qps": {
+        "median": 583.6126398356394,
+        "min": 582.0099039228523,
+        "max": 585.5605568282718,
+        "per_process_median": [
+          582.6588821732382,
+          583.7918348136053,
+          584.5678011300743
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 1.71207,
+        "p95": 1.7834705000000002,
+        "p99": 1.8081306,
+        "max": 2.99233,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 30000,
+        "median": 1.71215,
+        "p95": 1.7835605,
+        "partial_batches": 0,
+        "partial_median": null
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 23666986,
+        "total": 464776060
+      },
+      "device_used_delta_bytes_per_process": [
+        478150656,
+        478150656,
+        478150656
+      ],
+      "sampled_process_max_mib_per_process": [
+        610,
+        610,
+        610
+      ]
+    },
+    "sequential-b4-k1000": {
+      "mode": "sequential",
+      "batch": 4,
+      "k": 1000,
+      "throughput_qps": {
+        "median": 590.8140898917744,
+        "min": 588.6116870545667,
+        "max": 593.155554332337,
+        "per_process_median": [
+          591.8146553597019,
+          590.8319697577075,
+          589.18093021184
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 4.823665,
+        "p95": 6.842913,
+        "p99": 6.915712299999999,
+        "max": 8.22339,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 7500,
+        "median": 6.77396,
+        "p95": 6.90778,
+        "partial_batches": 0,
+        "partial_median": null
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 23665958,
+        "total": 535772906
+      },
+      "device_used_delta_bytes_per_process": [
+        553648128,
+        553648128,
+        553648128
+      ],
+      "sampled_process_max_mib_per_process": [
+        682,
+        682,
+        682
+      ]
+    },
+    "streams-b4-k1000": {
+      "mode": "streams",
+      "batch": 4,
+      "k": 1000,
+      "throughput_qps": {
+        "median": 1552.5130868663603,
+        "min": 1538.4874323884783,
+        "max": 1567.701584867917,
+        "per_process_median": [
+          1554.7597457605316,
+          1546.3398919338777,
+          1553.1526666574664
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 2.369155,
+        "p95": 2.67708,
+        "p99": 2.7630510999999998,
+        "max": 3.02028,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 7500,
+        "median": 2.55455,
+        "p95": 2.747182,
+        "partial_batches": 0,
+        "partial_median": null
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 23665958,
+        "total": 535772906
+      },
+      "device_used_delta_bytes_per_process": [
+        553648128,
+        553648128,
+        553648128
+      ],
+      "sampled_process_max_mib_per_process": [
+        682,
+        682,
+        682
+      ]
+    },
+    "batched-b4-k1000": {
+      "mode": "batched",
+      "batch": 4,
+      "k": 1000,
+      "throughput_qps": {
+        "median": 1527.8496844414321,
+        "min": 1519.5893145761713,
+        "max": 1536.2422120585113,
+        "per_process_median": [
+          1524.9432470002548,
+          1530.0462931801153,
+          1527.5556502330228
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 2.59646,
+        "p95": 2.7900595,
+        "p99": 2.8631934999999995,
+        "max": 3.06568,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 7500,
+        "median": 2.59656,
+        "p95": 2.7903205,
+        "partial_batches": 0,
+        "partial_median": null
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 23666986,
+        "total": 535777018
+      },
+      "device_used_delta_bytes_per_process": [
+        547356672,
+        547356672,
+        547356672
+      ],
+      "sampled_process_max_mib_per_process": [
+        676,
+        676,
+        676
+      ]
+    },
+    "sequential-b16-k1000": {
+      "mode": "sequential",
+      "batch": 16,
+      "k": 1000,
+      "throughput_qps": {
+        "median": 591.836437879885,
+        "min": 590.353092073499,
+        "max": 593.4341684012354,
+        "per_process_median": [
+          592.3193324306119,
+          591.5357679353241,
+          591.8906777162683
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 13.708549999999999,
+        "p95": 26.907415,
+        "p99": 27.186401,
+        "max": 28.4332,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 1860,
+        "median": 27.03745,
+        "p95": 27.290560000000003,
+        "partial_batches": 60,
+        "partial_median": 6.68641
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 23665958,
+        "total": 819764402
+      },
+      "device_used_delta_bytes_per_process": [
+        859832320,
+        859832320,
+        859832320
+      ],
+      "sampled_process_max_mib_per_process": [
+        974,
+        974,
+        974
+      ]
+    },
+    "streams-b16-k1000": {
+      "mode": "streams",
+      "batch": 16,
+      "k": 1000,
+      "throughput_qps": {
+        "median": 1770.5846713155725,
+        "min": 1753.586637052563,
+        "max": 1780.2311103148327,
+        "per_process_median": [
+          1773.5547024610532,
+          1770.871668109602,
+          1766.8300919055253
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 5.254725,
+        "p95": 8.9961035,
+        "p99": 9.2034174,
+        "max": 10.4846,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 1860,
+        "median": 9.025335,
+        "p95": 9.2836745,
+        "partial_batches": 60,
+        "partial_median": 2.5445349999999998
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 23665958,
+        "total": 819764402
+      },
+      "device_used_delta_bytes_per_process": [
+        859832320,
+        859832320,
+        859832320
+      ],
+      "sampled_process_max_mib_per_process": [
+        974,
+        974,
+        974
+      ]
+    },
+    "batched-b16-k1000": {
+      "mode": "batched",
+      "batch": 16,
+      "k": 1000,
+      "throughput_qps": {
+        "median": 2633.860084059005,
+        "min": 2605.5467922331777,
+        "max": 2652.056311642077,
+        "per_process_median": [
+          2628.195935446144,
+          2632.7641066883025,
+          2638.1613709065623
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 6.02212,
+        "p95": 6.24338,
+        "p99": 6.31074,
+        "max": 6.4451,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 1860,
+        "median": 6.02375,
+        "p95": 6.243646999999999,
+        "partial_batches": 60,
+        "partial_median": 2.548115
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 23666986,
+        "total": 819780850
+      },
+      "device_used_delta_bytes_per_process": [
+        832569344,
+        832569344,
+        832569344
+      ],
+      "sampled_process_max_mib_per_process": [
+        948,
+        948,
+        948
+      ]
+    },
+    "sequential-b32-k1000": {
+      "mode": "sequential",
+      "batch": 32,
+      "k": 1000,
+      "throughput_qps": {
+        "median": 591.6885419790937,
+        "min": 589.9195491315677,
+        "max": 592.8839225769485,
+        "per_process_median": [
+          592.0713599659897,
+          590.7150116098069,
+          592.3852807298204
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 27.0576,
+        "p95": 52.3001,
+        "p99": 54.193200999999995,
+        "max": 55.776,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 900,
+        "median": 54.0859,
+        "p95": 54.510799999999996,
+        "partial_batches": 60,
+        "partial_median": 33.57695
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 23665958,
+        "total": 1198419730
+      },
+      "device_used_delta_bytes_per_process": [
+        1268776960,
+        1268776960,
+        1268776960
+      ],
+      "sampled_process_max_mib_per_process": [
+        1364,
+        1364,
+        1364
+      ]
+    },
+    "streams-b32-k1000": {
+      "mode": "streams",
+      "batch": 32,
+      "k": 1000,
+      "throughput_qps": {
+        "median": 1818.0724039165436,
+        "min": 1801.7602476915845,
+        "max": 1827.8882370639435,
+        "per_process_median": [
+          1815.1252805578592,
+          1819.2723908457865,
+          1816.9292436917683
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 9.43857,
+        "p95": 17.360805000000003,
+        "p99": 17.705306,
+        "max": 18.2499,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 900,
+        "median": 17.57915,
+        "p95": 17.935470000000002,
+        "partial_batches": 60,
+        "partial_median": 11.26065
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 23665958,
+        "total": 1198419730
+      },
+      "device_used_delta_bytes_per_process": [
+        1268776960,
+        1268776960,
+        1268776960
+      ],
+      "sampled_process_max_mib_per_process": [
+        1364,
+        1364,
+        1364
+      ]
+    },
+    "batched-b32-k1000": {
+      "mode": "batched",
+      "batch": 32,
+      "k": 1000,
+      "throughput_qps": {
+        "median": 3000.477827391097,
+        "min": 2986.223832765732,
+        "max": 3018.987316932383,
+        "per_process_median": [
+          3000.318631175329,
+          2996.497205584539,
+          3005.5298141993294
+        ]
+      },
+      "completion_latency_ms": {
+        "median": 10.6145,
+        "p95": 10.8446,
+        "p99": 10.9108,
+        "max": 10.9852,
+        "samples": 30000
+      },
+      "batch_processing_ms": {
+        "full_batches": 900,
+        "median": 10.620750000000001,
+        "p95": 10.846515,
+        "partial_batches": 60,
+        "partial_median": 7.088485
+      },
+      "tracked_allocation_bytes": {
+        "shared_index": 441109074,
+        "per_query": 23666986,
+        "total": 1198452626
+      },
+      "device_used_delta_bytes_per_process": [
+        1210056704,
+        1210056704,
+        1210056704
+      ],
+      "sampled_process_max_mib_per_process": [
+        1308,
+        1308,
+        1308
+      ]
+    }
+  },
+  "contrasts": {
+    "batched-b1-k10 / sequential-b1-k10": {
+      "throughput_ratio": 0.9720192265249245,
+      "interval_95": [
+        0.9582564811221748,
+        0.9967361563259218
+      ],
+      "pairs": 60
+    },
+    "batched-b1-k10 / streams-b1-k10": {
+      "throughput_ratio": 0.959575207862162,
+      "interval_95": [
+        0.9574791078656724,
+        0.9621098219168449
+      ],
+      "pairs": 60
+    },
+    "batched-b1-k1000 / sequential-b1-k1000": {
+      "throughput_ratio": 0.9863468340484776,
+      "interval_95": [
+        0.9845579579739034,
+        0.9890186664361228
+      ],
+      "pairs": 60
+    },
+    "batched-b1-k1000 / streams-b1-k1000": {
+      "throughput_ratio": 0.9873485128941407,
+      "interval_95": [
+        0.9837577883134183,
+        0.9895728426789183
+      ],
+      "pairs": 60
+    },
+    "batched-b4-k10 / sequential-b4-k10": {
+      "throughput_ratio": 1.4716152842984866,
+      "interval_95": [
+        1.4184974968226012,
+        1.530327753261541
+      ],
+      "pairs": 60
+    },
+    "batched-b4-k10 / streams-b4-k10": {
+      "throughput_ratio": 0.9723432942966457,
+      "interval_95": [
+        0.9456116293993844,
+        0.9919457411911998
+      ],
+      "pairs": 60
+    },
+    "batched-b4-k10 / batched-b1-k10": {
+      "throughput_ratio": 1.5442748424596444,
+      "interval_95": [
+        1.5091331082386255,
+        1.5701508623801277
+      ],
+      "pairs": 60
+    },
+    "batched-b4-k1000 / sequential-b4-k1000": {
+      "throughput_ratio": 2.585757493441178,
+      "interval_95": [
+        2.5795482035831934,
+        2.590597345461197
+      ],
+      "pairs": 60
+    },
+    "batched-b4-k1000 / streams-b4-k1000": {
+      "throughput_ratio": 0.9839311034541351,
+      "interval_95": [
+        0.9800488447848886,
+        0.9890086894572163
+      ],
+      "pairs": 60
+    },
+    "batched-b4-k1000 / batched-b1-k1000": {
+      "throughput_ratio": 2.6168927170774308,
+      "interval_95": [
+        2.6121202164931923,
+        2.6212405107451358
+      ],
+      "pairs": 60
+    },
+    "batched-b16-k10 / sequential-b16-k10": {
+      "throughput_ratio": 1.717137823106505,
+      "interval_95": [
+        1.702372434669259,
+        1.727402417569482
+      ],
+      "pairs": 60
+    },
+    "batched-b16-k10 / streams-b16-k10": {
+      "throughput_ratio": 0.9984404017815769,
+      "interval_95": [
+        0.9928860191652091,
+        1.0070745009899464
+      ],
+      "pairs": 60
+    },
+    "batched-b16-k10 / batched-b1-k10": {
+      "throughput_ratio": 1.8141460409438201,
+      "interval_95": [
+        1.7958367619457931,
+        1.8269728720222003
+      ],
+      "pairs": 60
+    },
+    "batched-b16-k1000 / sequential-b16-k1000": {
+      "throughput_ratio": 4.44865230663782,
+      "interval_95": [
+        4.437941695913696,
+        4.459436690737388
+      ],
+      "pairs": 60
+    },
+    "batched-b16-k1000 / streams-b16-k1000": {
+      "throughput_ratio": 1.4880627119442,
+      "interval_95": [
+        1.4823424233077866,
+        1.4946584687839326
+      ],
+      "pairs": 60
+    },
+    "batched-b16-k1000 / batched-b1-k1000": {
+      "throughput_ratio": 4.511621906390429,
+      "interval_95": [
+        4.505044364066248,
+        4.518443677536136
+      ],
+      "pairs": 60
+    },
+    "batched-b32-k10 / sequential-b32-k10": {
+      "throughput_ratio": 1.7662032774649108,
+      "interval_95": [
+        1.74666235590052,
+        1.779702414264201
+      ],
+      "pairs": 60
+    },
+    "batched-b32-k10 / streams-b32-k10": {
+      "throughput_ratio": 0.9991475470979071,
+      "interval_95": [
+        0.9934813041290335,
+        1.0016876057704605
+      ],
+      "pairs": 60
+    },
+    "batched-b32-k10 / batched-b1-k10": {
+      "throughput_ratio": 1.8689220291424817,
+      "interval_95": [
+        1.8465209709090533,
+        1.8840851994039978
+      ],
+      "pairs": 60
+    },
+    "batched-b32-k1000 / sequential-b32-k1000": {
+      "throughput_ratio": 5.0724900102012604,
+      "interval_95": [
+        5.068007171398087,
+        5.076954484944059
+      ],
+      "pairs": 60
+    },
+    "batched-b32-k1000 / streams-b32-k1000": {
+      "throughput_ratio": 1.651373295599263,
+      "interval_95": [
+        1.6473729948978306,
+        1.6546712284048157
+      ],
+      "pairs": 60
+    },
+    "batched-b32-k1000 / batched-b1-k1000": {
+      "throughput_ratio": 5.141637308597109,
+      "interval_95": [
+        5.1325277796771855,
+        5.1504280676823955
+      ],
+      "pairs": 60
+    },
+    "sequential-b4-k10 / sequential-b1-k10": {
+      "throughput_ratio": 1.020011720403594,
+      "interval_95": [
+        0.9837375931888814,
+        1.0578151662795916
+      ],
+      "pairs": 60
+    },
+    "sequential-b4-k1000 / sequential-b1-k1000": {
+      "throughput_ratio": 0.9982234811582348,
+      "interval_95": [
+        0.9936579303699352,
+        1.000883160715859
+      ],
+      "pairs": 60
+    },
+    "sequential-b16-k10 / sequential-b1-k10": {
+      "throughput_ratio": 1.026932612975291,
+      "interval_95": [
+        1.012591577892039,
+        1.0513081830682118
+      ],
+      "pairs": 60
+    },
+    "sequential-b16-k1000 / sequential-b1-k1000": {
+      "throughput_ratio": 1.0003083354372486,
+      "interval_95": [
+        0.9982949568190356,
+        1.0019431757290107
+      ],
+      "pairs": 60
+    },
+    "sequential-b32-k10 / sequential-b1-k10": {
+      "throughput_ratio": 1.0285498664739956,
+      "interval_95": [
+        1.0129647498272458,
+        1.0541573719626083
+      ],
+      "pairs": 60
+    },
+    "sequential-b32-k1000 / sequential-b1-k1000": {
+      "throughput_ratio": 0.9997925419194814,
+      "interval_95": [
+        0.9986900859382096,
+        1.0006977366074135
+      ],
+      "pairs": 60
+    },
+    "streams-b1-k10 / sequential-b1-k10": {
+      "throughput_ratio": 1.012968257788242,
+      "interval_95": [
+        0.9985957559713405,
+        1.038627694246251
+      ],
+      "pairs": 60
+    },
+    "streams-b1-k1000 / sequential-b1-k1000": {
+      "throughput_ratio": 0.9989854860441052,
+      "interval_95": [
+        0.9958728626749808,
+        1.0010805635682862
+      ],
+      "pairs": 60
+    },
+    "streams-b4-k10 / sequential-b4-k10": {
+      "throughput_ratio": 1.5134729605586417,
+      "interval_95": [
+        1.487407766733566,
+        1.547903261137929
+      ],
+      "pairs": 60
+    },
+    "streams-b4-k10 / streams-b1-k10": {
+      "throughput_ratio": 1.5239965777945024,
+      "interval_95": [
+        1.5084714940462693,
+        1.5329475157950294
+      ],
+      "pairs": 60
+    },
+    "streams-b4-k1000 / sequential-b4-k1000": {
+      "throughput_ratio": 2.6279863339656173,
+      "interval_95": [
+        2.6179396549053884,
+        2.6375643859329077
+      ],
+      "pairs": 60
+    },
+    "streams-b4-k1000 / streams-b1-k1000": {
+      "throughput_ratio": 2.6259817618727705,
+      "interval_95": [
+        2.619298601477405,
+        2.6323715452208023
+      ],
+      "pairs": 60
+    },
+    "streams-b16-k10 / sequential-b16-k10": {
+      "throughput_ratio": 1.7198200513946684,
+      "interval_95": [
+        1.701406545039131,
+        1.7329218601033884
+      ],
+      "pairs": 60
+    },
+    "streams-b16-k10 / streams-b1-k10": {
+      "throughput_ratio": 1.7435287686924066,
+      "interval_95": [
+        1.722295736736667,
+        1.7595019437485853
+      ],
+      "pairs": 60
+    },
+    "streams-b16-k1000 / sequential-b16-k1000": {
+      "throughput_ratio": 2.9895596945813674,
+      "interval_95": [
+        2.983066987701641,
+        2.995476653440227
+      ],
+      "pairs": 60
+    },
+    "streams-b16-k1000 / streams-b1-k1000": {
+      "throughput_ratio": 2.993518448019722,
+      "interval_95": [
+        2.988710023162668,
+        2.998192499640546
+      ],
+      "pairs": 60
+    },
+    "streams-b32-k10 / sequential-b32-k10": {
+      "throughput_ratio": 1.7677101671269368,
+      "interval_95": [
+        1.7501573770425574,
+        1.7791571665694375
+      ],
+      "pairs": 60
+    },
+    "streams-b32-k10 / streams-b1-k10": {
+      "throughput_ratio": 1.7949013134261709,
+      "interval_95": [
+        1.77414753423725,
+        1.8066286099013018
+      ],
+      "pairs": 60
+    },
+    "streams-b32-k1000 / sequential-b32-k1000": {
+      "throughput_ratio": 3.0716798095978146,
+      "interval_95": [
+        3.0655668588810117,
+        3.0795208252293698
+      ],
+      "pairs": 60
+    },
+    "streams-b32-k1000 / streams-b1-k1000": {
+      "throughput_ratio": 3.074161344387102,
+      "interval_95": [
+        3.064834076714822,
+        3.081825277098333
+      ],
+      "pairs": 60
+    }
+  }
+}
