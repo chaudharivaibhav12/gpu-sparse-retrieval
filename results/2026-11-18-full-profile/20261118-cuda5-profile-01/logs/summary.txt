@@ -1,0 +1,12 @@
+v2-w1024           range_scores   share 100.0%  SM  50.7%  mem  57.4%  DRAM    0.0 GB/s  occ  98.2%  L2 hit  87.4%  stalls barrier 7.18, long_scoreboard 6.44, wait 3.29
+prune-w1024-s64    range_bounds   share  22.7%  SM   3.4%  mem   3.2%  DRAM    0.0 GB/s  occ  16.5%  L2 hit  44.4%  stalls long_scoreboard 35.13, wait 4.93, selected 1.00
+prune-w1024-s64    select_seeds   share   5.3%  SM   0.4%  mem   0.3%  DRAM    0.0 GB/s  occ  66.0%  L2 hit  85.4%  stalls barrier 32.66, long_scoreboard 3.41, wait 3.25
+prune-w1024-s64    score_ranges   share  71.6%  SM  46.4%  mem  46.8%  DRAM    0.0 GB/s  occ  85.4%  L2 hit  78.6%  stalls long_scoreboard 6.79, barrier 5.57, wait 3.22
+prune-w1024-s64    compact_kept   share   0.5%  SM   1.9%  mem   5.1%  DRAM    0.0 GB/s  occ  15.4%  L2 hit  42.1%  stalls long_scoreboard 32.13, imc_miss 20.88, wait 2.84
+prune-w256-s64     range_bounds   share  23.2%  SM  13.7%  mem  12.7%  DRAM    0.0 GB/s  occ  48.8%  L2 hit  35.2%  stalls long_scoreboard 34.27, wait 5.21, selected 1.00
+prune-w256-s64     select_seeds   share  10.8%  SM   0.5%  mem   1.2%  DRAM    0.0 GB/s  occ  64.7%  L2 hit  87.0%  stalls long_scoreboard 14.12, barrier 12.88, wait 3.19
+prune-w256-s64     score_ranges   share  65.5%  SM  35.8%  mem  35.8%  DRAM    0.0 GB/s  occ  90.6%  L2 hit  78.0%  stalls barrier 12.12, long_scoreboard 7.77, short_scoreboard 3.44
+prune-w256-s64     compact_kept   share   0.5%  SM   4.7%  mem  17.9%  DRAM    0.0 GB/s  occ  38.3%  L2 hit  21.0%  stalls long_scoreboard 45.50, imc_miss 21.06, wait 3.04
+v2-w1024           GPU span 664.7 us, busy 658.5 us (99%), idle gaps 6.5 us; per query {'range_scores': 1.0, '[CUDA memcpy Device-to-Host]': 1.0}
+prune-w1024-s64    GPU span 442.6 us, busy 436.2 us (98%), idle gaps 8.2 us; per query {'range_bounds': 1.0, 'select_seeds': 1.0, 'score_ranges': 2.0, 'compact_kept': 1.0, '[CUDA memcpy Device-to-Host]': 1.0}
+prune-w256-s64     GPU span 369.9 us, busy 361.8 us (98%), idle gaps 8.3 us; per query {'range_bounds': 1.0, 'select_seeds': 1.0, 'score_ranges': 2.0, 'compact_kept': 1.0, '[CUDA memcpy Device-to-Host]': 1.0}
