@@ -1,5 +1,8 @@
 # Speed Up Results
 
+November 18 compact-control update: Compact document-weight storage reduces paired query time by 1.93% and sampled GPU memory by 36.1% versus the guarded FP32-storage GPUSparse adaptation. The unchanged exhaustive range scorer remains 8.27× faster (conditional 95% interval 8.14–8.39) on all 8,841,823 passages, 500 calibration queries, RTX 4070, k=10 and batch size 1. All 6,480 held-out queries remain unused. [Report](experiments/2026-11-17-gpusparse-u8-storage/report.md). Newer team pruning, CPU and profile results retain their own protocols and qualifications.
+
+
 ## Latest: guarded FP32, full collection (November 17 update)
 
 | Implementation | Median ms | P95 of query/process medians, ms | Sampled own GPU peak, MiB |
@@ -8,13 +11,13 @@
 | GPUSparse, canonical U64 adaptation | 6.895403 | 9.331593 | 8358 |
 | GPUSparse, guarded canonical FP32 | 6.008201 | 8.162007 | 8324 |
 
-Guarded FP32 has lower measured latency than the U64 adaptation: paired ratio 0.872542, conditional 95% interval [0.870170, 0.874942]. The inverse is 1.146×. This strengthens the baseline comparison while preserving exact integer answers.
+Guarded FP32 has lower measured latency than the U64 adaptation: paired ratio 0.872542, conditional 95% interval [0.870170, 0.874942]. The inverse is 1.146Ã—. This strengthens the baseline comparison while preserving exact integer answers.
 
 | Contrast, numerator / denominator | Paired ratio | Conditional 95% interval | Inverse ratio |
 |---|---:|---:|---:|
-| FP32 / U64 | 0.872542 | [0.870170, 0.874942] | 1.146× |
-| Range / U64 | 0.103500 | [0.102051, 0.104968] | 9.662× |
-| Range / FP32 | 0.118619 | [0.116818, 0.120369] | 8.430× |
+| FP32 / U64 | 0.872542 | [0.870170, 0.874942] | 1.146Ã— |
+| Range / U64 | 0.103500 | [0.102051, 0.104968] | 9.662Ã— |
+| Range / FP32 | 0.118619 | [0.116818, 0.120369] | 8.430Ã— |
 
 These are complete resident-query wall timings for disclosed canonical adaptations on bounded integer inputs. All passage IDs, query weights, exact scores/ties, GPU, k, batch, warm-ups, repetitions and boundaries are matched. Intervals are conditional on this calibration set/session. The 6,480 held-out queries remain untouched; released arbitrary-float/end-to-end GPUSparse and full-collection CPU-BMP speed remain unmeasured.
 
@@ -30,7 +33,7 @@ Updated November 16, 2026. Full-collection comparisons use 8,841,823 passages an
 | GPUSparse monolithic, canonical U64 adaptation | 6.890346 | 8,358 |
 | CSR exhaustive control | 32.374350 | 5,382 |
 
-Primary paired speed ratios: **9.65x** versus the U64 adaptation (conditional 95% interval 9.515–9.785), **45.56x** versus CSR (44.926–46.192). Ratios are geometric averages of matched query/process median ratios, rather than divisions of table medians. All 105,249 output groups and 1,051,740 scores passed independent replay. Measured source `f10c7e7654269e670a0e7f0c678db497d4bc5ee0`; [report and protocol](experiments/2026-11-15-full-collection-baselines/report.md), [raw evidence](results/2026-11-15-full-collection-baselines/20261116-cuda5-baseline-repair02/README.md).
+Primary paired speed ratios: **9.65x** versus the U64 adaptation (conditional 95% interval 9.515â€“9.785), **45.56x** versus CSR (44.926â€“46.192). Ratios are geometric averages of matched query/process median ratios, rather than divisions of table medians. All 105,249 output groups and 1,051,740 scores passed independent replay. Measured source `f10c7e7654269e670a0e7f0c678db497d4bc5ee0`; [report and protocol](experiments/2026-11-15-full-collection-baselines/report.md), [raw evidence](results/2026-11-15-full-collection-baselines/20261116-cuda5-baseline-repair02/README.md).
 
 This is warmed resident-query timing; index construction/load/upload and validation are excluded. Memory is a one-second sampled process maximum, not an exact physical peak. C++ tracked buffers and Torch allocator counters have different scopes. The GPUSparse scorer was adapted to integer arithmetic and canonical ties; released arbitrary-float/end-to-end GPUSparse and full CPU BMP have not been given a matched full-collection speed claim. The guarded canonical FP32 follow-up is recorded above.
 

@@ -1,5 +1,8 @@
 # Experiment index
 
+November 18 compact-control update: Compact document-weight storage reduces paired query time by 1.93% and sampled GPU memory by 36.1% versus the guarded FP32-storage GPUSparse adaptation. The unchanged exhaustive range scorer remains 8.27× faster (conditional 95% interval 8.14–8.39) on all 8,841,823 passages, 500 calibration queries, RTX 4070, k=10 and batch size 1. All 6,480 held-out queries remain unused. [Report](2026-11-17-gpusparse-u8-storage/report.md). Newer team pruning, CPU and profile results retain their own protocols and qualifications.
+
+
 Each experiment has a branch and a folder. Read [CONTRIBUTING.md](../CONTRIBUTING.md) for the shared convention. Copy [_template](_template/) for a new experiment and replace every placeholder before execution.
 
 | Experiment ID | Question | Owner | Branch | State |
@@ -12,19 +15,19 @@ Each experiment has a branch and a folder. Read [CONTRIBUTING.md](../CONTRIBUTIN
 | [2026-11-11-cuda-block-control](2026-11-11-cuda-block-control/README.md) | Is the B16/B32 CSR block schedule exact? | Vaibhav | `exp/vaibhav/2026-11-11-cuda-block-control` | 350 fixture and 100 real queries passed |
 | [2026-11-11-cuda-fullbound-pruning](2026-11-11-cuda-fullbound-pruning/README.md) | Does exact full-byte pruning outweigh its overhead? | Vaibhav | `exp/vaibhav/2026-11-11-cuda-fullbound-pruning` | Correctness passed; conditional latency ratios 0.7626 / 0.8415 |
 | [2026-11-13-range-bitpack](2026-11-13-range-bitpack/README.md) | What is the batch-1 latency and index size of an exhaustive exact scorer over a range-split, bit-packed inverted index? | Arnav | `exp/arnav/2026-11-13-range-bitpack` | Exact on all checks; 0.205 ms pooled median at 1M/k10 on RTX 4070; paired baseline rerun pending |
-| [2026-11-14-range-bitpack-paired](2026-11-14-range-bitpack-paired/README.md) | Paired same-session latency of the range-split scorer against monolithic, CSR B16/B32 and the CSR exhaustive control | Arnav | `exp/arnav/2026-11-14-range-bitpack-paired` | Paired: 0.235× monolithic [0.231, 0.240], 0.081× CSR B16, 0.066× CSR B32; all outputs exact |
-| [2026-11-14-range-bitpack-profile](2026-11-14-range-bitpack-profile/README.md) | Where does the range scorer's time go, and how much of its advantage is GPU work vs host overhead? | Arnav | `exp/arnav/2026-11-14-range-bitpack-profile` | GPU-only ratio 0.375× monolithic (wall 0.241×); time: decode 55%, local top-k 34%, merge 9% |
-| [2026-11-14-range-bitpack-v2](2026-11-14-range-bitpack-v2/README.md) | Which of five profile-motivated changes reduce the range scorer's latency while staying exact? | Arnav | `exp/arnav/2026-11-14-range-bitpack-v2` | V2-5 exact; k=10: 0.805× v1 (W=4096), 0.533× v1 at W=1024; k=100: 0.304× monolithic |
+| [2026-11-14-range-bitpack-paired](2026-11-14-range-bitpack-paired/README.md) | Paired same-session latency of the range-split scorer against monolithic, CSR B16/B32 and the CSR exhaustive control | Arnav | `exp/arnav/2026-11-14-range-bitpack-paired` | Paired: 0.235Ã— monolithic [0.231, 0.240], 0.081Ã— CSR B16, 0.066Ã— CSR B32; all outputs exact |
+| [2026-11-14-range-bitpack-profile](2026-11-14-range-bitpack-profile/README.md) | Where does the range scorer's time go, and how much of its advantage is GPU work vs host overhead? | Arnav | `exp/arnav/2026-11-14-range-bitpack-profile` | GPU-only ratio 0.375Ã— monolithic (wall 0.241Ã—); time: decode 55%, local top-k 34%, merge 9% |
+| [2026-11-14-range-bitpack-v2](2026-11-14-range-bitpack-v2/README.md) | Which of five profile-motivated changes reduce the range scorer's latency while staying exact? | Arnav | `exp/arnav/2026-11-14-range-bitpack-v2` | V2-5 exact; k=10: 0.805Ã— v1 (W=4096), 0.533Ã— v1 at W=1024; k=100: 0.304Ã— monolithic |
 
 Add new experiments here on their own branches. Merge index rows through pull requests as experiments are reviewed. The shared research plan contains proposed tracks and their dependencies. An index entry identifies recorded work and does not assign a teammate to future work.
-- [2026-11-11-pruning-replication-profile](2026-11-11-pruning-replication-profile/README.md): complete — verified 500-query replication on Turing/Ada, separate stage/allocation/DRAM diagnostics, retained failures and reviewed retries.
+- [2026-11-11-pruning-replication-profile](2026-11-11-pruning-replication-profile/README.md): complete â€” verified 500-query replication on Turing/Ada, separate stage/allocation/DRAM diagnostics, retained failures and reviewed retries.
 
-- [2026-11-11-cuda-bound-precision](2026-11-11-cuda-bound-precision/README.md): complete — canonical full/coarse/selective ablation on Turing/Ada; coarse memory/latency tradeoff and selective negative latency result, with full repeated timings and checked profiles.
+- [2026-11-11-cuda-bound-precision](2026-11-11-cuda-bound-precision/README.md): complete â€” canonical full/coarse/selective ablation on Turing/Ada; coarse memory/latency tradeoff and selective negative latency result, with full repeated timings and checked profiles.
 
 - [Native GPUSparse audit](2026-11-11-gpusparse-baseline/README.md): original native compilation failure preserved; explicit compatibility repair completed correctness and repeated calibration timing.
 
-- [2026-11-15-range-worker-sweep](2026-11-15-range-worker-sweep/README.md): complete valid negative result — 119 synthetic / 9 real-data checks and 27 timing processes validated; retain W1024/T256 (~0.108109 ms, 420.90 MiB). Alternatives 1.31–2.94 times slower; retained failed attempts and quota-safe timing continuation; calibration only.
+- [2026-11-15-range-worker-sweep](2026-11-15-range-worker-sweep/README.md): complete valid negative result â€” 119 synthetic / 9 real-data checks and 27 timing processes validated; retain W1024/T256 (~0.108109 ms, 420.90 MiB). Alternatives 1.31â€“2.94 times slower; retained failed attempts and quota-safe timing continuation; calibration only.
 
 - [Full-collection matched baselines](2026-11-15-full-collection-baselines/report.md): complete; exact 8,841,823-passage comparison, independently replayed outputs/provenance/statistics. Range median 0.687415 ms; paired ratios 9.65x versus canonical U64 adaptation and 45.56x versus CSR, with explicit scope/limits and preserved failed attempts.
 
-- [Guarded canonical FP32, full collection](2026-11-16-guarded-fp32-baseline/report.md): complete — exact 8,841,823-passage / 500-calibration comparison. FP32/U64 paired ratio 0.872542; range remains 8.43× faster than FP32. All44attempts and earlier failures retained; independent replay and compiled arithmetic verified.
+- [Guarded canonical FP32, full collection](2026-11-16-guarded-fp32-baseline/report.md): complete â€” exact 8,841,823-passage / 500-calibration comparison. FP32/U64 paired ratio 0.872542; range remains 8.43Ã— faster than FP32. All44attempts and earlier failures retained; independent replay and compiled arithmetic verified.
