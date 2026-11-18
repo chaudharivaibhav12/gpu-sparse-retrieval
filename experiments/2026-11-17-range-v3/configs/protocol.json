@@ -185,6 +185,12 @@
       "change": "Owner decisions: (1) Measurement D is rerun in full and unchanged as 20261117-cuda5-measureD-02 behind a 5-minute quiet-GPU pre-launch wait; session 1 is kept as a failed attempt and its data are not combined with session 2. (2) Before that, an EXPLORATORY run 20261117-cuda5-contendedD-01 of the same matrix with CONTENDED=1 (code/session_lib.sh: no idle wait for other users' processes, overlaps recorded but not replaced; our own jobs still serialised), with per-process GPU-sharing summaries (analysis/contention_d.py from the poll and pmon monitors). It is not a registered measurement: R1-R3 are decided only from session 2; the contended run is reported separately as diagnostic, alongside session 2 to show how sharing affects the ratios.",
       "reason": "cuda5 is shared and was busy (another user's ~10 GB job and bursts of short GPU processes). Nsight Systems GPU metrics could not be used to observe other users' work (the GPU was already under another profiling session), so sharing is measured from the per-process monitors.",
       "gpu_time": "contended run about 19 minutes, session 2 about 19 minutes; owner approved going over the earlier 30-minute estimate"
+    },
+    {
+      "date": "2026-11-18 UTC",
+      "after": "Measurement D session 2 (20261117-cuda5-measureD-02) started 08:11 UTC after the 5-minute quiet-GPU wait and was stopped by the overlap rule in the k=10 set (slot timing-k10-r2-v3-2-w1024, 4 overlaps with another user's short GPU processes, 08:15-08:22 UTC); 14 processes complete, not analysed",
+      "change": "None yet. Session 2 is kept as a failed attempt; its data are not combined with any other session. R1-R3 remain undecided pending the owner's choice of how to proceed.",
+      "reason": "The other user's short GPU processes start during our roughly 7 s processes after an idle check has passed, so neither the pre-launch quiet wait nor the per-process idle check prevents overlaps."
     }
   ],
   "measurement_D": {
