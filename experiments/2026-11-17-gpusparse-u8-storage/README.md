@@ -1,11 +1,5 @@
 # Compact-weight canonical GPUSparse
 
-Question: does uint8 storage with exact guarded FP32 scoring strengthen our full-collection GPU control? No performance result yet. Parent: 2026-11-16-guarded-fp32-baseline, measured edcd32eed32bff0fceca6db5c6755099f225eba8, merged4fd69f7540903a7d085b35dc06952bba1efcad00.
+Completed: compact storage reduces paired latency 1.93% and sampled GPU memory 36.1%; unchanged range W1024/T256 remains 8.27× faster. Full 8,841,823 passages / 500 calibration queries / RTX 4070 / k10 / batch1.
 
-Fresh FP32-storage control, compact treatment and unchanged Arnav-derived range scorer. Full8,841,823passages,500calibration queries,k10,batch1,RTX4070;3processes,3warmup/20measured rounds. All6480held-out queries untouched. See configs/protocol.json for complete inherited settings/deltas and configs/parent-fp32-runtime.json for actual parent metadata.
-
-The compact variant preserves pinned upstream FP32 kernel source and canonical selector, specializes its document loads to uint8, and retains FP32 products/atomics/scores. It remains a disclosed adaptation. Modeled weight saving3,147,846,558bytes is not measured memory or latency. No tuning of launch/block/scorer/selector in this treatment. Compare primary compact/control; report valid null/slower results. Separate review and target gates/fixtures/full correctness precede timings. Repair02 waits passively between stages if the GPU is occupied (600secondchecks,24hlimit perwait), outside all timing; executed failures/ineligible timings still stop without automatic retries. Source is committed before measurement; run links/artifacts will identify its exact commit.
-
-Resource repair02 is prepared after two occupancy-interrupted attempts. No new source has been measured and no resubmission is authorized by this documentation. Original failures remain immutable.
-
-Repair03 corrects TTIR verifier parsing of the byte-pointer load annotation and binds that load to its unsigned FP32 conversion. The prior run passed saved full500-query correctness reports for all three systems but stopped before timing. New source is not yet executed; a fresh full protocol requires approval.
+Read the [report](report.md), [protocol](configs/protocol.json), [public replay](analysis/replay_public.py), and [run manifests](../../results/2026-11-17-gpusparse-u8-storage/). All four attempts are preserved. Measured source `f263feed61a47f9b6317fff45df9788430b0ff2c`; later packaging does not change it. All 6,480 held-out queries remain unused.
