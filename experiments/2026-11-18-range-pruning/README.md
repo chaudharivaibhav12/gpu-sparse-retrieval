@@ -34,13 +34,36 @@ Medians over queries. Smaller ranges have tighter bounds. 64 seeds come within 3
 
 Development: the fixture suite passed on the first build (864 scorer runs, 17,472 answer checks, 12,960 schedule checks). A full-collection probe (range size 256, 64 seeds, VERIFY=1) matched the reference and the host schedule on all 500 queries. Dry run `dev-prune-01` was stopped when the CPU limit was changed to 4.0 cores, and `dev-prune-02` passed end to end; see [runs/dev](runs/dev/README.md). Review so far is the author's own.
 
+Protocol amendments, each registered before the attempt it governs (see the protocol):
+1. GPU contention is judged over the released (timed) phase.
+2. Only timing waits for a quiet machine; replacements have no count limit and the run is bounded by a deadline; runs can be resumed; a retry may time an earlier attempt's verified binaries.
+3. Only *active* foreign GPU processes count. Measured on the control: an idle foreign holder left latency unchanged (0.684-0.687 ms vs 0.686-0.690 ms clean), and an active full-GPU job made it 3.8× slower.
+
 ## Runs
 
-None recorded yet.
+- [20261117-cuda5-prune-04](runs/20261117-cuda5-prune-04/README.md): **the result**. Completed; 27 timing processes with answers equal to the CPU reference.
+- [20261117-cuda5-prune-03](runs/20261117-cuda5-prune-03/README.md), [prune-02](runs/20261117-cuda5-prune-02/README.md), [prune-01](runs/20261117-cuda5-prune-01/README.md): aborted or failed attempts, kept and not analysed (a push rewrote prune-03's checkout; prune-02 hit the replacement limit; prune-01 had a run-script defect).
+- [dev](runs/dev/README.md): census, fixtures, probe, dry runs, gate, robustness and interference tests (not results).
 
 ## Findings and decision
 
-Pending.
+Full collection, 500 calibration queries, k=10, RTX 4070. **Seeded range-bound pruning makes the exact range scorer faster at every range size.**
+
+| | v2-w1024 (control) | prune-w1024-s64 | prune-w512-s64 | prune-w256-s64 |
+|---|---:|---:|---:|---:|
+| median / mean ms | 0.689 / 0.721 | 0.477 / 0.520 | 0.420 / 0.510 | **0.388 / 0.492** |
+| p99 ms | 1.086 | 1.205 | 1.648 | 2.133 |
+| ranges scored | 100% | 34.5% | 16.2% | 6.3% |
+| speedup (primary) | 1 | 1.51× [1.47, 1.56] | 1.62× [1.56, 1.68] | **1.71× [1.65, 1.78]** |
+
+All three primary intervals lie above 1, so by the registered decision rule pruning is adopted. The fastest configuration is `prune-w256-s64`: 0.388 ms median, 1.71× the previous best exact scorer. Every answer is still exact. For context only: the best published exact CPU result on this collection is BMP (SIGIR '24), a 10.5 ms mean on one thread and different hardware. Our 0.492 ms mean is about 21× lower. That is a cross-paper comparison; a matched run on cuda5 is open.
+
+The decomposition shows that pruning, not range size, is the gain:
+- exhaustive scoring at smaller ranges is slower (0.61× at 512, 0.33× at 256);
+- the work-list scheduling costs 12% at 1024 and nothing at 256;
+- pruning alone gives 1.7×, 2.8× and 5.1× at 1024, 512 and 256 as the bounds tighten.
+
+The tail does not improve. p99 rises at small ranges because queries whose bounds prune little pay the full small-range cost. `prune-w1024-s64` is the balanced alternative (1.51×, p99 1.205 vs 1.086 ms). Which configuration to freeze for the held-out evaluation is a separate, registered decision.
 
 ## Limits
 

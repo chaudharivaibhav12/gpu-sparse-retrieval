@@ -4,7 +4,7 @@
   "title": "Seeded range-bound pruning for the exact GPU range scorer",
   "owner": "parva",
   "branch": "exp/parva/2026-11-18-range-pruning",
-  "status": "protocol registered 2026-11-17; no recorded run yet",
+  "status": "completed 2026-11-17: recorded run 20261117-cuda5-prune-04 under the registered protocol with amendments 1-3; pruning adopted by the decision rule",
   "parent_experiment": "2026-11-15-full-collection-baselines",
   "parent_source_commit": "4fd69f7",
   "question": "Does seeded range-bound pruning make the exact GPU range scorer faster on the full collection, and how much of any change comes from the range size, the work-list scheduling and the pruning itself?",
@@ -35,5 +35,75 @@
   "success_rule": "A complete run under the registered protocol; the result is reported whatever the speedups are.",
   "failure_rule": "Any mismatch, rejected expected run, failure other than a contended GPU failure, or more than 3 ineligible processes for one configuration.",
   "recording_ids": [],
-  "runs": []
+  "runs": [
+    {
+      "run_id": "20261117-cuda5-prune-04",
+      "kind": "recorded",
+      "host": "cuda5",
+      "source_commit": "0dc7b3bbf796f64e6efc81b10e230b84ac3e5399",
+      "status": "completed",
+      "readme": "experiments/2026-11-18-range-pruning/runs/20261117-cuda5-prune-04/README.md",
+      "results": "results/2026-11-18-range-pruning/20261117-cuda5-prune-04",
+      "reuse": "binaries, fixtures and correctness from 20261117-cuda5-prune-03 (amendment 2d)",
+      "correctness": "27 of 27 timing comparisons equal the CPU reference",
+      "ineligible_processes": 5,
+      "median_ms": {
+        "v2-w1024": 0.689,
+        "prune-w1024-s64": 0.477,
+        "prune-w512-s64": 0.42,
+        "prune-w256-s64": 0.388
+      },
+      "primary": {
+        "v2-w1024 / prune-w1024-s64": {
+          "ratio": 1.512,
+          "interval_95": [
+            1.468,
+            1.556
+          ]
+        },
+        "v2-w1024 / prune-w512-s64": {
+          "ratio": 1.621,
+          "interval_95": [
+            1.562,
+            1.682
+          ]
+        },
+        "v2-w1024 / prune-w256-s64": {
+          "ratio": 1.711,
+          "interval_95": [
+            1.646,
+            1.777
+          ]
+        }
+      },
+      "decision": "adopt pruning; fastest prune-w256-s64; tail (p99) worse at small ranges, prune-w1024-s64 balanced"
+    },
+    {
+      "run_id": "20261117-cuda5-prune-03",
+      "kind": "recorded",
+      "source_commit": "8ff0f245de2f2086eac58b0ae8ef4f3d301873a8",
+      "status": "aborted (push rewrote the run checkout); checks passed and reused; not analysed",
+      "readme": "experiments/2026-11-18-range-pruning/runs/20261117-cuda5-prune-03/README.md"
+    },
+    {
+      "run_id": "20261117-cuda5-prune-02",
+      "kind": "recorded",
+      "source_commit": "93f175f475737edf422c0326ea80f08f4eba1742",
+      "status": "failed (replacement limit); not analysed",
+      "readme": "experiments/2026-11-18-range-pruning/runs/20261117-cuda5-prune-02/README.md"
+    },
+    {
+      "run_id": "20261117-cuda5-prune-01",
+      "kind": "recorded",
+      "source_commit": "76e13ff7925eaae47bc1b6c0316b9569e77f3f15",
+      "status": "failed (run-script defect); not analysed",
+      "readme": "experiments/2026-11-18-range-pruning/runs/20261117-cuda5-prune-01/README.md"
+    },
+    {
+      "run_id": "dev",
+      "kind": "development",
+      "status": "census, fixtures, probe, dry runs, gate/robustness/interference tests; not results",
+      "readme": "experiments/2026-11-18-range-pruning/runs/dev/README.md"
+    }
+  ]
 }
