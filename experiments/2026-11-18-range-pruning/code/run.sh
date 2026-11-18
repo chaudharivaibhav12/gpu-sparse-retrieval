@@ -34,7 +34,7 @@
 # Environment: GPU (index, default 0), PROCESSES (3), WARMUPS (3), ROUNDS (20), CPU_LIMIT (cores),
 # SAMPLER_CPU (15), FIXTURES (1), RUN_ROOT, FULL_DIR, DEADLINE_HOURS (12), RESUME, REUSE_FROM,
 # DEV=1 (development: no clean-tree check, not a result; with DEV=1 only, CORRECTNESS=0 skips
-# correctness and FORCE_REPLACE=1 forces one replacement).
+# correctness, FORCE_REPLACE=1 forces one replacement and QUIET=0 skips the quiet wait).
 set -u
 RUN_ID=$1
 EXP=2026-11-18-range-pruning
@@ -90,6 +90,8 @@ import os; t=os.sysconf("SC_CLK_TCK"); a=busy(); time.sleep(5); print("%.2f"%((b
 past_deadline() { [ "$(date +%s)" -ge "$DEADLINE" ]; }
 wait_quiet() {  # timing processes only; waits until quiet or the deadline
     local tag=$1 g c
+    # Development only: QUIET=0 skips the wait (a recorded run always waits).
+    [ "$DEV" = 1 ] && [ "${QUIET:-1}" = 0 ] && return 0
     while true; do
         past_deadline && fail "deadline reached waiting before $tag (resume with RESUME=1 and a later DEADLINE_HOURS)"
         g=$(gpu_others); c=$(cpu_others)
