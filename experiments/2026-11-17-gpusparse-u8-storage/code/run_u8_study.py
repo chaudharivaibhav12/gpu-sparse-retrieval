@@ -47,12 +47,17 @@ def main():
         contexts=[r for r in csv.reader(p.stdout.splitlines()) if r and r[0].strip()==target]
         return dict(uuid=row[0],name=row[1],compute_capability=row[2],total_bytes=int(row[3])*1024**2,free_bytes=int(row[4])*1024**2,contexts=contexts)
     def wait_idle(required=0):
-        state=gpu_state()
-        availability_count[0]+=1
-        write_new(out/'logs'/('availability-%06d.json'%availability_count[0]),dict(observed_at_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),required_bytes=required,**state))
-        if state['contexts'] or state['free_bytes']<required:
-            raise RuntimeError('Target occupied or insufficient free memory; stop, no automatic resubmission')
-        return state
+        deadline=time.monotonic()+protocol['availability_wait_limit_seconds']
+        while True:
+            state=gpu_state()
+            availability_count[0]+=1
+            write_new(out/'logs'/('availability-%06d.json'%availability_count[0]),dict(observed_at_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),required_bytes=required,**state))
+            if not state['contexts'] and state['free_bytes']>=required:
+                return state
+            if time.monotonic()>=deadline:
+                raise RuntimeError('GPU availability wait limit reached; no child launched on occupied device')
+            status('waiting','target-GPU-idle-and-memory',required_bytes=required,observed_free_bytes=state['free_bytes'],compute_context_count=len(state['contexts']))
+            time.sleep(600)
     def sampler(stop,path,pgid,summary):
         os.sched_setaffinity(0,{monitor_cpu});seen={};frames=0;external=set();unclassified=set();errors=[];own_peak=0;board_peak=0;owned_seen=False
         with path.open('x') as f:

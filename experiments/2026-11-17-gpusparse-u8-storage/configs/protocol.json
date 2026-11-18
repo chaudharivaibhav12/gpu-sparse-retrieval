@@ -56,8 +56,8 @@
     "domain": "Parent guarded integer FP32 certificate plus exact uint8 storage/load audit; same-source full correctness required for both storage modes and range."
   },
   "timing_boundary": "Host query construction through complete scoring, selection/merge, original numeric-ID results, D2H and synchronization. Index load/upload, gate, file writes and independent checking excluded and separately recorded. Device-event spans differ and are diagnostics only, never compared as matched GPU spans.",
-  "availability_wait_limit_seconds": 0,
-  "availability": "Require empty target UUID, enough modeled core plus safety headroom before submission and each child; stop immediately if occupied, no automatic replacement or delayed launch.",
+  "availability_wait_limit_seconds": 86400,
+  "availability": "Require targetUUID/emptycontexts/adequateheadroom before each child. If occupied, preserve snapshot and wait600seconds without GPUcompute; up to86400secondsperwait. First submission still requires idlequalification. Waiting is outside all child timing.",
   "monitoring": "One inherited conservative1s sampler/process. Any foreign context, missing owned timing context or sampling error makes timing ineligible and stops the study. No automatic replacement. Sampling is not exclusivity or exact peak proof.",
   "analysis": {
     "primary": "compact/control paired geometric latency ratio",
@@ -77,7 +77,7 @@
     "systems": "Fresh FP32-storage control, compact uint8-storage treatment and unchanged range anchor; omit U64 repetition.",
     "storage": "Document GPU dtypeFP32->uint8; widen via FP32 query multiplication in pinned kernel. Products/sums/selector remain parentFP32.",
     "runtime": "Truthful compact mode/storage bytes/conversion marks and exact memory expectations; parent control source unchanged.",
-    "resource_policy": "Stop on occupancy/failure/ineligible timing; remove automatic waiting/resource replacements.",
+    "resource_policy": "Repair02: after setup/betweenstages, wait600seconds on occupancy or lowheadroom, at most24hperwait, rather than failing the controller. No scorer/input/timing/selector/settings changes. No automatic retry of executed/failed/ineligible child.",
     "analysis": "Primary compact/control; fresh range comparisons; seeds2026111701/02/03.",
     "invariants": "Full8841823/500calibration,k10,batch1,3processes,3warm20rounds,canonicalIDs/scores/ties,sameGPU/CPU0/boundary,noheldout/chunking."
   },
@@ -116,5 +116,22 @@
     "compact_fp32_core_bytes": 5388224246,
     "compact_weight_saving_bytes": 3147846558
   },
-  "next_if_complete": "Independent raw/statistics/source/library/compact-load PTX validation and scoped result review. Preserve negative result."
+  "next_if_complete": "Independent raw/statistics/source/library/compact-load PTX validation and scoped result review. Preserve negative result.",
+  "resource_wait_repair": {
+    "treatment_id": "repair02-passive-between-stage-idle-wait",
+    "parent_source": "97bf7fc1115c748e91db92dfaba22884ef471791",
+    "failed_runs": [
+      "20261117-cuda5-u8-01",
+      "20261118-cuda5-u8-retry01"
+    ],
+    "reason": "Both stopped before a child when another GPUcontext appeared after initialadmission; use passivewaiting instead of restartingcompletecontroller.",
+    "invariants": [
+      "NoGPUcomputeonoccupieddevice",
+      "Allavailabilitysnapshotsretained",
+      "Waitoutsidechildtiming",
+      "Mid-childfailure/ineligible-timingstillstops",
+      "Noheldoutuse",
+      "Freshsourcecommitandrunrequired"
+    ]
+  }
 }
