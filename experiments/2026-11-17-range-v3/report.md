@@ -254,3 +254,171 @@ Overlapped processes (other process: PID only; no names recorded):
 Carry **v3-3** (changes 2 + 3: θ-filtered merge and radix-select local top-k) forward, not v3-all: change 1 made every variant it was added to slower on cuda5 and costs a resident block per SM. Keep the radix crossover at the rule's result (k=32); the k=1000 loss against ctrl is unexplained by this run and needs its own registered test before the radix path is used at k ≥ 1000.
 
 Not done here: Parva's batched copy of `range_scores` and `tests/check_batched_kernel_sync.py` were not edited and will need a refresh for whichever variant is adopted.
+
+## 8. Measurement D: uniform radix, k=1000 attribution, range size per k
+
+**Status: exploratory-contended (owner decision 2026-11-18).** The registered sessions 1 and 2 both stopped under the overlap rule (section D(f)). At the owner's request the full matrix was then run without idle checks as [20261117-cuda5-contendedD-02](../../results/2026-11-17-range-v3/20261117-cuda5-contendedD-02/manifest.json), 15:24–16:12 UTC: other users' GPU processes were recorded per process but not waited for or replaced. All tables in D(a)–D(d) come from this run. Whether its R1–R3 outcomes stand as Measurement D is the owner's decision.
+
+**How contended it was:** 52 of the 90 timed processes saw at least one other process in the 0.5 s poll. The median share of poll samples with another process present was 13%. Other processes averaged 0.9% SM and used at most 920 MiB ([analysis/contention.json](../../results/2026-11-17-range-v3/20261117-cuda5-contendedD-02/analysis/contention.json)). The cells it shares with Measurement A (clean, same builds, W=1024) agree to within 0.7%:
+
+| k | cell | Measurement A median (ms) | contendedD-02 median (ms) |
+|---|---|---|---|
+| 10 | ctrl | 0.1066 | 0.1073 |
+| 10 | v3-2 | 0.1057 | 0.1060 |
+| 32 | v3-3 (A) / v3-3r | 0.1094 | 0.1089 |
+| 100 | ctrl | 0.3597 | 0.3618 |
+| 100 | v3-3 (A) / v3-3r | 0.1914 | 0.1921 |
+| 1000 | ctrl | 1.7168 | 1.7099 |
+| 1000 | v3-3 (A) / v3-3r | 1.8387 | 1.8411 |
+
+(In A, v3-3 ran its radix path at k=32 and above: A's v3-3 / v3-2 at k=32 was 0.696, against 0.694 here. That is the same instantiation as v3-3r.)
+
+**Setting:**
+- **Hardware and index:** cuda5 (RTX 4070, CUDA 12.6) at 1M documents. Indexes `hash-1000000-w1024-pos.rbp` (977 ranges) and `hash-1000000-w4096-pos.rbp` (245 ranges), both verified by SHA-256 and not rebuilt.
+- **Launch:** 256 threads, batch 1, all 500 calibration queries.
+- **Timing:** 3 processes per cell, 3 warm-up and 20 measured rounds, order rotated within each k.
+- **Variants:** ctrl (V2-5, `74dd5d3`), v3-2, and v3-3r (the v3-3 build with crossover argument 1, so radix at every k).
+- **Correctness:** all 96 timed and stats outputs matched the CPU oracle, and the GPU survivors equal the CPU reference for every stats launch.
+- **Gates:** `20261117-cuda5-gateD-{ctrl-01, v3-2-02, v3-3r-01}` all passed (fixtures, 100K and 1M, k=10/16/32/100/1000 at W=4096, and v3-3r at W=1024 for k=10/16/32).
+
+### D(a). Latency per k
+
+Pooled median = median of the 1,500 per-query/process medians of wall latency. Ratios: geometric mean of paired query/process ratios, 95% crossed bootstrap (seed 20261118); below 1 = faster. Verdicts: faster/slower only when the interval excludes 1.
+
+##### k=10
+
+| variant | W | pooled median wall (ms) | ratio to ctrl W=1024 [95%] | ratio to the same variant at the other W [95%] |
+|---|---|---|---|---|
+| ctrl | 1024 | 0.1073 | reference | W=1024 / W=4096: 0.648 [0.634, 0.663] |
+| v3-2 | 1024 | 0.1060 | 0.973 [0.947, 0.991] faster | W=1024 / W=4096: 0.642 [0.633, 0.652] |
+| v3-3r | 1024 | 0.0980 | 0.880 [0.802, 1.040] no difference resolved | W=1024 / W=4096: 0.743 [0.599, 0.917] |
+| ctrl | 4096 | 0.1645 | 1.543 [1.509, 1.576] slower | W=4096 / W=1024: 1.543 [1.509, 1.576] slower |
+| v3-2 | 4096 | 0.1614 | 1.515 [1.493, 1.537] slower | W=4096 / W=1024: 1.557 [1.533, 1.579] slower |
+| v3-3r | 4096 | 0.1312 | 1.184 [1.076, 1.364] slower | W=4096 / W=1024: 1.346 [1.091, 1.668] slower |
+
+##### k=16
+
+| variant | W | pooled median wall (ms) | ratio to ctrl W=1024 [95%] | ratio to the same variant at the other W [95%] |
+|---|---|---|---|---|
+| ctrl | 1024 | 0.1226 | reference | W=1024 / W=4096: 0.637 [0.632, 0.642] |
+| v3-2 | 1024 | 0.1185 | 0.981 [0.970, 0.991] faster | W=1024 / W=4096: 0.633 [0.623, 0.642] |
+| v3-3r | 1024 | 0.0942 | 0.787 [0.779, 0.795] faster | W=1024 / W=4096: 0.787 [0.775, 0.798] |
+| ctrl | 4096 | 0.1879 | 1.569 [1.556, 1.582] slower | W=4096 / W=1024: 1.569 [1.556, 1.582] slower |
+| v3-2 | 4096 | 0.1825 | 1.549 [1.529, 1.567] slower | W=4096 / W=1024: 1.580 [1.557, 1.605] slower |
+| v3-3r | 4096 | 0.1234 | 1.000 [0.984, 1.017] no difference resolved | W=4096 / W=1024: 1.271 [1.254, 1.290] slower |
+
+##### k=32
+
+| variant | W | pooled median wall (ms) | ratio to ctrl W=1024 [95%] | ratio to the same variant at the other W [95%] |
+|---|---|---|---|---|
+| ctrl | 1024 | 0.1653 | reference | W=1024 / W=4096: 0.800 [0.790, 0.810] |
+| v3-2 | 1024 | 0.1575 | 0.948 [0.937, 0.959] faster | W=1024 / W=4096: 0.770 [0.761, 0.779] |
+| v3-3r | 1024 | 0.1089 | 0.658 [0.651, 0.667] faster | W=1024 / W=4096: 0.822 [0.806, 0.841] |
+| ctrl | 4096 | 0.2022 | 1.251 [1.235, 1.265] slower | W=4096 / W=1024: 1.251 [1.235, 1.265] slower |
+| v3-2 | 4096 | 0.1996 | 1.232 [1.219, 1.247] slower | W=4096 / W=1024: 1.299 [1.283, 1.315] slower |
+| v3-3r | 4096 | 0.1345 | 0.801 [0.776, 0.825] faster | W=4096 / W=1024: 1.217 [1.190, 1.240] slower |
+
+##### k=100
+
+| variant | W | pooled median wall (ms) | ratio to ctrl W=1024 [95%] | ratio to the same variant at the other W [95%] |
+|---|---|---|---|---|
+| ctrl | 1024 | 0.3618 | reference | W=1024 / W=4096: 1.261 [1.255, 1.268] |
+| v3-2 | 1024 | 0.3374 | 0.932 [0.926, 0.938] faster | W=1024 / W=4096: 1.198 [1.189, 1.206] |
+| v3-3r | 1024 | 0.1921 | 0.534 [0.528, 0.540] faster | W=1024 / W=4096: 1.071 [1.059, 1.084] |
+| ctrl | 4096 | 0.2820 | 0.793 [0.789, 0.797] faster | W=4096 / W=1024: 0.793 [0.789, 0.797] faster |
+| v3-2 | 4096 | 0.2797 | 0.778 [0.771, 0.785] faster | W=4096 / W=1024: 0.835 [0.829, 0.841] faster |
+| v3-3r | 4096 | 0.1824 | 0.498 [0.493, 0.504] faster | W=4096 / W=1024: 0.933 [0.922, 0.945] faster |
+
+##### k=1000
+
+| variant | W | pooled median wall (ms) | ratio to ctrl W=1024 [95%] | ratio to the same variant at the other W [95%] |
+|---|---|---|---|---|
+| ctrl | 1024 | 1.7099 | reference | W=1024 / W=4096: 1.142 [1.134, 1.148] |
+| v3-2 | 1024 | 2.0035 | 1.149 [1.136, 1.163] slower | W=1024 / W=4096: 1.334 [1.325, 1.343] |
+| v3-3r | 1024 | 1.8411 | 1.053 [1.041, 1.067] slower | W=1024 / W=4096: 2.021 [2.003, 2.042] |
+| ctrl | 4096 | 1.4935 | 0.876 [0.871, 0.882] faster | W=4096 / W=1024: 0.876 [0.871, 0.882] faster |
+| v3-2 | 4096 | 1.4731 | 0.861 [0.854, 0.869] faster | W=4096 / W=1024: 0.750 [0.745, 0.754] faster |
+| v3-3r | 4096 | 0.9025 | 0.521 [0.516, 0.526] faster | W=4096 / W=1024: 0.495 [0.490, 0.499] faster |
+
+### D(b). R1: uniform v3-3r
+
+Rule: per W, adopt uniform v3-3r if v3-3r / v3-2 has upper 95% bound ≤ 1.02 at both k=10 and k=16.
+
+| W | v3-3r / v3-2 at k=10 | at k=16 | at k=32 | at k=100 | at k=1000 | upper bound − 1.02 (k=10; k=16) | adopt uniform? | fallback crossover k | cost of uniformity: v3-3r / ctrl (same W) at k=1000 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1024 | 0.904 [0.833, 1.048] | 0.803 [0.794, 0.812] | 0.694 [0.684, 0.702] | 0.573 [0.569, 0.577] | 0.917 [0.914, 0.921] | +0.028; -0.208 | **no** | 16 | 1.053 [1.041, 1.067] slower |
+| 4096 | 0.782 [0.720, 0.889] | 0.646 [0.636, 0.655] | 0.650 [0.634, 0.664] | 0.640 [0.634, 0.647] | 0.605 [0.602, 0.609] | -0.131; -0.365 | **yes** | 16 | 0.595 [0.590, 0.600] faster |
+
+### D(c). R2: k=1000 attribution, with the stats set
+
+| W | cost of θ: v3-2 / ctrl | cost of radix: v3-3r / v3-2 | named causes (upper bound > 1) |
+|---|---|---|---|
+| 1024 | 1.149 [1.136, 1.163] slower | 0.917 [0.914, 0.921] faster | theta |
+| 4096 | 0.983 [0.979, 0.987] faster | 0.605 [0.602, 0.609] faster | none |
+
+Stats set (v3-all stats build, 500 queries, 1 + 5 rounds; θ and zero k-th shares from the exact CPU reference, whose survivors equal the GPU's for every measured launch). ctrl writes ranges × k candidates.
+
+| W | k | ranges | ctrl writes | candidates written: median (IQR) max | % of ctrl | survivors: median (IQR) max | % of ctrl | queries with θ = 0 | ranges with zero k-th score: per-query median (IQR); pooled | final θ median (IQR) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1024 | 10 | 977 | 9770 | 568 (424–726) 1299 | 5.8% | 41 (24–71) 398 | 0.42% | 0.0% | 0.0% (0.0–0.0%); 0.1% | 11649 (9361–14976) |
+| 1024 | 100 | 977 | 97700 | 9901 (7759–12565) 24637 | 10.1% | 832 (480–1576) 11990 | 0.85% | 0.0% | 1.8% (0.7–4.8%); 4.9% | 7461 (5420–9662) |
+| 1024 | 1000 | 977 | 977000 | 381056 (255930–517307) 937499 | 39.0% | 105810 (57686–158758) 444692 | 10.83% | 0.0% | 93.2% (90.5–95.5%); 92.8% | 1108 (672–1886) |
+| 4096 | 10 | 245 | 2450 | 304 (236–380) 661 | 12.4% | 29 (18–43) 243 | 1.18% | 0.0% | 0.0% (0.0–0.0%); 0.0% | 12274 (9866–15487) |
+| 4096 | 100 | 245 | 24500 | 6376 (5116–7614) 12298 | 26.0% | 436 (268–815) 4823 | 1.78% | 0.0% | 0.0% (0.0–0.0%); 0.3% | 8287 (6282–10482) |
+| 4096 | 1000 | 245 | 245000 | 90676 (74914–104200) 152899 | 37.0% | 8562 (5230–14552) 59556 | 3.49% | 0.0% | 9.8% (4.1–23.7%); 16.5% | 4370 (3099–6076) |
+
+### D(d). R3: range size per k (calibration tuning, to be frozen before held-out evaluation)
+
+| k | best W=1024 cell | best W=4096 cell | best W=4096 / best W=1024 [95%] | recommended (variant, W) |
+|---|---|---|---|---|
+| 10 | v3-3r-w1024 | v3-3r-w4096 | 1.346 [1.091, 1.668] slower | v3-3r-w1024 |
+| 16 | v3-3r-w1024 | v3-3r-w4096 | 1.271 [1.254, 1.290] slower | v3-3r-w1024 |
+| 32 | v3-3r-w1024 | v3-3r-w4096 | 1.217 [1.190, 1.240] slower | v3-3r-w1024 |
+| 100 | v3-3r-w1024 | v3-3r-w4096 | 0.933 [0.922, 0.945] faster | v3-3r-w4096 |
+| 1000 | ctrl-w1024 | v3-3r-w4096 | 0.521 [0.516, 0.526] faster | v3-3r-w4096 |
+
+One W for all k: **no** (recommended W per k: k=10 → 1024, k=16 → 1024, k=32 → 1024, k=100 → 4096, k=1000 → 4096).
+
+### D(e). Resources per instantiation (cuda5, CUDA 12.6, 256 threads)
+
+Registers and static shared memory from cuobjdump -res-usage in the Measurement D gate records; dynamic shared memory from the host formula (warp lists: 8 warps × min(k, 32 × ⌈W/256⌉) × 8 + W × 4; radix: P × 8 + 256 × 4 + W × 4, P = next power of two ≥ k). Blocks per SM for sm_89 as in section 5. Cell: shared bytes / blocks per SM (limit).
+
+| variant | instantiation | registers | static shared (B) | W | k=10 | k=16 | k=32 | k=100 | k=1000 |
+|---|---|---|---|---|---|---|---|---|---|
+| ctrl | warp lists | 38 | 3728 | 1024 | 8464 B / 6 (registers, threads) | 8848 B / 6 (registers, threads) | 9872 B / 6 (registers, threads) | 14224 B / 6 (registers, threads, shared) | 16016 B / 6 (registers, threads, shared) |
+| ctrl | warp lists | 38 | 3728 | 4096 | 20752 B / 4 (shared) | 21136 B / 4 (shared) | 22160 B / 4 (shared) | 26512 B / 3 (shared) | 52880 B / 1 (shared) |
+| v3-2 | warp lists | 38 | 3744 | 1024 | 8480 B / 6 (registers, threads) | 8864 B / 6 (registers, threads) | 9888 B / 6 (registers, threads) | 14240 B / 6 (registers, threads, shared) | 16032 B / 6 (registers, threads, shared) |
+| v3-2 | warp lists | 38 | 3744 | 4096 | 20768 B / 4 (shared) | 21152 B / 4 (shared) | 22176 B / 4 (shared) | 26528 B / 3 (shared) | 52896 B / 1 (shared) |
+| v3-3r | radix | 40 | 4016 | 1024 | 9264 B / 6 (registers, threads) | 9264 B / 6 (registers, threads) | 9392 B / 6 (registers, threads) | 10160 B / 6 (registers, threads) | 17328 B / 5 (shared) |
+| v3-3r | radix | 40 | 4016 | 4096 | 21552 B / 4 (shared) | 21552 B / 4 (shared) | 21680 B / 4 (shared) | 22448 B / 4 (shared) | 29616 B / 3 (shared) |
+
+### D(f). Failures and how they were handled
+
+| what | when | handling |
+|---|---|---|
+| Gate `gateD-v3-2-01` stopped in its idle wait (GPU busy) | gates | Kept with STATUS.md. Gates were rerun with `IDLE_POLICY=log-only` (owner decision; correctness only). All passed. |
+| **Session 1** (`measureD-01`) stopped by the overlap rule | 02:16–02:27 UTC | Slot `timing-k16-r0-v3-3r-w1024` overlapped another user's short GPU processes on 4 attempts. Kept as `failed-overlap-limit`, not analysed. |
+| Exploratory run `contendedD-01` heavily shared | 03:00–04:03 UTC | Every timed process (90/90) shared the GPU with another user's job of about 10 GB, at a mean of 24% SM. Medians were inflated by up to 1.5× at k=10. Kept as diagnostic only (below). |
+| **Session 2** (`measureD-02`) stopped by the overlap rule | 08:11–08:22 UTC, after a 4-hour wait for 5 quiet minutes | Slot `timing-k10-r2-v3-2-w1024` overlapped on 4 attempts: processes of 10–214 MiB and up to 56% SM, each starting after the idle check had passed. Kept as `failed-overlap-limit`, not analysed. |
+| Full run without idle checks (`contendedD-02`) | 15:24–16:12 UTC | Owner decision (protocol amendment). The launcher's fast-forward on cuda5 was refused because of untracked copies of contendedD-01, so the run used commit `31ff99e`. That commit differs from the recording commit only in `configs/protocol.json` (the amendments); the code and binaries are identical. |
+| `package_run.py` re-recorded moved archives | packaging contendedD-01 | Duplicated `excluded` entries removed (`dec2fae`). |
+
+The two contended runs differ in what they shared the GPU with, and this shows in the ratios:
+
+| | contendedD-01 | contendedD-02 |
+|---|---|---|
+| timed processes with another process present | 90/90 | 52/90 |
+| other processes: mean SM %, max memory | 23.6%, 10,257 MiB | 0.9%, 920 MiB |
+| ctrl W=1024 median, k=10 / k=100 / k=1000 (ms) | 0.1545 / 0.4289 / 1.7485 | 0.1073 / 0.3618 / 1.7099 |
+| R1 W=1024 (excess over 1.02 at k=10; k=16) | not adopted (−0.311; +0.034) | not adopted (+0.028; −0.208) |
+| R1 W=4096 | adopted | adopted |
+| R2 named causes, W=1024 / W=4096 | θ / θ (bound 1.026) | θ / none |
+| R3 W per k (10, 16, 32, 100, 1000) | 1024, 1024, 1024, 1024, 4096 | 1024, 1024, 1024, 4096, 4096 |
+
+### D(g). Interpretation (diagnostic)
+
+- **Radix wins at every k at W=4096** (v3-3r / v3-2 = 0.60–0.78), and at every k from 16 at W=1024.
+- **At W=1024, k=10, the result is unresolved, not a loss.** The point estimate is 0.904, but the interval [0.833, 1.048] is wide, and that is why R1 misses by 0.028. Of the three v3-3r-w1024 processes at k=10, one had a median of 0.108 ms against 0.090 ms for the other two. That process saw another process in 46% of its poll samples. The run cannot tell whether the miss is real or caused by that sharing.
+- **k=1000 cost of θ (R2).** At W=1024, θ costs 15% (v3-2 / ctrl = 1.149). There, 93% of ranges have a zero k-th score, so θ stays low (median 1,108), and 39% of ctrl's candidates are still written and 11% survive. Radix recovers part of that (0.917), which leaves uniform v3-3r 5% slower than ctrl at W=1024. At W=4096, the 4× longer ranges usually hold 1000 nonzero scores (zero k-th share 16.5%), θ is higher (median 4,370), only 3.5% of candidates survive, and θ has no cost (0.983).
+- **Range size (R3).** W=4096 trades fewer blocks for less merge work. With 245 blocks, about 1.3 waves at 4 blocks per SM, small-k queries are 1.2–1.35× slower than at W=1024. From k=100 the smaller merge wins: 0.93× at k=100 and 0.50× at k=1000.
+- **Calibration only.** All of this is calibration tuning, frozen before any held-out evaluation.
