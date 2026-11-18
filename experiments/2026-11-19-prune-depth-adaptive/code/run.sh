@@ -38,7 +38,7 @@
 #     tests/ are unchanged between its commit and this one, and the copied binaries have the hashes
 #     DIR recorded. The reuse is written to logs/reuse.txt and the manifest.
 # Environment: GPU (index, default 0), PROCESSES (3), WARMUPS (3), ROUNDS (20), CPU_LIMIT (cores),
-# SAMPLER_CPU (15), FIXTURES (1), RUN_ROOT, FULL_DIR, DEADLINE_HOURS (12), RESUME, REUSE_FROM,
+# SAMPLER_CPU (15), FIXTURES (1), RUN_ROOT, FULL_DIR, DEADLINE_HOURS (12), RESUME, REUSE_FROM, REUSE_BUILD,
 # DEV=1 (development: no clean-tree check, not a result; with DEV=1 only, CORRECTNESS=0 skips
 # correctness, FORCE_REPLACE=1 forces one replacement and QUIET=0 skips the quiet wait).
 set -u
@@ -156,7 +156,9 @@ checked() {  # checked OUT_STEM GROUPS_PER_QUERY NAME: answers against the CPU r
     local out=$1 groups=$2 k=${DEPTH[$3]} tag; tag=$(basename "$out")
     log python3 "$COMPARE" "${ORACLE[$k]}" "$out.tsv" --queries "$LIMIT" --k "$k" --groups-per-query "$groups" --output "$RUN/analysis/compare-$tag.json" > /dev/null || fail "reference mismatch $tag"
     sha256sum "$out.tsv" >> "$RUN/raw/top-sha256.txt"
-    xz -9 -T1 "$out.tsv" || fail "compress $tag"
+    # Amendment 1: multi-threaded xz (lossless). The k = 1000 listings are about 413 MB; single-threaded
+    # xz -9 took about 5 minutes each, with the GPU idle, which made the run hours longer.
+    xz -6 -T16 "$out.tsv" || fail "compress $tag"
 }
 # Move a process's outputs and expectation aside (DIR), e.g. after an ineligible or interrupted attempt.
 hold() {  # hold OUT_STEM TAG DIR
@@ -210,7 +212,8 @@ if ! done_stage build; then
             || fail "REUSE_FROM did not pass fixtures and correctness"
         from_commit=$(head -1 "$REUSE_FROM/logs/environment.txt")
         git diff --quiet "$from_commit" "$COMMIT" -- src tests || fail "src/ or tests/ changed since $from_commit"
-        from_build=build/$(basename "$REUSE_FROM")
+        # REUSE_BUILD: the earlier run's build folder (in its own detached checkout).
+        from_build=${REUSE_BUILD:-build/$(basename "$REUSE_FROM")}
         for b in "${BINARIES[@]}"; do cp "$from_build/$b" "$BUILD/$b" || fail "copy $b"; done
         binaries_match "$BUILD" "$REUSE_FROM/logs/binaries-sha256.txt" || fail "copied binaries differ from $REUSE_FROM's record"
         { echo "reuse_from $REUSE_FROM"; echo "reuse_from_commit $from_commit"; echo "src_and_tests_unchanged_to $COMMIT";

@@ -90,5 +90,14 @@
     "the switch threshold and both changes were designed from the same calibration queries (profile and run ts-01); the held-out evaluation is the unbiased test",
     "prunetma needs both indexes on the GPU (about 9 GB at k = 1000), so it needs a mostly free 12 GB GPU",
     "shared machine; calibration queries only; held-out untouched"
+  ],
+  "amendments": [
+    {
+      "number": 1,
+      "date": "2026-11-18",
+      "change": "Answer listings are compressed with `xz -6 -T16` (lossless, multi-threaded) instead of `xz -9 -T1`; run.sh accepts REUSE_BUILD for the earlier run's build folder",
+      "reason": "Recorded run 20261118-cuda5-da-01 passed fixtures, gate rejections and correctness for all 17 configurations, then ran 14 timing processes (13 eligible, 1 replaced). At k = 1000 each answer listing is about 413 MB, and single-threaded xz -9 took about 5 minutes per process with the GPU idle; the 18 k = 1000 processes would have added about 3 hours. da-01 was stopped during its 15th timing process (harness throughput only; nothing failed)",
+      "consequence": "Run 20261118-cuda5-da-02 times every configuration from the start with REUSE_FROM = da-01: its binaries (hash-checked), fixtures and correctness are reused, src/ and tests/ unchanged. da-01's timing processes are kept on record and not analysed; no latency from them was read. Timing, eligibility, analysis and decision rules are unchanged"
+    }
   ]
 }
