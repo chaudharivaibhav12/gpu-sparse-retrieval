@@ -21,7 +21,7 @@ On the full collection, BMP's top-10 equals the CPU reference on all 500 calibra
 
 ## Inputs
 
-- The full BMP indexes (block size 32, raw and compressed bounds) were built from the pinned raw CIFF. The build was done on cuda2 (251 GB RAM), because it peaks above 40 GB. An attempt on cuda5 pushed other users into swap and was stopped. The output was streamed to cuda5 and its hash checked at both ends.
+- The full BMP index (block size 32, raw bounds; 13,448,678,853 bytes, SHA-256 `eaf549b8...`) was built from the pinned raw CIFF on cuda2 (251 GB RAM), because the build peaks at 44 GB. An attempt on cuda5 pushed other users into swap and was stopped. The output was streamed to cuda5 and its hash checked at both ends. No compressed-bound index was built.
 - `calibration-500.pisa` comes from `code/export_queries.py`. It reads only the GSP vocabulary, and its first 25 queries are byte-identical to the validated 1M experiment's.
 
 ## Code

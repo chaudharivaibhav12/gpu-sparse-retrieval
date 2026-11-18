@@ -112,6 +112,9 @@ def main():
     ap.add_argument("--cpu-limit", type=float, required=True)
     ap.add_argument("--gpu-run", type=Path, required=True)
     ap.add_argument("--iowait-limit", type=float, required=True)
+    # GPU_RUN's own rounds (range-pruning protocol: 3 warm-up + 20 measured), independent of BMP's.
+    ap.add_argument("--gpu-warmups", type=int, default=3)
+    ap.add_argument("--gpu-rounds", type=int, default=20)
     ap.add_argument("--output", required=True)
     ap.add_argument("--development", action="store_true")
     a = ap.parse_args()
@@ -122,7 +125,7 @@ def main():
                         for p in range(a.processes)]}
     for n in GPU:
         # GPU_RUN was eligible under its own registered rules (its CPU limit was 4.0 cores).
-        data[n] = [load_gpu(a.gpu_run / "raw" / ("timing-r%d-%s" % (p, n)), a.warmups, a.rounds, 4.0, a.development) for p in range(a.processes)]
+        data[n] = [load_gpu(a.gpu_run / "raw" / ("timing-r%d-%s" % (p, n)), a.gpu_warmups, a.gpu_rounds, 4.0, a.development) for p in range(a.processes)]
     summary = {}
     for n, procs in data.items():
         medians = [pr["median"][q] for pr in procs for q in pr["order"]]
@@ -136,7 +139,7 @@ def main():
         contrasts["bmp-b32 / %s" % g] = dict(paired(data["bmp-b32"], data[g], rng), group="primary")
     summary["bmp-b32"]["cpu_busy_share_per_process"] = [pr["cpu_busy_share"] for pr in data["bmp-b32"]]
     summary["bmp-b32"]["cpu_iowait_share_per_process"] = [pr["cpu_iowait_share"] for pr in data["bmp-b32"]]
-    result = dict(run=str(a.run), gpu_run=str(a.gpu_run), processes=a.processes, warmups=a.warmups, rounds=a.rounds, queries=QUERIES,
+    result = dict(run=str(a.run), gpu_run=str(a.gpu_run), gpu_warmups=a.gpu_warmups, gpu_rounds=a.gpu_rounds, processes=a.processes, warmups=a.warmups, rounds=a.rounds, queries=QUERIES,
                   development=a.development, cpu_limit_cores=a.cpu_limit,
                   estimator="per (process, query) median of the measured rounds; paired ratios by process index and query; geometric mean; crossed process/query bootstrap, %d draws, seed %d" % (DRAWS, SEED),
                   reading="'A / B' is how many times longer A takes than B: above 1, B is faster",
