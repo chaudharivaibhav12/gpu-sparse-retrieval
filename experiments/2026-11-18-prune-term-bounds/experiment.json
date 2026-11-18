@@ -4,7 +4,7 @@
   "title": "Term-major range bounds for the seeded range-bound pruning scorer",
   "owner": "parva",
   "branch": "exp/parva/2026-11-18-prune-term-bounds",
-  "status": "protocol registered 2026-11-18; no recorded run yet",
+  "status": "completed 2026-11-18: recorded run 20261118-cuda5-tb-01; prunetb adopted by the decision rule",
   "parent_experiment": "2026-11-18-full-profile",
   "parent_source_commit": "c891196",
   "question": "Does computing the range bounds term-major make the pruned scorer faster, with an identical schedule and answers?",
@@ -32,5 +32,62 @@
   "success_rule": "A complete run under the registered protocol; reported whatever the ratios are.",
   "failure_rule": "Any mismatch or rejected expected run; ineligible processes are replaced.",
   "recording_ids": [],
-  "runs": []
+  "runs": [
+    {
+      "run_id": "20261118-cuda5-tb-01",
+      "kind": "recorded",
+      "host": "cuda5",
+      "source_commit": "bffb7ec",
+      "status": "completed",
+      "readme": "experiments/2026-11-18-prune-term-bounds/runs/20261118-cuda5-tb-01/README.md",
+      "results": "results/2026-11-18-prune-term-bounds/20261118-cuda5-tb-01",
+      "correctness": "20 of 20 comparisons equal the CPU reference; prunetb VERIFY=1 schedules equal the host recomputation",
+      "ineligible_processes": 1,
+      "median_ms": {
+        "v2-w1024": 0.691,
+        "prune-w1024-s64": 0.478,
+        "prunetb-w1024-s64": 0.377,
+        "prune-w256-s64": 0.389,
+        "prunetb-w256-s64": 0.28
+      },
+      "primary": {
+        "prune-w1024-s64 / prunetb-w1024-s64": {
+          "ratio": 1.274,
+          "interval_95": [
+            1.266,
+            1.282
+          ]
+        },
+        "prune-w256-s64 / prunetb-w256-s64": {
+          "ratio": 1.355,
+          "interval_95": [
+            1.341,
+            1.369
+          ]
+        }
+      },
+      "secondary": {
+        "v2-w1024 / prunetb-w1024-s64": {
+          "ratio": 1.927,
+          "interval_95": [
+            1.864,
+            1.989
+          ]
+        },
+        "v2-w1024 / prunetb-w256-s64": {
+          "ratio": 2.311,
+          "interval_95": [
+            2.209,
+            2.417
+          ]
+        }
+      }
+    },
+    {
+      "run_id": "dev",
+      "kind": "development",
+      "status": "fixtures and smoke test dev-tb-01; not results",
+      "readme": "experiments/2026-11-18-prune-term-bounds/runs/dev/README.md"
+    }
+  ]
 }

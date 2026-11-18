@@ -22,4 +22,19 @@ The full-collection hardware profile ([2026-11-18-full-profile](../2026-11-18-fu
 
 ## Runs
 
-None yet.
+- [20261118-cuda5-tb-01](runs/20261118-cuda5-tb-01/README.md): **the result**. Completed; 20 answer comparisons equal to the reference; one contention replacement.
+- [dev](runs/dev/README.md): fixtures and smoke test (not results).
+
+## Findings
+
+Term-major bounds make the pruned scorer **1.27× [1.27, 1.28] faster at range size 1024 and 1.36× [1.34, 1.37] at 256**, with an identical schedule and identical answers. This is profile-driven: the replaced kernel was the profile's largest overhead.
+
+The project's exact scorers on the full collection (RTX 4070, k=10, 500 calibration queries) now stand as follows:
+
+| scorer | median ms | p99 ms | over the exact range scorer |
+|---|---:|---:|---|
+| v2-w1024 (exhaustive range scorer) | 0.691 | 1.087 | 1 |
+| prunetb-w1024-s64 | 0.377 | 1.010 | 1.93× |
+| prunetb-w256-s64 | 0.280 | 1.923 | 2.31× |
+
+By the registered decision rule, `cuda_range_prune_tb` replaces `cuda_range_prune`. At range size 1024 its p99 is below the exhaustive control's. The remaining pruning overhead is seed selection (one thread block).
