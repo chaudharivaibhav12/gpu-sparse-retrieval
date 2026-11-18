@@ -11,14 +11,14 @@ import argparse, csv, json, statistics
 from collections import defaultdict
 
 SCALE = {"byte": 1, "Kbyte": 1e3, "Mbyte": 1e6, "Gbyte": 1e9, "nsecond": 1e-9, "usecond": 1e-6, "msecond": 1e-3, "second": 1,
-         "byte/second": 1, "Kbyte/second": 1e3, "Mbyte/second": 1e6, "Gbyte/second": 1e9, "Tbyte/second": 1e12}
+         "byte/second": 1, "Kbyte/second": 1e3, "Mbyte/second": 1e6, "Gbyte/second": 1e9, "Tbyte/second": 1e12,
+         "ns": 1e-9, "us": 1e-6, "ms": 1e-3, "s": 1, "byte/s": 1, "Kbyte/s": 1e3, "Mbyte/s": 1e6, "Gbyte/s": 1e9, "Tbyte/s": 1e12}
 METRICS = {
     "duration_s": "gpu__time_duration.sum",
     "sm_throughput_pct": "sm__throughput.avg.pct_of_peak_sustained_elapsed",
     "memory_throughput_pct": "gpu__compute_memory_throughput.avg.pct_of_peak_sustained_elapsed",
-    "dram_throughput_pct": "dram__throughput.avg.pct_of_peak_sustained_elapsed",
-    "dram_read_bytes": "dram__bytes_read.sum",
-    "dram_write_bytes": "dram__bytes_write.sum",
+    "dram_GBps": "dram__bytes.sum.per_second",
+    "dram_cycles_active_pct": "dram__cycles_active.avg.pct_of_peak_sustained_elapsed",
     "l2_hit_pct": "lts__t_sector_hit_rate.pct",
     "achieved_occupancy_pct": "sm__warps_active.avg.pct_of_peak_sustained_active",
     "theoretical_occupancy_pct": "sm__maximum_warps_per_active_cycle_pct",
@@ -62,8 +62,8 @@ def ncu(path):
                 # Duration-weighted mean over launches.
                 w = [(x[k], x["duration_s"]) for x in recs if x.get(k) is not None]
                 s[k] = sum(a * b for a, b in w) / sum(b for _, b in w)
-        bytes_ = [(x.get("dram_read_bytes") or 0) + (x.get("dram_write_bytes") or 0) for x in recs]
-        s["achieved_dram_GBps"] = sum(bytes_) / sum(d) / 1e9 if sum(d) else None
+        s["achieved_dram_GBps"] = s.get("dram_GBps") / 1e9 if s.get("dram_GBps") is not None else None
+        s.pop("dram_GBps", None)
         stall = defaultdict(float)
         for x in recs:
             for reason, v in x["stalls"].items():
@@ -71,6 +71,7 @@ def ncu(path):
                     stall[reason] += v * x["duration_s"]
         top = sorted(((v / sum(d), r) for r, v in stall.items()), reverse=True)[:6]
         s["top_stalls_cycles_per_issue"] = {r: round(v, 3) for v, r in top}
+        assert all(x["duration_s"] is not None and x["duration_s"] < 1 for x in recs), "implausible kernel duration units"
         out[name] = s
     return out
 
@@ -124,9 +125,9 @@ def main():
     json.dump(result, open(a.output, "w"), indent=2)
     for n, ks in result["ncu"].items():
         for k, s in ks.items():
-            print("%-18s %-14s share %5.1f%%  SM %5.1f%%  mem %5.1f%%  DRAM %6.1f GB/s  occ %5.1f%%  L2 hit %5.1f%%  stalls %s" % (
+            print("%-18s %-14s share %5.1f%%  SM %5.1f%%  mem %5.1f%%  DRAM %6.1f GB/s (%4.1f%% active)  occ %5.1f%%  L2 hit %5.1f%%  stalls %s" % (
                 n, k, 100 * (s["share_of_kernel_time"] or 0), s.get("sm_throughput_pct", 0), s.get("memory_throughput_pct", 0),
-                s.get("achieved_dram_GBps") or 0, s.get("achieved_occupancy_pct", 0), s.get("l2_hit_pct", 0),
+                s.get("achieved_dram_GBps") or 0, s.get("dram_cycles_active_pct", 0), s.get("achieved_occupancy_pct", 0), s.get("l2_hit_pct", 0),
                 ", ".join("%s %.2f" % kv for kv in list(s["top_stalls_cycles_per_issue"].items())[:3])))
     for n, s in result["nsys"].items():
         print("%-18s GPU span %.1f us, busy %.1f us (%.0f%%), idle gaps %.1f us; per query %s" % (
