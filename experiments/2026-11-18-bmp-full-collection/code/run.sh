@@ -123,7 +123,8 @@ hold() {  # hold OUT_STEM TAG DIR
 watchdog() {  # watchdog OUT_STEM
     local out=$1 p s
     while sleep 15; do
-        p=$(pgrep -f "project_benchmark_single.*--samples $out.bmp/samples.tsv" | head -1)
+        # Anchored at argv[0]: the gate's own command line also contains this text.
+        p=$(pgrep -f "^[^ ]*/project_benchmark_single .*--samples $out.bmp/samples.tsv" | head -1)
         [ -z "$p" ] && continue
         s=$(awk '/^VmSwap:/ {print $2}' "/proc/$p/status" 2>/dev/null)
         if [ "${s:-0}" -gt 1048576 ]; then echo "$(date -u +%FT%TZ) VmSwap ${s} kB: stopped" > "$out.paged"; kill "$p"; return; fi
