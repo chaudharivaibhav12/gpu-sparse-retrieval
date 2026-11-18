@@ -1,5 +1,17 @@
 # Current project status
 
+November 17 (evening): three studies were merged on the full collection (8,841,823 passages, 500 calibration queries, k=10, RTX 4070 on cuda5). All answers equal the CPU reference.
+
+| Study | Result | Evidence |
+|---|---|---|
+| [Range-bound pruning](../experiments/2026-11-18-range-pruning/README.md) (#19) | Exact pruned scorer **0.388 ms median** (0.492 mean), **1.71× [1.65, 1.78]** the range scorer, at range size 256 with 64 seeds; 1.51× at 1024 (balanced tail) and 1.62× at 512. Pruning alone gives 1.7× / 2.8× / 5.1× at 1024 / 512 / 256; p99 grows at small ranges | run `20261117-cuda5-prune-04`; 3 earlier attempts preserved |
+| [CPU baselines](../experiments/2026-11-17-cpu-baselines/README.md) (#18) | Range scorer **66×** an exact 1-core CPU scorer and **10.6×** an exact 16-core one (2× Xeon E5-2650 v2) | run `20261117-cuda5-cpu-01` |
+| [Batching](../experiments/2026-11-15-range-batching/report.md) (#14, #15) | Batched execution reaches **1,672 queries/s** at batch 32, **1.20×** sequential | run `20261117-cuda5-full-03` |
+
+For context only, the best published exact CPU result on this collection is BMP (SIGIR '24): 10.5 ms mean, one thread, different hardware. A matched BMP run on cuda5 is still open and is needed before any state-of-the-art claim. Also open: freezing settings, the held-out evaluation, k>10, and a profile of hardware use.
+
+Measurement on the shared GPU: an idle foreign process left range-scorer latency unchanged, while an active full-GPU job made it 3.8× slower. The pruning experiment's run harness therefore judges contention by per-process GPU activity. It also resumes interrupted runs and reuses verified binaries ([protocol amendments](../experiments/2026-11-18-range-pruning/configs/protocol.json)), and may be worth adopting team-wide.
+
 November 17: [guarded FP32 qualification](../experiments/2026-11-16-guarded-fp32-baseline/report.md) is complete. Full **8,841,823 passages**, 500 calibration queries, RTX 4070, k=10, batch=1: range median **0.685848 ms**, canonical U64 GPUSparse **6.895403 ms**, guarded canonical FP32 GPUSparse **6.008201 ms**. FP32 uses 12.75% less query time than U64 by the paired estimator; range remains **8.43×** faster than FP32 (conditional 95% interval 8.31–8.56). All correctness/provenance/statistical checks passed; earlier failures are preserved. FP32 qualification is resolved for this bounded domain; full CPU-BMP, broader workloads, settings freeze and held-out evaluation remain open. The older status text below is historical. See [team context](../experiments/2026-11-16-guarded-fp32-baseline/TEAM-CONTEXT.md).
 
 
