@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-18-prune-seed-select",
+  "title": "Fast seed selection for the term-major pruned scorer",
+  "owner": "parva",
+  "branch": "exp/parva/2026-11-18-prune-seed-select",
+  "status": "completed 2026-11-18: recorded run 20261118-cuda5-ts-01; prunets adopted by the decision rule (small gain)",
+  "parent_experiment": "2026-11-18-prune-term-bounds",
+  "parent_source_commit": "24b390e",
+  "question": "Does a faster seed selection make the term-major pruned scorer faster, with the same seeds, schedule and answers?",
+  "hypothesis": "Yes at both range sizes, more at 256, from the profiled 22-48 us select_seeds kernel; the gain is bounded by that time.",
+  "motivation": "Profile-driven: select_seeds is the largest remaining pruning overhead, one thread block stalled on barriers and uncoalesced loads.",
+  "code_paths": [
+    "src/cuda_range_prune_ts.cu",
+    "tests/check_seed_select.cu",
+    "experiments/2026-11-18-prune-seed-select/code/run.sh",
+    "experiments/2026-11-18-prune-seed-select/code/expect.py",
+    "experiments/2026-11-18-prune-seed-select/code/gate.py",
+    "experiments/2026-11-18-prune-seed-select/analysis/analyze.py"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-18-prune-seed-select/configs/protocol.json",
+    "experiments/2026-11-18-prune-seed-select/configs/configs.tsv"
+  ],
+  "declared_changes": {
+    "new_scorer": "src/cuda_range_prune_ts.cu (select_seeds replaced; RBP_NO_MAIN guard)",
+    "new_test": "tests/check_seed_select.cu",
+    "control": "src/cuda_range_prune_tb.cu and src/cuda_range_v2.cu unchanged",
+    "shared_files": "none modified"
+  },
+  "scoring_contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "query_split": "calibration-500 only; held-out untouched",
+  "correctness_rule": "Every configuration's top-10 equals the CPU reference for every query; prunets' schedule equals the host recomputation (VERIFY=1) and prunetb's.",
+  "success_rule": "A complete run under the registered protocol; reported whatever the ratios are.",
+  "failure_rule": "Any mismatch or rejected expected run; ineligible processes are replaced.",
+  "recording_ids": [],
+  "runs": [
+    {
+      "run_id": "20261118-cuda5-ts-01",
+      "kind": "recorded",
+      "host": "cuda5",
+      "source_commit": "ce08a1c",
+      "status": "completed",
+      "readme": "experiments/2026-11-18-prune-seed-select/runs/20261118-cuda5-ts-01/README.md",
+      "results": "results/2026-11-18-prune-seed-select/20261118-cuda5-ts-01",
+      "correctness": "20 of 20 comparisons equal the CPU reference; prunets VERIFY=1 schedules equal the host recomputation; prunetb and prunets schedules identical",
+      "ineligible_processes": 1,
+      "median_ms": {
+        "v2-w1024": 0.69,
+        "prunetb-w1024-s64": 0.376,
+        "prunets-w1024-s64": 0.368,
+        "prunetb-w256-s64": 0.279,
+        "prunets-w256-s64": 0.272
+      },
+      "primary": {
+        "prunetb-w1024-s64 / prunets-w1024-s64": {
+          "ratio": 1.024,
+          "interval_95": [
+            1.022,
+            1.027
+          ]
+        },
+        "prunetb-w256-s64 / prunets-w256-s64": {
+          "ratio": 1.027,
+          "interval_95": [
+            1.025,
+            1.029
+          ]
+        }
+      },
+      "secondary": {
+        "v2-w1024 / prunets-w1024-s64": {
+          "ratio": 1.978,
+          "interval_95": [
+            1.912,
+            2.046
+          ]
+        },
+        "v2-w1024 / prunets-w256-s64": {
+          "ratio": 2.375,
+          "interval_95": [
+            2.268,
+            2.487
+          ]
+        }
+      }
+    },
+    {
+      "run_id": "dev",
+      "kind": "development",
+      "status": "unit test, fixtures, VERIFY smoke and harness smoke; not results",
+      "readme": "experiments/2026-11-18-prune-seed-select/runs/dev/README.md"
+    }
+  ]
+}
