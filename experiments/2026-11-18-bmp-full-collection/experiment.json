@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-18-bmp-full-collection",
+  "title": "BMP (exact CPU state of the art) vs the exact GPU scorers on the full collection, same host",
+  "owner": "parva",
+  "branch": "exp/parva/2026-11-18-bmp-full-collection",
+  "status": "completed 2026-11-18: recorded run 20261118-cuda5-bmp-02 under the registered protocol with amendment 1",
+  "parent_experiment": "2026-11-18-range-pruning",
+  "parent_source_commit": "c891196",
+  "question": "How does BMP compare with the exact GPU scorers on the same host, index, queries and answers, at full scale?",
+  "hypothesis": "None about the size of the gap; replaces a cross-paper indication with a same-host measurement.",
+  "motivation": "The only state-of-the-art comparison so far is BMP's published 10.5 ms mean against our GPU means on other hardware; the team validated BMP at 100K and 1M only.",
+  "code_paths": [
+    "experiments/2026-11-18-bmp-full-collection/code/project_benchmark_single.rs",
+    "experiments/2026-11-18-bmp-full-collection/code/export_queries.py",
+    "experiments/2026-11-18-bmp-full-collection/code/bmp_to_topk.py",
+    "experiments/2026-11-18-bmp-full-collection/code/gate.py",
+    "experiments/2026-11-18-bmp-full-collection/code/expect.py",
+    "experiments/2026-11-18-bmp-full-collection/code/run.sh",
+    "experiments/2026-11-18-bmp-full-collection/analysis/analyze.py"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-18-bmp-full-collection/configs/protocol.json",
+    "experiments/2026-11-18-bmp-full-collection/configs/configs.tsv"
+  ],
+  "declared_changes": {
+    "bmp": "pinned BMP 67ad8c68 with the team's reviewed canonical patch and resident overlay; new single-index adapter whose timed query() is byte-identical to the validated adapter",
+    "gpu": "no new GPU timing; compared with range-pruning run 20261117-cuda5-prune-04",
+    "shared_files": "none modified"
+  },
+  "scoring_contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1 (GPU) / GSP-CAP32-U64-NUMERIC-TIES-v1 (BMP); identical answers",
+  "query_split": "calibration-500 only; held-out untouched",
+  "correctness_rule": "BMP's ordered (original_id, score) top-10 equals the pinned CPU reference for every query, in correctness and in every timing process.",
+  "success_rule": "A complete run under the registered protocol; the result is reported whatever the ratios are.",
+  "failure_rule": "Any mismatch, rejected expected run, or failure other than an ineligible (contended or paging) process.",
+  "recording_ids": [],
+  "runs": [
+    {
+      "run_id": "20261118-cuda5-bmp-02",
+      "kind": "recorded",
+      "host": "cuda5",
+      "source_commit": "7ad8f11",
+      "status": "completed",
+      "readme": "experiments/2026-11-18-bmp-full-collection/runs/20261118-cuda5-bmp-02/README.md",
+      "results": "results/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02",
+      "correctness": "4 of 4 comparisons equal the CPU reference (correctness + 3 timing processes x 23 rounds)",
+      "ineligible_processes": 0,
+      "bmp_median_ms": 11.904,
+      "bmp_mean_ms": 13.47,
+      "primary": {
+        "bmp-b32 / v2-w1024": {
+          "ratio": 16.845,
+          "interval_95": [
+            16.267,
+            17.457
+          ]
+        },
+        "bmp-b32 / prune-w1024-s64": {
+          "ratio": 25.462,
+          "interval_95": [
+            24.8,
+            26.137
+          ]
+        },
+        "bmp-b32 / prune-w256-s64": {
+          "ratio": 28.823,
+          "interval_95": [
+            28.035,
+            29.611
+          ]
+        }
+      },
+      "gpu_timing_from": "20261117-cuda5-prune-04"
+    },
+    {
+      "run_id": "20261118-cuda5-bmp-01",
+      "kind": "recorded",
+      "source_commit": "3d09cf6",
+      "status": "failed (BMP swapped out during load; no timing)",
+      "readme": "experiments/2026-11-18-bmp-full-collection/runs/20261118-cuda5-bmp-01/README.md"
+    },
+    {
+      "run_id": "dev",
+      "kind": "development",
+      "status": "index build, query export, correctness check, smoke tests dev-bmp-01/02/03, watchdog test; not results",
+      "readme": "experiments/2026-11-18-bmp-full-collection/runs/dev/README.md"
+    }
+  ]
+}

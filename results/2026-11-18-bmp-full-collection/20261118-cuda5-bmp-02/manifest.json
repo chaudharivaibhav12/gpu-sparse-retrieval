@@ -1,0 +1,514 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-18-bmp-full-collection",
+  "run_id": "20261118-cuda5-bmp-02",
+  "status": "completed-timing",
+  "scope": "host cuda5; 8841823 documents; 500 calibration queries; k=10; BMP b32 raw bounds on CPU 0 (1 Rayon thread, memory node 0); 3 processes; 3 warm-up + 20 measured rounds; CPU_LIMIT 4.0 cores; iowait limit 0.01; replacements 0; compared with GPU timing of 20261117-cuda5-prune-04",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "7ad8f119ee62e0b55a78b24c3db7a10cfc097b88",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "cargo build --release --bins --locked (BMP 67ad8c683fbc0c30145d1ee42c1dffbed8b12332 + reviewed patches + single-index adapter)",
+    "source_sha256": {
+      "experiments/2026-11-18-bmp-full-collection/configs/configs.tsv": "d54e9eaf14319db8a62767d593ac6459436028c1eb19f17198c829c38de051fc",
+      "experiments/2026-11-18-bmp-full-collection/code/gate.py": "016982e4c3d386c6228dbef4a88e63124e73001bbe8302264a04ebee3a9d866e",
+      "experiments/2026-11-18-bmp-full-collection/code/expect.py": "d51fb9832ef5675a113bc76a30ce3ea9e0c63ce5d7ec9982f96521ee6c264d64",
+      "experiments/2026-11-18-bmp-full-collection/code/bmp_to_topk.py": "617b669ff96e6380af554c0629b0197d51280d5745c68c77214611fe753026ee",
+      "experiments/2026-11-18-bmp-full-collection/code/export_queries.py": "0755b8f8944fe023d8fa2e400c8f6fefffcf6aa80089d3abb82bc2c9791c6f02",
+      "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py": "ca43fb45ed74e0fc8d24c14898ac8ae3d32c7ebd3f805b55f6d59db87378d18e",
+      "experiments/2026-11-18-bmp-full-collection/analysis/analyze.py": "d7c36163be8f6da17c802a60c7827c4985dc8763353331d487e847697a972827",
+      "experiments/2026-11-18-bmp-full-collection/code/run.sh": "5e9a84e45210963ba066d6881b298dd4f511425447c5eb42f812ae0b0d0a6bad",
+      "experiments/2026-11-18-bmp-full-collection/code/project_benchmark_single.rs": "702de2e72ceb35c9ac988c98d703c8ab6c8c397e7b61ed64ffedf8c8f2fd72c6",
+      "experiments/2026-11-10-bmp-correctness-fixes/code/bmp-canonical.patch": "bfedc4c9787287723642df4d6c4a4bbc1fe31be4691a55b9d941b02400b8dc5b",
+      "experiments/2026-11-11-bmp-resident-timing/code/resident-context.patch": "ed6067e9f551c61a946b7ca58e6fcf9e02e6f89fcb722c9f63a71b2aed60ed3d",
+      "experiments/2026-11-11-bmp-resident-timing/code/project_benchmark.rs": "7eddaaa7519c38a887cf7b2680ff12d6c6842f6b5bc1ad5b3809bd46a23dc8c3",
+      "experiments/2026-11-10-bmp-native-alignment/configs/BMP-Cargo.lock": "b91150c01efcae565c7144a49d7fdf1e3b0f52518bf33b93503b99c6de26f07e"
+    },
+    "binary_sha256": {
+      "build/20261118-cuda5-bmp-02/BMP/target/release/project_benchmark_single": "41bbfde13d19fa30bfa9ff9589238b28530a4b95486e5796926fb00d1d7309f0"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "/scratch/psp8502/full/calibration-500.pisa": {
+      "sha256": "0ac4ad355c198fffa65a94ec4ae23da19a0fbea5978a690f343e850fdb7a00d9",
+      "bytes": 1005878
+    },
+    "/scratch/psp8502/full/full-8841823-bmp-b32-raw.bmp": {
+      "sha256": "eaf549b82636dba01287ebd7e9128244f1cbc8d85af233c9587a4a7c205df94d",
+      "bytes": 13448678853
+    },
+    "/scratch/psp8502/full/oracle/cpu-top10-8841823.tsv": {
+      "sha256": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed",
+      "bytes": 116558
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "unavailable"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "git clone -q https://github.com/pisa-engine/BMP build/20261118-cuda5-bmp-02/BMP",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/expect.py bmp-b32 --rounds 1 --warmups 0 --limit 500 --queries /scratch/psp8502/full/calibration-500.pisa --bmp-index /scratch/psp8502/full/full-8841823-bmp-b32-raw.bmp --cpu 1 --output /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/expect/reject-bmp-cpu.json",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/expect/reject-bmp-cpu.json --receipt /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/reject-bmp-cpu.receipt.json --sampler-cpu 15 -- env RAYON_NUM_THREADS=1 numactl --membind=0 build/20261118-cuda5-bmp-02/BMP/target/release/project_benchmark_single --index /scratch/psp8502/full/full-8841823-bmp-b32-raw.bmp --queries /scratch/psp8502/full/calibration-500.pisa --samples /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/reject-bmp-cpu.bmp/samples.tsv --results /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/reject-bmp-cpu.bmp/results.tsv --monitoring /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/reject-bmp-cpu.bmp/monitoring.tsv --expected-docs 8841823 --expected-queries 500 --cpu 0 --k 10 --block-size 32 --warmups 0 --repeats 1",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/expect.py bmp-b32 --rounds 1 --warmups 0 --limit 500 --queries /scratch/psp8502/full/calibration-500.pisa --bmp-index /scratch/psp8502/full/full-8841823-bmp-b32-raw.bmp --cpu 0 --output /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/expect/correct-bmp-b32.json",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/expect/correct-bmp-b32.json --receipt /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/correct-bmp-b32.receipt.json --sampler-cpu 15 -- env RAYON_NUM_THREADS=1 numactl --membind=0 build/20261118-cuda5-bmp-02/BMP/target/release/project_benchmark_single --index /scratch/psp8502/full/full-8841823-bmp-b32-raw.bmp --queries /scratch/psp8502/full/calibration-500.pisa --samples /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/correct-bmp-b32.bmp/samples.tsv --results /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/correct-bmp-b32.bmp/results.tsv --monitoring /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/correct-bmp-b32.bmp/monitoring.tsv --expected-docs 8841823 --expected-queries 500 --cpu 0 --k 10 --block-size 32 --warmups 0 --repeats 1",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/bmp_to_topk.py /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/correct-bmp-b32.bmp/results.tsv /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/correct-bmp-b32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/correct-bmp-b32-raw.tsv --queries 500 --k 10 --groups-per-query 1 --output /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/analysis/compare-correct-bmp-b32.json",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/expect.py bmp-b32 --rounds 20 --warmups 3 --limit 500 --queries /scratch/psp8502/full/calibration-500.pisa --bmp-index /scratch/psp8502/full/full-8841823-bmp-b32-raw.bmp --cpu 0 --output /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/expect/timing-r0-bmp-b32.json",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/expect/timing-r0-bmp-b32.json --receipt /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r0-bmp-b32.receipt.json --sampler-cpu 15 -- env RAYON_NUM_THREADS=1 numactl --membind=0 build/20261118-cuda5-bmp-02/BMP/target/release/project_benchmark_single --index /scratch/psp8502/full/full-8841823-bmp-b32-raw.bmp --queries /scratch/psp8502/full/calibration-500.pisa --samples /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r0-bmp-b32.bmp/samples.tsv --results /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r0-bmp-b32.bmp/results.tsv --monitoring /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r0-bmp-b32.bmp/monitoring.tsv --expected-docs 8841823 --expected-queries 500 --cpu 0 --k 10 --block-size 32 --warmups 3 --repeats 20",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/bmp_to_topk.py /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r0-bmp-b32.bmp/results.tsv /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r0-bmp-b32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r0-bmp-b32-raw.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/analysis/compare-timing-r0-bmp-b32.json",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/expect.py bmp-b32 --rounds 20 --warmups 3 --limit 500 --queries /scratch/psp8502/full/calibration-500.pisa --bmp-index /scratch/psp8502/full/full-8841823-bmp-b32-raw.bmp --cpu 0 --output /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/expect/timing-r1-bmp-b32.json",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/expect/timing-r1-bmp-b32.json --receipt /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r1-bmp-b32.receipt.json --sampler-cpu 15 -- env RAYON_NUM_THREADS=1 numactl --membind=0 build/20261118-cuda5-bmp-02/BMP/target/release/project_benchmark_single --index /scratch/psp8502/full/full-8841823-bmp-b32-raw.bmp --queries /scratch/psp8502/full/calibration-500.pisa --samples /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r1-bmp-b32.bmp/samples.tsv --results /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r1-bmp-b32.bmp/results.tsv --monitoring /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r1-bmp-b32.bmp/monitoring.tsv --expected-docs 8841823 --expected-queries 500 --cpu 0 --k 10 --block-size 32 --warmups 3 --repeats 20",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/bmp_to_topk.py /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r1-bmp-b32.bmp/results.tsv /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r1-bmp-b32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r1-bmp-b32-raw.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/analysis/compare-timing-r1-bmp-b32.json",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/expect.py bmp-b32 --rounds 20 --warmups 3 --limit 500 --queries /scratch/psp8502/full/calibration-500.pisa --bmp-index /scratch/psp8502/full/full-8841823-bmp-b32-raw.bmp --cpu 0 --output /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/expect/timing-r2-bmp-b32.json",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/gate.py --expect /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/expect/timing-r2-bmp-b32.json --receipt /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r2-bmp-b32.receipt.json --sampler-cpu 15 -- env RAYON_NUM_THREADS=1 numactl --membind=0 build/20261118-cuda5-bmp-02/BMP/target/release/project_benchmark_single --index /scratch/psp8502/full/full-8841823-bmp-b32-raw.bmp --queries /scratch/psp8502/full/calibration-500.pisa --samples /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r2-bmp-b32.bmp/samples.tsv --results /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r2-bmp-b32.bmp/results.tsv --monitoring /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r2-bmp-b32.bmp/monitoring.tsv --expected-docs 8841823 --expected-queries 500 --cpu 0 --k 10 --block-size 32 --warmups 3 --repeats 20",
+    "python3 experiments/2026-11-18-bmp-full-collection/code/bmp_to_topk.py /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r2-bmp-b32.bmp/results.tsv /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r2-bmp-b32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r2-bmp-b32-raw.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/analysis/compare-timing-r2-bmp-b32.json",
+    "python3 experiments/2026-11-18-bmp-full-collection/analysis/analyze.py /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02 --gpu-run /scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04 --processes 3 --warmups 3 --rounds 20 --cpu-limit 4.0 --iowait-limit 0.01 --output /scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/analysis/statistics.json"
+  ],
+  "artifacts": {
+    "analysis/checked-correct-bmp-b32": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "analysis/checked-timing-r0-bmp-b32": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "analysis/checked-timing-r1-bmp-b32": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "analysis/checked-timing-r2-bmp-b32": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "analysis/compare-correct-bmp-b32.json": {
+      "sha256": "1955bce38ff65fbd5adfb9f274a12f9da375bffd9644cb17701c4fc652e11b02",
+      "bytes": 362
+    },
+    "analysis/compare-timing-r0-bmp-b32.json": {
+      "sha256": "90a40aeaff5a3d602d4a9d0871befbbb776a598f1fdd02f9b22f05e736b45d96",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r1-bmp-b32.json": {
+      "sha256": "2fe9179f92da4f53e45015b3cbb7d6f6cb99370ef29a168966783aad63f9353c",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r2-bmp-b32.json": {
+      "sha256": "c207322e8b822773f8729c2b2bb8acedf2a5f0235b4d87b3fbc47b8f39c08831",
+      "bytes": 368
+    },
+    "analysis/statistics.json": {
+      "sha256": "40c5e02679db5b872534664e4df4b4158e3ada425bacd35ea75a757a5b895488",
+      "bytes": 3322
+    },
+    "configs.tsv": {
+      "sha256": "d54e9eaf14319db8a62767d593ac6459436028c1eb19f17198c829c38de051fc",
+      "bytes": 123
+    },
+    "expect/correct-bmp-b32.json": {
+      "sha256": "c1e5a6a4d85f3179ab32e6cebe983467f2673e929e9a5a9a7e7a632db2a84a8f",
+      "bytes": 845
+    },
+    "expect/reject-bmp-cpu.json": {
+      "sha256": "889fabc3d9870936698cdaa3327fa399ca7101241f42fc013d3ad7d0575f0b23",
+      "bytes": 845
+    },
+    "expect/timing-r0-bmp-b32.json": {
+      "sha256": "fd47b462c600731308301be7f76eaf6ff00a1780c8b7a2616e75735091a3008f",
+      "bytes": 846
+    },
+    "expect/timing-r1-bmp-b32.json": {
+      "sha256": "fd47b462c600731308301be7f76eaf6ff00a1780c8b7a2616e75735091a3008f",
+      "bytes": 846
+    },
+    "expect/timing-r2-bmp-b32.json": {
+      "sha256": "fd47b462c600731308301be7f76eaf6ff00a1780c8b7a2616e75735091a3008f",
+      "bytes": 846
+    },
+    "logs/analyze.log": {
+      "sha256": "e68ad9bd96b3b7c6c4e57876f54a6ec87c4a653ede32c8ec5e9fccf8e6ffa1d3",
+      "bytes": 563
+    },
+    "logs/binaries-sha256.txt": {
+      "sha256": "a823fc145b7bb6fdba162d5a5fd4a81bb0931908de9a6228e8c764c0e8330cf2",
+      "bytes": 138
+    },
+    "logs/cargo-build.log": {
+      "sha256": "54e64d50e94df2bbaf2ab3d873eb739892c24e4bc411ee396ae5ddb8c639642f",
+      "bytes": 17677
+    },
+    "logs/cargo-test.log": {
+      "sha256": "e5268c18f6f9f04ed2d4570da1b2e34899c229a589d59a66315094b756732a2a",
+      "bytes": 28689
+    },
+    "logs/commands.txt": {
+      "sha256": "de1f9e0effdcb9e0eac4905bd6fadd813b5f2f14c3cab0c2579b9e187897e46d",
+      "bytes": 10003
+    },
+    "logs/commit.txt": {
+      "sha256": "c6b4922753b0f11d0ac7fdb800d147dfb6f2d5958ab288b4a818d608ce4fea13",
+      "bytes": 41
+    },
+    "logs/environment.txt": {
+      "sha256": "dd3ba659a2b3dcb0debdd92a1ff2da8253a4d2dde463a0b3bdfcc3322d169189",
+      "bytes": 710
+    },
+    "logs/gate.txt": {
+      "sha256": "c5ad2a9465efeed70db7cbbaee0f82ac6b083fcdffa8c07eb8877137d49bc679",
+      "bytes": 305
+    },
+    "logs/gpu-run-sha256.txt": {
+      "sha256": "d13bcfab7b61a0ffbf2119f6c74e2dc5f6622d93e4e9920863367889ad7863e2",
+      "bytes": 1761
+    },
+    "logs/gpu-run.txt": {
+      "sha256": "39b24a7c97894e555056699580a3d1654a267e2e913739807631d7459a097f14",
+      "bytes": 71
+    },
+    "logs/inputs-sha256.txt": {
+      "sha256": "b70e3bf1878fef1f4db25fcb03a747108696f689faed772e230d346897250458",
+      "bytes": 442
+    },
+    "logs/quiet-timing-r0-bmp-b32.txt": {
+      "sha256": "317dd1886bada106480505d46e8749d5187373034100d3c6f30a78abfd3e03a2",
+      "bytes": 61
+    },
+    "logs/quiet-timing-r1-bmp-b32.txt": {
+      "sha256": "6bbd894d1e5c6775fe6e8296c4552e5fd732429e276a2d90692ed9c2aef55874",
+      "bytes": 61
+    },
+    "logs/quiet-timing-r2-bmp-b32.txt": {
+      "sha256": "530ac92abb04da79281a49c1ebecec768f9582bcf79056504d09adf05d406346",
+      "bytes": 61
+    },
+    "logs/stages.txt": {
+      "sha256": "9d483a1d2f2a7f96d600b00e37b1d69acf0b91ff1a38f4239979f7093f542ea8",
+      "bytes": 572
+    },
+    "logs/started-epoch.txt": {
+      "sha256": "2795bde362fbda3f68eee5e9e1551ac120ab3b04851d27c84a3ec8c92836d9e2",
+      "bytes": 11
+    },
+    "logs/verdicts.txt": {
+      "sha256": "a0424bc54998dac8642816d270cff7009fdb82664af533566deebfc49684dd1f",
+      "bytes": 192
+    },
+    "raw/correct-bmp-b32-raw.tsv.xz": {
+      "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+      "bytes": 34504
+    },
+    "raw/correct-bmp-b32.bmp/monitoring.tsv": {
+      "sha256": "770b05d2fc47baa87fe02ba3e8da130d6f1c59da2f0c6f88c1721f2b6809df80",
+      "bytes": 270
+    },
+    "raw/correct-bmp-b32.bmp/results.tsv.xz": {
+      "sha256": "221d7f6448d555793124b5f312b2e7f58d48fa2fac965f1982b2bb8545b728e8",
+      "bytes": 34364
+    },
+    "raw/correct-bmp-b32.bmp/samples.tsv": {
+      "sha256": "c90530cf0d04d02f141098e69e1e43b4bbdf06bfa42cc20af79479dcf2f3f242",
+      "bytes": 18435
+    },
+    "raw/correct-bmp-b32.receipt.json": {
+      "sha256": "835f7e2cbb27a6041a65f546b7f388a6b8dab8b51099330652fadf1f36bbf1e8",
+      "bytes": 3337
+    },
+    "raw/correct-bmp-b32.receipt.log": {
+      "sha256": "ef2927084153bfa22c2805c0cb0490a221a7ca68629851e6153bbefb5162db38",
+      "bytes": 26
+    },
+    "raw/correct-bmp-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/correct-bmp-b32.receipt.runtime/runtime.json": {
+      "sha256": "c3ee81118839fb3b68fdc114705dab70fcee4ed91892c26c7bd6d550d09eab29",
+      "bytes": 686
+    },
+    "raw/correct-bmp-b32.receipt.sampler.log": {
+      "sha256": "aa88b809a8bb6b6f17e22bfe4a708498b8aa8f3aef91d7f40678fe16e5061330",
+      "bytes": 18388
+    },
+    "raw/reject-bmp-cpu.bmp/monitoring.tsv": {
+      "sha256": "1d69b47180bccec5d2b0d12956990d6f72447f8b4b504b7f51a3f1f84ef2c445",
+      "bytes": 59
+    },
+    "raw/reject-bmp-cpu.bmp/results.tsv": {
+      "sha256": "02fcc1b1342673d3a6c9f553822035e967a010bec1203a32030b30fbd5c88475",
+      "bytes": 51
+    },
+    "raw/reject-bmp-cpu.bmp/samples.tsv": {
+      "sha256": "269acfebb3aceebb229505322dab9c152d5a2fe33bee4cae5fd4ab7a4922be16",
+      "bytes": 57
+    },
+    "raw/reject-bmp-cpu.receipt.json": {
+      "sha256": "f95068aa09da7c1f230233301eb3fdfd14d38a99c8c6675e79a8dde005e7911a",
+      "bytes": 3417
+    },
+    "raw/reject-bmp-cpu.receipt.log": {
+      "sha256": "0e5857b3c10face357c4e3e3b4ec8611a5b6caf4859d8394420a54fadff3806a",
+      "bytes": 29
+    },
+    "raw/reject-bmp-cpu.receipt.runtime/reject": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/reject-bmp-cpu.receipt.runtime/runtime.json": {
+      "sha256": "c3ee81118839fb3b68fdc114705dab70fcee4ed91892c26c7bd6d550d09eab29",
+      "bytes": 686
+    },
+    "raw/reject-bmp-cpu.receipt.sampler.log": {
+      "sha256": "1ca140123ab5facc6526ff2f4fce9747a283ff7a6caa82e3383307cb878525a4",
+      "bytes": 15804
+    },
+    "raw/timing-r0-bmp-b32-raw.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r0-bmp-b32.bmp/monitoring.tsv": {
+      "sha256": "58c376353ceca80151edf9f86952c39b82eabbb4674f234d4afbcdbc2e3c69d7",
+      "bytes": 4920
+    },
+    "raw/timing-r0-bmp-b32.bmp/results.tsv.xz": {
+      "sha256": "65c1942db85c3b5f343f9d6e062e7529db08734f688baa0d31a2eb8a3324d9a1",
+      "bytes": 108784
+    },
+    "raw/timing-r0-bmp-b32.bmp/samples.tsv": {
+      "sha256": "d761aa674b098bffef6e75ae2af59681bba0752dc1d6eed8fd2be21f6af55018",
+      "bytes": 424877
+    },
+    "raw/timing-r0-bmp-b32.receipt.json": {
+      "sha256": "ecb1e9f4d7297e26b7051f9356fd5f1fb0de5cd489adf5a77c50df29341df2e7",
+      "bytes": 3345
+    },
+    "raw/timing-r0-bmp-b32.receipt.log": {
+      "sha256": "2b6455e2b28523414f4545ffa841f2055b7554082e663dcd8d027b824b3ab8ff",
+      "bytes": 602
+    },
+    "raw/timing-r0-bmp-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-bmp-b32.receipt.runtime/runtime.json": {
+      "sha256": "e86193c7ca0e7bbd97598c71241f1f614f7acea527285fd0d739fb3b33346cd4",
+      "bytes": 687
+    },
+    "raw/timing-r0-bmp-b32.receipt.sampler.log": {
+      "sha256": "863da4ad8139eb644d013b9ffb6d7b2af56882c9a417701d81b2aeb87ad75078",
+      "bytes": 43684
+    },
+    "raw/timing-r1-bmp-b32-raw.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r1-bmp-b32.bmp/monitoring.tsv": {
+      "sha256": "7371bc673a0b4fff0c54c58a1dd7a615ae4084105496b001453f570b16258542",
+      "bytes": 4920
+    },
+    "raw/timing-r1-bmp-b32.bmp/results.tsv.xz": {
+      "sha256": "65c1942db85c3b5f343f9d6e062e7529db08734f688baa0d31a2eb8a3324d9a1",
+      "bytes": 108784
+    },
+    "raw/timing-r1-bmp-b32.bmp/samples.tsv": {
+      "sha256": "8d5a37e920f0b711c185e98104c7c8dd71ad0ea435727db0a0b4cac05d9765d2",
+      "bytes": 424745
+    },
+    "raw/timing-r1-bmp-b32.receipt.json": {
+      "sha256": "c80d5ffff3757fcf454b419e5f81278afe1fb5e3b193b69d66a46a715f692a7e",
+      "bytes": 3345
+    },
+    "raw/timing-r1-bmp-b32.receipt.log": {
+      "sha256": "2b6455e2b28523414f4545ffa841f2055b7554082e663dcd8d027b824b3ab8ff",
+      "bytes": 602
+    },
+    "raw/timing-r1-bmp-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-bmp-b32.receipt.runtime/runtime.json": {
+      "sha256": "e86193c7ca0e7bbd97598c71241f1f614f7acea527285fd0d739fb3b33346cd4",
+      "bytes": 687
+    },
+    "raw/timing-r1-bmp-b32.receipt.sampler.log": {
+      "sha256": "c5841fe76996a6fafe050484198ceccbc35b01a09b2dc275cdb80322ef77a5b3",
+      "bytes": 38924
+    },
+    "raw/timing-r2-bmp-b32-raw.tsv.xz": {
+      "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+      "bytes": 110984
+    },
+    "raw/timing-r2-bmp-b32.bmp/monitoring.tsv": {
+      "sha256": "da9a2001fd9dddee8194d5beebc09befef2ef0498145b644ac4cc38a6dd98a28",
+      "bytes": 4920
+    },
+    "raw/timing-r2-bmp-b32.bmp/results.tsv.xz": {
+      "sha256": "65c1942db85c3b5f343f9d6e062e7529db08734f688baa0d31a2eb8a3324d9a1",
+      "bytes": 108784
+    },
+    "raw/timing-r2-bmp-b32.bmp/samples.tsv": {
+      "sha256": "15c64652426312de3b32789bfbaec54eb5a171881e7aaec31e1349a4e2536f11",
+      "bytes": 424812
+    },
+    "raw/timing-r2-bmp-b32.receipt.json": {
+      "sha256": "a24ff28fff8db4e7d9402fb62752049183cceb89ec0ad3b7b6649fdf00acf6cb",
+      "bytes": 3345
+    },
+    "raw/timing-r2-bmp-b32.receipt.log": {
+      "sha256": "2b6455e2b28523414f4545ffa841f2055b7554082e663dcd8d027b824b3ab8ff",
+      "bytes": 602
+    },
+    "raw/timing-r2-bmp-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-bmp-b32.receipt.runtime/runtime.json": {
+      "sha256": "e86193c7ca0e7bbd97598c71241f1f614f7acea527285fd0d739fb3b33346cd4",
+      "bytes": 687
+    },
+    "raw/timing-r2-bmp-b32.receipt.sampler.log": {
+      "sha256": "b1dbdb3f2191a285e3daf26856127911ef0613a756e044e54c0ff1e6dd826002",
+      "bytes": 45860
+    },
+    "raw/top-sha256.txt": {
+      "sha256": "b0e1469a9039534b739d75f4afd535e37fff65d778429d6778d3a373b80b606a",
+      "bytes": 682
+    }
+  },
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [
+      {
+        "original": "raw/correct-bmp-b32-raw.tsv",
+        "sha256": "a58c2134bbef03af24d50767b6938f4c58ca3eb171f40f3399d78421fcf31ad3",
+        "bytes": 171570,
+        "public": "raw/correct-bmp-b32-raw.tsv",
+        "transformation": "decompressed from raw/correct-bmp-b32-raw.tsv.xz (sha256 62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd); original hash computed at packaging"
+      },
+      {
+        "original": "raw/correct-bmp-b32.bmp/results.tsv",
+        "sha256": "3d1c3b2233672c1accdb3c60426bf15ded0534e41195fa7d689264926033a288",
+        "bytes": 191577,
+        "public": "raw/correct-bmp-b32.bmp/results.tsv",
+        "transformation": "decompressed from raw/correct-bmp-b32.bmp/results.tsv.xz (sha256 221d7f6448d555793124b5f312b2e7f58d48fa2fac965f1982b2bb8545b728e8); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-bmp-b32-raw.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r0-bmp-b32-raw.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-bmp-b32-raw.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r0-bmp-b32.bmp/results.tsv",
+        "sha256": "a157fc8a592725f79e926f8643c8b2bba36c08960f8a66b00e7a32d9061e3cb8",
+        "bytes": 4425149,
+        "public": "raw/timing-r0-bmp-b32.bmp/results.tsv.gz",
+        "transformation": "decompressed from raw/timing-r0-bmp-b32.bmp/results.tsv.xz (sha256 65c1942db85c3b5f343f9d6e062e7529db08734f688baa0d31a2eb8a3324d9a1); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-bmp-b32-raw.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r1-bmp-b32-raw.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-bmp-b32-raw.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r1-bmp-b32.bmp/results.tsv",
+        "sha256": "a157fc8a592725f79e926f8643c8b2bba36c08960f8a66b00e7a32d9061e3cb8",
+        "bytes": 4425149,
+        "public": "raw/timing-r1-bmp-b32.bmp/results.tsv.gz",
+        "transformation": "decompressed from raw/timing-r1-bmp-b32.bmp/results.tsv.xz (sha256 65c1942db85c3b5f343f9d6e062e7529db08734f688baa0d31a2eb8a3324d9a1); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-bmp-b32-raw.tsv",
+        "sha256": "6c5fd8005b62c6fb570d32568547adc274a8747eab4faf670830180249a4556b",
+        "bytes": 3965142,
+        "public": "raw/timing-r2-bmp-b32-raw.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-bmp-b32-raw.tsv.xz (sha256 03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      },
+      {
+        "original": "raw/timing-r2-bmp-b32.bmp/results.tsv",
+        "sha256": "a157fc8a592725f79e926f8643c8b2bba36c08960f8a66b00e7a32d9061e3cb8",
+        "bytes": 4425149,
+        "public": "raw/timing-r2-bmp-b32.bmp/results.tsv.gz",
+        "transformation": "decompressed from raw/timing-r2-bmp-b32.bmp/results.tsv.xz (sha256 65c1942db85c3b5f343f9d6e062e7529db08734f688baa0d31a2eb8a3324d9a1); lossless gzip (level 9, no name/mtime); original hash computed at packaging"
+      }
+    ],
+    "excluded": [
+      {
+        "original": "raw/correct-bmp-b32-raw.tsv.xz",
+        "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+        "bytes": 34504,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/correct-bmp-b32-raw.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/correct-bmp-b32.bmp/results.tsv.xz",
+        "sha256": "221d7f6448d555793124b5f312b2e7f58d48fa2fac965f1982b2bb8545b728e8",
+        "bytes": 34364,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/correct-bmp-b32.bmp/results.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-bmp-b32-raw.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r0-bmp-b32-raw.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r0-bmp-b32.bmp/results.tsv.xz",
+        "sha256": "65c1942db85c3b5f343f9d6e062e7529db08734f688baa0d31a2eb8a3324d9a1",
+        "bytes": 108784,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r0-bmp-b32.bmp/results.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-bmp-b32-raw.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r1-bmp-b32-raw.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r1-bmp-b32.bmp/results.tsv.xz",
+        "sha256": "65c1942db85c3b5f343f9d6e062e7529db08734f688baa0d31a2eb8a3324d9a1",
+        "bytes": 108784,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r1-bmp-b32.bmp/results.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-bmp-b32-raw.tsv.xz",
+        "sha256": "03301199ca1f50c87987ef4760d4e0991033ed17043deb2e66a82581ca848aac",
+        "bytes": 110984,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r2-bmp-b32-raw.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/timing-r2-bmp-b32.bmp/results.tsv.xz",
+        "sha256": "65c1942db85c3b5f343f9d6e062e7529db08734f688baa0d31a2eb8a3324d9a1",
+        "bytes": 108784,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02/raw/timing-r2-bmp-b32.bmp/results.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      }
+    ],
+    "recorded_artifacts_not_in_public_tree_or_lists": []
+  }
+}
