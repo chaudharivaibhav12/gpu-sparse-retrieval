@@ -2,6 +2,13 @@
 import hashlib,re
 from pathlib import Path
 
+def byte_load_widened_to_fp32(text):
+    # Triton TTIR annotates tt.load with its POINTER tensor type, not
+    # necessarily an explicit result type. Bind the loaded SSA value to the
+    # unsigned conversion instead of accepting an unrelated byte signature.
+    loads=re.findall(r'(?m)^\s*(%[\w.$]+)\s*=\s*tt\.load[^\n]*:\s*tensor<[^>\n]*!tt\.ptr<i8>>',text)
+    return any(re.search(r'arith\.uitofp\s+'+re.escape(value)+r'\s*:\s*tensor<[^>\n]*xi8>\s+to\s+tensor<[^>\n]*xf32>',text) for value in loads)
+
 def inspect_compact(cache):
     root=Path(cache);matches=[]
     for p in root.rglob('_fast_scatter_add_kernel.ttir'):
@@ -11,7 +18,7 @@ def inspect_compact(cache):
         # Unsigned byte pointer/load and explicit unsigned-to-FP32 conversion;
         # SSA layouts vary by GPU, so match types rather than hardcoded names.
         checks=dict(byte_input='!tt.ptr<i8>' in text,
-                    byte_load=bool(re.search(r'tt\.load[^\n]*tensor<[^\n>]*xi8>',text)),
+                    byte_load=byte_load_widened_to_fp32(text),
                     widen_fp32=bool(re.search(r'arith\.uitofp[^\n]*xi8>[^\n]*xf32>',text)),
                     product_fp32=bool(re.search(r'arith\.mulf[^\n]*xf32>',text)),
                     atomic_fp32=bool(re.search(r'atom[^;\n]*\.add\.f32',machine)))

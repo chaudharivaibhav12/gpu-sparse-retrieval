@@ -1,0 +1,48 @@
+{
+  "status": "PASS",
+  "review_kind": "Separate repair02 controller-resource-wait review",
+  "parent_source": "97bf7fc1115c748e91db92dfaba22884ef471791",
+  "changed_code": "wait_idleonly",
+  "tests": [
+    "emptyreturnswithoutdelay",
+    "occupiedwaitstwiceandthenproceeds",
+    "lowmemorywaitsandthenproceeds",
+    "boundedtimeout",
+    "statusqueryerrorstopswithoutfalseidle",
+    "zerolimitstopsoccupied",
+    "allavailabilitysnapshotsunique",
+    "nochildlaunchinsideresourcewait"
+  ],
+  "inherited_functions_AST_identical": [
+    "one",
+    "stable",
+    "sampler",
+    "process",
+    "verify_source",
+    "gpu_state"
+  ],
+  "other_code_files_byte_identical": true,
+  "protocol_delta_whitelist": "availabilitywaitcadence/limit/statusonly",
+  "limitations": [
+    "No new targetexecution; originalfullcorrectness/JIT/performance stillrequired.",
+    "Not an exclusiveGPUreservation; mid-childfailure/ineligible-timingstillstops.",
+    "NextCIMSsubmissionrequiresuserapproval."
+  ],
+  "source_files": {
+    "code/analyze_full_baselines.py": "5fe2993e810a3e14ab550ab25d5e94d848eafdf397b3735ef6b8da011ad50b9b",
+    "code/compare_exact.py": "9ce6dd171e767215bc55b056fb96e152ce8554831932d3abf6471220765d87da",
+    "code/expected_baselines.py": "8d686da9e0382afb27ddd444a6676cf56cf4fb89eedede8698a33c946d8ecfb5",
+    "code/guarded_domain.py": "f1f924868c19481efb374ddbb8df85b55a4b962caf5d8cacc4673926ab35415b",
+    "code/inspect_compact_jit.py": "e20d8fca841de189048a8c40ec9a7dceaa8eecefff7a7684684888cc20fa140f",
+    "code/reference_checks.py": "a8854075b242924e335fc2d05e476ca6a7e0adb77ec66209691c6c63938b24f9",
+    "code/run_u8_study.py": "5db7021538964fa6661a911d03a0f9bba3c061089287f1da933bab41f6ef4c9a",
+    "code/validate_baseline_outputs.py": "2f39a428e314d98b664d8cf4fe561a87955467919128c94fdd65ad9cc0fd5262",
+    "code/fp32/canonical_baseline.py": "d72538f02d9d4bf62bb6cce279f30c03d232bc12b42ec43fbb1f6e3b58e205ce",
+    "code/fp32/expected_config.py": "cb031708fa5a12dfa8b2b1a2116bcd6f4336daf5c4f0a3d78d80e73a83c23746",
+    "code/fp32/fp32_monolithic.py": "7f7637b8d95ea517da2fecce2d1bd44610b9657a2269866b417d806633459710",
+    "code/fp32/gsp_input.py": "a58462a957cb6522a5de2d3cc385329bf53864e3e27943a116652416d9ceebd6",
+    "code/fp32/runtime_gate.py": "6f151ff4f7266b2d8b05bc93dedc5570d13d535286141cad681b9b6919e4c450",
+    "code/fp32/storage_domain.py": "e9a1b4a35f6dd30c972fc53b3372d81c687094768b4ca3770cf9ade95a87cfc1",
+    "code/fp32/u64_monolithic.py": "5d88a452fb4e9f32613b36b3dac6e38ce22028645ef4e0c2b01de36b9eec32d4"
+  }
+}

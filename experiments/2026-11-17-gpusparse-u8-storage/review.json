@@ -1,39 +1,49 @@
 {
   "status": "PASS",
-  "review_kind": "Separate repair02 controller-resource-wait review",
-  "parent_source": "97bf7fc1115c748e91db92dfaba22884ef471791",
-  "changed_code": "wait_idleonly",
-  "tests": [
-    "emptyreturnswithoutdelay",
-    "occupiedwaitstwiceandthenproceeds",
-    "lowmemorywaitsandthenproceeds",
-    "boundedtimeout",
-    "statusqueryerrorstopswithoutfalseidle",
-    "zerolimitstopsoccupied",
-    "allavailabilitysnapshotsunique",
-    "nochildlaunchinsideresourcewait"
+  "review_kind": "Separate repair03 generated-code verifier review",
+  "diagnosis": "ActualTTIRtt.loadannotatespointertensor;oldregexexpectedexplicitresulttensor. RealunsignedbyteSSALOADfeedsFP32uitofp.",
+  "actual_compact_artifacts_pass": {
+    "success": true,
+    "entries": [
+      {
+        "ttir": "kKCi-bVqo1utJzcfR3hBtXoiuGzoTSfdVfn5SPGR6u4\\_fast_scatter_add_kernel.ttir",
+        "ttir_sha256": "66449e5752a823db5876c4bc88b89ad59aa9b605128f489d203b661e7d352e64",
+        "ptx": "kKCi-bVqo1utJzcfR3hBtXoiuGzoTSfdVfn5SPGR6u4\\_fast_scatter_add_kernel.ptx",
+        "ptx_sha256": "c0809a62fe12f61f67e401adc640470d9dff1a8976afe0fc01334b5434334b20",
+        "checks": {
+          "byte_input": true,
+          "byte_load": true,
+          "widen_fp32": true,
+          "product_fp32": true,
+          "atomic_fp32": true
+        }
+      }
+    ],
+    "qualification": "Compiled uint8 load/unsigned FP32 widening/FP32 product and atomic evidence. Not an instruction trace; full same-build canonical correctness is independently required."
+  },
+  "negative_cases_rejected": 7,
+  "negative_cases": [
+    "i16pointer",
+    "signedconversion",
+    "unrelatedconversionSSA",
+    "unrelatedloadSSA",
+    "realFP32controlartifacts",
+    "missingFP32multiply",
+    "nonFP32atomic"
   ],
-  "inherited_functions_AST_identical": [
-    "one",
-    "stable",
-    "sampler",
-    "process",
-    "verify_source",
-    "gpu_state"
+  "source_sha256": "5677ecc0917f53782018edf67741038211da8458eff47642c8475c5324ec93a0",
+  "limits": [
+    "Compiledartifactsarenotexecutiontrace.",
+    "Savedfullcorrectnessreportsall500queriespass;noacceptedtimingyet.",
+    "Newsourcefullprotocolrequiredafterexplicitapproval."
   ],
-  "other_code_files_byte_identical": true,
-  "protocol_delta_whitelist": "availabilitywaitcadence/limit/statusonly",
-  "limitations": [
-    "No new targetexecution; originalfullcorrectness/JIT/performance stillrequired.",
-    "Not an exclusiveGPUreservation; mid-childfailure/ineligible-timingstillstops.",
-    "NextCIMSsubmissionrequiresuserapproval."
-  ],
+  "parent_source": "60a585371206da30e404d45c230c74c735a4ac63",
   "source_files": {
     "code/analyze_full_baselines.py": "5fe2993e810a3e14ab550ab25d5e94d848eafdf397b3735ef6b8da011ad50b9b",
     "code/compare_exact.py": "9ce6dd171e767215bc55b056fb96e152ce8554831932d3abf6471220765d87da",
     "code/expected_baselines.py": "8d686da9e0382afb27ddd444a6676cf56cf4fb89eedede8698a33c946d8ecfb5",
     "code/guarded_domain.py": "f1f924868c19481efb374ddbb8df85b55a4b962caf5d8cacc4673926ab35415b",
-    "code/inspect_compact_jit.py": "e20d8fca841de189048a8c40ec9a7dceaa8eecefff7a7684684888cc20fa140f",
+    "code/inspect_compact_jit.py": "5677ecc0917f53782018edf67741038211da8458eff47642c8475c5324ec93a0",
     "code/reference_checks.py": "a8854075b242924e335fc2d05e476ca6a7e0adb77ec66209691c6c63938b24f9",
     "code/run_u8_study.py": "5db7021538964fa6661a911d03a0f9bba3c061089287f1da933bab41f6ef4c9a",
     "code/validate_baseline_outputs.py": "2f39a428e314d98b664d8cf4fe561a87955467919128c94fdd65ad9cc0fd5262",
