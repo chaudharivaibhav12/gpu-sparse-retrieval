@@ -2,73 +2,70 @@
   "experiment_id": "2026-11-18-bmp-full-collection",
   "status": "DRAFT: not registered; no recorded run",
   "recording": "self-contained runtime gate (code/gate.py, a copy of experiments/2026-11-18-range-pruning/code/gate.py at 0dc7b3b, amendments 1 and 3) and self-recorded manifests; not recorded by the team runtime",
-  "question": "How do the exact GPU scorers (range v2 and seeded range-bound pruning) compare with BMP, the exact state-of-the-art CPU method, on the same machine, index, queries and answers, at full scale?",
-  "hypothesis": "None about the size of the gap. Published single-thread BMP reports 10.5 ms mean for this collection at k=10 on other hardware; our GPU scorers measured 0.49-0.72 ms mean on cuda5. This run replaces that cross-paper indication with a paired same-host measurement",
+  "question": "How does BMP, the exact state-of-the-art CPU method, compare with the exact GPU scorers (range v2 and seeded range-bound pruning) on the same host (cuda5), index, queries and answers, at full scale?",
+  "hypothesis": "None about the size of the gap. Published single-thread BMP reports 10.5 ms mean for this collection at k=10 on other hardware; our GPU scorers measured 0.49-0.72 ms mean on cuda5. This run replaces that cross-paper indication with a same-host measurement",
   "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1 for the GPU scorers and GSP-CAP32-U64-NUMERIC-TIES-v1 for BMP (uint64 sums); identical answers under the uint32 guard. All passages eligible, ties by original numeric passage ID, cap32 query weights",
   "inputs": {
     "rule": "checked by whole-file SHA-256 before any scoring, in this order",
     "files": [
-      "full GSP",
-      "RBP W1024",
-      "RBP W256",
-      "BMP b32 raw",
+      "BMP b32 raw index",
       "calibration-500.tsv",
       "calibration-500.pisa",
       "CPU reference top-10"
     ],
     "sha256_in_order": [
-      "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac",
-      "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab",
-      "0ad6531c7698c7541fd9f6d62fb4fa34619e4b765656cccfa3d13fdc64202892",
       "eaf549b82636dba01287ebd7e9128244f1cbc8d85af233c9587a4a7c205df94d",
       "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
       "0ac4ad355c198fffa65a94ec4ae23da19a0fbea5978a690f343e850fdb7a00d9",
       "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed"
     ],
     "bmp_index_provenance": "Built with the patched BMP ciff2bmp --bsize 32 (raw block bounds) from the pinned raw CIFF (SHA-256 16b111a409c557b966322c3b093e96a83c54a76e7863a0af4db3d0ae57043953, re-downloaded on cuda2 from the pinned Hugging Face revision and accepted on hash equality) on cuda2, a CIMS host with 251 GB RAM: the build peaked at 44.1 GB (22 min), which cuda5 could not spare; an attempt there pushed other users into swap and was stopped. The 13,448,678,853-byte output was streamed to cuda5; its SHA-256 eaf549b8... was computed on the stream and on the cuda5 file and is equal. No compressed-bound index was built (see implementations.bmp-b32)",
-    "pisa_queries_provenance": "code/export_queries.py from the pinned GSP vocabulary; its first 25 lines are byte-identical to the 25-query file of the validated 1M BMP experiment (2026-11-11-bmp-resident-timing)"
+    "pisa_queries_provenance": "code/export_queries.py from the pinned GSP vocabulary; its first 25 lines are byte-identical to the 25-query file of the validated 1M BMP experiment (2026-11-11-bmp-resident-timing)",
+    "gpu_timing": "the 9 timing CSVs and receipts of v2-w1024, prune-w1024-s64 and prune-w256-s64 in 20261117-cuda5-prune-04/raw, hashed by run.sh and checked against that run's manifest"
   },
   "fixed": {
     "documents": 8841823,
     "k": 10,
     "query_count": 500,
-    "host": "cuda5 (2 x Xeon E5-2650 v2, RTX 4070 UUID GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7)"
+    "host": "cuda5 (2 x Xeon E5-2650 v2; BMP pinned to CPU 0, memory node 0)"
   },
   "implementations": {
     "bmp-b32": "pisa-engine/BMP 67ad8c683fbc0c30145d1ee42c1dffbed8b12332 with the reviewed canonical patch (experiments/2026-11-10-bmp-correctness-fixes) and resident-context overlay (experiments/2026-11-11-bmp-resident-timing), timed by code/project_benchmark_single.rs: the validated project_benchmark adapter with its timed query() and monitor() functions byte-identical and only the second (compressed) index and the raw/compressed interleaving removed, so one 13.4 GB index is resident instead of two (about 24 GB, which risked pushing other users into swap on cuda5). Raw block bounds: the faster layout in the team's 1M timing (compressed 12.11% slower), so the stronger BMP baseline. Pinned Cargo.lock, cargo build --release --locked with cuda5's system Rust. Block size 32, alpha = beta = 1 (exact), one Rayon thread pinned to CPU 0, memory bound to node 0, queries in file order",
-    "gpu": "the exact cuda_range_v2 and cuda_range_prune binaries of range-pruning run 20261117-cuda5-prune-04 (built and verified by 20261117-cuda5-prune-03), checked by hash; host thread on CPU 0, local allocation; 256 score threads",
     "configurations": [
-      "bmp-b32",
-      "v2-w1024",
-      "prune-w1024-s64",
-      "prune-w256-s64"
-    ]
+      "bmp-b32"
+    ],
+    "gpu_compared": "v2-w1024, prune-w1024-s64, prune-w256-s64 as recorded in range-pruning run 20261117-cuda5-prune-04 (binaries built and verified by 20261117-cuda5-prune-03)"
   },
   "timing_boundary": "BMP: per query, from the resident index and the query text to the ordered TREC top-k string (cursor creation, query preparation, bounds, scheduling, scoring, top-k), the validated adapter's boundary. GPU: from the parsed (term, weight) pairs to the ordered top-k in host memory, including launches, synchronisation and result transfer. BMP's boundary additionally includes query-text parsing and TREC string construction, which favours the GPU slightly; this is stated wherever the comparison is reported",
   "timing": {
     "processes": 3,
     "warmup_rounds": 3,
     "measured_rounds": 20,
-    "order": "every configuration once per pass, three passes with rotation offsets 0, ceil(n/3), ceil(2n/3)",
-    "before_each_process": "wait (30 s polls, bounded by the deadline) until other users' CPU use over 5 s is at most CPU_LIMIT cores and, for GPU scorers, no foreign GPU process is active with at least 7000 MiB of device memory free, or, for BMP, at least 20 GiB of host memory is available (BMP holds a 13.4 GB index resident; this avoids pushing other users into swap)",
-    "sampling": "every 0.5 s: machine CPU time from /proc minus the scorer and the sampler (all processes); nvidia-smi compute processes and per-process activity (GPU scorers); the BMP adapter also records CPU-0 jiffies and frequency before and after every round",
-    "eligibility": "a timing process is ineligible if other users' CPU use averaged more than CPU_LIMIT cores, or (GPU scorers) a foreign GPU process was active in its released phase or its own was not sampled; a non-zero exit while another GPU process was sampled is a contended failure (ineligible); any other failure stops the run",
+    "order": "BMP processes in sequence (the GPU side was timed in rotating order in its own run)",
+    "before_each_process": "wait (30 s polls, bounded by the deadline) until other users' CPU use over 5 s is at most CPU_LIMIT cores and at least 34 GiB of host memory is available. BMP holds about 26 GB resident (25.7 GB peak in development); the margin keeps it from being paged out or pushing other users into swap",
+    "sampling": "every 0.5 s: machine CPU time from /proc minus BMP and the sampler; the adapter records BMP's CPU jiffies (including iowait) and frequency before and after every round",
+    "eligibility": "a BMP timing process is ineligible if other users' CPU use averaged more than CPU_LIMIT cores, or if its CPU spent more than 1% of the measured rounds' time in iowait (the index was not resident, so the timing would measure the disk, not BMP); any other failure stops the run",
+    "iowait_limit": 0.01,
+    "iowait_rationale": "In a development check, one cold round on all 500 queries spent 321 s of its CPU time in iowait and 22 s computing (the 13.4 GB index is paged in lazily, on a machine that was swapping). The rule rejects any process whose timing includes paging",
     "replacement": "ineligible processes are kept under raw/ineligible/ and replaced without a count limit; the run stops at a 12-hour wall-clock deadline and can be resumed from the same commit",
     "cpu_limit_cores": 4.0,
-    "cpu_limit_rationale": "the value of the range-pruning experiment; BMP is single-threaded and pinned to CPU 0, and the adapter's CPU-0 records allow reporting how much of CPU 0 was used by others"
+    "cpu_limit_rationale": "the value of the range-pruning experiment, whose GPU timing is compared"
   },
-  "correctness_gate": "BMP's unit tests; two deliberate runtime-gate rejections (BMP CPU, v2 score threads); BMP once on all 500 queries equal to the CPU reference; every timing process's answers equal to the CPU reference. The GPU binaries' fixtures and correctness are those of range-pruning runs 03/04 (logs/reuse.txt). Any mismatch stops the run",
+  "correctness_gate": "BMP's unit tests; a deliberate runtime-gate rejection (BMP CPU); BMP once on all 500 queries equal to the CPU reference; every timing process's answers equal to the CPU reference. The GPU side's answers were checked against the same reference in every timing process of prune-04. Any mismatch stops the run",
   "analysis": {
     "per_process_query": "median of the 20 measured rounds",
-    "primary": "bmp-b32 / GPU scorer for v2-w1024, prune-w1024-s64 and prune-w256-s64: geometric mean over (process, query) pairs of median_bmp / median_gpu, paired by process index and query",
+    "primary": "bmp-b32 / GPU scorer for v2-w1024, prune-w1024-s64 and prune-w256-s64: geometric mean over (process, query) pairs of median_bmp / median_gpu, pairing BMP process i with prune-04 process i of each GPU configuration and the same query",
     "secondary": "descriptive median, mean, p95, p99 per configuration; BMP's CPU-0 busy share per process from its own /proc/stat snapshots",
-    "interval": "crossed process/query bootstrap, 10,000 draws, seed 20261118, percentile 2.5/97.5; conditional on this session and the calibration queries",
+    "interval": "crossed process/query bootstrap, 10,000 draws, seed 20261118, percentile 2.5/97.5; conditional on the two sessions and the calibration queries",
     "script": "analysis/analyze.py"
   },
   "limits": [
-    "one host; BMP single-threaded (its published setting), on a 2013 server CPU; GPU a 2023 consumer card",
-    "BMP's timing boundary includes query-text parsing and TREC output, the GPU's does not",
+    "one host; BMP single-threaded (its published setting) on a 2013 server CPU; GPU a 2023 consumer card",
+    "the BMP and GPU timings come from two sessions on the same host; pairing is by query and process index",
+    "BMP's timing boundary includes query-text parsing and TREC output, the GPU's does not (favours the GPU slightly)",
     "shared machine; calibration queries only; held-out untouched",
     "BMP is the exact state of the art; approximate methods (e.g. Seismic) are not compared"
-  ]
+  ],
+  "design": "BMP is timed in this run (CPU only). The GPU side is the recorded timing of range-pruning run 20261117-cuda5-prune-04: same host, same verified binaries, same 500 queries and timing boundary, another session (2026-11-17 00:46-01:30 UTC). GPU latencies were consistent across five sessions (control median 0.686-0.690 ms), and re-timing them would need a quiet GPU, which is the scarce resource. The pairing is by query and process index across the two sessions, and every report states it",
+  "development_disclosure": "Before registration one development round was seen (BMP on CPU 2, cold index, swapping machine: median 397 ms, dominated by iowait). No setting was chosen from it; it led to the memory threshold and the iowait rule"
 }
