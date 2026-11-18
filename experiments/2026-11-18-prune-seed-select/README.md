@@ -33,4 +33,19 @@ The kernel selects the same set as before: the S largest bounds, ties to the low
 
 ## Runs
 
+- [20261118-cuda5-ts-01](runs/20261118-cuda5-ts-01/README.md): **the result**. Completed; 20 answer comparisons equal to the reference; one contention replacement.
 - [dev](runs/dev/README.md): unit test, fixtures and smoke test (not results).
+
+## Findings
+
+The fast seed selection makes the pruned scorer **1.024× [1.022, 1.027] faster at range size 1024 and 1.027× [1.025, 1.029] at 256**, with identical seeds, schedule and answers. That is about 7-8 µs per query, much less than the profiled 22-48 µs of the old kernel, and not larger at 256 as the hypothesis expected. By the registered decision rule `cuda_range_prune_ts` replaces `cuda_range_prune_tb`.
+
+The project's exact scorers on the full collection (RTX 4070, k=10, 500 calibration queries) now stand as follows:
+
+| scorer | median ms | p99 ms | over the exact range scorer |
+|---|---:|---:|---|
+| v2-w1024 (exhaustive range scorer) | 0.690 | 1.085 | 1 |
+| prunets-w1024-s64 | 0.368 | 1.001 | 1.98× |
+| prunets-w256-s64 | 0.272 | 1.910 | 2.38× |
+
+Seed selection is no longer worth optimising further; the pruned scorer's time is now mostly scoring.

@@ -4,7 +4,7 @@
   "title": "Fast seed selection for the term-major pruned scorer",
   "owner": "parva",
   "branch": "exp/parva/2026-11-18-prune-seed-select",
-  "status": "registered 2026-11-18; recorded run 20261118-cuda5-ts-01 pending",
+  "status": "completed 2026-11-18: recorded run 20261118-cuda5-ts-01; prunets adopted by the decision rule (small gain)",
   "parent_experiment": "2026-11-18-prune-term-bounds",
   "parent_source_commit": "24b390e",
   "question": "Does a faster seed selection make the term-major pruned scorer faster, with the same seeds, schedule and answers?",
@@ -35,6 +35,56 @@
   "failure_rule": "Any mismatch or rejected expected run; ineligible processes are replaced.",
   "recording_ids": [],
   "runs": [
+    {
+      "run_id": "20261118-cuda5-ts-01",
+      "kind": "recorded",
+      "host": "cuda5",
+      "source_commit": "ce08a1c",
+      "status": "completed",
+      "readme": "experiments/2026-11-18-prune-seed-select/runs/20261118-cuda5-ts-01/README.md",
+      "results": "results/2026-11-18-prune-seed-select/20261118-cuda5-ts-01",
+      "correctness": "20 of 20 comparisons equal the CPU reference; prunets VERIFY=1 schedules equal the host recomputation; prunetb and prunets schedules identical",
+      "ineligible_processes": 1,
+      "median_ms": {
+        "v2-w1024": 0.69,
+        "prunetb-w1024-s64": 0.376,
+        "prunets-w1024-s64": 0.368,
+        "prunetb-w256-s64": 0.279,
+        "prunets-w256-s64": 0.272
+      },
+      "primary": {
+        "prunetb-w1024-s64 / prunets-w1024-s64": {
+          "ratio": 1.024,
+          "interval_95": [
+            1.022,
+            1.027
+          ]
+        },
+        "prunetb-w256-s64 / prunets-w256-s64": {
+          "ratio": 1.027,
+          "interval_95": [
+            1.025,
+            1.029
+          ]
+        }
+      },
+      "secondary": {
+        "v2-w1024 / prunets-w1024-s64": {
+          "ratio": 1.978,
+          "interval_95": [
+            1.912,
+            2.046
+          ]
+        },
+        "v2-w1024 / prunets-w256-s64": {
+          "ratio": 2.375,
+          "interval_95": [
+            2.268,
+            2.487
+          ]
+        }
+      }
+    },
     {
       "run_id": "dev",
       "kind": "development",

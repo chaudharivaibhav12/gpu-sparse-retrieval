@@ -1,0 +1,35 @@
+{
+  "config": {
+    "docs": 8841823,
+    "query_count": 500,
+    "k": 10,
+    "index_path": "/scratch/psp8502/full/full-8841823-w1024.rbp",
+    "queries_path": "data/derived/calibration-500.tsv",
+    "gpu_id": 0,
+    "range_size": 1024,
+    "postings_cap": 0,
+    "ranges": 8635,
+    "score_threads": 256,
+    "merge_threads": 256,
+    "verify_scores": 0,
+    "warmup_rounds": 0,
+    "repeats": 1,
+    "index_sha256": "482cb80e9e0830275fb9e9c4a56341a8965c565e31045677a8f1bf822cdd6b25",
+    "source_gsp_sha256": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac",
+    "mode": "cuda-range-prune",
+    "seed_ranges": 16
+  },
+  "behavior": {
+    "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+    "arithmetic": "uint32-guarded-exact-widened-uint64",
+    "document_impacts": "uint8-exact",
+    "query_policy": "BMP-f32-ceil-cap32",
+    "tie_order": "score_desc_original_numeric_id_asc",
+    "eligibility": "all_documents",
+    "layout": "range-split-bitpacked-positions-term-major",
+    "schedule": "seeded-range-bound-pruning;bound-lt-theta-skipped;persistent-work-list",
+    "bound": "weight*block-max-impact*max-multiplicity-uint32",
+    "seeds": "largest-bounds-ties-lower-range-radix-select-12bit-from-bound-bits-tiled-scan",
+    "bounds_kernel": "term-major-atomic-add"
+  }
+}
