@@ -172,6 +172,90 @@
       "after": "fix-1 re-gates passed; before any timed or profiled run",
       "change": "Binaries are taken from the fix-1 build directories on cuda5: build/v3variants-fix1 (all five variants, rebuilt from their registered commits; ctrl, v3-2 and v3-3 SASS equal to their gated builds), build/v3variants-clocks-fix1 and build/v3variants-stats-fix1. Session scripts: code/run_timing.sh, code/run_profile.sh, code/session_lib.sh, code/overlap.py; analyses analysis/analyze_timing_v3.py and analysis/theta_counts.py (code/review-run-scripts.json).",
       "reason": "The registered build commands were run into new directories after fix 1 so that no earlier build directory was overwritten."
+    },
+    {
+      "date": "2026-11-17",
+      "after": "Measurements A and B reported; owner decisions: change 1 dropped, uniform v3-3 preferred",
+      "change": "Measurement D registered (measurement_D): W=4096 is added for this measurement only (not_in_this_registration listed other range sizes); v3-3 with crossover argument 1 is timed as v3-3r at k=10/16/32/100/1000; v3-1 and v3-all are not timed again (the v3-all stats build is used for counts only).",
+      "reason": "Owner questions Q1-Q3 (measurement_D.questions)."
     }
-  ]
+  ],
+  "measurement_D": {
+    "name": "uniform radix, k=1000 attribution and range size at 1M",
+    "registered": "2026-11-18 UTC (2026-11-17 local), after the Measurement A/B report and the Measurement D gates, before any Measurement D timing",
+    "decisions_already_made": "change 1 (warp-cooperative lookup) is dropped: v3-1 and v3-all are not timed again; the per-thread binary search stays. Preferred final design: uniform v3-3 (theta-filtered merge plus radix local top-k at every k, no branch on k).",
+    "questions": {
+      "Q1": "Is uniform radix close enough to the current small-k path at small k (k=10, 16) to keep one code path?",
+      "Q2": "Why is radix slower than ctrl at k=1000 at W=1024: the theta filter, radix, or both? Hypothesis: at W=1024 a range's 1,000th score is usually 0, so theta filters nothing, and radix sorts about 1,024 keys per range.",
+      "Q3": "Does W=4096 beat W=1024 at some k, with and without the v3 changes?"
+    },
+    "code": "no kernel code changes; the timed builds of Measurements A/B (build/v3variants-fix1 on cuda5, CUDA 12.6): ctrl (main 74dd5d3, V2-5), v3-2 (025dbdb), v3-3 (510def3); stats build build/v3variants-stats-fix1/v3-all (a8a9a1e, -DRBP_V3_STATS=1; change 1 does not affect the counts)",
+    "variants": {
+      "ctrl": "V2-5 (main 74dd5d3)",
+      "v3-2": "theta-filtered merge, current (warp-list) local top-k",
+      "v3-3r": "theta-filtered merge + radix local top-k at every k: the v3-3 build with crossover argument 1 (host parameter); the candidate final, uniform v3-3",
+      "not_timed": "v3-3 with crossover 100 equals v3-2 below k=100 and v3-3r from k=100"
+    },
+    "indexes": {
+      "W=1024": "data/derived/hash-1000000-w1024-pos.rbp, sha256 3c653e914699ac9a6558d2889d0000aa29d573a5d045f43ea26d15fc2f6c68f5 (as in Measurements A/B)",
+      "W=4096": "data/derived/hash-1000000-w4096-pos.rbp, sha256 67e19c8c6eec751f709b644488c8f4bd13e72a821831a7ca9d65133fc02bed34 (11-14 v2 cuda5 gate and timing manifests); 100K gate index hash-100000-w4096-pos.rbp b8c6701c55e7fde9ba3eb98ce5b4dad10494a3ddd6dc33d8038c307e827a2e16",
+      "rule": "verified by SHA-256 before use (index-expected-sha256.txt in every run); neither index is rebuilt"
+    },
+    "gates": "code/gate_d.sh, run IDs 20261117-cuda5-gateD-<label>-NN: v3-2 and v3-3r (crossover 1) run the fixture suite (range sizes include 4096; version-3 cases enforced) and 100K and 1M x all 500 calibration queries x k=10/16/32/100/1000 at W=4096; v3-3r also at W=1024 for k=10/16/32; ctrl (no fixtures; gated at W=4096 on 11-14) at W=4096 for all five k. Exact match with the CPU oracle (k=16/32: first k entries of the top-100 oracle). Any failure stops Measurement D before timing; kernel code is not fixed in this measurement. Outcome: all passed (gateD-v3-2-02, gateD-v3-3r-01, gateD-ctrl-01; zero mismatches; SASS equal to the Measurement A builds: ctrl 53eb3cac, v3-2 5141e15b, v3-3 a644e9d5). gateD-v3-2-01 was stopped in its idle wait before any GPU job (kept, STATUS.md). Owner decision: the gates ran with IDLE_POLICY=log-only (other users' processes logged, not waited for; correctness only); timing keeps the full idle rule.",
+    "script": "code/run_d.sh (one cuda5 session); analyses analysis/analyze_d.py, analysis/stats_d.py, analysis/theta_cpu.cpp",
+    "matrix": "{ctrl, v3-2, v3-3r} x W {1024, 4096} x k {10, 16, 32, 100, 1000} = 30 cells",
+    "workload": {
+      "documents": 1000000,
+      "queries": "data/derived/calibration-500.tsv, all 500; the 6,480 held-out queries are not used",
+      "batch_size": 1,
+      "score_threads": 256,
+      "merge_threads": 256
+    },
+    "processes_per_cell": 3,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "set_order": "k=10, 16, 32, 100, 1000",
+    "order": "within each k, the 6 (variant, W) implementations in the fixed list ctrl-w1024, v3-2-w1024, v3-3r-w1024, ctrl-w4096, v3-2-w4096, v3-3r-w4096 rotate: in round p (0, 1, 2) implementation (i + offset_p) mod 6 runs i-th, offsets 0, 2, 4",
+    "boundary": "as Measurement A",
+    "during_timing": "every saved top-k group of every warm-up and measured round is compared with the oracle after each process; any mismatch stops the session",
+    "gpu_policy": "as gpu_policy (idle check before every process, monitors, overlap replace-and-preserve, samplers killed)",
+    "analysis": {
+      "reduction": "per process, median wall latency of each query over the 20 measured rounds",
+      "statistic": "geometric mean of paired query/process ratios (process p with process p of the same k set), pooled over the 3 x 500 pairs",
+      "uncertainty": "crossed query/process bootstrap, 10,000 draws, 95% percentile interval, seed 20261118 (new for Measurement D); conditional on this calibration set and session",
+      "contrasts_per_k": "every cell / ctrl-w1024; each variant W=4096 / W=1024; per W: v3-3r / v3-2, v3-2 / ctrl, v3-3r / ctrl (same W); R3's best W=4096 cell / best W=1024 cell",
+      "decision_language": "faster/slower only when the 95% interval excludes 1; otherwise 'no difference resolved'"
+    },
+    "stats_set": {
+      "untimed": true,
+      "runs": "v3-all stats build at W=1024 and W=4096, k = 10, 100, 1000, all 500 calibration queries, 1 warm-up + 5 measured rounds, after the timing sets in the same session; outputs checked with the oracle",
+      "per_query": "candidates written, survivors after the final filter (GPU stats build); final theta and the share of ranges (with >= k documents) whose local k-th score is 0 (analysis/theta_cpu.cpp, exact CPU reference from the GSP index; ranges are uniform blocks of GSP order). The CPU survivors must equal the GPU survivors for every measured launch (checked against Measurement B's 300 rows before registration: 0 mismatches).",
+      "summaries": "median / IQR / max over queries of candidates written and survivors; share of queries with theta = 0; share of ranges with a zero k-th score (per-query median and pooled)"
+    },
+    "decision_rules": {
+      "R1": {
+        "rule": "Uniform code. Per W, adopt v3-3r (theta + radix at every k, no branch on k) if v3-3r / v3-2 has its upper 95% bound <= 1.02 at BOTH k=10 and k=16. If not, report how far it misses, and give as fallback the crossover k = the smallest k in {16, 32, 100} with an upper bound < 1. Also report v3-3r / ctrl (same W) at k=1000 as the cost of uniformity at large k.",
+        "ks": [
+          10,
+          16
+        ],
+        "upper_bound_max": 1.02,
+        "fallback_crossover_ks": [
+          16,
+          32,
+          100
+        ]
+      },
+      "R2": {
+        "rule": "k=1000 attribution, per W: v3-2 / ctrl (cost of theta) and v3-3r / v3-2 (cost of radix). A factor whose upper 95% bound is > 1 is named as a cause."
+      },
+      "R3": {
+        "rule": "W per k: report every (variant, W) cell's ratio to ctrl-w1024 and, per variant, W=4096 / W=1024. The best cell of each W is the one with the lowest point estimate of its ratio to ctrl-w1024 (ctrl-w1024 = 1). Recommend W=4096 for that k only if best W=4096 cell / best W=1024 cell has an upper 95% bound < 1; otherwise W=1024. Labelled calibration tuning, to be frozen before held-out evaluation."
+      }
+    },
+    "gpu_time_estimate": "gates used about 11.5 minutes of wall time (mostly fixtures); remaining for the session about 19 minutes of GPU process time (90 timed processes about 18 minutes from Measurement A process durations and the gate durations at W=4096; stats set about 1 minute); idle waits and CPU-side oracle checks come on top. Within the owner's 30-minute go-ahead.",
+    "stopping": "as stopping; a gate failure stops Measurement D and is reported (no kernel fix in this measurement)",
+    "report": "a 'Measurement D' section appended to report.md; the Measurement A and B sections are unchanged",
+    "launch": "the session is started only once the GPU has no compute process (a pre-launch wait on cuda5); within the session gpu_policy applies unchanged"
+  }
 }
