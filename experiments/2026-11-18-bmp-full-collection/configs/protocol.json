@@ -49,7 +49,8 @@
     "iowait_rationale": "In a development check, one cold round on all 500 queries spent 321 s of its CPU time in iowait and 22 s computing (the 13.4 GB index is paged in lazily, on a machine that was swapping). The rule rejects any process whose timing includes paging",
     "replacement": "ineligible processes are kept under raw/ineligible/ and replaced without a count limit; the run stops at a 12-hour wall-clock deadline and can be resumed from the same commit",
     "cpu_limit_cores": 4.0,
-    "cpu_limit_rationale": "the value of the range-pruning experiment, whose GPU timing is compared"
+    "cpu_limit_rationale": "the value of the range-pruning experiment, whose GPU timing is compared",
+    "amendment_1": "Registered 2026-11-18 after recorded run 20261118-cuda5-bmp-01 and before any later attempt. In that run another user's job grew while the first BMP timing process loaded; 25.8 GB of BMP was swapped out and it stalled paging back at about 3 MB/s, so the author stopped it after 22 minutes (no query had run; run 01 is kept as failed). Rule: while a BMP timing process runs, a watchdog checks its VmSwap every 15 s and stops it if more than 1 GiB is in swap; the process is then ineligible (paged out) and replaced. This only applies the iowait rule's purpose earlier: a paged-out BMP cannot give a valid timing. No timing output of run 01 exists or was read"
   },
   "correctness_gate": "BMP's unit tests; a deliberate runtime-gate rejection (BMP CPU); BMP once on all 500 queries equal to the CPU reference; every timing process's answers equal to the CPU reference. The GPU side's answers were checked against the same reference in every timing process of prune-04. Any mismatch stops the run",
   "analysis": {

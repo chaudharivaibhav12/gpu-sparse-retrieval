@@ -20,6 +20,7 @@
 #      are kept under raw/ineligible/ and replaced without a count limit; the run stops at
 #      DEADLINE_HOURS and can be resumed (RESUME=1). The rejection and correctness steps wait only
 #      for memory.
+#      Amendment 1: a BMP timing process with more than 1 GiB in swap is stopped and is ineligible.
 #   5. analysis (BMP against GPU_RUN's per-query medians) and manifest.
 set -u
 RUN_ID=$1
@@ -117,11 +118,25 @@ hold() {  # hold OUT_STEM TAG DIR
     [ -e "$RUN/expect/$tag.json" ] && mv "$RUN/expect/$tag.json" "$dir/expect.json"
     rm -f "$RUN/analysis/compare-$tag.json" "$RUN/analysis/checked-$tag"
 }
+# Amendment 1: while a BMP timing process runs, stop it if more than 1 GiB of it is in swap (it would
+# stall for hours paging back and could not give a valid timing); it is then ineligible and replaced.
+watchdog() {  # watchdog OUT_STEM
+    local out=$1 p s
+    while sleep 15; do
+        p=$(pgrep -f "project_benchmark_single.*--samples $out.bmp/samples.tsv" | head -1)
+        [ -z "$p" ] && continue
+        s=$(awk '/^VmSwap:/ {print $2}' "/proc/$p/status" 2>/dev/null)
+        if [ "${s:-0}" -gt 1048576 ]; then echo "$(date -u +%FT%TZ) VmSwap ${s} kB: stopped" > "$out.paged"; kill "$p"; return; fi
+    done
+}
 # verdict OUT_STEM -> eligible | ineligible | failed (and the measured-round iowait share of BMP's CPU)
 verdict() {
     python3 - "$1" "$CPU_LIMIT" "$IOWAIT_LIMIT" <<'PY'
 import csv, json, sys
 stem, limit, iowait_limit = sys.argv[1], float(sys.argv[2]), float(sys.argv[3])
+import os
+if os.path.exists(stem + ".paged"):
+    print("ineligible paged-out " + open(stem + ".paged").read().strip()); sys.exit()
 r = json.load(open(stem + ".receipt.json")); c = r["cpu_sampling"]
 if r["verdict"] != "accepted" or r["exit_code"] != 0:
     print("failed"); sys.exit()
@@ -213,7 +228,9 @@ for ((p=0;p<PROCESSES;p++)); do
     while true; do
         wait_quiet "$tag"
         stage "$tag"
+        watchdog "$out" & wpid=$!
         run_bmp "$out" "$ROUNDS" "$WARMUPS"
+        kill "$wpid" 2> /dev/null; wait "$wpid" 2> /dev/null
         [ -e "$out.receipt.json" ] || fail "$tag: no gate receipt"
         v=$(verdict "$out"); echo "$tag $v" >> "$RUN/logs/verdicts.txt"
         case "$v" in failed*) fail "$tag";; esac
