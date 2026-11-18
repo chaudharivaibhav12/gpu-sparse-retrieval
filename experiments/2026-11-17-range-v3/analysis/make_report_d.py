@@ -84,7 +84,9 @@ def main():
            "Registers and static shared memory from cuobjdump -res-usage in the Measurement D gate records; dynamic shared memory from the host formula (warp lists: 8 warps × min(k, 32 × ⌈W/256⌉) × 8 + W × 4; radix: P × 8 + 256 × 4 + W × 4, P = next power of two ≥ k). Blocks per SM for sm_89 as in section 5. Cell: shared bytes / blocks per SM (limit).", "",
            "| variant | instantiation | registers | static shared (B) | W | " + " | ".join("k=%d" % k for k in KS) + " |", "|---|---|---|---|---|" + "---|" * len(KS)]
     for label, run, inst_used in (("ctrl", "ctrl", "small-k"), ("v3-2", "v3-2", "small-k"), ("v3-3r", "v3-3r", "radix")):
-        text = (Path(a.gates) / ("20261117-cuda5-gateD-%s-01" % run) / "logs/res-usage.txt").read_text().splitlines()
+        passed = [d for d in sorted(Path(a.gates).glob("20261117-cuda5-gateD-%s-*" % run))
+                  if (d / "manifest.json").exists() and json.loads((d / "manifest.json").read_text())["status"] == "passed-gate"]
+        text = (passed[-1] / "logs/res-usage.txt").read_text().splitlines()   # latest passed gate of this label
         for i, line in enumerate(text):
             m = re.search(r"Function (\S+):", line)
             if not m or "range_scores" not in m.group(1):

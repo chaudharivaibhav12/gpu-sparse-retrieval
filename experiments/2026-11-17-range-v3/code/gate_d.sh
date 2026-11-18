@@ -7,6 +7,8 @@
 #   FIXTURES=1   run the fixture suite (tests/check_range_bitpack.py; its range sizes include 4096)
 #   W1024_KS     k values also gated at W=1024 (e.g. "10 16 32" for v3-3r); default none
 #   GPU (0), RUN_ROOT (results/2026-11-17-range-v3), WAIT_MAX (1800)
+#   IDLE_POLICY  wait (default) or log-only: proceed while other users' processes are on the
+#                GPU, logging them (gates only; correctness does not need an exclusive GPU)
 # Real data: 100K and 1M x all 500 calibration queries x k = 10, 16, 32, 100, 1000 at W=4096,
 # 256 threads, compared with the cpu_pilot oracles; k=16/32 oracles are the first k entries
 # of the top-100 oracle (canonical total order). No timing. Kernel code is not changed.
@@ -33,12 +35,18 @@ idle() {   # $1 = job name; waits until the GPU is idle, logs one line per check
         ours=$(pgrep -u "$(id -u)" -fc "[/]scorer |[c]uda_range_v2 |[n]sys profile|[n]cu " || true)
         echo "$(date -u +%FT%TZ) job=$1 compute_apps=$apps our_gpu_jobs=$ours gpu=[$mem]" >> "$RUN/logs/gpu-checks.txt"
         [ "$apps" = 0 ] && [ "$ours" = 0 ] && return 0
+        # IDLE_POLICY=log-only (owner decision 2026-11-17, gates only, never timing): other users'
+        # GPU processes are logged (count and memory) and the job proceeds; our own jobs still block.
+        if [ "${IDLE_POLICY:-wait}" = log-only ] && [ "$ours" = 0 ]; then
+            echo "$(date -u +%FT%TZ) job=$1 proceeding with $apps other compute process(es) present (IDLE_POLICY=log-only; correctness only)" >> "$RUN/logs/gpu-checks.txt"
+            return 0
+        fi
         [ "$waited" -ge "$WAIT_MAX" ] && { echo "GPU_BUSY: not idle for ${WAIT_MAX}s before $1"; exit 3; }
         sleep 30; waited=$((waited+30))
     done
 }
 { echo "label: $LABEL"; echo "commit: $(cat "$BUILD/commit.txt")"; echo "flags: $(cat "$BUILD/flags.txt")"; echo "scorer extra argument: ${SCORER_ARG:-none}";
-  echo "checkout HEAD: $(git rev-parse HEAD)"; nvcc --version | tail -1; nvidia-smi -i "$GPU" --query-gpu=name,driver_version --format=csv,noheader; hostname -s; } > "$RUN/logs/environment.txt"
+  echo "idle policy: ${IDLE_POLICY:-wait}"; echo "checkout HEAD: $(git rev-parse HEAD)"; nvcc --version | tail -1; nvidia-smi -i "$GPU" --query-gpu=name,driver_version --format=csv,noheader; hostname -s; } > "$RUN/logs/environment.txt"
 sha256sum "$BUILD/scorer" "$BUILD/range_bitpack_tool" | sed "s|$BUILD/||" > "$RUN/logs/binary-sha256.txt"
 cuobjdump -sass "$BUILD/scorer" | grep -E '^\s+/\*[0-9a-f]{4}\*/' | sed -E 's#/\*[0-9a-f]{4}\*/##; s#;\s*/\*.*##' | sha256sum | cut -d' ' -f1 > "$RUN/logs/sass-sha256.txt"
 cuobjdump -res-usage "$BUILD/scorer" > "$RUN/logs/res-usage.txt" 2>&1
