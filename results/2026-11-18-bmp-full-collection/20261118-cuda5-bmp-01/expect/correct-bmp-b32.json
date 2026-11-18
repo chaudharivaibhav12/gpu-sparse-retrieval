@@ -1,0 +1,30 @@
+{
+  "config": {
+    "mode": "bmp-resident-single",
+    "docs": 8841823,
+    "query_count": 500,
+    "k": 10,
+    "block_size": 32,
+    "cpu": 0,
+    "warmups": 0,
+    "repeats": 1,
+    "rayon_threads": 1,
+    "index": "/scratch/psp8502/full/full-8841823-bmp-b32-raw.bmp",
+    "queries_path": "/scratch/psp8502/full/calibration-500.pisa",
+    "alpha": 1.0,
+    "beta": 1.0,
+    "order": "file-order",
+    "boundary": "resident-query-through-trec"
+  },
+  "behavior": {
+    "document_impacts": "uint8-exact",
+    "query_policy": "BMP-f32-ceil-cap32",
+    "tie_order": "score_desc_original_numeric_id_asc",
+    "eligibility": "all_documents",
+    "contract": "GSP-CAP32-U64-NUMERIC-TIES-v1",
+    "arithmetic": "uint64",
+    "resident_context": "numeric-ids-and-zero-order",
+    "bounds": "raw",
+    "selection": "sorted-wide-block-candidates"
+  }
+}

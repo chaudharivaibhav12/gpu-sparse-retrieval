@@ -4,7 +4,7 @@
   "title": "BMP (exact CPU state of the art) vs the exact GPU scorers on the full collection, same host",
   "owner": "parva",
   "branch": "exp/parva/2026-11-18-bmp-full-collection",
-  "status": "protocol registered 2026-11-17; no recorded run yet",
+  "status": "completed 2026-11-18: recorded run 20261118-cuda5-bmp-02 under the registered protocol with amendment 1",
   "parent_experiment": "2026-11-18-range-pruning",
   "parent_source_commit": "c891196",
   "question": "How does BMP compare with the exact GPU scorers on the same host, index, queries and answers, at full scale?",
@@ -34,5 +34,56 @@
   "success_rule": "A complete run under the registered protocol; the result is reported whatever the ratios are.",
   "failure_rule": "Any mismatch, rejected expected run, or failure other than an ineligible (contended or paging) process.",
   "recording_ids": [],
-  "runs": []
+  "runs": [
+    {
+      "run_id": "20261118-cuda5-bmp-02",
+      "kind": "recorded",
+      "host": "cuda5",
+      "source_commit": "7ad8f11",
+      "status": "completed",
+      "readme": "experiments/2026-11-18-bmp-full-collection/runs/20261118-cuda5-bmp-02/README.md",
+      "results": "results/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02",
+      "correctness": "4 of 4 comparisons equal the CPU reference (correctness + 3 timing processes x 23 rounds)",
+      "ineligible_processes": 0,
+      "bmp_median_ms": 11.904,
+      "bmp_mean_ms": 13.47,
+      "primary": {
+        "bmp-b32 / v2-w1024": {
+          "ratio": 16.845,
+          "interval_95": [
+            16.267,
+            17.457
+          ]
+        },
+        "bmp-b32 / prune-w1024-s64": {
+          "ratio": 25.462,
+          "interval_95": [
+            24.8,
+            26.137
+          ]
+        },
+        "bmp-b32 / prune-w256-s64": {
+          "ratio": 28.823,
+          "interval_95": [
+            28.035,
+            29.611
+          ]
+        }
+      },
+      "gpu_timing_from": "20261117-cuda5-prune-04"
+    },
+    {
+      "run_id": "20261118-cuda5-bmp-01",
+      "kind": "recorded",
+      "source_commit": "3d09cf6",
+      "status": "failed (BMP swapped out during load; no timing)",
+      "readme": "experiments/2026-11-18-bmp-full-collection/runs/20261118-cuda5-bmp-01/README.md"
+    },
+    {
+      "run_id": "dev",
+      "kind": "development",
+      "status": "index build, query export, correctness check, smoke tests dev-bmp-01/02/03, watchdog test; not results",
+      "readme": "experiments/2026-11-18-bmp-full-collection/runs/dev/README.md"
+    }
+  ]
 }

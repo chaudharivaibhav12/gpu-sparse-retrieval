@@ -33,11 +33,24 @@ On the full collection, BMP's top-10 equals the CPU reference on all 500 calibra
 
 ## Runs
 
-None recorded yet.
+- [20261118-cuda5-bmp-02](runs/20261118-cuda5-bmp-02/README.md): **the result**. Completed; every BMP answer equals the CPU reference; all three timing processes eligible (0.0% iowait).
+- [20261118-cuda5-bmp-01](runs/20261118-cuda5-bmp-01/README.md): stopped when BMP was swapped out during its load. No timing exists; it led to amendment 1 (swap watchdog).
+- [dev](runs/dev/README.md): index build, correctness check, smoke tests (not results).
 
 ## Findings
 
-Pending.
+On cuda5, full collection (8,841,823 passages), 500 calibration queries, k=10, exact answers everywhere:
+
+| | median ms | mean ms | p99 ms | BMP / GPU |
+|---|---:|---:|---:|---|
+| **BMP** (SIGIR '24; one CPU thread, b=32, raw bounds) | 11.904 | 13.470 | 38.399 | 1 |
+| range scorer v2-w1024 (RTX 4070) | 0.689 | 0.721 | 1.086 | **16.8× [16.3, 17.5]** |
+| pruned prune-w1024-s64 | 0.477 | 0.520 | 1.205 | **25.5× [24.8, 26.1]** |
+| pruned prune-w256-s64 | 0.388 | 0.492 | 2.133 | **28.8× [28.0, 29.6]** |
+
+The exact GPU scorers are 17-29× faster than the exact state-of-the-art CPU method on the same host, index, queries and answers. BMP's measured mean (13.5 ms on a 2013 2.6 GHz Xeon) is consistent with its published 10.5 ms on a 2.8 GHz Xeon. The GPU rows come from range-pruning run `20261117-cuda5-prune-04`, another session on the same host.
+
+This settles the open matched comparison for the exact, single-thread setting BMP reports. Multi-threaded BMP and approximate methods remain outside it.
 
 ## Limits
 

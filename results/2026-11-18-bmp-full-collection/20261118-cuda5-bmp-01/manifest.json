@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-18-bmp-full-collection",
+  "run_id": "20261118-cuda5-bmp-01",
+  "status": "failed",
+  "failure": "FAILED timing-r0-bmp-b32 2026-11-18T05:06:15Z: stopped by the author; 25.8 GB of the BMP process was swapped out during its load (another user's job grew) and it stalled paging back after 22 minutes with no query run",
+  "scope": "cuda5 BMP attempt under the registered protocol at 3d09cf6; build, inputs, gate rejection and correctness on all 500 queries passed; no timing value exists; led to amendment 1 (swap watchdog)",
+  "recording": "run.sh stops before its manifest stage on failure; this manifest was written at packaging on 2026-11-18 from the preserved folder, so the 'artifacts' section is empty and file hashes are those computed at packaging",
+  "source_commit": "3d09cf664381afccabd38e3570c88ce0c748495c",
+  "artifacts": {},
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [
+      {
+        "original": "raw/correct-bmp-b32-raw.tsv",
+        "sha256": "a58c2134bbef03af24d50767b6938f4c58ca3eb171f40f3399d78421fcf31ad3",
+        "bytes": 171570,
+        "public": "raw/correct-bmp-b32-raw.tsv",
+        "transformation": "decompressed from raw/correct-bmp-b32-raw.tsv.xz (sha256 62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd); original hash computed at packaging"
+      },
+      {
+        "original": "raw/correct-bmp-b32.bmp/results.tsv",
+        "sha256": "3d1c3b2233672c1accdb3c60426bf15ded0534e41195fa7d689264926033a288",
+        "bytes": 191577,
+        "public": "raw/correct-bmp-b32.bmp/results.tsv",
+        "transformation": "decompressed from raw/correct-bmp-b32.bmp/results.tsv.xz (sha256 221d7f6448d555793124b5f312b2e7f58d48fa2fac965f1982b2bb8545b728e8); original hash computed at packaging"
+      }
+    ],
+    "excluded": [
+      {
+        "original": "raw/correct-bmp-b32-raw.tsv.xz",
+        "sha256": "62ae3706701cdfb094eb22b8d8600055f138ac26696c92d7c8eb724600a8b9cd",
+        "bytes": 34504,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-01/raw/correct-bmp-b32-raw.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      },
+      {
+        "original": "raw/correct-bmp-b32.bmp/results.tsv.xz",
+        "sha256": "221d7f6448d555793124b5f312b2e7f58d48fa2fac965f1982b2bb8545b728e8",
+        "bytes": 34364,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-01/raw/correct-bmp-b32.bmp/results.tsv.xz.",
+        "reason": "xz form superseded by .gz"
+      }
+    ],
+    "recorded_artifacts_not_in_public_tree_or_lists": []
+  }
+}

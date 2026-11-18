@@ -1,0 +1,131 @@
+{
+  "run": "/scratch/psp8502/runs/2026-11-18-bmp-full-collection/20261118-cuda5-bmp-02",
+  "gpu_run": "/scratch/psp8502/runs/2026-11-18-range-pruning/20261117-cuda5-prune-04",
+  "gpu_warmups": 3,
+  "gpu_rounds": 20,
+  "processes": 3,
+  "warmups": 3,
+  "rounds": 20,
+  "queries": 500,
+  "development": false,
+  "cpu_limit_cores": 4.0,
+  "estimator": "per (process, query) median of the measured rounds; paired ratios by process index and query; geometric mean; crossed process/query bootstrap, 10000 draws, seed 20261118",
+  "reading": "'A / B' is how many times longer A takes than B: above 1, B is faster",
+  "configurations": {
+    "bmp-b32": {
+      "query_process_medians_ms": {
+        "median": 11.903565,
+        "mean": 13.469567805333332,
+        "p95": 27.665151150000003,
+        "p99": 38.39883263999998,
+        "max": 63.776049
+      },
+      "per_process_median_ms": [
+        12.0799365,
+        11.72448325,
+        11.841372499999999
+      ],
+      "other_cpu_cores_mean_per_process": [
+        1.923633670320595,
+        1.3414345178530582,
+        2.3666585658390167
+      ],
+      "cpu_busy_share_per_process": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "cpu_iowait_share_per_process": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "v2-w1024": {
+      "query_process_medians_ms": {
+        "median": 0.68915675,
+        "mean": 0.720711265,
+        "p95": 0.9616026999999997,
+        "p99": 1.0858085,
+        "max": 1.172745
+      },
+      "per_process_median_ms": [
+        0.689794,
+        0.687677,
+        0.6884792500000001
+      ],
+      "other_cpu_cores_mean_per_process": [
+        1.1653072501601482,
+        2.1899509594769144,
+        1.5215291234289612
+      ]
+    },
+    "prune-w1024-s64": {
+      "query_process_medians_ms": {
+        "median": 0.47693375,
+        "mean": 0.5200144329999999,
+        "p95": 0.9950830249999996,
+        "p99": 1.2053832999999998,
+        "max": 1.290325
+      },
+      "per_process_median_ms": [
+        0.47698275,
+        0.47729775,
+        0.47649949999999996
+      ],
+      "other_cpu_cores_mean_per_process": [
+        1.1736486148447451,
+        1.6919940764697217,
+        1.5074491133502297
+      ]
+    },
+    "prune-w256-s64": {
+      "query_process_medians_ms": {
+        "median": 0.3884205,
+        "mean": 0.4917144686666666,
+        "p95": 1.1936372499999999,
+        "p99": 2.13282565,
+        "max": 2.373305
+      },
+      "per_process_median_ms": [
+        0.38674525,
+        0.39011225,
+        0.38786750000000003
+      ],
+      "other_cpu_cores_mean_per_process": [
+        1.2016242562379271,
+        2.196332560813916,
+        1.4480290428303209
+      ]
+    }
+  },
+  "contrasts": {
+    "bmp-b32 / v2-w1024": {
+      "ratio": 16.8447307700499,
+      "interval_95": [
+        16.267261101151835,
+        17.4569205094666
+      ],
+      "pairs": 1500,
+      "group": "primary"
+    },
+    "bmp-b32 / prune-w1024-s64": {
+      "ratio": 25.46244462606612,
+      "interval_95": [
+        24.800467495676656,
+        26.137181601238265
+      ],
+      "pairs": 1500,
+      "group": "primary"
+    },
+    "bmp-b32 / prune-w256-s64": {
+      "ratio": 28.822631586702446,
+      "interval_95": [
+        28.035123588809714,
+        29.6113355003304
+      ],
+      "pairs": 1500,
+      "group": "primary"
+    }
+  }
+}
