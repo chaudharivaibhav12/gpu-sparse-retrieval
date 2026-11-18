@@ -48,8 +48,13 @@ def schedule(docs, range_size, weights, k, seeds):
     scored = set(chosen) | {r for r in range(ranges) if bound[r] >= theta}
     # Ranges scored only because their bound equals a positive theta exactly.
     equal = sum(1 for r in scored if r not in chosen and bound[r] == theta) if theta else 0
+    # Theta-filtered merge (cuda_range_prune_tm): every seed range's list, plus the lists of the other
+    # scored ranges whose best document reaches theta.
+    best = [max(scores[starts[r]:starts[r + 1]], default=0) for r in range(ranges)]
+    merged = len(chosen) + sum(1 for r in scored if r not in chosen and best[r] >= theta)
+    filtered = sum(1 for r in scored if r not in chosen and best[r] < theta)
     return dict(theta=theta, ranges=ranges, scored=len(scored), postings=sum(postings[r] for r in scored),
-                seeds=len(chosen), bound_equal_theta=equal)
+                seeds=len(chosen), bound_equal_theta=equal, merged=merged, filtered=filtered)
 
 
 def main():
@@ -71,7 +76,7 @@ def main():
     coverage = {"straddle": 0, "one_value_blocks": 0, "multi_tile_blocks": 0, "empty_terms": 0, "max_width": {}, "narrow_ranges": 0}
     summary = {"index_configurations": 0, "scorer_runs": 0, "query_checks": 0, "schedule_checks": 0, "tied_boundary_checks": 0,
                "pruned_queries": 0, "skipped_ranges": 0, "bound_equal_theta_ranges": 0, "seeded_below_k_queries": 0,
-               "expected_rejections": 0, "fixtures": {}}
+               "expected_rejections": 0, "merge_filter_checks": 0, "filtered_lists": 0, "fixtures": {}}
 
     for name, (ids, docs, vocab) in base.fixtures().items():
         gsp = root / ("%s.gsp" % name)
@@ -117,6 +122,10 @@ def main():
                             got = dict(theta=int(row["theta"]), scored=int(row["scored_ranges"]), postings=int(row["scored_postings"]))
                             assert got == {key: want[key] for key in got}, (name, w, k, seeds, row["query_id"], got, want)
                             assert int(row["ranges"]) == want["ranges"]
+                            if "merged_lists" in row:  # scorers with the theta-filtered merge
+                                assert int(row["merged_lists"]) == want["merged"], (name, w, k, seeds, row["query_id"], row["merged_lists"], want)
+                                summary["merge_filter_checks"] += 1
+                                summary["filtered_lists"] += want["filtered"] if row["phase"] == "measured" else 0
                             summary["schedule_checks"] += 1
                             if row["phase"] == "measured":
                                 summary["pruned_queries"] += want["scored"] < want["ranges"]
@@ -171,6 +180,7 @@ def main():
     assert summary["pruned_queries"] > 0 and summary["skipped_ranges"] > 0, "pruning never skipped a range"
     assert summary["bound_equal_theta_ranges"] > 0, "no range was kept only by bound == theta"
     assert summary["seeded_below_k_queries"] > 0, "no query seeded fewer than k documents"
+    assert not summary["merge_filter_checks"] or summary["filtered_lists"] > 0, "the theta filter never dropped a list"
     summary["coverage"] = coverage
     summary["range_sizes"], summary["depth_thread_settings"], summary["seeds"] = RANGE_SIZES, DEPTHS, SEEDS
     if args.output:

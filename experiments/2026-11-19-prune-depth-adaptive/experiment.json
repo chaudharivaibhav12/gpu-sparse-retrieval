@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-19-prune-depth-adaptive",
+  "title": "Deeper top-k with a theta-filtered merge, and adaptive range size",
+  "owner": "parva",
+  "branch": "exp/parva/2026-11-19-prune-depth-adaptive",
+  "status": "draft 2026-11-18: protocol not yet registered",
+  "parent_experiment": "2026-11-18-prune-seed-select",
+  "parent_source_commit": "574e1a8",
+  "question": "(A) Does a theta-filtered merge speed up the pruned scorer at k = 100 and 1000? (B) Does an adaptive range size beat fixed 1024 at k = 10 with a similar tail?",
+  "hypothesis": "(A) yes at depth, more at range size 256 and k = 1000, none at k = 10. (B) about 1.18x over fixed 1024 with a similar p99 (model of run ts-01).",
+  "motivation": "GPUSparse's headline is k = 1000 (merge-dominated); Arnav's theta-filtered merge idea; run ts-01's tail at range size 256.",
+  "code_paths": [
+    "src/cuda_range_prune_tm.cu",
+    "src/cuda_range_prune_ta.cu",
+    "tests/check_range_prune.py",
+    "tests/check_range_prune_adaptive.py",
+    "experiments/2026-11-19-prune-depth-adaptive/code/run.sh",
+    "experiments/2026-11-19-prune-depth-adaptive/code/expect.py",
+    "experiments/2026-11-19-prune-depth-adaptive/code/gate.py",
+    "experiments/2026-11-19-prune-depth-adaptive/analysis/analyze.py"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-19-prune-depth-adaptive/configs/protocol.json",
+    "experiments/2026-11-19-prune-depth-adaptive/configs/configs.tsv"
+  ],
+  "declared_changes": {
+    "new_scorers": "src/cuda_range_prune_tm.cu (theta-filtered merge), src/cuda_range_prune_ta.cu (adaptive range size)",
+    "new_test": "tests/check_range_prune_adaptive.py",
+    "changed_test": "tests/check_range_prune.py: merged-list model, checked only for scorers that report merged_lists",
+    "control": "src/cuda_range_v2.cu and src/cuda_range_prune_ts.cu unchanged",
+    "shared_files": "tests/check_range_prune.py (additive check)"
+  },
+  "scoring_contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "query_split": "calibration-500 only; held-out untouched",
+  "correctness_rule": "Every configuration's top-k equals the CPU reference at its depth for every query; VERIFY=1 schedules (incl. merged lists and the switch) equal the host recomputation; prunets and prunetm schedules identical.",
+  "success_rule": "A complete run under the registered protocol; reported whatever the ratios are.",
+  "failure_rule": "Any mismatch or rejected expected run; ineligible processes are replaced.",
+  "recording_ids": [],
+  "runs": [
+    {
+      "run_id": "dev",
+      "kind": "development",
+      "status": "references, fixtures and smoke tests; not results",
+      "readme": "experiments/2026-11-19-prune-depth-adaptive/runs/dev/README.md"
+    }
+  ]
+}

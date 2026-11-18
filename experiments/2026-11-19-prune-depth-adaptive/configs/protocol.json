@@ -1,0 +1,94 @@
+{
+  "experiment_id": "2026-11-19-prune-depth-adaptive",
+  "status": "DRAFT 2026-11-18: not yet registered",
+  "recording": "self-contained runtime gate (code/gate.py, a copy of experiments/2026-11-18-range-pruning/code/gate.py (amendments 1 and 3)) and self-recorded manifests; not recorded by the team runtime",
+  "question": "(A) At depths k = 100 and 1000, does a theta-filtered merge make the pruned scorer faster, with the same schedule and answers? (B) At k = 10, does choosing the range size per query (256, switching to 1024 when pruning is poor) beat the fixed balanced size 1024, with a similar tail?",
+  "hypothesis": "(A) At k = 1000 the final merge reads up to k candidates from every scored range in k sequential rounds, so it should dominate deep queries; dropping lists and candidates below the seeded theta (a lower bound on the final k-th score) should make prunetm faster than prunets at k = 100 and 1000, more so at range size 256 (more lists) and at k = 1000, with no measurable change at k = 10. (B) In run 20261118-cuda5-ts-01, 403 of 500 calibration queries were faster at size 256 and the slow ones were those that prune little; a model of that run's per-query medians (switch when more than 22% of small ranges are scored, plus about 12 us of extra launches per query and 50 us of wasted small-size work per switched query) predicts about 1.18x over fixed 1024 with a p99 near 1024's",
+  "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1; uint8 impacts, prepared integer query weights, uint32 accumulation under the conservative-bound guard, reported as uint64; ties by original numeric passage ID; all passages eligible",
+  "exactness": "prunetm: theta is the k-th best score among the seeded documents, so the final k-th score is at least theta; a dropped list or candidate scores strictly below theta and cannot be in the top k; candidates equal to theta are kept (canonical ties). Seeds, theta and the scored set are those of cuda_range_prune_ts. prunetma: each query runs exactly one complete prunetm schedule, on the small or the large index of the same collection (checked: same IDs, vocabulary, multiplicity and source GSP), so its answers are exact either way",
+  "inputs": {
+    "rule": "checked by whole-file SHA-256 before any scoring",
+    "gsp": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac",
+    "rbp_w1024": "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab (pinned in experiments/2026-11-15-full-collection-baselines; content hash 482cb80e9e0830275fb9e9c4a56341a8965c565e31045677a8f1bf822cdd6b25)",
+    "rbp_w512": "d35a69909ea2507e29ac6c27edc96b4ca259e69614f9aca5029c6801d3f408a0 (content hash b5a23d269b58f29eaca1b1960db683f9b0064d3c6d5e71d7193f7017357cd3df)",
+    "rbp_w256": "0ad6531c7698c7541fd9f6d62fb4fa34619e4b765656cccfa3d13fdc64202892 (content hash 90b86a651aa0be4cc45094e9f1891df184c2d93718dc71f081a74072248cd328)",
+    "queries": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091 (500 calibration queries)",
+    "cpu_reference_top10": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed",
+    "provenance": "W512 and W256 built on cuda5 from the pinned GSP by range_bitpack_tool (`build GSP OUT SIZE positions`, uniform ranges), compiled from src/range_bitpack_tool.cpp and src/range_bitpack.h as last changed in 223cf4b; the same binary regenerated the pinned W1024 index with an equal hash",
+    "cpu_reference_top100": "70484b2361eb82f09aa9c1c6ef18ef85ba362c654a7bd3e88bf793498646daeb (the first 100 rows per query of the top-1000 reference; a canonical ranking's prefix is the canonical top-100)",
+    "cpu_reference_top1000": "302b63d4fc0c55cb41eeb9f63ad9b108706ead26edb36304e7c57fbd9c9dc086, produced on cuda5 by `cpu_pilot score GSP calibration-500.tsv OUT 1000 500` (exhaustive uint64 scoring of every passage, canonical ties), built from src/cpu_pilot.cpp at main 574e1a8 with a binary hash equal to the pinned cpu_pilot (faeeabb9...); its first 10 rows per query equal the pinned top-10 reference"
+  },
+  "fixed": {
+    "documents": 8841823,
+    "k": 10,
+    "query_count": 500,
+    "score_threads": 256,
+    "host": "cuda5 (RTX 4070, UUID GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7; host thread on CPU 0, local allocation)"
+  },
+  "implementations": {
+    "v2": "src/cuda_range_v2.cu unchanged (variant 5): exhaustive; supports k up to 1000",
+    "prunets": "src/cuda_range_prune_ts.cu unchanged: the project's pruned scorer (run 20261118-cuda5-ts-01)",
+    "prunetm": "src/cuda_range_prune_tm.cu: prunets with the theta-filtered merge (phase-1 ranges whose best candidate is below theta take no list; candidates below theta are written invalid); reports merged_lists; VERIFY also checks merged_lists",
+    "prunetma": "src/cuda_range_prune_ta.cu: prunetm with both the 256 and 1024 indexes resident; every query runs the 256 schedule to its compaction, and switches to the full 1024 schedule if (seeds + kept) x 1000 > 220 x ranges; decided on the GPU (no host round trip; the unused path's kernels return at once); VERIFY checks the small schedule, the switch and the chosen path",
+    "build": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6)",
+    "prior_binaries": "cuda_range_v2, cuda_range_prune_ts and range_bitpack_tool are the binaries of run 20261118-cuda5-ts-01 (hash-checked, sources unchanged); their fixtures are not repeated; correctness at every depth is run here",
+    "switch_threshold": "220 permille, fixed before this run from the per-query medians of recorded run 20261118-cuda5-ts-01 (calibration queries) with the cost model in the hypothesis; not tuned on this run; the held-out evaluation is the unbiased test"
+  },
+  "configurations": [
+    "v2-w1024-k10",
+    "prunets-w256-s64-k10",
+    "prunetm-w256-s64-k10",
+    "prunetm-w1024-s64-k10",
+    "prunetma-w256-1024-s64-p220-k10",
+    "v2-w1024-k100",
+    "prunets-w1024-s64-k100",
+    "prunetm-w1024-s64-k100",
+    "prunets-w256-s64-k100",
+    "prunetm-w256-s64-k100",
+    "prunetma-w256-1024-s64-p220-k100",
+    "v2-w1024-k1000",
+    "prunets-w1024-s64-k1000",
+    "prunetm-w1024-s64-k1000",
+    "prunets-w256-s64-k1000",
+    "prunetm-w256-s64-k1000",
+    "prunetma-w256-1024-s64-p220-k1000"
+  ],
+  "control": "v2-w1024-k<k> at each depth",
+  "timing_boundary": "Per query, host wall clock from building the query argument from its parsed (term, weight) pairs to the ordered top-k (original IDs and scores) in host memory, including every kernel launch, synchronisation and the result transfer (query_wall_ms, unchanged from v2). The pruned scorer's schedule statistics are copied after the boundary. Index loading, block maxima, tie ranks, the gate, output writes and checks are outside it",
+  "timing": {
+    "processes": 3,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "order": "every configuration once per pass, three passes with rotation offsets 0, ceil(n/3), ceil(2n/3)",
+    "before_each_process": "timing processes only: wait (30 s polls, bounded by the deadline) until no foreign GPU process is active, 7000 MiB of device memory are free (11000 MiB for prunetma, which holds both indexes) and other users' CPU use is at most CPU_LIMIT cores",
+    "sampling": "every 0.5 s during each process: nvidia-smi compute processes on the GPU and machine CPU time from /proc minus the scorer and the sampler; sampler on CPU 15",
+    "eligibility": "a timing process is ineligible if a foreign GPU process was active (per-process SM or memory utilisation above 0, or listed but not reported) in its released phase, its own was not sampled, or other users' CPU use averaged more than CPU_LIMIT cores; a non-zero exit while another GPU process was sampled is a contended failure (ineligible); any other failure stops the run",
+    "replacement": "ineligible processes are kept under raw/ineligible/ and replaced without a count limit; the run stops at a 12-hour deadline and can be resumed from the same commit",
+    "cpu_limit_cores": 4.0,
+    "cpu_limit_rationale": "Every configuration is a GPU scorer with one host thread on CPU 0 (sampler on CPU 15, 14 other cores). The earlier GPU experiments (range batching, full-collection baselines) had no CPU rule. The CPU-baseline experiment's 1.0 core was first adopted here, but in dry-run dev-prune-01 another user's single-threaded job kept other CPU use at 1.1-2.7 cores for over 15 minutes with no GPU process, which would stall or fail the run without bearing on GPU timing. 4.0 cores is a quarter of the machine. It was set before registration and before any latency from this experiment was read; other users' CPU use is recorded for every process. The GPU rule (no other GPU process sampled) is unchanged",
+    "rules_source": "the range-pruning experiment's rules with its amendments 1-3 in force from the start"
+  },
+  "correctness_gate": "From the timed source and binaries on the timed host: tests/check_range_prune.py for prunetm (answers, the independent schedule model and its merged-list count) and tests/check_range_prune_adaptive.py for prunetma (answers, both paths' schedules, the switch); two deliberate gate rejections; every configuration once against the CPU reference at its depth, with VERIFY=1 for the configurations marked in configs.tsv (prunetm at k = 10 / 256 and k = 1000 at both sizes; prunetma at k = 10 and 1000); every timing process's answers against the reference at its depth; prunets and prunetm schedules identical at every size and depth (analysis). Any mismatch stops the run",
+  "analysis": {
+    "per_process_query": "median of the 20 measured rounds",
+    "primary_merge": "prunets-w<size>-s64-k<k> / prunetm-w<size>-s64-k<k> for size 1024 and 256 and k 100 and 1000",
+    "check_merge_k10": "prunets-w256-s64-k10 / prunetm-w256-s64-k10",
+    "primary_adaptive": "prunetm-w1024-s64-k10 / prunetma-w256-1024-s64-p220-k10, with both p99s",
+    "secondary": "prunetm-w256-s64-k<k> / prunetma at every k; prunetm-w1024-s64-k<k> / prunetma at k 100 and 1000; v2-w1024-k<k> / every pruned configuration at the same k",
+    "replication": "v2-w1024-k10 / prunets-w256-s64-k10 against run 20261118-cuda5-ts-01 (2.375)",
+    "descriptive": "median, mean, p95, p99 of the query-process medians; scored range fraction, postings, merged lists and (prunetma) switched queries per configuration",
+    "interval": "crossed process/query bootstrap, 10,000 draws, seed 20261118, percentile 2.5/97.5; conditional on this session and the calibration queries",
+    "script": "analysis/analyze.py"
+  },
+  "decision_rule": {
+    "merge": "prunetm replaces prunets as the project's pruned scorer if at least one primary-merge interval lies wholly above 1, none lies wholly below 1, and the k = 10 check interval's lower end is at least 0.98 (no regression above 2% at k = 10); otherwise prunets is kept and the result is reported",
+    "adaptive": "prunetma becomes the balanced configuration for the freeze (in place of fixed size 1024) if the primary-adaptive interval lies wholly above 1 and its k = 10 p99 is at most 1.10 x prunetm-w1024-s64-k10's p99; otherwise fixed 1024 stays the balanced configuration. The fastest-median configuration stays fixed size 256 either way; this run reports both",
+    "freeze": "the configurations proposed for the held-out freeze follow from these two rules; the freeze itself is registered separately"
+  },
+  "limits": [
+    "one host, one GPU (RTX 4070), batch 1",
+    "the switch threshold and both changes were designed from the same calibration queries (profile and run ts-01); the held-out evaluation is the unbiased test",
+    "prunetma needs both indexes on the GPU (about 9 GB at k = 1000), so it needs a mostly free 12 GB GPU",
+    "shared machine; calibration queries only; held-out untouched"
+  ]
+}
