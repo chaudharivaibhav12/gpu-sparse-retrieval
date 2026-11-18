@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-18-prune-term-bounds",
+  "title": "Term-major range bounds for the seeded range-bound pruning scorer",
+  "owner": "parva",
+  "branch": "exp/parva/2026-11-18-prune-term-bounds",
+  "status": "protocol draft; fixtures passed; no recorded run yet",
+  "parent_experiment": "2026-11-18-full-profile",
+  "parent_source_commit": "c891196",
+  "question": "Does computing the range bounds term-major make the pruned scorer faster, with an identical schedule and answers?",
+  "hypothesis": "Yes at both range sizes, more at 256, from the profiled 100-114 us bounds kernel.",
+  "motivation": "Profile-driven: per-range bounds kernel 23% of pruned kernel time, memory-latency bound.",
+  "code_paths": [
+    "src/cuda_range_prune_tb.cu",
+    "experiments/2026-11-18-prune-term-bounds/code/run.sh",
+    "experiments/2026-11-18-prune-term-bounds/code/expect.py",
+    "experiments/2026-11-18-prune-term-bounds/code/gate.py",
+    "experiments/2026-11-18-prune-term-bounds/analysis/analyze.py"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-18-prune-term-bounds/configs/protocol.json",
+    "experiments/2026-11-18-prune-term-bounds/configs/configs.tsv"
+  ],
+  "declared_changes": {
+    "new_scorer": "src/cuda_range_prune_tb.cu (term-major bounds; 44-line diff from cuda_range_prune.cu)",
+    "control": "src/cuda_range_prune.cu and src/cuda_range_v2.cu unchanged",
+    "shared_files": "none modified"
+  },
+  "scoring_contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "query_split": "calibration-500 only; held-out untouched",
+  "correctness_rule": "Every configuration's top-10 equals the CPU reference for every query; prunetb's schedule equals the host recomputation (VERIFY=1).",
+  "success_rule": "A complete run under the registered protocol; reported whatever the ratios are.",
+  "failure_rule": "Any mismatch or rejected expected run; ineligible processes are replaced.",
+  "recording_ids": [],
+  "runs": []
+}
