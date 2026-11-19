@@ -196,11 +196,15 @@ def main():
         adapter=root/'experiments/2026-11-17-gpusparse-u8-storage/code/fp32/canonical_baseline.py'
         probe="import json,numpy,scipy,torch,triton,hashlib;from pathlib import Path;p=Path(torch.__file__).parent;files=[Path(torch.__file__),*p.glob('_C*.so'),*[p/'lib'/n for n in ['libtorch_cuda.so','libtorch_cpu.so','libc10.so','libc10_cuda.so']]];hashes={str(f):hashlib.file_digest(f.open('rb'),'sha256').hexdigest() for f in files if f.is_file()};print(json.dumps(dict(torch_version=str(torch.__version__),triton_version=triton.__version__,numpy_version=numpy.__version__,scipy_version=scipy.__version__,torch_cuda_version=torch.version.cuda,library_sha256=hashes)))"
         observed([sys.executable,'-c',probe],'packages-before');environment=read(out/'logs/packages-before.stdout');assert environment==inputs['packages']
+        device_profile=read(root/'experiments'/E/'configs/device-profile.json');assert device_profile['target_uuid']==TARGET
+        resolver_environment=dict(environment,gpu_name=device_profile['gpu_name'],compute_capability=device_profile['compute_capability'])
         assert digest(inputs['bmp_binary']['path'])==inputs['bmp_binary']['sha256']
         assert digest(root/'experiments'/E/'code/project_benchmark_matched.rs')==inputs['bmp_binary']['adapter_sha256']
         builds={name:dict(source_commit=inputs['source_commit'],prepared_build_manifest_sha256=inputs['build_manifest']['sha256'],binary_sha256=prepared['binaries']['bmp' if name=='bmp' else 'prunets' if name.startswith('prunets') else 'range']['sha256'] if name!='compact' else None,packages=environment if name=='compact' else None) for name in ORDER}
-        def one(label,tag,repeats,warmups,verify,negative=False):
-            wait_resources(tag);status('running',stage=tag);directory=out/'raw'/tag;directory.mkdir()
+        def one(label,tag,repeats,warmups,verify,negative=False,plan_only=False):
+            if not plan_only:wait_resources(tag);status('running',stage=tag)
+            else:source_check()
+            directory=out/'raw'/tag;directory.mkdir()
             paths=dict(csv=directory/('samples.tsv' if label=='bmp' else 'timing.csv'),top=directory/('results.tsv' if label=='bmp' else 'top.tsv'),cpu_monitor=directory/'monitoring.tsv')
             if label.startswith('prunets'):
                 w=int(label[len('prunets'):]);index=inputs['rbp'+str(w)]['path'];state=pruned_expected(root,index,query,metadata[w],rows,repeats,warmups,verify);cfg=state['config'];behavior=state['behavior']
@@ -208,12 +212,14 @@ def main():
             elif label=='range':
                 index=inputs['rbp1024']['path'];cfg=re.config(index,query,metadata[1024],gm,rows,10,256,repeats,warmups,verify,0);behavior=re.marks();argv=[prepared['binaries']['range']['path'],index,query,paths['csv'],paths['top'],500,10,0,verify,repeats,warmups,256,256,gsp['path'] if verify else '-']
             elif label=='compact':
-                cfg=fe.expected(gsp['path'],query,inputs['oracle']['path'],inputs['native_repo'],adapter,environment,0,500,10,512,repeats,warmups,verify,{'triton_kernel.py':inputs['native_monolithic_sha256']},inputs['native_revision']);behavior=fe.marks(verify)
+                cfg=fe.expected(gsp['path'],query,inputs['oracle']['path'],inputs['native_repo'],adapter,resolver_environment,0,500,10,512,repeats,warmups,verify,{'triton_kernel.py':inputs['native_monolithic_sha256']},inputs['native_revision']);behavior=fe.marks(verify)
                 argv=[sys.executable,adapter,'--variant','monolithic','--index',gsp['path'],'--queries',query,'--reference',inputs['oracle']['path'],'--native-repo',inputs['native_repo'],'--csv',paths['csv'],'--top',paths['top'],'--validation',directory/'native-validation.json','--jit-manifest',directory/'jit-manifest.json','--limit',500,'--k',10,'--gpu',0,'--block-pl',512,'--repeats',repeats,'--warmups',warmups,'--verify',verify]
             else:
                 cfg=dict(mode='bmp-resident-parsed',docs=8841823,query_count=500,k=10,block_size=32,cpu=0,warmups=warmups,repeats=repeats,rayon_threads=1,index=inputs['bmp_index']['path'],queries_path=str(pisa),alpha=1.0,beta=1.0,order='file-order',boundary='parsed-query-through-host-numeric-topk')
                 behavior=dict(contract='GSP-CAP32-U64-NUMERIC-TIES-v1',arithmetic='uint64',document_impacts='uint8-exact',query_policy='BMP-f32-ceil-cap32',tie_order='score_desc_original_numeric_id_asc',eligibility='all_documents',resident_context='numeric-ids-and-zero-order',bounds='raw',selection='sorted-wide-block-candidates')
                 argv=[inputs['bmp_binary']['path'],'--index',inputs['bmp_index']['path'],'--queries',pisa,'--expected-docs',8841823,'--expected-queries',500,'--cpu',0,'--k',10,'--block-size',32,'--warmups',warmups,'--repeats',repeats,'--samples',paths['csv'],'--results',paths['top'],'--monitoring',paths['cpu_monitor']]
+            if plan_only:
+                path=out/'analysis'/(tag+'.json');write_new(path,dict(expected=cfg,behavior=behavior,command=list(map(str,argv)),qualification='CPU-only expected-state resolution; no retrieval execution'));return path
             if negative:cfg=dict(cfg,seed_ranges=65)
             spec=L.plan(dict(title='Matched calibration '+tag,question=question['id'],hypothesis='Exact same canonical answers; empirical timing differences',motivation='Five fresh controls under one disclosed boundary and admission protocol',owner='vaibhav',expected=cfg,behavior=behavior,split='calibration',success_rule='SPEC_VIOLATION before query data' if negative else 'EXECUTED, exact complete outputs, eligible timing where applicable',failure_rule='Preserve and review; up to3 reviewed technical repairs',next_if_null='Retain slower/null result without tuning',timing_boundary=BOUNDARY,inputs=[dict(role=key,path=item['path'],sha256=item['sha256']) for key,item in [('canonical_gsp',gsp),('queries',inputs['queries']),('oracle',inputs['oracle'])]]+([dict(role='index',path=inputs['bmp_index']['path'],sha256=inputs['bmp_index']['sha256']),dict(role='prepared_queries',path=str(pisa),sha256=digest(pisa))] if label=='bmp' else [dict(role='index',path=inputs['rbp'+('256' if label=='prunets256' else '1024')]['path'],sha256=inputs['rbp'+('256' if label=='prunets256' else '1024')]['sha256'])] if label!='compact' else []),build=builds[label],correctness_rule='All raw canonical answers match independent full oracle; complete sample/order checks',analysis_plan='Per-query20-round medians; paired process/query geometric ratios; fixed crossed bootstrap; no heldout',refs=[question['id']]))
             command=[sys.executable,root/'scripts/research.py','run',spec['id'],'--gate-seconds',600]
@@ -261,6 +267,10 @@ def main():
             assert valid,(tag,validation,summary)
             if timing and not eligible:raise ResourceIneligible(tag)
             completed.append(entry);return entry
+        preflight=[]
+        for verify,repeats,warmups,phase in [(1,1,0,'correctness'),(0,20,3,'timing')]:
+            for label in ORDER:preflight.append(one(label,'config-preflight-'+phase+'-'+label,repeats,warmups,verify,plan_only=True))
+        L.event('observation',dict(title='All five expected-state factories resolved before query execution',motivation='Catch incomplete software/hardware configuration assembly before any long correctness stage',artifacts=[L.blob(p) for p in preflight]+[L.blob(root/'experiments'/E/'configs/device-profile.json')]),[question['id']])
         resource_retries(one,'prunets256','reject-prunets-full-state',1,0,0,True)
         for label in ORDER:resource_retries(one,label,'correctness-'+label,1,0,1)
         for block in range(3):
