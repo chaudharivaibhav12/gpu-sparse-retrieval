@@ -27,11 +27,14 @@ Primary: pruned streams b32 against pruned sequential b32 (throughput).
 
 ## Runs
 
-- [20261119-cuda5-pb-01](runs/20261119-cuda5-pb-01/README.md): **the result**. Completed; every answer equal to the reference; 6 contention replacements; one pause for other users' job series.
-- [dev](runs/dev/README.md): fixtures, VERIFY check and smoke test (not results).
+- [20261119-cuda5-pb-02](runs/20261119-cuda5-pb-02/README.md): **the result**, under amendment 1 (pinned-core rule). Completed; every answer equal to the reference; no replacements.
+- [20261119-cuda5-pb-01](runs/20261119-cuda5-pb-01/README.md): the first recorded run, kept and reported. Its primary contrast was inconclusive because one process shared its pinned CPU 0 with another user's process. The machine-wide CPU rule could not see that, and amendment 1 closes the gap.
+- [dev](runs/dev/README.md): fixtures, VERIFY check, smoke tests, the diagnosis of pb-01's slow process, the audit of earlier runs, and the gate check (not results).
 
 ## Findings
 
-- **One query at a time,** the pruned scorer serves **3,126 queries/s**: 2.2× the exhaustive scorer one at a time, and 1.87× its best batch mode (1,669 q/s).
-- **8 queries in flight on streams** give **1.36× [1.361, 1.364] more throughput (4,255 q/s)**, consistently, with the lowest completion latency (median 1.0 ms, p99 3.6 ms).
-- **At 32 in flight,** two processes reached 4,415 q/s, but one clean process stayed at 2,830 q/s in every round. So the registered primary contrast, 1.22× [0.90, 1.42], includes 1, and by the decision rule streams is **not** adopted. The evidence favours batch 8 over batch 32 for a throughput mode; that would need its own registered test.
+From pb-02:
+- **One query at a time,** the pruned scorer serves **3,110 queries/s**: 2.2× the exhaustive scorer one at a time, and 1.87× its best batch mode (1,664 q/s).
+- **32 queries in flight on streams** give **1.41× [1.411, 1.413]** the throughput, **4,389 q/s**. That is **2.6×** the exhaustive scorer's best batch mode. By the registered rule, streams is the pruned scorer's throughput mode.
+- **8 in flight** give 1.37× (4,245 q/s) with the lowest completion latency: median 1.0 ms and p99 3.6 ms, against 3.7 / 9.1 ms at batch 32.
+- **pb-01, for comparison.** Its primary was 1.22× [0.90, 1.42] because of one process at 2,832 q/s. That process got 0.50 of its pinned core, and pb-02 shows this was a measurement artifact. Several queries in flight need the host thread to keep launching, so they are sensitive to a shared core; one query at a time is not.
