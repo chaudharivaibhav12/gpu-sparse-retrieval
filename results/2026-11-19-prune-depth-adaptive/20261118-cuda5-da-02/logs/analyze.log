@@ -1,0 +1,42 @@
+v2-w1024-k10                       median   0.688 ms  mean   0.719  p95   0.961  p99   1.083
+prunets-w256-s64-k10               median   0.273 ms  mean   0.376  p95   1.016  p99   1.909 scored ranges 0.063
+prunetm-w256-s64-k10               median   0.237 ms  mean   0.325  p95   0.852  p99   1.622 scored ranges 0.063 merged lists 65
+prunetm-w1024-s64-k10              median   0.318 ms  mean   0.352  p95   0.698  p99   0.885 scored ranges 0.345 merged lists 65
+prunetma-w256-1024-s64-p220-k10    median   0.248 ms  mean   0.314  p95   0.745  p99   0.951 scored ranges 0.063 merged lists 65 switched 53
+v2-w1024-k100                      median   2.687 ms  mean   2.705  p95   2.873  p99   2.956
+prunets-w1024-s64-k100             median   1.862 ms  mean   1.810  p95   2.845  p99   3.029 scored ranges 0.608
+prunetm-w1024-s64-k100             median   1.224 ms  mean   1.205  p95   1.895  p99   2.190 scored ranges 0.608 merged lists 94
+prunets-w256-s64-k100              median   1.319 ms  mean   1.701  p95   4.189  p99   5.831 scored ranges 0.202
+prunetm-w256-s64-k100              median   0.694 ms  mean   0.829  p95   1.829  p99   2.936 scored ranges 0.202 merged lists 112
+prunetma-w256-1024-s64-p220-k100   median   0.707 ms  mean   1.056  p95   2.050  p99   2.383 scored ranges 0.202 merged lists 102 switched 231
+v2-w1024-k1000                     median  12.380 ms  mean  12.387  p95  12.610  p99  12.734
+prunets-w1024-s64-k1000            median  11.270 ms  mean  10.471  p95  13.030  p99  13.214 scored ranges 0.854
+prunetm-w1024-s64-k1000            median   3.364 ms  mean   4.038  p95   8.867  p99  14.896 scored ranges 0.854 merged lists 510
+prunets-w256-s64-k1000             median  21.921 ms  mean  21.399  p95  36.910  p99  39.358 scored ranges 0.522
+prunetm-w256-s64-k1000             median   3.218 ms  mean   4.921  p95  14.410  p99  22.856 scored ranges 0.522 merged lists 1452
+prunetma-w256-1024-s64-p220-k1000  median   3.981 ms  mean   4.330  p95   8.251  p99  11.259 scored ranges 0.854 merged lists 538 switched 447
+check-merge-k10    prunets-w256-s64-k10 / prunetm-w256-s64-k10                          1.135 [  1.129,   1.141]
+primary-merge      prunets-w1024-s64-k100 / prunetm-w1024-s64-k100                      1.475 [  1.463,   1.491]
+primary-merge      prunets-w256-s64-k100 / prunetm-w256-s64-k100                        1.860 [  1.826,   1.899]
+primary-merge      prunets-w1024-s64-k1000 / prunetm-w1024-s64-k1000                    2.786 [  2.641,   2.901]
+primary-merge      prunets-w256-s64-k1000 / prunetm-w256-s64-k1000                      4.847 [  4.664,   5.036]
+primary-adaptive   prunetm-w1024-s64-k10 / prunetma-w256-1024-s64-p220-k10              1.169 [  1.150,   1.189]
+secondary-adaptive prunetm-w256-s64-k10 / prunetma-w256-1024-s64-p220-k10               0.979 [  0.971,   0.988]
+secondary-adaptive prunetm-w256-s64-k100 / prunetma-w256-1024-s64-p220-k100             0.825 [  0.808,   0.843]
+secondary-adaptive prunetm-w1024-s64-k100 / prunetma-w256-1024-s64-p220-k100            1.315 [  1.274,   1.358]
+secondary-adaptive prunetm-w256-s64-k1000 / prunetma-w256-1024-s64-p220-k1000           0.960 [  0.932,   0.989]
+secondary-adaptive prunetm-w1024-s64-k1000 / prunetma-w256-1024-s64-p220-k1000          0.909 [  0.879,   0.953]
+replication        v2-w1024-k10 / prunets-w256-s64-k10                                  2.372 [  2.263,   2.486]
+secondary          v2-w1024-k10 / prunetm-w256-s64-k10                                  2.692 [  2.575,   2.810]
+secondary          v2-w1024-k10 / prunetm-w1024-s64-k10                                 2.255 [  2.186,   2.327]
+secondary          v2-w1024-k10 / prunetma-w256-1024-s64-p220-k10                       2.636 [  2.533,   2.737]
+secondary          v2-w1024-k100 / prunets-w1024-s64-k100                               1.632 [  1.573,   1.697]
+secondary          v2-w1024-k100 / prunetm-w1024-s64-k100                               2.408 [  2.329,   2.488]
+secondary          v2-w1024-k100 / prunets-w256-s64-k100                                2.063 [  1.938,   2.196]
+secondary          v2-w1024-k100 / prunetm-w256-s64-k100                                3.837 [  3.660,   4.019]
+secondary          v2-w1024-k100 / prunetma-w256-1024-s64-p220-k100                     3.167 [  2.990,   3.351]
+secondary          v2-w1024-k1000 / prunets-w1024-s64-k1000                             1.224 [  1.195,   1.255]
+secondary          v2-w1024-k1000 / prunetm-w1024-s64-k1000                             3.410 [  3.218,   3.575]
+secondary          v2-w1024-k1000 / prunets-w256-s64-k1000                              0.666 [  0.634,   0.701]
+secondary          v2-w1024-k1000 / prunetm-w256-s64-k1000                              3.231 [  3.051,   3.415]
+secondary          v2-w1024-k1000 / prunetma-w256-1024-s64-p220-k1000                   3.100 [  2.993,   3.209]

@@ -30,4 +30,20 @@ Three processes each, 3 warm-up + 20 rounds, in rotating order. The decision rul
 
 ## Runs
 
-- [dev](runs/dev/README.md): fixtures and smoke tests (not results).
+- [20261118-cuda5-da-02](runs/20261118-cuda5-da-02/README.md): **the result**. Completed; 51 answer comparisons equal to the reference; 15 contention replacements; two pauses for other users' job series.
+- [20261118-cuda5-da-01](runs/20261118-cuda5-da-01/README.md): passed fixtures and correctness, which da-02 reuses; stopped during timing for harness throughput (amendment 1); not analysed.
+- [dev](runs/dev/README.md): references, fixtures and smoke tests (not results).
+
+## Findings
+
+Full collection, RTX 4070, 500 calibration queries; exact answers everywhere.
+
+| | k=10 | k=100 | k=1000 |
+|---|---:|---:|---:|
+| v2-w1024 (exhaustive), median ms | 0.688 | 2.687 | 12.380 |
+| best pruned, median ms | **0.237** (prunetm-w256) | **0.694** (prunetm-w256) | **3.218** (prunetm-w256) |
+| best pruned over v2 (paired) | 2.69× | 3.84× | 3.23-3.41× |
+| prunetma (adaptive), median / p99 ms | 0.248 / **0.951** | 0.707 / 2.383 | 3.981 / **11.259** |
+
+- **(A) Theta-filtered merge.** It makes the pruned scorer **1.48-1.86× faster at k=100 and 2.79-4.85× at k=1000**, and 1.14× at k=10, with an identical schedule and answers. Without it, pruning at range size 256 and k=1000 was slower than exhaustive scoring; with it, pruning is 3.2-3.4× faster than v2 at k=1000. By the decision rule, `cuda_range_prune_tm` becomes the project's pruned scorer.
+- **(B) Adaptive range size.** At k=10 it beats fixed 1024 by **1.17× [1.15, 1.19]**, keeps a p99 (0.951 ms) below the exhaustive scorer's (1.083 ms), and has the lowest mean. By the decision rule it becomes the balanced configuration for the freeze; fixed 256 stays the fastest-median one. Its threshold was set from k=10 data. At depth it switches most queries: slower than fixed 256 at k=100, but with the lightest tail at k=1000.
