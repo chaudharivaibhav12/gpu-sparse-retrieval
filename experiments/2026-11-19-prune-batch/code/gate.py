@@ -21,6 +21,14 @@ its nvidia-smi call returned, so a sample that straddles the release counts. `gp
 and no other GPU process was in the released phase, with no sampler errors; whole-life counts
 stay in the receipt. CPU use by others is recorded for every process; the eligibility rule for
 it is in configs/protocol.json.
+
+Amendment 1 of this experiment (pinned core): with --scorer-cpu C (the core numactl pins every
+thread of the scorer to), each sample also reads core C's line of /proc/stat. Other use of that
+core = its user + nice + system time minus the scorer's own time; interrupt and softirq time are
+left out (they follow device interrupt routing, not other users' processes). It is recorded over
+the whole life and over the released phase (a CPU sample is released if the release happened
+before it was taken). The machine-wide figure above cannot see this: one other process on the
+scorer's core is a small machine-wide load but halves the scorer's share of its core.
 """
 import argparse, datetime, json, os, subprocess, sys, threading, time
 from pathlib import Path
@@ -40,6 +48,17 @@ def machine_ticks():
     values = [int(x) for x in fields[:8]]  # user nice system idle iowait irq softirq steal; guest is inside user
     busy = sum(values) - values[3] - values[4]  # minus idle and iowait
     return busy
+
+
+def core_ticks(cpu):
+    """user + nice + system ticks of one core (amendment 1); interrupt time is excluded."""
+    name = "cpu%d" % cpu
+    with open("/proc/stat") as f:
+        for line in f:
+            fields = line.split()
+            if fields[0] == name:
+                return int(fields[1]) + int(fields[2]) + int(fields[3])
+    raise RuntimeError("no %s in /proc/stat" % name)
 
 
 def process_ticks(pid):
@@ -72,9 +91,9 @@ def activity(gpu_uuid, pids):
 
 
 class Sampler(threading.Thread):
-    def __init__(self, pid, gpu_uuid):
+    def __init__(self, pid, gpu_uuid, scorer_cpu=None):
         super().__init__(daemon=True)
-        self.pid, self.gpu_uuid = pid, gpu_uuid
+        self.pid, self.gpu_uuid, self.scorer_cpu = pid, gpu_uuid, scorer_cpu
         self.stop = threading.Event()
         self.released = threading.Event()
         self.lines = []
@@ -82,9 +101,12 @@ class Sampler(threading.Thread):
                         released_samples=0, released_own_samples=0, released_other_samples=0, released_other_max_mib=0,
                         other_active_samples=0, released_other_active_samples=0, released_other_idle_samples=0)
         self.cpu = dict(samples=0, other_cores_sum=0.0, other_cores_max=0.0, own_cores_sum=0.0, errors=0)
+        self.core = dict(samples=0, other_sum=0.0, other_max=0.0, released_samples=0, released_other_sum=0.0,
+                         released_other_max=0.0, released_own_sum=0.0, errors=0)
 
     def run(self):
         last = None
+        last_core = None
         while not self.stop.is_set():
             began = time.monotonic()
             line = now()
@@ -134,6 +156,25 @@ class Sampler(threading.Thread):
             except Exception as error:
                 self.cpu["errors"] += 1
                 line += " CPU_ERROR %r" % error
+            if self.scorer_cpu is not None:
+                try:
+                    current = (time.monotonic(), core_ticks(self.scorer_cpu), process_ticks(self.pid))
+                    released = self.released.is_set()
+                    if last_core and current[2] is not None and last_core[2] is not None:
+                        seconds = current[0] - last_core[0]
+                        core = (current[1] - last_core[1]) / TICKS / seconds
+                        own = (current[2] - last_core[2]) / TICKS / seconds
+                        other = max(0.0, core - own)
+                        k = self.core
+                        k["samples"] += 1; k["other_sum"] += other; k["other_max"] = max(k["other_max"], other)
+                        if released and last_core[3]:  # the whole interval lies in the released phase
+                            k["released_samples"] += 1; k["released_other_sum"] += other; k["released_own_sum"] += own
+                            k["released_other_max"] = max(k["released_other_max"], other)
+                        line += " core%d_busy=%.3f core_own=%.3f core_other=%.3f" % (self.scorer_cpu, core, own, other)
+                    last_core = current + (released,)
+                except Exception as error:
+                    self.core["errors"] += 1
+                    line += " CORE_ERROR %r" % error
             self.lines.append(line)
             self.stop.wait(max(0.0, SAMPLE_SECONDS - (time.monotonic() - began)))
 
@@ -154,6 +195,7 @@ def main():
     ap.add_argument("--receipt", required=True)
     ap.add_argument("--gpu-uuid")
     ap.add_argument("--sampler-cpu", type=int)
+    ap.add_argument("--scorer-cpu", type=int, help="amendment 1: the core the scorer is pinned to; sampled per core")
     ap.add_argument("command", nargs=argparse.REMAINDER)
     a = ap.parse_args()
     command = a.command[1:] if a.command[:1] == ["--"] else a.command
@@ -171,7 +213,8 @@ def main():
     process = subprocess.Popen(command, env=env, stdout=log, stderr=subprocess.STDOUT)
     if a.sampler_cpu is not None:
         os.sched_setaffinity(0, {a.sampler_cpu})
-    sampler = Sampler(process.pid, a.gpu_uuid)
+    assert a.scorer_cpu is None or a.scorer_cpu != a.sampler_cpu, "the sampler must not share the scorer's core"
+    sampler = Sampler(process.pid, a.gpu_uuid, a.scorer_cpu)
     sampler.start()
     actual, diff, verdict = None, None, "no-runtime-report"
     while process.poll() is None:
@@ -193,14 +236,24 @@ def main():
                other_cores_max=c["other_cores_max"],
                own_cores_mean=c["own_cores_sum"] / c["samples"] if c["samples"] else None,
                note="whole-run averages over the process's life, including index loading; machine busy time minus this scorer and this sampler")
+    k = sampler.core
+    core = dict(cpu=a.scorer_cpu, interval_seconds=SAMPLE_SECONDS, samples=k["samples"], errors=k["errors"],
+                other_cores_mean=k["other_sum"] / k["samples"] if k["samples"] else None, other_cores_max=k["other_max"],
+                released_samples=k["released_samples"],
+                released_other_cores_mean=k["released_other_sum"] / k["released_samples"] if k["released_samples"] else None,
+                released_other_cores_max=k["released_other_max"],
+                released_own_cores_mean=k["released_own_sum"] / k["released_samples"] if k["released_samples"] else None,
+                note="amendment 1: user+nice+system time of the scorer's pinned core minus the scorer's own time; "
+                     "released = sample intervals wholly after the release") if a.scorer_cpu is not None else None
     gpu = dict(g, interval_seconds=SAMPLE_SECONDS) if a.gpu_uuid else None
     gpu_eligible = (g["released_own_samples"] > 0 and g["released_other_active_samples"] == 0 and g["errors"] == 0) if a.gpu_uuid else None
     receipt = dict(started_utc=started, ended_utc=now(), argv=command, expected=expected, actual=actual, differences=diff,
                    verdict=verdict, exit_code=process.returncode, gpu_uuid=a.gpu_uuid, gpu_sampling=gpu,
-                   gpu_eligible=gpu_eligible, cpu_sampling=cpu)
+                   gpu_eligible=gpu_eligible, cpu_sampling=cpu, pinned_core_sampling=core)
     receipt_path.write_text(json.dumps(receipt, indent=2) + "\n")
-    print("GATE %s exit=%s gpu_eligible=%s other_cores_mean=%s" % (verdict, process.returncode, gpu_eligible,
-          "%.2f" % cpu["other_cores_mean"] if cpu["other_cores_mean"] is not None else "-"))
+    print("GATE %s exit=%s gpu_eligible=%s other_cores_mean=%s pinned_core_other=%s" % (verdict, process.returncode, gpu_eligible,
+          "%.2f" % cpu["other_cores_mean"] if cpu["other_cores_mean"] is not None else "-",
+          "%.3f" % core["released_other_cores_mean"] if core and core["released_other_cores_mean"] is not None else "-"))
     if verdict == "accepted" and process.returncode == 0:
         return 0
     return 3 if verdict == "rejected" else 1

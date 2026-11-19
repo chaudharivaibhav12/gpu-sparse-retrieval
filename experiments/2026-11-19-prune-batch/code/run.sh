@@ -17,8 +17,12 @@
 #      process compared with the reference. Eligibility, waiting, replacement, resume and the deadline are
 #      those of experiments/2026-11-19-prune-depth-adaptive (amendments 1-3 of range pruning, its amendment 1);
 #   6. analysis (analysis/analyze.py: throughput per round, paired ratios) and manifest.
+# Amendment 1 (pinned core): before each timing process, wait_quiet picks the least-busy core of
+# CORE_CANDIDATES (NUMA node 0, the node of every earlier run) and waits until that core's busy time is at
+# most CORE_LIMIT cores; the scorer is pinned there and code/gate.py samples that core (--scorer-cpu). A
+# process whose pinned core was used by others above CORE_LIMIT (released-phase mean) is ineligible.
 # Environment: GPU (index, default 0), PROCESSES (3), WARMUPS (3), ROUNDS (20), CPU_LIMIT (cores),
-# SAMPLER_CPU (15), FIXTURES (1), RUN_ROOT, FULL_DIR, DEADLINE_HOURS (12), RESUME, REUSE_FROM, REUSE_BUILD,
+# CORE_LIMIT (cores, amendment 1), SAMPLER_CPU (15), FIXTURES (1), RUN_ROOT, FULL_DIR, DEADLINE_HOURS (12), RESUME, REUSE_FROM, REUSE_BUILD,
 # DEV=1 (development: no clean-tree check, not a result; with DEV=1 only, CORRECTNESS=0 skips
 # correctness, FORCE_REPLACE=1 forces one replacement and QUIET=0 skips the quiet wait).
 set -u
@@ -26,6 +30,9 @@ RUN_ID=$1
 EXP=2026-11-19-prune-batch
 GPU=${GPU:-0}; PROCESSES=${PROCESSES:-3}; WARMUPS=${WARMUPS:-3}; ROUNDS=${ROUNDS:-20}
 CPU_LIMIT=${CPU_LIMIT:?set CPU_LIMIT (registered in protocol.json)}; SAMPLER_CPU=${SAMPLER_CPU:-15}
+CORE_LIMIT=${CORE_LIMIT:?set CORE_LIMIT (amendment 1, registered in protocol.json)}
+CORE_CANDIDATES="0 2 4 6 8 10 12 14"
+SCORER_CPU=0   # non-timing processes (gate rejections, correctness); timing processes use wait_quiet's choice
 FIXTURES=${FIXTURES:-1}; DEV=${DEV:-0}; LIMIT=500; RESUME=${RESUME:-0}; REUSE_FROM=${REUSE_FROM:-}
 DEADLINE_HOURS=${DEADLINE_HOURS:-12}
 F=${FULL_DIR:-/scratch/psp8502/full}
@@ -75,11 +82,26 @@ done < "$RUN/configs.tsv"
 n=${#NAMES[@]}
 
 gpu_others() { nvidia-smi -i "$GPU" --query-compute-apps=pid,used_memory --format=csv,noheader; }
-cpu_others() { python3 -c '
-import time
-def busy():
-    v=[int(x) for x in open("/proc/stat").readline().split()[1:9]]; return sum(v)-v[3]-v[4]
-import os; t=os.sysconf("SC_CLK_TCK"); a=busy(); time.sleep(5); print("%.2f"%((busy()-a)/t/5))'; }
+# cpu_state: over 5 s, machine busy cores and (amendment 1) the least-busy core of CORE_CANDIDATES
+# (user+nice+system time; ties to the lowest number). Prints "MACHINE CORE CORE_BUSY".
+cpu_state() { python3 - $CORE_CANDIDATES <<'PY'
+import os, sys, time
+cand = [int(x) for x in sys.argv[1:]]
+def read():
+    rows = {}
+    for line in open("/proc/stat"):
+        f = line.split()
+        if f[0].startswith("cpu"):
+            rows[f[0]] = [int(x) for x in f[1:9]]
+    return rows
+t = os.sysconf("SC_CLK_TCK"); a = read(); time.sleep(5); b = read()
+v = [y - x for x, y in zip(a["cpu"], b["cpu"])]
+machine = (sum(v) - v[3] - v[4]) / t / 5
+cores = {c: sum(b["cpu%d" % c][i] - a["cpu%d" % c][i] for i in range(3)) / t / 5 for c in cand}
+best = min(cand, key=lambda c: (cores[c], c))
+print("%.2f %d %.3f" % (machine, best, cores[best]))
+PY
+}
 past_deadline() { [ "$(date +%s)" -ge "$DEADLINE" ]; }
 # Amendment 3: the GPU is quiet when no foreign compute process is active (code/gate.py activity())
 # and at least MIN_FREE MiB of device memory is free (7000).
@@ -98,17 +120,18 @@ sys.exit(0 if not active and free >= need else 1)
 PY
 }
 wait_quiet() {  # wait_quiet TAG NAME: timing processes only; waits until quiet or the deadline
-    local tag=$1 need=7000 g c
-    # Development only: QUIET=0 skips the wait (a recorded run always waits).
-    [ "$DEV" = 1 ] && [ "${QUIET:-1}" = 0 ] && return 0
+    local tag=$1 need=7000 g c core busy
+    # Development only: QUIET=0 skips the wait (a recorded run always waits); the core is still chosen.
+    if [ "$DEV" = 1 ] && [ "${QUIET:-1}" = 0 ]; then read -r c SCORER_CPU busy <<< "$(cpu_state)"; return 0; fi
     while true; do
         past_deadline && fail "deadline reached waiting before $tag (resume with RESUME=1 and a later DEADLINE_HOURS)"
         local gq=0
-        g=$(gpu_quiet "$need") || gq=1; c=$(cpu_others)
-        if [ "$gq" = 0 ] && python3 -c "import sys; sys.exit(0 if $c <= $CPU_LIMIT else 1)"; then
-            echo "$(date -u +%FT%TZ) quiet other_cores=$c $g" >> "$RUN/logs/quiet-$tag.txt"; return 0
+        g=$(gpu_quiet "$need") || gq=1; read -r c core busy <<< "$(cpu_state)"
+        if [ "$gq" = 0 ] && python3 -c "import sys; sys.exit(0 if $c <= $CPU_LIMIT and $busy <= $CORE_LIMIT else 1)"; then
+            SCORER_CPU=$core
+            echo "$(date -u +%FT%TZ) quiet other_cores=$c scorer_cpu=$core core_busy=$busy $g" >> "$RUN/logs/quiet-$tag.txt"; return 0
         fi
-        echo "$(date -u +%FT%TZ) busy other_cores=$c $g" >> "$RUN/logs/busy-$tag.txt"
+        echo "$(date -u +%FT%TZ) busy other_cores=$c least_busy_cpu=$core core_busy=$busy $g" >> "$RUN/logs/busy-$tag.txt"
         sleep 30
     done
 }
@@ -119,14 +142,14 @@ run_cfg() {
     [ "$verify" = 1 ] && gsp=$GSP
     log python3 "$EXPECT" "$name" --rounds "$rounds" --warmups "$warmups" --limit "$LIMIT" --verify "$verify" --index "$rbp" \
         --queries "$Q" ${expect_seeds:+--seeds "$expect_seeds"} --output "$exp" || return 1
-    cmd=(env CUDA_VISIBLE_DEVICES="$UUID" numactl --physcpubind=0 --localalloc)
+    cmd=(env CUDA_VISIBLE_DEVICES="$UUID" numactl --physcpubind="$SCORER_CPU" --localalloc)
     case "${SCORER[$name]}" in
         # cuda_range_batch: VERIFY 1 = poisoning, counter checks and the in-driver CPU reference; 2 = poisoning and counters only.
         v2batch) cmd+=("$BUILD/cuda_range_batch" "$rbp" "$Q" "$out.csv" "$out.tsv" "$LIMIT" "$k" 0 "$verify" "$rounds" "$warmups" 256 "${MODE[$name]}" "${BATCH[$name]}" "$gsp") ;;
         tmb) cmd+=("$BUILD/cuda_range_prune_tmb" "$rbp" "$Q" "$out.csv" "$out.tsv" "$LIMIT" "$k" 0 "$verify" "$rounds" "$warmups" 256 256 "$gsp" "${SEEDS[$name]}" "${MODE[$name]}" "${BATCH[$name]}") ;;
         *) return 1 ;;
     esac
-    log python3 "$GATE" --expect "$exp" --receipt "$out.receipt.json" --gpu-uuid "$UUID" --sampler-cpu "$SAMPLER_CPU" -- "${cmd[@]}" >> "$RUN/logs/gate.txt" 2>&1
+    log python3 "$GATE" --expect "$exp" --receipt "$out.receipt.json" --gpu-uuid "$UUID" --sampler-cpu "$SAMPLER_CPU" --scorer-cpu "$SCORER_CPU" -- "${cmd[@]}" >> "$RUN/logs/gate.txt" 2>&1
 }
 checked() {  # checked OUT_STEM GROUPS_PER_QUERY NAME: answers against the CPU reference at the configuration's depth
     local out=$1 groups=$2 k=${DEPTH[$3]} tag; tag=$(basename "$out")
@@ -151,16 +174,18 @@ hold() {  # hold OUT_STEM TAG DIR
 }
 # verdict RECEIPT -> prints eligible | ineligible | failed
 verdict() {
-    python3 - "$1" "$CPU_LIMIT" <<'PY'
+    python3 - "$1" "$CPU_LIMIT" "$CORE_LIMIT" <<'PY'
 import json, sys
-r = json.load(open(sys.argv[1])); limit = float(sys.argv[2])
-c, g = r["cpu_sampling"], r["gpu_sampling"]
+r = json.load(open(sys.argv[1])); limit, core_limit = float(sys.argv[2]), float(sys.argv[3])
+c, g, k = r["cpu_sampling"], r["gpu_sampling"], r["pinned_core_sampling"]
 contended = g["other_samples"] > 0
 if r["verdict"] != "accepted":
     print("failed"); sys.exit()
 if r["exit_code"] != 0:
     print("ineligible" if contended else "failed"); sys.exit()
 ok = r["gpu_eligible"] and c["errors"] == 0 and c["samples"] > 0 and c["other_cores_mean"] <= limit
+# Amendment 1: others' use of the scorer's pinned core over the released phase.
+ok = ok and k["errors"] == 0 and k["released_samples"] > 0 and k["released_other_cores_mean"] <= core_limit
 print("eligible" if ok else "ineligible")
 PY
 }
@@ -320,14 +345,14 @@ stage timing-complete
 stage analysis
 DEVFLAG=; [ "$DEV" = 1 ] && DEVFLAG=--development
 rm -f "$RUN/analysis/statistics.json"
-log python3 "$ANALYZE" "$RUN" --processes "$PROCESSES" --warmups "$WARMUPS" --rounds "$ROUNDS" --cpu-limit "$CPU_LIMIT" $DEVFLAG \
+log python3 "$ANALYZE" "$RUN" --processes "$PROCESSES" --warmups "$WARMUPS" --rounds "$ROUNDS" --cpu-limit "$CPU_LIMIT" --core-limit "$CORE_LIMIT" $DEVFLAG \
     --output "$RUN/analysis/statistics.json" > "$RUN/logs/analyze.log" 2>&1 || fail analysis
 stage manifest
 STATUS=completed-timing; [ "$DEV" = 1 ] && STATUS=development-not-a-timing-result
 REUSE_NOTE=; [ -n "$REUSE_FROM" ] && REUSE_NOTE="; binaries, fixtures and correctness reused from $(basename "$REUSE_FROM") (logs/reuse.txt)"
 rm -f "$RUN/manifest.json"
 python3 experiments/2026-11-13-range-bitpack/code/write_manifest.py "$RUN" --status "$STATUS" \
-    --scope "host $(hostname -s); GPU $UUID; 8841823 documents; $LIMIT calibration queries; k=10; multi-query drivers; configurations ${NAMES[*]}; fixtures, gate and correctness checks then $PROCESSES processes each in rotating order; $WARMUPS warm-up + $ROUNDS measured rounds; CPU_LIMIT $CPU_LIMIT cores; replacements $(for x in "${NAMES[@]}"; do printf '%s=%s ' "$x" "${REPLACED[$x]}"; done)$REUSE_NOTE" \
+    --scope "host $(hostname -s); GPU $UUID; 8841823 documents; $LIMIT calibration queries; k=10; multi-query drivers; configurations ${NAMES[*]}; fixtures, gate and correctness checks then $PROCESSES processes each in rotating order; $WARMUPS warm-up + $ROUNDS measured rounds; CPU_LIMIT $CPU_LIMIT cores; CORE_LIMIT $CORE_LIMIT cores on the pinned core (amendment 1); replacements $(for x in "${NAMES[@]}"; do printf '%s=%s ' "$x" "${REPLACED[$x]}"; done)$REUSE_NOTE" \
     --flags "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17; g++ -O3 -std=c++17 -pthread" \
     --input "$Q" --input "$GSP" --input "${RBP[1024]}" --input "${RBP[512]}" --input "${RBP[256]}" --input "${ORACLE[10]}" \
     --binary "$BUILD/cuda_range_batch" --binary "$BUILD/cuda_range_prune_tmb" --binary "$BUILD/range_bitpack_tool" \

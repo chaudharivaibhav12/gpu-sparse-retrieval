@@ -1,6 +1,10 @@
 """Throughput and completion latency for a run of code/run.sh. Standard library only.
 
-python3 analyze.py RUN_DIR --processes P --warmups W --rounds R --cpu-limit C --output JSON [--development]
+python3 analyze.py RUN_DIR --processes P --warmups W --rounds R --cpu-limit C [--core-limit L] --output JSON [--development]
+
+Amendment 1: when a receipt has pinned_core_sampling (code/gate.py --scorer-cpu), a recorded run also
+requires others' released-phase use of the scorer's pinned core to be at most --core-limit cores.
+Receipts without it (run 20261119-cuda5-pb-01) are analysed as before; their pinned core is reported as 0.
 
 Per configuration and timing process, from raw/timing-r<p>-<NAME>.csv:
 - round time = sum of batch_wall_ms over the round's batches (each batch counted once; the 500
@@ -40,7 +44,7 @@ def rows_of(path):
         return list(csv.DictReader(fh))
 
 
-def load(run, name, p, warmups, rounds, cpu_limit, development):
+def load(run, name, p, warmups, rounds, cpu_limit, development, core_limit=None):
     path = run / "raw" / ("timing-r%d-%s.csv" % (p, name))
     rows = rows_of(path)
     assert len(rows) == (warmups + rounds) * QUERIES, "%s: %d rows" % (path, len(rows))
@@ -62,7 +66,14 @@ def load(run, name, p, warmups, rounds, cpu_limit, development):
     if not development:
         assert receipt["gpu_eligible"] is True, "%s: GPU not eligible" % path
         assert cpu["errors"] == 0 and cpu["other_cores_mean"] <= cpu_limit, "%s: CPU use by others above the limit" % path
-    return dict(throughput=throughput, completion=completion, schedule=schedule, other_cores_mean=cpu["other_cores_mean"])
+    core = receipt.get("pinned_core_sampling")
+    if core and not development:
+        assert core_limit is not None, "%s: pinned-core receipt needs --core-limit" % path
+        assert core["errors"] == 0 and core["released_samples"] > 0 and core["released_other_cores_mean"] <= core_limit, \
+            "%s: others used the pinned core above the limit" % path
+    return dict(throughput=throughput, completion=completion, schedule=schedule, other_cores_mean=cpu["other_cores_mean"],
+                pinned_cpu=core["cpu"] if core else 0,
+                pinned_core_other_mean=core["released_other_cores_mean"] if core else None)
 
 
 def contrast(a, b, rng):
@@ -83,11 +94,12 @@ def main():
     for key in ("processes", "warmups", "rounds"):
         ap.add_argument("--" + key, type=int, required=True)
     ap.add_argument("--cpu-limit", type=float, required=True)
+    ap.add_argument("--core-limit", type=float)
     ap.add_argument("--output", required=True)
     ap.add_argument("--development", action="store_true")
     a = ap.parse_args()
     names = [line.split("\t")[1] for line in (a.run / "configs.tsv").read_text().splitlines() if line.startswith("cfg\t")]
-    data = {n: [load(a.run, n, p, a.warmups, a.rounds, a.cpu_limit, a.development) for p in range(a.processes)] for n in names}
+    data = {n: [load(a.run, n, p, a.warmups, a.rounds, a.cpu_limit, a.development, a.core_limit) for p in range(a.processes)] for n in names}
     summary, schedules = {}, {}
     for n, procs in data.items():
         tp = [t for pr in procs for t in pr["throughput"]]
@@ -95,7 +107,9 @@ def main():
         summary[n] = dict(throughput_qps=dict(median=statistics.median(tp), mean=statistics.fmean(tp), min=min(tp), max=max(tp)),
                           per_process_median_qps=[statistics.median(pr["throughput"]) for pr in procs],
                           completion_latency_ms=dict(median=percentile(comp, 50), p95=percentile(comp, 95), p99=percentile(comp, 99)),
-                          other_cpu_cores_mean_per_process=[pr["other_cores_mean"] for pr in procs])
+                          other_cpu_cores_mean_per_process=[pr["other_cores_mean"] for pr in procs],
+                          pinned_cpu_per_process=[pr["pinned_cpu"] for pr in procs],
+                          pinned_core_other_mean_per_process=[pr["pinned_core_other_mean"] for pr in procs])
         if procs[0]["schedule"]:
             assert all(pr["schedule"] == procs[0]["schedule"] for pr in procs), "%s: schedule differs between processes" % n
             schedules[n] = procs[0]["schedule"]
@@ -119,7 +133,7 @@ def main():
     add("tmb-w256-sequential-b32", "v2batch-sequential-b32", "secondary")
     add("v2batch-batched-b32", "v2batch-sequential-b32", "replication")
     result = dict(run=str(a.run), processes=a.processes, warmups=a.warmups, rounds=a.rounds, queries=QUERIES, development=a.development,
-                  cpu_limit_cores=a.cpu_limit,
+                  cpu_limit_cores=a.cpu_limit, pinned_core_limit_cores=a.core_limit,
                   estimator="round throughput = 500 / sum of batch_wall_ms; ratios paired by (process, round); geometric mean; crossed process/round bootstrap, %d draws, seed %d" % (DRAWS, SEED),
                   reading="'A over B' is A's throughput divided by B's: above 1, A serves more queries per second",
                   configurations=summary, schedule_identical=schedule_identical, contrasts=contrasts)
