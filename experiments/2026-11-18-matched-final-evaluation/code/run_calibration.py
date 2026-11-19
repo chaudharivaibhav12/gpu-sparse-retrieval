@@ -226,7 +226,8 @@ def main():
             for name,path in paths.items():
                 if name!='cpu_monitor' or label=='bmp':command+=['--output',path]
             if label=='compact':command+=['--output',directory/'native-validation.json','--output',directory/'jit-manifest.json']
-            command+=['--command',*argv];stop=threading.Event();summary={};observer=None
+            admission=directory/'admission.jsonl'
+            command+=['--output',admission,'--command',sys.executable,root/'experiments'/E/'code/admit_exec.py','--log',admission,'--',*argv];stop=threading.Event();summary={};observer=None
             wait_resources(tag+'-final-admission');status('starting-instrumented-run',stage=tag,experiment=spec['id'],timing_requested=tag.startswith('timing-'))
             with (directory/'runner.stdout').open('xb') as so,(directory/'runner.stderr').open('xb') as se:
                 launch=['numactl','--physcpubind=0','--localalloc',*map(str,command)];write_new(directory/'runner-command.json',dict(argv=launch,cwd=str(root),environment_overrides=dict(CUDA_VISIBLE_DEVICES='0',OMP_NUM_THREADS='1',RAYON_NUM_THREADS='1',CUDA_MODULE_LOADING='LAZY',TRITON_CACHE_DIR=str(out/'jit'/tag),CUDA_CACHE_PATH=str(out/'cuda-cache'/tag))))
@@ -250,8 +251,14 @@ def main():
                     stop.set()
                     if observer is not None and observer.ident is not None:observer.join(timeout=45)
             assert not observer.is_alive();write_new(directory/'monitor-summary.json',summary);event=read(directory/'runner.stdout');done=event['id']
+            admission_records=[json.loads(line) for line in admission.read_text().splitlines()] if admission.exists() else []
+            admission_timeout=(event['payload'].get('exit_code')==75 and event['payload'].get('runtime') is None and admission_records and admission_records[-1]['decision']=='timeout' and not paths['csv'].exists() and not paths['top'].exists())
+            if admission_timeout:
+                review(L,done,dict(result_summary=dict(admission_timeout=True,monitor=summary),interpretation='Backend not started: post-hash admission timed out',conclusions=[],decision='Preserve failed runner attempt and replace under resource-only retry cap',motivation='Availability can change during runner hashing; no query compute allowed here',confidence='high',limitations=['Availability is not a reservation'],next_steps=[dict(task='Wait for resources and retry fresh attempt',owner='unassigned',reason='No backend executed',done_when='Post-hash admission succeeds')]))
+                entry=dict(tag=tag,label=label,run=done,valid=False,admission_timeout=True,monitor=summary);attempts.append(entry);write_new(out/'analysis'/(tag+'.json'),entry)
+                raise ResourceIneligible(tag)
             if negative:
-                valid=event['payload']['status']=='SPEC_VIOLATION' and set(event['payload'].get('runtime_delta',{}))=={'config.seed_ranges'} and not paths['csv'].exists() and not paths['top'].exists();lat={};validation={'deliberate_rejection':valid}
+                valid=event['payload']['status']=='SPEC_VIOLATION' and set(event['payload'].get('runtime_delta') or {})=={'config.seed_ranges'} and not paths['csv'].exists() and not paths['top'].exists();lat={};validation={'deliberate_rejection':valid}
             else:
                 valid=rc==0 and event['payload']['status']=='EXECUTED';lat={};validation={'status':event['payload']['status']}
                 if valid:

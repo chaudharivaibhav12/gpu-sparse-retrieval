@@ -79,5 +79,12 @@
     "Fresh full calibration with all fifteen eligible timing processes",
     "Independent raw/statistical/claim-time review",
     "Final immutable method/analysis/split freeze, then6480-query heldout evaluation"
-  ]
+  ],
+  "post_hash_admission": {
+    "reason": "Repair03 OOM before runtime report; competing contexts observed, allocation cause unproved",
+    "guard": "After private runner input hashes, before exec: same UUID, no GPU contexts, >=10000MiB GPUfree, >=34GiB host, <=4busy CPU cores, one-second CPU sample",
+    "budget_seconds": 120,
+    "resource_timeout": "Exit75, no runtime and no query output; preserve failed runner attempt and retry stage with fresh directory under existing three-attempt resource cap",
+    "limits": "No reservation; no OOM auto-retry or relaxed runtime gate. Arbitrary failures stop for inspection. No algorithm, timing-boundary or query split changes."
+  }
 }
