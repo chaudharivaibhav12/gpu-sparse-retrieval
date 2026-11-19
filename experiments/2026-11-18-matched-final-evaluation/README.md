@@ -11,3 +11,8 @@ The published CPU-BMP study uses text-to-TREC CPU timing and GPU timings from an
 The [calibration controller](code/run_calibration.py) uses the team runner, waits every two minutes for an empty GPU and sufficient host memory, preserves excluded attempts and retries only resource-ineligible timing attempts within a fixed cap. Correctness or technical failures stop for reviewed repair. It never signals a foreign GPU process. Exact source/binary/build/runtime/input identities and all per-query outputs are retained. Local checks cover four accepted raw formats, invalid outputs, process safety and resource retry boundaries; the [full runtime model](code/pruned_expected.py) reproduces both accepted raw pruned snapshots and rejects 22 invalid cases.
 
 Remaining prerequisites are the exact-source CPU/CUDA build and Linux monitoring smoke check, safe resource admission, full calibration, independent statistics and claim-time review. Only then may the final source/settings/split/analysis freeze precede the 6,480 held-out queries. No held-out content has been accessed and this preparation is not a held-out freeze.
+
+
+## Calibration06 and frozen heldout continuation
+
+Calibration06 completed the full five-system protocol and independent raw/provenance review; see runs/20261119-cuda5-matched-calibration06/README.md. Heldout preparation/evaluation drivers preserve all backends and scientific settings; configs/heldout-method.json binds phase runtime templates and allowed mechanically derived query metadata. The pre-content method freeze precedes parsing; exact runtime freezes are instantiated from that fixed method before each instrumented run. No6480heldout contents have been read at this source review.

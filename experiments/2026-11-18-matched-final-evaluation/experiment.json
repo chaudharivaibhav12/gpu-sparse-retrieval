@@ -4,7 +4,7 @@
   "title": "Strict matched full-collection controls and frozen final evaluation",
   "owner": "vaibhav",
   "branch": "exp/vaibhav/2026-11-18-matched-final-evaluation",
-  "status": "implementation-reviewed;CPU-validation-in-progress;full-calibration-pending",
+  "status": "calibration06-independently-validated;heldout-controller-reviewed",
   "parent_experiment": "2026-11-17-gpusparse-u8-storage",
   "parent_source_commit": "f263feed61a47f9b6317fff45df9788430b0ff2c",
   "parent_merge_commit": "b31ff7a57b3283884d637a8f8480e85640ae9242",
@@ -15,11 +15,15 @@
     "code\\project_benchmark_matched.rs",
     "code\\pruned_expected.py",
     "code\\run_calibration.py",
-    "code\\verify_collection_ids.rs"
+    "code\\verify_collection_ids.rs",
+    "code/run_heldout.py",
+    "code/run_final_evaluation.py",
+    "code/prepare_heldout_queries.py"
   ],
   "configuration_files": [
     "configs/protocol-draft.json",
-    "configs/pruned-runtime-templates.json"
+    "configs/pruned-runtime-templates.json",
+    "configs/heldout-method.json"
   ],
   "declared_changes": [
     "CPU PISA cap32 text is prepared once outside timer; duplicates counted exactly, unsupported >32 weights or >128 distinct terms rejected",
@@ -68,6 +72,7 @@
   ],
   "runs": [
     "20261118-cuda5-adapter-build01",
-    "20261118-cuda5-adapter-fixture01"
+    "20261118-cuda5-adapter-fixture01",
+    "20261119-cuda5-matched-calibration06"
   ]
 }
