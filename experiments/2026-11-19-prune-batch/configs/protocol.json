@@ -1,0 +1,72 @@
+{
+  "experiment_id": "2026-11-19-prune-batch",
+  "status": "REGISTERED 2026-11-18 before any recorded run; after tests/check_range_prune_batch.py on cuda_range_prune_tmb (1,296 runs), a full-collection VERIFY=1 check (40 queries, batch 32, range sizes 256 and 1024) and smoke test dev-pb-01 (DEV=1, no fixtures or correctness, no quiet wait, 1 process, 1 warm-up + 1 round) passed every stage. Only the smoke analysis's structure (contrast names, schedule check, answer comparisons) was read; no throughput or latency from this experiment was read before registration",
+  "recording": "self-contained runtime gate (code/gate.py, a copy of experiments/2026-11-18-range-pruning/code/gate.py (amendments 1 and 3)) and self-recorded manifests; not recorded by the team runtime",
+  "question": "Does running several queries in flight (one CUDA stream per query) raise the throughput of the exact pruned scorer with the theta-filtered merge, with the same schedule and answers, and how does it compare with the exhaustive range scorer's best batch mode?",
+  "hypothesis": "The pruned scorer runs five dependent kernels per query, two of them single-block (seed selection) or short (bounds, compaction), and its persistent scoring grid often has little work (6.3% of ranges at range size 256). One query at a time leaves the GPU partly idle; with 32 queries in flight on separate streams, one query's small kernels and idle gaps overlap others' scoring, so throughput should rise (by an unknown factor; not more than the inverse of one query's busy fraction). The range scorer's batched mode reached 1.20x its sequential throughput in run 20261117-cuda5-full-03; the pruned scorer starts about 2.7x faster per query",
+  "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1; uint8 impacts, prepared integer query weights, uint32 accumulation under the conservative-bound guard, reported as uint64; ties by original numeric passage ID; all passages eligible",
+  "exactness": "Each query owns every mutable object (bounds, marks and epoch, work list, state, candidates, heads, scratch, output, stream, pinned results); the kernels are cuda_range_prune_tm.cu's, unchanged, so each query's schedule and answers are those of the single-query scorer",
+  "inputs": {
+    "rule": "checked by whole-file SHA-256 before any scoring",
+    "gsp": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac",
+    "rbp_w1024": "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab (pinned in experiments/2026-11-15-full-collection-baselines; content hash 482cb80e9e0830275fb9e9c4a56341a8965c565e31045677a8f1bf822cdd6b25)",
+    "rbp_w512": "d35a69909ea2507e29ac6c27edc96b4ca259e69614f9aca5029c6801d3f408a0 (content hash b5a23d269b58f29eaca1b1960db683f9b0064d3c6d5e71d7193f7017357cd3df)",
+    "rbp_w256": "0ad6531c7698c7541fd9f6d62fb4fa34619e4b765656cccfa3d13fdc64202892 (content hash 90b86a651aa0be4cc45094e9f1891df184c2d93718dc71f081a74072248cd328)",
+    "queries": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091 (500 calibration queries)",
+    "cpu_reference_top10": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed",
+    "provenance": "W512 and W256 built on cuda5 from the pinned GSP by range_bitpack_tool (`build GSP OUT SIZE positions`, uniform ranges), compiled from src/range_bitpack_tool.cpp and src/range_bitpack.h as last changed in 223cf4b; the same binary regenerated the pinned W1024 index with an equal hash"
+  },
+  "fixed": {
+    "documents": 8841823,
+    "k": 10,
+    "query_count": 500,
+    "score_threads": 256,
+    "host": "cuda5 (RTX 4070, UUID GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7; host thread on CPU 0, local allocation)"
+  },
+  "implementations": {
+    "v2batch": "src/cuda_range_batch.cu unchanged (#15): multi-query driver for the exhaustive range scorer v2 (range size 1024), modes sequential and batched",
+    "tmb": "src/cuda_range_prune_tmb.cu: multi-query driver for cuda_range_prune_tm.cu (64 seeds), modes sequential (one query at a time) and streams (all queries of a batch launched on their own streams before any is collected)",
+    "build": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6)",
+    "prior_binaries": "range_bitpack_tool (fixture index builder) from run 20261118-cuda5-da-01, hash-checked"
+  },
+  "configurations": [
+    "v2batch-sequential-b32",
+    "v2batch-batched-b32",
+    "tmb-w256-sequential-b32",
+    "tmb-w256-streams-b8",
+    "tmb-w256-streams-b32",
+    "tmb-w1024-sequential-b32",
+    "tmb-w1024-streams-b32"
+  ],
+  "control": "tmb-w256-sequential-b32 (primary); v2batch-batched-b32 (secondary)",
+  "timing_boundary": "Per batch, host wall clock from the start of the batch (all its queries complete in host memory beforehand) to the last query's ordered top-k in pinned host memory (batch_wall_ms), including every launch, stream and event; per query, completion_ms from the batch start. Schedule statistics, checks and output writes are after the boundary",
+  "timing": {
+    "processes": 3,
+    "warmup_rounds": 3,
+    "measured_rounds": 20,
+    "order": "every configuration once per pass, three passes with rotation offsets 0, ceil(n/3), ceil(2n/3)",
+    "before_each_process": "timing processes only: wait (30 s polls, bounded by the deadline) until no foreign GPU process is active, 7000 MiB of device memory are free and other users' CPU use is at most CPU_LIMIT cores",
+    "sampling": "every 0.5 s during each process: nvidia-smi compute processes on the GPU and machine CPU time from /proc minus the scorer and the sampler; sampler on CPU 15",
+    "eligibility": "a timing process is ineligible if a foreign GPU process was active (per-process SM or memory utilisation above 0, or listed but not reported) in its released phase, its own was not sampled, or other users' CPU use averaged more than CPU_LIMIT cores; a non-zero exit while another GPU process was sampled is a contended failure (ineligible); any other failure stops the run",
+    "replacement": "ineligible processes are kept under raw/ineligible/ and replaced without a count limit; the run stops at a 12-hour deadline and can be resumed from the same commit",
+    "cpu_limit_cores": 4.0,
+    "cpu_limit_rationale": "Every configuration is a GPU scorer with one host thread on CPU 0 (sampler on CPU 15, 14 other cores). The earlier GPU experiments (range batching, full-collection baselines) had no CPU rule. The CPU-baseline experiment's 1.0 core was first adopted here, but in dry-run dev-prune-01 another user's single-threaded job kept other CPU use at 1.1-2.7 cores for over 15 minutes with no GPU process, which would stall or fail the run without bearing on GPU timing. 4.0 cores is a quarter of the machine. It was set before registration and before any latency from this experiment was read; other users' CPU use is recorded for every process. The GPU rule (no other GPU process sampled) is unchanged",
+    "rules_source": "the range-pruning experiment's rules with its amendments 1-3 in force from the start"
+  },
+  "correctness_gate": "From the timed source and binaries on the timed host: tests/check_range_batch.py (cuda_range_batch, all modes) and tests/check_range_prune_batch.py (cuda_range_prune_tmb, both modes, batch sizes with partial last batches, answers and the independent schedule model, VERIFY=1 poisoning); two deliberate gate rejections; every configuration once against the CPU reference, with VERIFY=1 for tmb-w256-streams-b32 (in-driver host recomputation of answers and schedule) and v2batch-batched-b32 (in-driver CPU reference); every timing process's answers against the reference; tmb schedules identical across rounds, processes and modes (analysis). Any mismatch stops the run",
+  "analysis": {
+    "per_process_round": "throughput = 500 / sum of batch_wall_ms over the round's batches",
+    "primary": "tmb-w256-streams-b32 over tmb-w256-sequential-b32 (throughput ratio, paired by process and round; geometric mean)",
+    "secondary": "tmb-w256-streams-b32 over v2batch-batched-b32; tmb-w256-streams-b8 over tmb-w256-sequential-b32; tmb-w1024-streams-b32 over tmb-w1024-sequential-b32; tmb-w256-sequential-b32 over v2batch-sequential-b32",
+    "replication": "v2batch-batched-b32 over v2batch-sequential-b32 against run 20261117-cuda5-full-03 (1.20)",
+    "descriptive": "median throughput (queries/s); completion latency median, p95, p99",
+    "interval": "crossed process/round bootstrap, 10,000 draws, seed 20261118, percentile 2.5/97.5; conditional on this session and the calibration queries",
+    "script": "analysis/analyze.py"
+  },
+  "decision_rule": "streams becomes the pruned scorer's throughput mode (reported with its batch size and completion latency) if the primary interval lies wholly above 1; otherwise the result is reported as negative and one query at a time stays the reference",
+  "limits": [
+    "one host, one GPU (RTX 4070), k = 10, batches formed from consecutive calibration queries with no arrival process",
+    "throughput and completion latency trade off: a query in a batch of 32 waits for its batch",
+    "shared machine; calibration queries only; held-out untouched"
+  ]
+}

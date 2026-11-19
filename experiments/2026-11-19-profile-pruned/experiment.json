@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-19-profile-pruned",
+  "title": "Hardware profile of the current pruned scorers",
+  "owner": "parva",
+  "branch": "exp/parva/2026-11-19-threshold-profile-batch",
+  "status": "completed 2026-11-18: run 20261118-cuda5-profile-02 (descriptive)",
+  "parent_experiment": "2026-11-19-prune-depth-adaptive",
+  "question": "Where does the time go now in prunetm / prunetma at k = 10 and 1000?",
+  "code_paths": [
+    "experiments/2026-11-19-profile-pruned/code/run_profile.sh",
+    "experiments/2026-11-18-full-profile/analysis/summarize.py"
+  ],
+  "query_split": "first 25 calibration queries; held-out untouched",
+  "runs": [
+    {
+      "run_id": "20261118-cuda5-profile-02",
+      "kind": "descriptive",
+      "host": "cuda5",
+      "source_commit": "c1ecb97",
+      "status": "completed",
+      "readme": "experiments/2026-11-19-profile-pruned/runs/20261118-cuda5-profile-02/README.md",
+      "results": "results/2026-11-19-profile-pruned/20261118-cuda5-profile-02",
+      "correctness": "10 of 10 profiled runs equal the CPU reference at their depth"
+    }
+  ]
+}

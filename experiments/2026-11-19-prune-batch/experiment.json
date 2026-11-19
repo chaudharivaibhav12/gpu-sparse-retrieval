@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-19-prune-batch",
+  "title": "Several queries in flight for the pruned scorer",
+  "owner": "parva",
+  "branch": "exp/parva/2026-11-19-threshold-profile-batch",
+  "status": "completed 2026-11-19: run 20261119-cuda5-pb-01; primary inconclusive (streams b32 not adopted); streams b8 1.36x secondary",
+  "parent_experiment": "2026-11-19-prune-depth-adaptive",
+  "question": "Does running several queries in flight (one CUDA stream per query) raise the throughput of the exact pruned scorer with the theta-filtered merge, with the same schedule and answers, and how does it compare with the exhaustive range scorer's best batch mode?",
+  "code_paths": [
+    "src/cuda_range_prune_tmb.cu",
+    "tests/check_range_prune_batch.py",
+    "experiments/2026-11-19-prune-batch/code/run.sh",
+    "experiments/2026-11-19-prune-batch/code/expect.py",
+    "experiments/2026-11-19-prune-batch/analysis/analyze.py"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-19-prune-batch/configs/protocol.json",
+    "experiments/2026-11-19-prune-batch/configs/configs.tsv"
+  ],
+  "declared_changes": {
+    "new_driver": "src/cuda_range_prune_tmb.cu",
+    "new_test": "tests/check_range_prune_batch.py",
+    "shared_files": "none modified"
+  },
+  "query_split": "calibration-500 only; held-out untouched",
+  "runs": [
+    {
+      "run_id": "20261119-cuda5-pb-01",
+      "kind": "recorded",
+      "host": "cuda5",
+      "source_commit": "6393970",
+      "status": "completed",
+      "readme": "experiments/2026-11-19-prune-batch/runs/20261119-cuda5-pb-01/README.md",
+      "results": "results/2026-11-19-prune-batch/20261119-cuda5-pb-01",
+      "ineligible_processes": 6,
+      "throughput_qps_median": {
+        "v2batch-sequential-b32": 1392.7,
+        "v2batch-batched-b32": 1668.8,
+        "tmb-w256-sequential-b32": 3126.2,
+        "tmb-w256-streams-b8": 4254.6,
+        "tmb-w256-streams-b32": 4411.0,
+        "tmb-w1024-sequential-b32": 2875.4,
+        "tmb-w1024-streams-b32": 3843.9
+      },
+      "contrasts": {
+        "tmb-w256-streams-b32 over tmb-w256-sequential-b32": {
+          "ratio": 1.218,
+          "interval_95": [
+            0.904,
+            1.419
+          ],
+          "group": "primary"
+        },
+        "tmb-w256-streams-b32 over v2batch-batched-b32": {
+          "ratio": 2.278,
+          "interval_95": [
+            1.696,
+            2.649
+          ],
+          "group": "secondary"
+        },
+        "tmb-w256-streams-b8 over tmb-w256-sequential-b32": {
+          "ratio": 1.363,
+          "interval_95": [
+            1.361,
+            1.364
+          ],
+          "group": "secondary"
+        },
+        "tmb-w1024-streams-b32 over tmb-w1024-sequential-b32": {
+          "ratio": 1.337,
+          "interval_95": [
+            1.327,
+            1.346
+          ],
+          "group": "secondary"
+        },
+        "tmb-w256-sequential-b32 over v2batch-sequential-b32": {
+          "ratio": 2.241,
+          "interval_95": [
+            2.233,
+            2.246
+          ],
+          "group": "secondary"
+        },
+        "v2batch-batched-b32 over v2batch-sequential-b32": {
+          "ratio": 1.198,
+          "interval_95": [
+            1.197,
+            1.2
+          ],
+          "group": "replication"
+        }
+      }
+    },
+    {
+      "run_id": "dev",
+      "kind": "development",
+      "status": "fixtures, VERIFY check and smoke test; not results",
+      "readme": "experiments/2026-11-19-prune-batch/runs/dev/README.md"
+    }
+  ]
+}

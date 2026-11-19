@@ -1,0 +1,11 @@
+# cfg	NAME	SCORER	RANGE_SIZE	SEEDS	MODE	BATCH	VERIFY
+# SCORER: v2batch = cuda_range_batch (exhaustive range scorer v2, multi-query driver), tmb = cuda_range_prune_tmb
+# (pruned scorer with the theta-filtered merge, multi-query driver). k = 10 throughout. VERIFY 1: in-driver host
+# recomputation of every answer (and, for tmb, the whole schedule) in the correctness stage.
+cfg	v2batch-sequential-b32	v2batch	1024	-	sequential	32	0
+cfg	v2batch-batched-b32	v2batch	1024	-	batched	32	1
+cfg	tmb-w256-sequential-b32	tmb	256	64	sequential	32	0
+cfg	tmb-w256-streams-b8	tmb	256	64	streams	8	0
+cfg	tmb-w256-streams-b32	tmb	256	64	streams	32	1
+cfg	tmb-w1024-sequential-b32	tmb	1024	64	sequential	32	0
+cfg	tmb-w1024-streams-b32	tmb	1024	64	streams	32	0

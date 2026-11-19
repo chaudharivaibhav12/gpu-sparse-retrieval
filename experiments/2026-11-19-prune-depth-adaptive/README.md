@@ -47,3 +47,14 @@ Full collection, RTX 4070, 500 calibration queries; exact answers everywhere.
 
 - **(A) Theta-filtered merge.** It makes the pruned scorer **1.48-1.86× faster at k=100 and 2.79-4.85× at k=1000**, and 1.14× at k=10, with an identical schedule and answers. Without it, pruning at range size 256 and k=1000 was slower than exhaustive scoring; with it, pruning is 3.2-3.4× faster than v2 at k=1000. By the decision rule, `cuda_range_prune_tm` becomes the project's pruned scorer.
 - **(B) Adaptive range size.** At k=10 it beats fixed 1024 by **1.17× [1.15, 1.19]**, keeps a p99 (0.951 ms) below the exhaustive scorer's (1.083 ms), and has the lowest mean. By the decision rule it becomes the balanced configuration for the freeze; fixed 256 stays the fastest-median one. Its threshold was set from k=10 data. At depth it switches most queries: slower than fixed 256 at k=100, but with the lightest tail at k=1000.
+
+## Follow-up: a per-depth switch threshold (analysis, no new run)
+
+[analysis/threshold_model.py](analysis/threshold_model.py) models other thresholds from da-02's per-query medians. Its output is in [threshold-model.json](../../results/2026-11-19-prune-depth-adaptive/20261118-cuda5-da-02/analysis/threshold-model.json).
+- **Method.** The adaptive scorer's overheads were measured in the same run: about 9 µs per query that stays at range size 256, and 92 / 143 / 627 µs per query that switches, at k = 10 / 100 / 1000.
+- **Validation.** The model reproduces the measured 220-permille result (v2 over adaptive 2.635 against 2.636 measured at k=10, 3.170 against 3.166 at k=100).
+- **k = 10:** 220 permille is already near-optimal (the best, 260, gains 0.1%).
+- **k = 100:** no threshold beats fixed 256 (best 3.80× against 3.84× over v2), because every query pays the overhead and few gain.
+- **k = 1000:** the best threshold (640) beats fixed 1024 by about 1% (3.42× against 3.39×).
+- **Decision.** A recorded run to confirm gains of at most about 1% was not made. For the freeze: adaptive at k = 10, fixed 256 at k = 100, fixed 1024 at k = 1000. The measured 220-permille adaptive scorer keeps the lightest k = 1000 tail.
+- **Caveat.** In-sample: the thresholds are judged on the same calibration queries.
