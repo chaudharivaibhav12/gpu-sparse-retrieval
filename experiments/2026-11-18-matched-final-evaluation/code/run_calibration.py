@@ -11,6 +11,9 @@ TARGET='GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7'
 BOUNDARY='Resident parsed cap32 term/weight pairs through fresh query preparation, complete exact retrieval/selection/transfers/synchronization, and ordered original numeric IDs and integer scores in host memory; excludes file decoding, index setup, domain validation and textual formatting.'
 ORDER=['prunets256','prunets1024','range','compact','bmp']
 class ResourceIneligible(RuntimeError):pass
+def admission_command(root,log,argv):
+    return [sys.executable,Path(root)/'experiments'/E/'code/admit_exec.py','--log',log,*argv]
+
 def resource_retries(run,label,tag,*args):
     for retry in range(3):
         try:return run(label,tag+('' if retry==0 else '-resource-retry'+str(retry)),*args)
@@ -227,7 +230,7 @@ def main():
                 if name!='cpu_monitor' or label=='bmp':command+=['--output',path]
             if label=='compact':command+=['--output',directory/'native-validation.json','--output',directory/'jit-manifest.json']
             admission=directory/'admission.jsonl'
-            command+=['--output',admission,'--command',sys.executable,root/'experiments'/E/'code/admit_exec.py','--log',admission,'--',*argv];stop=threading.Event();summary={};observer=None
+            command+=['--output',admission,'--command',*admission_command(root,admission,argv)];stop=threading.Event();summary={};observer=None
             wait_resources(tag+'-final-admission');status('starting-instrumented-run',stage=tag,experiment=spec['id'],timing_requested=tag.startswith('timing-'))
             with (directory/'runner.stdout').open('xb') as so,(directory/'runner.stderr').open('xb') as se:
                 launch=['numactl','--physcpubind=0','--localalloc',*map(str,command)];write_new(directory/'runner-command.json',dict(argv=launch,cwd=str(root),environment_overrides=dict(CUDA_VISIBLE_DEVICES='0',OMP_NUM_THREADS='1',RAYON_NUM_THREADS='1',CUDA_MODULE_LOADING='LAZY',TRITON_CACHE_DIR=str(out/'jit'/tag),CUDA_CACHE_PATH=str(out/'cuda-cache'/tag))))
