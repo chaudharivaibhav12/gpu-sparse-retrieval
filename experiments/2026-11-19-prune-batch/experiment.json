@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-19-prune-batch",
+  "title": "Several queries in flight for the pruned scorer",
+  "owner": "parva",
+  "branch": "exp/parva/2026-11-19-threshold-profile-batch",
+  "status": "registered 2026-11-18; recorded run 20261119-cuda5-pb-01 pending",
+  "parent_experiment": "2026-11-19-prune-depth-adaptive",
+  "question": "Does running several queries in flight (one CUDA stream per query) raise the throughput of the exact pruned scorer with the theta-filtered merge, with the same schedule and answers, and how does it compare with the exhaustive range scorer's best batch mode?",
+  "code_paths": [
+    "src/cuda_range_prune_tmb.cu",
+    "tests/check_range_prune_batch.py",
+    "experiments/2026-11-19-prune-batch/code/run.sh",
+    "experiments/2026-11-19-prune-batch/code/expect.py",
+    "experiments/2026-11-19-prune-batch/analysis/analyze.py"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-19-prune-batch/configs/protocol.json",
+    "experiments/2026-11-19-prune-batch/configs/configs.tsv"
+  ],
+  "declared_changes": {
+    "new_driver": "src/cuda_range_prune_tmb.cu",
+    "new_test": "tests/check_range_prune_batch.py",
+    "shared_files": "none modified"
+  },
+  "query_split": "calibration-500 only; held-out untouched",
+  "runs": [
+    {
+      "run_id": "dev",
+      "kind": "development",
+      "status": "fixtures, VERIFY check and smoke test; not results",
+      "readme": "experiments/2026-11-19-prune-batch/runs/dev/README.md"
+    }
+  ]
+}
