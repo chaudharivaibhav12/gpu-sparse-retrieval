@@ -1,0 +1,312 @@
+{
+  "run": "/scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02",
+  "processes": 3,
+  "warmups": 3,
+  "rounds": 20,
+  "queries": 500,
+  "development": false,
+  "cpu_limit_cores": 4.0,
+  "pinned_core_limit_cores": 0.05,
+  "estimator": "round throughput = 500 / sum of batch_wall_ms; ratios paired by (process, round); geometric mean; crossed process/round bootstrap, 10000 draws, seed 20261118",
+  "reading": "'A over B' is A's throughput divided by B's: above 1, A serves more queries per second",
+  "configurations": {
+    "v2batch-sequential-b32": {
+      "throughput_qps": {
+        "median": 1392.4859509110445,
+        "mean": 1391.9193331757801,
+        "min": 1388.5791585932361,
+        "max": 1395.4833228579053
+      },
+      "per_process_median_qps": [
+        1392.9031593630766,
+        1389.4973745570865,
+        1393.2441401599099
+      ],
+      "completion_latency_ms": {
+        "median": 11.48225,
+        "p95": 22.23671,
+        "p99": 23.460613999999996
+      },
+      "other_cpu_cores_mean_per_process": [
+        1.265164844637989,
+        1.2380017969178345,
+        1.25359707574138
+      ],
+      "pinned_cpu_per_process": [
+        2,
+        4,
+        2
+      ],
+      "pinned_core_other_mean_per_process": [
+        0.004450981967372671,
+        0.006671237768988437,
+        0.006672795564863449
+      ]
+    },
+    "v2batch-batched-b32": {
+      "throughput_qps": {
+        "median": 1664.144658073849,
+        "mean": 1665.9063936436194,
+        "min": 1657.8875991997043,
+        "max": 1677.5410469131066
+      },
+      "per_process_median_qps": [
+        1664.0106311343561,
+        1664.2753828269472,
+        1664.2629437339215
+      ],
+      "completion_latency_ms": {
+        "median": 19.2969,
+        "p95": 20.4152,
+        "p99": 20.4963
+      },
+      "other_cpu_cores_mean_per_process": [
+        1.2449992592977344,
+        1.3038101338191082,
+        1.3201122392078275
+      ],
+      "pinned_cpu_per_process": [
+        2,
+        2,
+        2
+      ],
+      "pinned_core_other_mean_per_process": [
+        0.005339868154398916,
+        0.005329734987130475,
+        0.006673923540316876
+      ]
+    },
+    "tmb-w256-sequential-b32": {
+      "throughput_qps": {
+        "median": 3109.97174313853,
+        "mean": 3109.3553740626717,
+        "min": 3101.5741977809353,
+        "max": 3113.827198782369
+      },
+      "per_process_median_qps": [
+        3109.718551512997,
+        3110.953365263506,
+        3109.474297812912
+      ],
+      "completion_latency_ms": {
+        "median": 5.255929999999999,
+        "p95": 10.75221,
+        "p99": 12.034342999999833
+      },
+      "other_cpu_cores_mean_per_process": [
+        1.257122424247806,
+        1.2645738631212264,
+        1.239698222384771
+      ],
+      "pinned_cpu_per_process": [
+        2,
+        2,
+        2
+      ],
+      "pinned_core_other_mean_per_process": [
+        0.011990258632312034,
+        0.008887425993377083,
+        0.006005213754520788
+      ]
+    },
+    "tmb-w256-streams-b8": {
+      "throughput_qps": {
+        "median": 4245.143396063727,
+        "mean": 4245.71573232348,
+        "min": 4225.662764357251,
+        "max": 4260.249508499274
+      },
+      "per_process_median_qps": [
+        4244.462740939806,
+        4248.256555923359,
+        4244.053480709454
+      ],
+      "completion_latency_ms": {
+        "median": 0.9901255,
+        "p95": 2.7781569999999998,
+        "p99": 3.6423417
+      },
+      "other_cpu_cores_mean_per_process": [
+        1.2493654578877829,
+        1.2697420263304626,
+        1.2346950691124
+      ],
+      "pinned_cpu_per_process": [
+        2,
+        2,
+        2
+      ],
+      "pinned_core_other_mean_per_process": [
+        0.0024952974376084014,
+        0.0074907614094333885,
+        0.0028491440343143865
+      ]
+    },
+    "tmb-w256-streams-b32": {
+      "throughput_qps": {
+        "median": 4388.708048589759,
+        "mean": 4389.68667101997,
+        "min": 4371.88361206423,
+        "max": 4406.272028606223
+      },
+      "per_process_median_qps": [
+        4391.507842980856,
+        4388.242769558545,
+        4386.320628690202
+      ],
+      "completion_latency_ms": {
+        "median": 3.740805,
+        "p95": 7.9319465,
+        "p99": 9.1220783
+      },
+      "other_cpu_cores_mean_per_process": [
+        1.2494107302657218,
+        1.2622440728076012,
+        1.253152283101756
+      ],
+      "pinned_cpu_per_process": [
+        2,
+        2,
+        2
+      ],
+      "pinned_core_other_mean_per_process": [
+        0.007498434964562581,
+        0.0074846071530627195,
+        0.0028497056552809603
+      ]
+    },
+    "tmb-w1024-sequential-b32": {
+      "throughput_qps": {
+        "median": 2865.0707618429915,
+        "mean": 2864.0871911410622,
+        "min": 2856.1432070204005,
+        "max": 2873.0650553291994
+      },
+      "per_process_median_qps": [
+        2863.8670133737605,
+        2858.9405256291057,
+        2869.0825870028348
+      ],
+      "completion_latency_ms": {
+        "median": 5.5294799999999995,
+        "p95": 11.217905,
+        "p99": 12.115809999999998
+      },
+      "other_cpu_cores_mean_per_process": [
+        1.2438183433084398,
+        1.2398826331709318,
+        1.2397572071695726
+      ],
+      "pinned_cpu_per_process": [
+        6,
+        2,
+        2
+      ],
+      "pinned_core_other_mean_per_process": [
+        0.0066629402955389085,
+        0.001996713170314002,
+        0.0
+      ]
+    },
+    "tmb-w1024-streams-b32": {
+      "throughput_qps": {
+        "median": 3846.8686382008673,
+        "mean": 3844.0660345544843,
+        "min": 3800.298277811229,
+        "max": 3873.4323444615493
+      },
+      "per_process_median_qps": [
+        3849.0365981163136,
+        3847.4556503064323,
+        3827.4101679009555
+      ],
+      "completion_latency_ms": {
+        "median": 4.1889,
+        "p95": 8.460392,
+        "p99": 9.278043899999997
+      },
+      "other_cpu_cores_mean_per_process": [
+        1.2363545893477765,
+        1.237839252995799,
+        1.2723731596618115
+      ],
+      "pinned_cpu_per_process": [
+        2,
+        2,
+        2
+      ],
+      "pinned_core_other_mean_per_process": [
+        0.00747979808338782,
+        0.0,
+        0.00857527286641029
+      ]
+    }
+  },
+  "schedule_identical": {
+    "w256": [
+      "tmb-w256-sequential-b32",
+      "tmb-w256-streams-b8",
+      "tmb-w256-streams-b32"
+    ],
+    "w1024": [
+      "tmb-w1024-sequential-b32",
+      "tmb-w1024-streams-b32"
+    ]
+  },
+  "contrasts": {
+    "tmb-w256-streams-b32 over tmb-w256-sequential-b32": {
+      "throughput_ratio": 1.4117661027406903,
+      "interval_95": [
+        1.4106319399960052,
+        1.4130322860172098
+      ],
+      "pairs": 60,
+      "group": "primary"
+    },
+    "tmb-w256-streams-b32 over v2batch-batched-b32": {
+      "throughput_ratio": 2.635020069946706,
+      "interval_95": [
+        2.631418042315756,
+        2.6382207483293647
+      ],
+      "pairs": 60,
+      "group": "secondary"
+    },
+    "tmb-w256-streams-b8 over tmb-w256-sequential-b32": {
+      "throughput_ratio": 1.3654635655335303,
+      "interval_95": [
+        1.3645900709113776,
+        1.3663400448963725
+      ],
+      "pairs": 60,
+      "group": "secondary"
+    },
+    "tmb-w1024-streams-b32 over tmb-w1024-sequential-b32": {
+      "throughput_ratio": 1.342151393180491,
+      "interval_95": [
+        1.3363220705202359,
+        1.346355449050913
+      ],
+      "pairs": 60,
+      "group": "secondary"
+    },
+    "tmb-w256-sequential-b32 over v2batch-sequential-b32": {
+      "throughput_ratio": 2.2338628835986447,
+      "interval_95": [
+        2.2308315847387625,
+        2.2381059164025996
+      ],
+      "pairs": 60,
+      "group": "secondary"
+    },
+    "v2batch-batched-b32 over v2batch-sequential-b32": {
+      "throughput_ratio": 1.19683790389457,
+      "interval_95": [
+        1.1948702175966925,
+        1.1989838696599764
+      ],
+      "pairs": 60,
+      "group": "replication"
+    }
+  }
+}
