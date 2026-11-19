@@ -1,0 +1,422 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-19-profile-pruned",
+  "run_id": "20261118-cuda5-profile-02",
+  "status": "completed-profiling",
+  "scope": "cuda5 RTX 4070; 8841823 documents; first 25 calibration queries; k=10 and 1000; prunetm-w256-s64-k10 prunetma-w256-1024-s64-p220-k10 v2-w1024-k1000 prunetm-w1024-s64-k1000 prunetm-w256-s64-k1000; Nsight Systems 3+20 rounds, Nsight Compute 1 round; binaries of 20261118-cuda5-da-01",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "c1ecb9706acdb7b6fec7d60aea2ffd711ad02cc7",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "binaries reused (nvcc -O3 -lineinfo -arch=sm_89 -std=c++17, CUDA 12.6)",
+    "source_sha256": {
+      "src/cuda_range_v2.cu": "a8058952b7dbfe5b810183fbe708838464b11e82995f09d98cf06d28564e6e56",
+      "src/cuda_range_prune_tm.cu": "baf84e448787447b94339a003cd1769f15624f017fe75bf2a67680e869891c1b",
+      "src/cuda_range_prune_ta.cu": "0a01fbfd898fcb9fb6abcdd4747b4c52d52bd2040b78aa6f36b2d954c5a2d886",
+      "experiments/2026-11-19-profile-pruned/code/run_profile.sh": "b48e1a0c550c9ea69934d568a1a1d10947a2739ddec0dc318c2723f420fd091d",
+      "experiments/2026-11-18-full-profile/analysis/summarize.py": "f6d3bc24d78da3be96720cc8b8cb99fa70a33276e40de63672e10e02080fbf80",
+      "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py": "ca43fb45ed74e0fc8d24c14898ac8ae3d32c7ebd3f805b55f6d59db87378d18e"
+    },
+    "binary_sha256": {
+      "build/20261118-cuda5-profile-02/cuda_range_v2": "584ce0e94b6f8822bf5ee21692c317b5bad926c4ad5c4907f7f358c762796045",
+      "build/20261118-cuda5-profile-02/cuda_range_prune_tm": "1dbb86a996b70c62609581f9c5daf1218db14be73b5c8486a6de7254c7643493",
+      "build/20261118-cuda5-profile-02/cuda_range_prune_ta": "1ad0938fd5b4d5a77162ac66a512e96e1818bf948f8de2ab13585262f2b69f22"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "/scratch/psp8502/full/full-8841823-w1024.rbp": {
+      "sha256": "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab",
+      "bytes": 3638491070
+    },
+    "/scratch/psp8502/full/full-8841823-w256.rbp": {
+      "sha256": "0ad6531c7698c7541fd9f6d62fb4fa34619e4b765656cccfa3d13fdc64202892",
+      "bytes": 4705954185
+    },
+    "/scratch/psp8502/full/oracle/cpu-top10-8841823.tsv": {
+      "sha256": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed",
+      "bytes": 116558
+    },
+    "/scratch/psp8502/full/oracle-k1000/cpu-top1000-8841823.tsv": {
+      "sha256": "302b63d4fc0c55cb41eeb9f63ad9b108706ead26edb36304e7c57fbd9c9dc086",
+      "bytes": 12379465
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_12.6.r12.6/compiler.35059454_0"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "nsys profile -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k10 --trace=cuda --sample=none --cpuctxsw=none build/20261118-cuda5-profile-02/cuda_range_prune_tm /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k10.csv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k10.tsv 25 10 0 0 20 3 256 256 - 64",
+    "nsys stats -r cuda_gpu_trace -f csv -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k10 /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k10.nsys-rep",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k10.tsv --queries 25 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/analysis/compare-nsys-prunetm-w256-s64-k10.json",
+    "ncu -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w256-s64-k10 --section SpeedOfLight --section MemoryWorkloadAnalysis --section Occupancy --section LaunchStats --section WarpStateStats --section SchedulerStats --section InstructionStats build/20261118-cuda5-profile-02/cuda_range_prune_tm /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w256-s64-k10.csv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w256-s64-k10.tsv 25 10 0 0 1 0 256 256 - 64",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w256-s64-k10.tsv --queries 25 --k 10 --groups-per-query 1 --output /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/analysis/compare-ncu-prunetm-w256-s64-k10.json",
+    "nsys profile -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetma-w256-1024-s64-p220-k10 --trace=cuda --sample=none --cpuctxsw=none build/20261118-cuda5-profile-02/cuda_range_prune_ta /scratch/psp8502/full/full-8841823-w256.rbp /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetma-w256-1024-s64-p220-k10.csv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetma-w256-1024-s64-p220-k10.tsv 25 10 0 0 20 3 256 256 - 64 220",
+    "nsys stats -r cuda_gpu_trace -f csv -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetma-w256-1024-s64-p220-k10 /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetma-w256-1024-s64-p220-k10.nsys-rep",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetma-w256-1024-s64-p220-k10.tsv --queries 25 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/analysis/compare-nsys-prunetma-w256-1024-s64-p220-k10.json",
+    "ncu -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetma-w256-1024-s64-p220-k10 --section SpeedOfLight --section MemoryWorkloadAnalysis --section Occupancy --section LaunchStats --section WarpStateStats --section SchedulerStats --section InstructionStats build/20261118-cuda5-profile-02/cuda_range_prune_ta /scratch/psp8502/full/full-8841823-w256.rbp /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetma-w256-1024-s64-p220-k10.csv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetma-w256-1024-s64-p220-k10.tsv 25 10 0 0 1 0 256 256 - 64 220",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetma-w256-1024-s64-p220-k10.tsv --queries 25 --k 10 --groups-per-query 1 --output /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/analysis/compare-ncu-prunetma-w256-1024-s64-p220-k10.json",
+    "nsys profile -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-v2-w1024-k1000 --trace=cuda --sample=none --cpuctxsw=none build/20261118-cuda5-profile-02/cuda_range_v2 /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-v2-w1024-k1000.csv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-v2-w1024-k1000.tsv 25 1000 0 0 20 3 256 256 -",
+    "nsys stats -r cuda_gpu_trace -f csv -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-v2-w1024-k1000 /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-v2-w1024-k1000.nsys-rep",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle-k1000/cpu-top1000-8841823.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-v2-w1024-k1000.tsv --queries 25 --k 1000 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/analysis/compare-nsys-v2-w1024-k1000.json",
+    "ncu -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-v2-w1024-k1000 --section SpeedOfLight --section MemoryWorkloadAnalysis --section Occupancy --section LaunchStats --section WarpStateStats --section SchedulerStats --section InstructionStats build/20261118-cuda5-profile-02/cuda_range_v2 /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-v2-w1024-k1000.csv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-v2-w1024-k1000.tsv 25 1000 0 0 1 0 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle-k1000/cpu-top1000-8841823.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-v2-w1024-k1000.tsv --queries 25 --k 1000 --groups-per-query 1 --output /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/analysis/compare-ncu-v2-w1024-k1000.json",
+    "nsys profile -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w1024-s64-k1000 --trace=cuda --sample=none --cpuctxsw=none build/20261118-cuda5-profile-02/cuda_range_prune_tm /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w1024-s64-k1000.csv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w1024-s64-k1000.tsv 25 1000 0 0 20 3 256 256 - 64",
+    "nsys stats -r cuda_gpu_trace -f csv -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w1024-s64-k1000 /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w1024-s64-k1000.nsys-rep",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle-k1000/cpu-top1000-8841823.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w1024-s64-k1000.tsv --queries 25 --k 1000 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/analysis/compare-nsys-prunetm-w1024-s64-k1000.json",
+    "ncu -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w1024-s64-k1000 --section SpeedOfLight --section MemoryWorkloadAnalysis --section Occupancy --section LaunchStats --section WarpStateStats --section SchedulerStats --section InstructionStats build/20261118-cuda5-profile-02/cuda_range_prune_tm /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w1024-s64-k1000.csv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w1024-s64-k1000.tsv 25 1000 0 0 1 0 256 256 - 64",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle-k1000/cpu-top1000-8841823.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w1024-s64-k1000.tsv --queries 25 --k 1000 --groups-per-query 1 --output /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/analysis/compare-ncu-prunetm-w1024-s64-k1000.json",
+    "nsys profile -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k1000 --trace=cuda --sample=none --cpuctxsw=none build/20261118-cuda5-profile-02/cuda_range_prune_tm /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k1000.csv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k1000.tsv 25 1000 0 0 20 3 256 256 - 64",
+    "nsys stats -r cuda_gpu_trace -f csv -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k1000 /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k1000.nsys-rep",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle-k1000/cpu-top1000-8841823.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k1000.tsv --queries 25 --k 1000 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/analysis/compare-nsys-prunetm-w256-s64-k1000.json",
+    "ncu -o /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w256-s64-k1000 --section SpeedOfLight --section MemoryWorkloadAnalysis --section Occupancy --section LaunchStats --section WarpStateStats --section SchedulerStats --section InstructionStats build/20261118-cuda5-profile-02/cuda_range_prune_tm /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w256-s64-k1000.csv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w256-s64-k1000.tsv 25 1000 0 0 1 0 256 256 - 64",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle-k1000/cpu-top1000-8841823.tsv /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w256-s64-k1000.tsv --queries 25 --k 1000 --groups-per-query 1 --output /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/analysis/compare-ncu-prunetm-w256-s64-k1000.json",
+    "python3 experiments/2026-11-18-full-profile/analysis/summarize.py --ncu prunetm-w256-s64-k10=/scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w256-s64-k10-raw.csv --nsys prunetm-w256-s64-k10=/scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k10_cuda_gpu_trace.csv --ncu prunetma-w256-1024-s64-p220-k10=/scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetma-w256-1024-s64-p220-k10-raw.csv --nsys prunetma-w256-1024-s64-p220-k10=/scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetma-w256-1024-s64-p220-k10_cuda_gpu_trace.csv --ncu v2-w1024-k1000=/scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-v2-w1024-k1000-raw.csv --nsys v2-w1024-k1000=/scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-v2-w1024-k1000_cuda_gpu_trace.csv --ncu prunetm-w1024-s64-k1000=/scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w1024-s64-k1000-raw.csv --nsys prunetm-w1024-s64-k1000=/scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w1024-s64-k1000_cuda_gpu_trace.csv --ncu prunetm-w256-s64-k1000=/scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/ncu-prunetm-w256-s64-k1000-raw.csv --nsys prunetm-w256-s64-k1000=/scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/raw/nsys-prunetm-w256-s64-k1000_cuda_gpu_trace.csv --queries 25 --rounds 20 --output /scratch/psp8502/runs/2026-11-19-profile-pruned/20261118-cuda5-profile-02/analysis/profile-summary.json"
+  ],
+  "artifacts": {
+    "analysis/compare-ncu-prunetm-w1024-s64-k1000.json": {
+      "sha256": "a50b6d92e77c544ce73f2c387b45347b3af2c7dde4f32ba381f170651c13d69b",
+      "bytes": 378
+    },
+    "analysis/compare-ncu-prunetm-w256-s64-k10.json": {
+      "sha256": "20358abeb108250be5e5cecbbf581bfd1a100d7f29abd12dcf07a4931710ca6b",
+      "bytes": 363
+    },
+    "analysis/compare-ncu-prunetm-w256-s64-k1000.json": {
+      "sha256": "2fc5b9fa55e40f06b4edf7011d1dbb5da4d16751b1f6cac76d7729b74df2ff42",
+      "bytes": 377
+    },
+    "analysis/compare-ncu-prunetma-w256-1024-s64-p220-k10.json": {
+      "sha256": "d51d77a60e792ebc7acfe92acfd4a890731d1a196dd63a24750c545089a2d5bb",
+      "bytes": 374
+    },
+    "analysis/compare-ncu-v2-w1024-k1000.json": {
+      "sha256": "437805c35d3f40cf94bf9f908f7212ea54a5ef993a37aade30a45f31055a024c",
+      "bytes": 369
+    },
+    "analysis/compare-nsys-prunetm-w1024-s64-k1000.json": {
+      "sha256": "81a750afe9880e7f86d9669fe42339776d2638768db90713d2f148d096186d6a",
+      "bytes": 381
+    },
+    "analysis/compare-nsys-prunetm-w256-s64-k10.json": {
+      "sha256": "4ca97b0fa83954f06c6d4935b3f76910288660af8ddfef9b9186f3d579c63da3",
+      "bytes": 366
+    },
+    "analysis/compare-nsys-prunetm-w256-s64-k1000.json": {
+      "sha256": "e9baf24d0136750da5800523b9ecee4b9a41c071cbef008ba933f118d26bdc34",
+      "bytes": 380
+    },
+    "analysis/compare-nsys-prunetma-w256-1024-s64-p220-k10.json": {
+      "sha256": "81cf020fe7c88fbf1ce6a68e0f55305091e283bb6733f83ab140874ab3696012",
+      "bytes": 377
+    },
+    "analysis/compare-nsys-v2-w1024-k1000.json": {
+      "sha256": "201d16a1369fe2b73ad971bec48823f1d77f26ebf1060151b00e504fb68371da",
+      "bytes": 372
+    },
+    "analysis/profile-summary.json": {
+      "sha256": "31ea363024063ddd6caf518e27a453c1e34273c5dec8b6aafb184f8eb3d48cbd",
+      "bytes": 16786
+    },
+    "logs/busy-nsys-v2-w1024-k1000.txt": {
+      "sha256": "523d8e6ced0e969bbbe5da69fd3c984658e5022adc08c231f69123dd81453b88",
+      "bytes": 50
+    },
+    "logs/commands.txt": {
+      "sha256": "627cdacec20566a342b557e98b8d0476dd27e5e09df6f946e0e823129831b78d",
+      "bytes": 13205
+    },
+    "logs/environment.txt": {
+      "sha256": "bb1ad0e1c047f3a065056b92376c45bab59ba3b49de054538891eb3dae846e30",
+      "bytes": 413
+    },
+    "logs/inputs-sha256.txt": {
+      "sha256": "f0b2f33a67a06d9a8bc062d2d384e7a59eed30acebabe264fabc3874ccc6afa0",
+      "bytes": 562
+    },
+    "logs/ncu-prunetm-w1024-s64-k1000.log": {
+      "sha256": "d97e769cedc26e3d8e8616476e446bd3ec60f11d0339b11dd9415764a4f6da43",
+      "bytes": 9413
+    },
+    "logs/ncu-prunetm-w256-s64-k10.log": {
+      "sha256": "a0cea389eff8233cdb34b1143e0383141a99b66108634cfac388d2456ce8adc6",
+      "bytes": 9406
+    },
+    "logs/ncu-prunetm-w256-s64-k1000.log": {
+      "sha256": "d7c16d44bfac1e649ce70318fd2ad9a0a55836a4eeec0196b96fb2c5af56c76f",
+      "bytes": 9410
+    },
+    "logs/ncu-prunetma-w256-1024-s64-p220-k10.log": {
+      "sha256": "85bcdf4171f6f83db92f29cbb936fc2e7e13a5e6baca7fcabbcfd5359d274e38",
+      "bytes": 18381
+    },
+    "logs/ncu-v2-w1024-k1000.log": {
+      "sha256": "d12b6ff00ede8b22df8e5a695675fef29893f7bc99d988245ab1bf2350586476",
+      "bytes": 2384
+    },
+    "logs/nsys-prunetm-w1024-s64-k1000.log": {
+      "sha256": "5695f78704ed20e679c427dfd89794fed6f91b72d7c8ed33cea921c2c2e06854",
+      "bytes": 2399
+    },
+    "logs/nsys-prunetm-w256-s64-k10.log": {
+      "sha256": "7b97ad9c9bb9ee24ec1881bad6293066596bf2830ebc65415e34e819ababf6ea",
+      "bytes": 2488
+    },
+    "logs/nsys-prunetm-w256-s64-k1000.log": {
+      "sha256": "99a8a40e7cc54be606d802fb30e3ee24f82f99c7409db35c778f1b31c08a0434",
+      "bytes": 2676
+    },
+    "logs/nsys-prunetma-w256-1024-s64-p220-k10.log": {
+      "sha256": "2cfb3550f2a88f04df2ab11cd7ac59589de9dd645fc746e984e9ffca38358581",
+      "bytes": 3479
+    },
+    "logs/nsys-v2-w1024-k1000.log": {
+      "sha256": "927e05803bb54c408df1b990ea1d566391b3e60fa48f018af308cfbe907c2e10",
+      "bytes": 3288
+    },
+    "logs/quiet-ncu-prunetm-w1024-s64-k1000.txt": {
+      "sha256": "b56db67f2f47c42b55608cd31cd45f61d6d4bee0b6f606089f8897114819c91b",
+      "bytes": 51
+    },
+    "logs/quiet-ncu-prunetm-w256-s64-k10.txt": {
+      "sha256": "e13a48d6b55076df5e4bdb03ab6377a2c579a9dcdf02849ab52e4a5071458741",
+      "bytes": 51
+    },
+    "logs/quiet-ncu-prunetm-w256-s64-k1000.txt": {
+      "sha256": "fde7540fc4195e9d0d65d4aa085fe36788549c24e7ea0429650dc3f30de21842",
+      "bytes": 51
+    },
+    "logs/quiet-ncu-prunetma-w256-1024-s64-p220-k10.txt": {
+      "sha256": "21a5b0eee9aa6703c6bc350fc25ac09a1b09a3be923717f4da59a78d9fa51d17",
+      "bytes": 51
+    },
+    "logs/quiet-ncu-v2-w1024-k1000.txt": {
+      "sha256": "e463057115b4341cab38a97b3aa93a73d54ee68f1f763be41410e15f1fe5347a",
+      "bytes": 51
+    },
+    "logs/quiet-nsys-prunetm-w1024-s64-k1000.txt": {
+      "sha256": "bdfa2fa3c564d532cfbebff18079c23e51189bc38b7ae23e873ce10a31935108",
+      "bytes": 51
+    },
+    "logs/quiet-nsys-prunetm-w256-s64-k10.txt": {
+      "sha256": "afbd51bc0789e164da33c6399c1d997ef434bbb769fdd58fc2113db587e88876",
+      "bytes": 51
+    },
+    "logs/quiet-nsys-prunetm-w256-s64-k1000.txt": {
+      "sha256": "66086b466bd24c4eb964eeae833e1d854f76ef3b33ec6872d7843bc9cab92cb7",
+      "bytes": 51
+    },
+    "logs/quiet-nsys-prunetma-w256-1024-s64-p220-k10.txt": {
+      "sha256": "c0832acfd3e4c23e64d526f80abf15579b2760075180ec832e0a3882a2668c16",
+      "bytes": 51
+    },
+    "logs/quiet-nsys-v2-w1024-k1000.txt": {
+      "sha256": "b5aaf5c523880a13e25d04885ec4e7d333fe7fab5d0a2203d268cdaf2d1d5d1a",
+      "bytes": 51
+    },
+    "logs/reuse.txt": {
+      "sha256": "c35539f123536125787272aa7f23be590c8e40ea514a7b5dfb24f51098812c5e",
+      "bytes": 100
+    },
+    "logs/stages.txt": {
+      "sha256": "2efb20e435708f98698bb8a9e35c1feeba674143e195a9096e9f4e51fcab0959",
+      "bytes": 650
+    },
+    "logs/summary.txt": {
+      "sha256": "3850c3d271c1b34958d82dfe3b5504bcd9d500a881632b78c8c673fcc7d7b508",
+      "bytes": 4471
+    },
+    "raw/ncu-prunetm-w1024-s64-k1000-raw.csv": {
+      "sha256": "8811f44e9662fabc6df6ebfbcc06cef59bfa625b57c21df5305ba8860dca6c1d",
+      "bytes": 662278
+    },
+    "raw/ncu-prunetm-w1024-s64-k1000.csv": {
+      "sha256": "db8228ddf96204732d79b28b84a8807aeb0da9f9428a3ac911e06a5a8adfec4b",
+      "bytes": 4398
+    },
+    "raw/ncu-prunetm-w1024-s64-k1000.ncu-rep": {
+      "sha256": "8cb94466c60ff6685d4fd25a9bc94b79f0caa34a0248c20a9c02e51aa713a731",
+      "bytes": 7788949
+    },
+    "raw/ncu-prunetm-w1024-s64-k1000.tsv": {
+      "sha256": "ed8e976def0d972f026ecafdd3cf2562474e2da95581b82edb1d481ac7f1508b",
+      "bytes": 883942
+    },
+    "raw/ncu-prunetm-w256-s64-k10-raw.csv": {
+      "sha256": "394fec400982be17a2e10d5b7e3867b1c32cb0de0d66336c102f0491aefb193b",
+      "bytes": 660683
+    },
+    "raw/ncu-prunetm-w256-s64-k10.csv": {
+      "sha256": "5bb57f6cb0c926dccbeacd626ca7a4dca08bfe4d6be257cb2d02b90e8a31fdcc",
+      "bytes": 4263
+    },
+    "raw/ncu-prunetm-w256-s64-k10.ncu-rep": {
+      "sha256": "77a39a8629e75ce8da8a3e8b5d2196350ba5d22d909c2e8a1fe12763181b0b3f",
+      "bytes": 7841869
+    },
+    "raw/ncu-prunetm-w256-s64-k10.tsv": {
+      "sha256": "8f21cbad9d41886dea415504f9d683eec7ddefebe163a35426b12024c7163319",
+      "bytes": 8521
+    },
+    "raw/ncu-prunetm-w256-s64-k1000-raw.csv": {
+      "sha256": "1defeb363f31a31ce236345339946fb93f96b84134dbfb1801920dcd8c4d186e",
+      "bytes": 663701
+    },
+    "raw/ncu-prunetm-w256-s64-k1000.csv": {
+      "sha256": "7e9546d6451f322a08a6f7a487c40518a662536d6a0dd82ae797b447e96ce032",
+      "bytes": 4424
+    },
+    "raw/ncu-prunetm-w256-s64-k1000.ncu-rep": {
+      "sha256": "349559aeccbf6b3b2a104a9f92b0f167de751460d718a7590881d1cc9f762d13",
+      "bytes": 7821183
+    },
+    "raw/ncu-prunetm-w256-s64-k1000.tsv": {
+      "sha256": "ed8e976def0d972f026ecafdd3cf2562474e2da95581b82edb1d481ac7f1508b",
+      "bytes": 883942
+    },
+    "raw/ncu-prunetma-w256-1024-s64-p220-k10-raw.csv": {
+      "sha256": "a9725fe38da73a500bad0172daff8a2c52d0ca6f1d7757866b1ec5d8db5ea89a",
+      "bytes": 1297369
+    },
+    "raw/ncu-prunetma-w256-1024-s64-p220-k10.csv": {
+      "sha256": "18b29d7adb9281c817441d66aaea631d1a4b6782d19c5e41c2e1ca32cfd025f8",
+      "bytes": 4443
+    },
+    "raw/ncu-prunetma-w256-1024-s64-p220-k10.ncu-rep": {
+      "sha256": "c9bd0c9ee81b5fb9ea237144ec435acba47265d6ee6ccdbef21053775e4de33e",
+      "bytes": 15336294
+    },
+    "raw/ncu-prunetma-w256-1024-s64-p220-k10.tsv": {
+      "sha256": "8f21cbad9d41886dea415504f9d683eec7ddefebe163a35426b12024c7163319",
+      "bytes": 8521
+    },
+    "raw/ncu-v2-w1024-k1000-raw.csv": {
+      "sha256": "f8559d7ccf6704b560135a1d80ec0b7807b78281340ea8dd5f5c2178062acf1b",
+      "bytes": 158690
+    },
+    "raw/ncu-v2-w1024-k1000.csv": {
+      "sha256": "ffc5323f30e468d8044d1c2fb491bdee563afcb6522c0280a1f34d557f6a9284",
+      "bytes": 3364
+    },
+    "raw/ncu-v2-w1024-k1000.ncu-rep": {
+      "sha256": "242c7ecc0260d8ad05d1c128e864d433fd96e0b6c62044750d8698db581e52c4",
+      "bytes": 1791623
+    },
+    "raw/ncu-v2-w1024-k1000.tsv": {
+      "sha256": "ed8e976def0d972f026ecafdd3cf2562474e2da95581b82edb1d481ac7f1508b",
+      "bytes": 883942
+    },
+    "raw/nsys-prunetm-w1024-s64-k1000.csv": {
+      "sha256": "4eef856fe7102e1b7ebce3949b1fbe4ff6a9d2461f9cc7087ffa8c547cef2446",
+      "bytes": 94118
+    },
+    "raw/nsys-prunetm-w1024-s64-k1000.nsys-rep": {
+      "sha256": "f49c85af6c39543139b9a08de920226f1e8f21e71f4760b298be72bce2e425fb",
+      "bytes": 350664
+    },
+    "raw/nsys-prunetm-w1024-s64-k1000.sqlite": {
+      "sha256": "85509caa18c5ba022676c51e3ff5431c0c208f0c9d299b8fa1293a2e05a98d26",
+      "bytes": 1155072
+    },
+    "raw/nsys-prunetm-w1024-s64-k1000.tsv.xz": {
+      "sha256": "2673c444098690d26b3282fa52e49b9b522325203ac98f8bae38d1e539edd6f6",
+      "bytes": 459152
+    },
+    "raw/nsys-prunetm-w1024-s64-k1000_cuda_gpu_trace.csv": {
+      "sha256": "6b1802be3a01656bb032bd15b7dc2ea7ee81f24533f3296057994f76c617318b",
+      "bytes": 864567
+    },
+    "raw/nsys-prunetm-w256-s64-k10.csv": {
+      "sha256": "503d4d8ab52ec1f3d21932c03a1822c5a90ac6afbcefd929e8a8c675cfb55830",
+      "bytes": 91918
+    },
+    "raw/nsys-prunetm-w256-s64-k10.nsys-rep": {
+      "sha256": "c840b996c6fc18af50dd06ab3b082fcf5c4a9f31366bc99ae462926dfeffa1b2",
+      "bytes": 344548
+    },
+    "raw/nsys-prunetm-w256-s64-k10.sqlite": {
+      "sha256": "f5e41b879382feb025d531465c689a0003b71c259feaa93252ef6e587e92e4ac",
+      "bytes": 1138688
+    },
+    "raw/nsys-prunetm-w256-s64-k10.tsv.xz": {
+      "sha256": "02ec44f8e7ed1d53eea9b4c54a72cfa61fd4afbc31737a8bbf1c4ba689d06aaa",
+      "bytes": 6360
+    },
+    "raw/nsys-prunetm-w256-s64-k1000.csv": {
+      "sha256": "f82115f1608031e57e72faf871b7c535040dea77ac892f30993c18c10c13d34e",
+      "bytes": 94629
+    },
+    "raw/nsys-prunetm-w256-s64-k1000.nsys-rep": {
+      "sha256": "15a538997d4fa94e6c89cafbd051ac2b6b030325b5fca65dbaae9a931067f869",
+      "bytes": 359979
+    },
+    "raw/nsys-prunetm-w256-s64-k1000.sqlite": {
+      "sha256": "2e65beb128515171dc7181a7b80507144419e71c2f57ca773540fe0ab7f8c0ab",
+      "bytes": 1159168
+    },
+    "raw/nsys-prunetm-w256-s64-k1000.tsv.xz": {
+      "sha256": "2673c444098690d26b3282fa52e49b9b522325203ac98f8bae38d1e539edd6f6",
+      "bytes": 459152
+    },
+    "raw/nsys-prunetm-w256-s64-k1000_cuda_gpu_trace.csv": {
+      "sha256": "a809b744256e33fe0212151ee558ee2e18257916bab679583cb9484fe39b0223",
+      "bytes": 866120
+    },
+    "raw/nsys-prunetm-w256-s64-k10_cuda_gpu_trace.csv": {
+      "sha256": "1500d34ea6405ded66b0aa3ddb6104a0f55e48c3e39016101d26fa759d4ff781",
+      "bytes": 862660
+    },
+    "raw/nsys-prunetma-w256-1024-s64-p220-k10.csv": {
+      "sha256": "f15a6dd8e4fcc33ae6232b8945dda687409cdf118ca645bf515904635c7a634a",
+      "bytes": 95798
+    },
+    "raw/nsys-prunetma-w256-1024-s64-p220-k10.nsys-rep": {
+      "sha256": "6e7b184bec2461b558f8abb50ef3f8db9bebaeb1ee2c2cfa31fe0aca725b43a7",
+      "bytes": 517735
+    },
+    "raw/nsys-prunetma-w256-1024-s64-p220-k10.sqlite": {
+      "sha256": "eb62e5f19a8bf11a07e84df7cf783795aeb45a4f0ac692bddd35095be0223922",
+      "bytes": 1552384
+    },
+    "raw/nsys-prunetma-w256-1024-s64-p220-k10.tsv.xz": {
+      "sha256": "02ec44f8e7ed1d53eea9b4c54a72cfa61fd4afbc31737a8bbf1c4ba689d06aaa",
+      "bytes": 6360
+    },
+    "raw/nsys-prunetma-w256-1024-s64-p220-k10_cuda_gpu_trace.csv": {
+      "sha256": "daa997dabbfd5ccad97ee18e3fe47a56b979630fc214ec62060c8e5f2145fe4e",
+      "bytes": 1831382
+    },
+    "raw/nsys-v2-w1024-k1000.csv": {
+      "sha256": "e881412bb58ef3afe3c78a0e02b53205d15236b3f436b2c061e341282639c2e6",
+      "bytes": 72054
+    },
+    "raw/nsys-v2-w1024-k1000.nsys-rep": {
+      "sha256": "4c932341de391fccf6f3197af9aaa20f1a6ee927009b69d5e6fdc612fb20ea7d",
+      "bytes": 201717
+    },
+    "raw/nsys-v2-w1024-k1000.sqlite": {
+      "sha256": "29a01f254bdf1d4abe877421ab1e3090fd58e48f0e2c8ba8837660ec04fdf339",
+      "bytes": 782336
+    },
+    "raw/nsys-v2-w1024-k1000.tsv.xz": {
+      "sha256": "2673c444098690d26b3282fa52e49b9b522325203ac98f8bae38d1e539edd6f6",
+      "bytes": 459152
+    },
+    "raw/nsys-v2-w1024-k1000_cuda_gpu_trace.csv": {
+      "sha256": "dbdc473e76cccd98d27cdfcf2266d60bc0b50f714904c191c8b37c9107ca10be",
+      "bytes": 211408
+    }
+  }
+}

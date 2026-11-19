@@ -23,4 +23,15 @@ Where does the time go now in the current pruned scorers (`cuda_range_prune_tm`,
 
 ## Runs
 
-- (pending)
+- [20261118-cuda5-profile-02](runs/20261118-cuda5-profile-02/README.md): completed; 10 of 10 profiled runs equal to the reference.
+
+## Findings
+
+- **k = 10.**
+  - Since the first profile, bounds take 11 µs instead of 114, and scoring and merge take about 142 µs instead of 198.
+  - The bounds kernel now reads at about half of DRAM peak.
+  - Seed selection (about 40 µs, one block, shared-memory stalls) is the largest remaining overhead.
+- **k = 1000.**
+  - Almost all the time is in the scoring kernel, which is latency-bound: 3% DRAM activity, 90% L2 hit.
+  - The remaining cost is most likely the single-block final merge (k rounds over 500-1,450 lists).
+- **Next targets:** a parallel merge at depth, and a multi-block seed selection.
