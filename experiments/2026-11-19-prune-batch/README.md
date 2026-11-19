@@ -27,4 +27,11 @@ Primary: pruned streams b32 against pruned sequential b32 (throughput).
 
 ## Runs
 
-- [dev](runs/dev/README.md) (pending)
+- [20261119-cuda5-pb-01](runs/20261119-cuda5-pb-01/README.md): **the result**. Completed; every answer equal to the reference; 6 contention replacements; one pause for other users' job series.
+- [dev](runs/dev/README.md): fixtures, VERIFY check and smoke test (not results).
+
+## Findings
+
+- **One query at a time,** the pruned scorer serves **3,126 queries/s**: 2.2× the exhaustive scorer one at a time, and 1.87× its best batch mode (1,669 q/s).
+- **8 queries in flight on streams** give **1.36× [1.361, 1.364] more throughput (4,255 q/s)**, consistently, with the lowest completion latency (median 1.0 ms, p99 3.6 ms).
+- **At 32 in flight,** two processes reached 4,415 q/s, but one clean process stayed at 2,830 q/s in every round. So the registered primary contrast, 1.22× [0.90, 1.42], includes 1, and by the decision rule streams is **not** adopted. The evidence favours batch 8 over batch 32 for a throughput mode; that would need its own registered test.

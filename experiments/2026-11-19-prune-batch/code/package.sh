@@ -1,7 +1,7 @@
 #!/bin/bash
 # package.sh RUN_ID: repo-ready copy in /scratch/psp8502/pack/<RUN_ID> (answers deduplicated by pack_answers.py, csv > 1 MB gzipped)
 set -eu
-D=/scratch/psp8502/runs/2026-11-19-prune-depth-adaptive; RUN=$D/$1; OUT=/scratch/psp8502/pack/$1
+D=/scratch/psp8502/runs/2026-11-19-prune-batch; RUN=$D/$1; OUT=/scratch/psp8502/pack/$1
 PACK=/scratch/psp8502/runsrc/20261118-cuda5-da-02/experiments/2026-11-15-range-batching/code/pack_answers.py
 rm -rf $OUT; mkdir -p $OUT
 rsync -a --exclude "fixtures-*" --exclude "*.tsv.xz" --exclude "*.tsv" $RUN/ $OUT/

@@ -1,0 +1,241 @@
+{
+  "run": "/scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-01",
+  "processes": 3,
+  "warmups": 3,
+  "rounds": 20,
+  "queries": 500,
+  "development": false,
+  "cpu_limit_cores": 4.0,
+  "estimator": "round throughput = 500 / sum of batch_wall_ms; ratios paired by (process, round); geometric mean; crossed process/round bootstrap, 10000 draws, seed 20261118",
+  "reading": "'A over B' is A's throughput divided by B's: above 1, A serves more queries per second",
+  "configurations": {
+    "v2batch-sequential-b32": {
+      "throughput_qps": {
+        "median": 1392.6711522006167,
+        "mean": 1393.068864844297,
+        "min": 1386.1058962727059,
+        "max": 1396.3637013580194
+      },
+      "per_process_median_qps": [
+        1392.3384073716657,
+        1395.0820887735972,
+        1393.7496422228792
+      ],
+      "completion_latency_ms": {
+        "median": 11.4734,
+        "p95": 22.215439999999997,
+        "p99": 23.4376
+      },
+      "other_cpu_cores_mean_per_process": [
+        0.2731588583859419,
+        1.3891139500345382,
+        0.9688758906668541
+      ]
+    },
+    "v2batch-batched-b32": {
+      "throughput_qps": {
+        "median": 1668.8060775956023,
+        "mean": 1669.3730454672857,
+        "min": 1654.879511532524,
+        "max": 1681.9149072154823
+      },
+      "per_process_median_qps": [
+        1667.8016064194799,
+        1669.4051360147394,
+        1669.0986138218518
+      ],
+      "completion_latency_ms": {
+        "median": 19.2647,
+        "p95": 20.3889,
+        "p99": 20.5036
+      },
+      "other_cpu_cores_mean_per_process": [
+        0.2814422542741028,
+        1.3372717567592907,
+        0.2370935558464543
+      ]
+    },
+    "tmb-w256-sequential-b32": {
+      "throughput_qps": {
+        "median": 3126.1672357579173,
+        "mean": 3121.549687080279,
+        "min": 3107.0785650293215,
+        "max": 3132.008456172271
+      },
+      "per_process_median_qps": [
+        3126.5783368543216,
+        3111.560589197636,
+        3128.367707828223
+      ],
+      "completion_latency_ms": {
+        "median": 5.225405,
+        "p95": 10.705305,
+        "p99": 12.112013999999999
+      },
+      "other_cpu_cores_mean_per_process": [
+        0.22501044832730496,
+        1.1996070241972279,
+        0.2386966803188124
+      ]
+    },
+    "tmb-w256-streams-b8": {
+      "throughput_qps": {
+        "median": 4254.64708664746,
+        "mean": 4253.681423988638,
+        "min": 4196.967372104134,
+        "max": 4275.406171495793
+      },
+      "per_process_median_qps": [
+        4262.1500562019155,
+        4246.340057396878,
+        4259.400297853557
+      ],
+      "completion_latency_ms": {
+        "median": 0.984787,
+        "p95": 2.7916274999999997,
+        "p99": 3.625707399999999
+      },
+      "other_cpu_cores_mean_per_process": [
+        0.3092245022363913,
+        1.3224531040974863,
+        0.34736493077555614
+      ]
+    },
+    "tmb-w256-streams-b32": {
+      "throughput_qps": {
+        "median": 4410.99080059307,
+        "mean": 3884.408824155046,
+        "min": 2517.41471980721,
+        "max": 4430.65663483299
+      },
+      "per_process_median_qps": [
+        4418.202286948555,
+        4416.073151031278,
+        2831.51026076588
+      ],
+      "completion_latency_ms": {
+        "median": 3.865235,
+        "p95": 15.261834999999994,
+        "p99": 19.345403
+      },
+      "other_cpu_cores_mean_per_process": [
+        0.27611915275767124,
+        1.1550247127087627,
+        0.570046362852996
+      ]
+    },
+    "tmb-w1024-sequential-b32": {
+      "throughput_qps": {
+        "median": 2875.439539025628,
+        "mean": 2872.7127415798286,
+        "min": 2838.672829614625,
+        "max": 2888.3277189056353
+      },
+      "per_process_median_qps": [
+        2878.725244288674,
+        2864.4829911933566,
+        2875.905453342391
+      ],
+      "completion_latency_ms": {
+        "median": 5.512445,
+        "p95": 11.174415,
+        "p99": 12.078710999999998
+      },
+      "other_cpu_cores_mean_per_process": [
+        0.37492595910673693,
+        1.2628460515047084,
+        2.04962744597004
+      ]
+    },
+    "tmb-w1024-streams-b32": {
+      "throughput_qps": {
+        "median": 3843.8702918509657,
+        "mean": 3841.4763641417762,
+        "min": 3789.107951533974,
+        "max": 3895.5512337444493
+      },
+      "per_process_median_qps": [
+        3862.0078217175515,
+        3851.803051159348,
+        3815.46917782597
+      ],
+      "completion_latency_ms": {
+        "median": 4.18177,
+        "p95": 8.466621499999999,
+        "p99": 9.2843138
+      },
+      "other_cpu_cores_mean_per_process": [
+        0.25056587494848837,
+        1.380443412428211,
+        2.177490189571086
+      ]
+    }
+  },
+  "schedule_identical": {
+    "w256": [
+      "tmb-w256-sequential-b32",
+      "tmb-w256-streams-b8",
+      "tmb-w256-streams-b32"
+    ],
+    "w1024": [
+      "tmb-w1024-sequential-b32",
+      "tmb-w1024-streams-b32"
+    ]
+  },
+  "contrasts": {
+    "tmb-w256-streams-b32 over tmb-w256-sequential-b32": {
+      "throughput_ratio": 1.2180625986026024,
+      "interval_95": [
+        0.9037787776451968,
+        1.4187960645777602
+      ],
+      "pairs": 60,
+      "group": "primary"
+    },
+    "tmb-w256-streams-b32 over v2batch-batched-b32": {
+      "throughput_ratio": 2.277654420571923,
+      "interval_95": [
+        1.6957782721700638,
+        2.648680168482315
+      ],
+      "pairs": 60,
+      "group": "secondary"
+    },
+    "tmb-w256-streams-b8 over tmb-w256-sequential-b32": {
+      "throughput_ratio": 1.362679913395973,
+      "interval_95": [
+        1.3612153553973845,
+        1.3640651675417161
+      ],
+      "pairs": 60,
+      "group": "secondary"
+    },
+    "tmb-w1024-streams-b32 over tmb-w1024-sequential-b32": {
+      "throughput_ratio": 1.3372075191245223,
+      "interval_95": [
+        1.3273045560093584,
+        1.345794868110577
+      ],
+      "pairs": 60,
+      "group": "secondary"
+    },
+    "tmb-w256-sequential-b32 over v2batch-sequential-b32": {
+      "throughput_ratio": 2.240766732041573,
+      "interval_95": [
+        2.2327541919056113,
+        2.2458871711487562
+      ],
+      "pairs": 60,
+      "group": "secondary"
+    },
+    "v2batch-batched-b32 over v2batch-sequential-b32": {
+      "throughput_ratio": 1.1983354998197944,
+      "interval_95": [
+        1.1967732170506349,
+        1.199951002001452
+      ],
+      "pairs": 60,
+      "group": "replication"
+    }
+  }
+}

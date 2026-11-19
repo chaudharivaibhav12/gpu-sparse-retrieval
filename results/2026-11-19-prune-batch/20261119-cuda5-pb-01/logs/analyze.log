@@ -1,0 +1,13 @@
+v2batch-sequential-b32     throughput   1392.7 q/s (median round)  completion median 11.473 p95 22.215 p99 23.438 ms
+v2batch-batched-b32        throughput   1668.8 q/s (median round)  completion median 19.265 p95 20.389 p99 20.504 ms
+tmb-w256-sequential-b32    throughput   3126.2 q/s (median round)  completion median 5.225 p95 10.705 p99 12.112 ms
+tmb-w256-streams-b8        throughput   4254.6 q/s (median round)  completion median 0.985 p95 2.792 p99 3.626 ms
+tmb-w256-streams-b32       throughput   4411.0 q/s (median round)  completion median 3.865 p95 15.262 p99 19.345 ms
+tmb-w1024-sequential-b32   throughput   2875.4 q/s (median round)  completion median 5.512 p95 11.174 p99 12.079 ms
+tmb-w1024-streams-b32      throughput   3843.9 q/s (median round)  completion median 4.182 p95 8.467 p99 9.284 ms
+primary      tmb-w256-streams-b32 over tmb-w256-sequential-b32            1.218 [  0.904,   1.419]
+secondary    tmb-w256-streams-b32 over v2batch-batched-b32                2.278 [  1.696,   2.649]
+secondary    tmb-w256-streams-b8 over tmb-w256-sequential-b32             1.363 [  1.361,   1.364]
+secondary    tmb-w1024-streams-b32 over tmb-w1024-sequential-b32          1.337 [  1.327,   1.346]
+secondary    tmb-w256-sequential-b32 over v2batch-sequential-b32          2.241 [  2.233,   2.246]
+replication  v2batch-batched-b32 over v2batch-sequential-b32              1.198 [  1.197,   1.200]
