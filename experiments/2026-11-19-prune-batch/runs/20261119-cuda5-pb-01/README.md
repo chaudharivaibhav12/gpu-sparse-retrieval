@@ -22,8 +22,8 @@ Completed; the result of this experiment. Source `6393970` (registered protocol)
 
 **Primary contrast** (pruned streams b32 over pruned sequential b32): **1.218× [0.904, 1.419]**. The interval includes 1, so by the registered decision rule streams is **not** adopted, and one query at a time stays the reference.
 - *Why the interval is wide.* Processes 0 and 1 of `tmb-w256-streams-b32` ran at about 4,415 q/s in every round (1.41× sequential). Process 2 ran at about 2,830 q/s in every round, which is slower than sequential.
-- *Process 2 was clean:* no other GPU process in any of its 148 samples, and 0.57 cores of other CPU use.
-- *Cause.* The slowdown is specific to that process instance and stable within it. It is most likely a per-context scheduling or clock state with 32 concurrent pipelines (32 persistent scoring grids competing). This run cannot tell which, and it was not rerun to chase a better number.
+- *Process 2 passed the registered rules:* no other GPU process in any of its 148 samples, and 0.57 cores of other CPU use machine-wide.
+- *Cause (corrected 2026-11-19, [amendment 1](../../configs/protocol.json)).* This README first suggested a per-context GPU scheduling or clock state. That is withdrawn. Every scorer's host thread was pinned to CPU 0, and another user's process shared that core: the scorer got **0.50 cores over the released phase** (sampler log), against 1.00 for every other process of this run. The machine-wide CPU rule cannot see one process on the pinned core. Diagnostic processes with this run's binaries (outside the protocol) reproduced it: on a busy CPU 0, 2,630-2,970 q/s; pinned to an idle core, 4,414 and 4,407 q/s. Several queries in flight on streams need the host thread to keep launching, so they are sensitive to this; one query at a time is not (the host waits on the GPU). Under amendment 1 this process would be ineligible. Run `20261119-cuda5-pb-02` repeats the timing under the corrected rule.
 
 **Secondary contrasts:**
 - tmb-w256-streams-b8 over sequential: **1.363× [1.361, 1.364]** (all three processes consistent);
