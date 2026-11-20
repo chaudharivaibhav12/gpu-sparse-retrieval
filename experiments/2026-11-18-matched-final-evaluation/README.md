@@ -16,3 +16,8 @@ Remaining prerequisites are the exact-source CPU/CUDA build and Linux monitoring
 ## Calibration06 and frozen heldout continuation
 
 Calibration06 completed the full five-system protocol and independent raw/provenance review; see runs/20261119-cuda5-matched-calibration06/README.md. Heldout preparation/evaluation drivers preserve all backends and scientific settings; configs/heldout-method.json binds phase runtime templates and allowed mechanically derived query metadata. The pre-content method freeze precedes parsing; exact runtime freezes are instantiated from that fixed method before each instrumented run. No6480heldout contents have been read at this source review.
+
+
+## Interrupted heldout continuation
+
+The first heldout pipeline stopped after5correctness and8eligible timingprocesses. Its sealed terminalarchiveSHA is e0feb7f6bb611693d50c2f5d61b0cdbb5434abf880f2785cf758c8e631a269c8. The reviewed continuation binds preserved raw evidence and skips completed slots; only7remaining timingprocesses run. It does not regenerate the oracle or rerun correctness. Per-entryorigin/rawpaths retain sourceidentity; interrupted/excludedattempts remain. No scoring/settings/eligibility change. Analysis must disclose the interruption and conditional session-spanning paired blocks.

@@ -66,13 +66,13 @@ def main():
         e=event(a.ledger_root,entry['run'])['payload']
         if entry['tag'].startswith('reject-'):
             assert e['status']=='SPEC_VIOLATION' and set(e['runtime_delta'])=={'config.seed_ranges'} and e['runtime']['config']['seed_ranges']==64
-            directory=a.run/'raw'/entry['tag'];assert not (directory/'timing.csv').exists() and not (directory/'top.tsv').exists();rejections+=1;continue
+            directory=Path(entry.get('raw_directory',str(a.run/'raw'/entry['tag'])));assert not (directory/'timing.csv').exists() and not (directory/'top.tsv').exists();rejections+=1;continue
         assert e['status']=='EXECUTED' and e['exit_code']==0
         plan=event(a.ledger_root,e['experiment'])['payload'];assert e['runtime']==dict(config=plan['expected'],behavior=plan['behavior']) and not e['runtime_delta']
         cfg=e['runtime']['config'];assert cfg['docs']==8841823 and cfg['query_count']==6480 and cfg.get('k',cfg.get('requested_k'))==10
         inputs={x['role']:x['sha256'] for x in e['inputs']};assert inputs['canonical_gsp']=='e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac' and inputs['queries']==digest(a.queries) and inputs['oracle']==digest(a.oracle)
         assert 'GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7' in e['environment']['gpu']['stdout']
-        directory=a.run/'raw'/entry['tag'];monitor=replay_monitor(directory,label) if timing else None
+        directory=Path(entry.get('raw_directory',str(a.run/'raw'/entry['tag'])));monitor=replay_monitor(directory,label) if timing else None
         csvpath=directory/('samples.tsv' if label=='bmp' else 'timing.csv');tops=directory/('results.tsv' if label=='bmp' else 'top.tsv');times={q:[] for q in qids};sequence=[]
         for row in csv.DictReader(csvpath.open(),delimiter='\t' if label=='bmp' else ','):
             sequence.append((row['phase'],int(row['round']),row['query_id']));wall=int(row['elapsed_ns'])/1e6 if label=='bmp' else float(row['query_wall_ms']);assert math.isfinite(wall) and wall>0
@@ -101,7 +101,7 @@ def main():
         values=[x for block in range(3) for x in blocks[block]];summaries[label]=dict(median_ms=statistics.median(values),mean_ms=statistics.fmean(values),p95_ms=quantile(values,.95),p99_ms=quantile(values,.99),max_ms=max(values),per_process_median_ms=[statistics.median(blocks[i]) for i in range(3)])
     contrasts={}
     for left,right,kind in CONTRASTS:contrasts[left+' / '+right]=dict(contrast([matrices[left][i] for i in range(3)],[matrices[right][i] for i in range(3)]),kind=kind)
-    result=dict(source_commit=manifest['source_commit'],queries=6480,documents=8841823,k=10,batch_size=1,processes=3,warmups=3,rounds=20,ranked_scores_checked=ranks,validation=checks,correctness=correctness,runtime_rejections=rejections,descriptive=summaries,contrasts=contrasts,limitations=['Conditional on three process blocks and one shared-host study; process pairs may be separated by resource waits','Six individual intervals, two primary and four secondary; no family-wise error control claim','Sampled context absence is not exclusivity; global mean CPU rule does not guarantee CPU0 exclusivity','Clock and temperature ranges describe whole processes, not only measured query regions','No unrestricted floating-weight claim; claim-time comparisons and physical JIT audit must accompany final conclusions'])
+    result=dict(source_commit=manifest['source_commit'],queries=6480,documents=8841823,k=10,batch_size=1,processes=3,warmups=3,rounds=20,ranked_scores_checked=ranks,validation=checks,correctness=correctness,runtime_rejections=rejections,descriptive=summaries,contrasts=contrasts,limitations=['Conditional on three process blocks and one shared-host study; process pairs may be separated by resource waits','Six individual intervals, two primary and four secondary; no family-wise error control claim','Sampled context absence is not exclusivity; global mean CPU rule does not guarantee CPU0 exclusivity','Clock and temperature ranges describe whole processes, not only measured query regions','Interrupted continuation may span sessions; preserve assigned blocks and disclose timing gaps', 'No unrestricted floating-weight claim; claim-time comparisons and physical JIT audit must accompany final conclusions'])
     with a.output.open('x') as output:output.write(json.dumps(result,indent=2)+'\n')
     print(json.dumps(dict(status='RAW_REPLAY_PASS_COMPARATIVE_REVIEW_PENDING',ranked_scores=ranks,contrasts_computed=len(contrasts))))
 if __name__=='__main__':main()

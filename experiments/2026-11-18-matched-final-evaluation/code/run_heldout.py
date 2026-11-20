@@ -6,6 +6,7 @@ and instrumented independent oracle generation. No query-dependent tuning. Resou
 import argparse,csv,datetime,hashlib,importlib.util,json,math,os,signal,statistics,subprocess,sys,threading,time,traceback
 from pathlib import Path
 from pruned_expected import expected as pruned_expected
+from continuation import load_manifest,slots
 E='2026-11-18-matched-final-evaluation'
 TARGET='GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7'
 BOUNDARY='Resident parsed cap32 term/weight pairs through fresh query preparation, complete exact retrieval/selection/transfers/synchronization, and ordered original numeric IDs and integer scores in host memory; excludes file decoding, index setup, domain validation and textual formatting.'
@@ -112,6 +113,12 @@ def validate_outputs(label,paths,gold,qids,repeats,warmups,verify=0,config=None)
             delta=[int(b)-int(a) for a,b in zip(before['cpu_jiffies'].split()[1:9],after['cpu_jiffies'].split()[1:9])];assert len(delta)==8 and min(delta)>=0;total+=sum(delta);wait+=delta[4]
         assert total>0;io_share=wait/total
     return {q:statistics.median(v) for q,v in lat.items()},dict(groups=len(groups),ranked_scores=sum(map(len,groups.values())),iowait_share=io_share)
+def runner_result(path):
+    try:value=json.loads(Path(path).read_text())
+    except (OSError,ValueError) as error:raise RuntimeError('Missing or malformed runner final JSON') from error
+    if not isinstance(value,dict) or not isinstance(value.get('id'),str) or not isinstance(value.get('payload'),dict):raise RuntimeError('Invalid runner final event schema')
+    return value
+
 def validate_method_state(cfg,behavior,template):
     assert behavior==template['behavior'] and set(cfg)==set(template['config'])
     variable={'queries_path','query_count','max_query_terms','max_conservative_score_bound','query_tensor_width','reference_path'}
@@ -121,14 +128,14 @@ def validate_method_state(cfg,behavior,template):
 def main():
     def terminate_owned(signum,frame):raise KeyboardInterrupt('Owned controller termination')
     signal.signal(signal.SIGTERM,terminate_owned)
-    parser=argparse.ArgumentParser();parser.add_argument('--repository',type=Path,required=True);parser.add_argument('--inputs',type=Path,required=True);parser.add_argument('--output',type=Path,required=True);a=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--repository',type=Path,required=True);parser.add_argument('--inputs',type=Path,required=True);parser.add_argument('--output',type=Path,required=True);parser.add_argument('--continuation',type=Path);a=parser.parse_args()
     root=a.repository.resolve();out=a.output.resolve();assert out.is_relative_to(root);os.chdir(root);sys.path.insert(0,str(root/'scripts'))
     from research import Ledger,digest,read,write_new,review,export,differences
     inputs=read(a.inputs);receipt=read(root/'deployment-receipt.json');assert receipt['source_commit']==inputs['source_commit']
     out.mkdir(parents=True,exist_ok=False)
     for name in ['logs','raw','analysis','build','jit','cuda-cache']:(out/name).mkdir()
     write_new(out/'heldout-inputs.json',inputs)
-    L=Ledger(root);completed=[];attempts=[];deadline=time.monotonic()+259200
+    L=Ledger(root);completed=[];attempts=[];inherited=None;deadline=time.monotonic()+259200
     def status(state,**extra):
         # Status is mutable operational state; scientific records remain append-only.
         temp=out/'status.pending';temp.write_text(json.dumps(dict(state=state,utc=utc(),source_commit=inputs['source_commit'],completed=len(completed),**extra),indent=2));temp.replace(out/'status.json')
@@ -164,6 +171,10 @@ def main():
         e=L.event('observation',dict(title='Matched study preparation '+tag,motivation='Bind uninstrumented setup/build to exact source and output before retrieval',argv=list(map(str,argv)),cwd=str(root),exit_code=p.returncode,monitor=summary,qualification='Uninstrumented setup/data validation, no retrieval performance conclusion',artifacts=[L.blob(out/'logs'/(tag+'.stdout')),L.blob(out/'logs'/(tag+'.stderr'))]),[question['id']]);assert p.returncode==0 and (not observer or not observer.is_alive()),(tag,e['id'])
     try:
         source_check()
+        if a.continuation:
+            inherited=load_manifest(a.continuation,inputs['continuation_manifest_sha256'])
+            assert inherited['queries_sha256']==inputs['queries']['sha256'] and inherited['oracle_sha256']==inputs['oracle']['sha256'] and inherited['method_freeze']==inputs['method_freeze']
+            completed.extend(inherited['completed']);attempts.extend(inherited['attempts'])
         question=L.event('question',dict(title='Frozen full-collection heldout comparison',motivation='Close cross-session and CPU-formatting boundary gaps using strongest audited exact controls before heldout freeze',source_commit=inputs['source_commit'],parent_merge='b31ff7a57b3283884d637a8f8480e85640ae9242',protocol=read(root/'experiments'/E/'configs/heldout-method.json'),artifacts=[L.blob(a.inputs),L.blob(root/'deployment-receipt.json')]),[])
         wait_resources('before-large-input-hash-and-setup');status('validating-full-input-hashes')
         # Calibration paths/hashes are fixed explicitly. Never substitute another query file.
@@ -271,11 +282,17 @@ def main():
                 finally:
                     stop.set()
                     if observer is not None and observer.ident is not None:observer.join(timeout=45)
-            assert not observer.is_alive();write_new(directory/'monitor-summary.json',summary);event=read(directory/'runner.stdout');done=event['id']
+            assert not observer.is_alive();write_new(directory/'monitor-summary.json',summary)
+            try:event=runner_result(directory/'runner.stdout')
+            except RuntimeError as error:
+                starts=[e['id'] for e in L.events() if e['kind']=='run_started' and e['payload']['experiment']==spec['id']]
+                L.event('observation',dict(title='Runner interrupted before final JSON',motivation='Preserve actual exit and swap evidence without inventing a run_finished',stage=tag,returncode=rc,monitor=summary,error=str(error),artifacts=[L.blob(directory/'runner.stdout'),L.blob(directory/'runner.stderr'),L.blob(directory/'monitor-summary.json')]),starts)
+                raise RuntimeError('Runner ended without final JSON;rc='+str(rc)+';own_swap_limit_exceeded='+str(summary['own_swap_limit_exceeded'])) from error
+            done=event['id']
             admission_records=[json.loads(line) for line in admission.read_text().splitlines()] if admission.exists() else []
             admission_timeout=(event['payload'].get('exit_code')==75 and event['payload'].get('runtime') is None and admission_records and admission_records[-1]['decision']=='timeout' and not paths['csv'].exists() and not paths['top'].exists())
             if admission_timeout:
-                review(L,done,dict(result_summary=dict(admission_timeout=True,monitor=summary),interpretation='Backend not started: post-hash admission timed out',conclusions=[],decision='Preserve failed runner attempt and replace under resource-only retry cap',motivation='Availability can change during runner hashing; no query compute allowed here',confidence='high',limitations=['Availability is not a reservation'],next_steps=[dict(task='Wait for resources and retry fresh attempt',owner='unassigned',reason='No backend executed',done_when='Post-hash admission succeeds')]))
+                review(L,done,dict(result_summary=dict(admission_timeout=True,monitor=summary),interpretation='Backend not started: post-hash admission timed out',conclusions=[dict(text='Post-hash admission timed out before backend execution',scope='This attempt only;no query output or runtime',evidence_refs=[done])],decision='Preserve failed runner attempt and replace under resource-only retry cap',motivation='Availability can change during runner hashing; no query compute allowed here',confidence='high',limitations=['Availability is not a reservation'],next_steps=[dict(task='Wait for resources and retry fresh attempt',owner='unassigned',reason='No backend executed',done_when='Post-hash admission succeeds')]))
                 entry=dict(tag=tag,label=label,run=done,valid=False,admission_timeout=True,monitor=summary);attempts.append(entry);write_new(out/'analysis'/(tag+'.json'),entry)
                 raise ResourceIneligible(tag)
             if negative:
@@ -291,7 +308,7 @@ def main():
             timing=tag.startswith('timing-');eligible=not summary['foreign_pids'] and not summary['errors'] and summary['samples']>0 and not summary['own_swap_limit_exceeded']
             if timing:eligible=eligible and summary['other_cpu_cores_mean'] is not None and summary['other_cpu_cores_mean']<=4 and (label=='bmp' or summary['own_gpu_context_seen']) and (label!='bmp' or validation.get('iowait_share',1)<=.01)
             review(L,done,dict(result_summary=dict(validation=validation,monitor=summary,eligible=eligible if timing else None),interpretation='Exactness/runtime checks passed' if valid else 'Failed attempt; preserve and inspect',conclusions=[dict(text='Per-run checks only; no comparative speed claim',scope='Full collection,6480 heldout queries,k10,batch1',evidence_refs=[done])],decision='Continue fixed protocol' if valid and (eligible or not timing) else 'Wait and replace under frozen resource-only retry cap' if valid and timing else 'Stop for reviewed technical repair',motivation='Correctness and uncontaminated timing precede comparison',confidence='high' if valid else 'low',limitations=['Sampled shared-host evidence','No final heldout conclusions'],next_steps=[dict(task='Complete fixed calibration and independent review before freeze',owner='unassigned',reason='Final evaluation prerequisites',done_when='All15 eligible timing processes and canonical outputs reviewed')]))
-            entry=dict(tag=tag,label=label,run=done,latencies=lat if timing else None,validation=validation,monitor=summary,valid=valid,timing_eligible=eligible if timing else None);attempts.append(entry);write_new(out/'analysis'/(tag+'.json'),entry)
+            entry=dict(tag=tag,label=label,run=done,raw_directory=str(directory),origin_root=str(root),controller_source_commit=inputs['source_commit'],latencies=lat if timing else None,validation=validation,monitor=summary,valid=valid,timing_eligible=eligible if timing else None);attempts.append(entry);write_new(out/'analysis'/(tag+'.json'),entry)
             assert valid,(tag,validation,summary)
             if timing and not eligible:raise ResourceIneligible(tag)
             completed.append(entry);return entry
@@ -299,12 +316,16 @@ def main():
         for verify,repeats,warmups,phase in [(1,1,0,'correctness'),(0,20,3,'timing')]:
             for label in ORDER:preflight.append(one(label,'config-preflight-'+phase+'-'+label,repeats,warmups,verify,plan_only=True))
         L.event('observation',dict(title='All five expected-state factories resolved before query execution',motivation='Catch incomplete software/hardware configuration assembly before any long correctness stage',artifacts=[L.blob(p) for p in preflight]+[L.blob(root/'experiments'/E/'configs/device-profile.json')]),[question['id']])
-        resource_retries(one,'prunets256','reject-prunets-full-state',1,0,0,True)
-        for label in ORDER:resource_retries(one,label,'correctness-'+label,1,0,1)
+        if inherited is None:
+            resource_retries(one,'prunets256','reject-prunets-full-state',1,0,0,True)
+            for label in ORDER:resource_retries(one,label,'correctness-'+label,1,0,1)
+        carried=slots(completed)
         for block in range(3):
-            for label in ORDER[block:]+ORDER[:block]:resource_retries(one,label,f'timing-p{block}-'+label,20,3,0)['process_block']=block
+            for label in ORDER[block:]+ORDER[:block]:
+                if (block,label) in carried:continue
+                resource_retries(one,label,f'timing-p{block}-'+label,20,3,0)['process_block']=block
         observed([sys.executable,'-c',probe],'packages-after');assert read(out/'logs/packages-after.stdout')==environment
-        write_new(out/'manifest.json',dict(status='heldout-complete-analysis-pending',source_commit=inputs['source_commit'],completed=completed,attempts=attempts,qualification='No comparative claim until independent bootstrap/claim-time comparisons. Compact physical-kernel checks retained for each compact run. Frozen heldout evaluation.'))
+        write_new(out/'manifest.json',dict(status='heldout-complete-analysis-pending',source_commit=inputs['source_commit'],completed=completed,attempts=attempts,continuation_parent=inherited['origin_output'] if inherited else None,continuation_archive_sha256=inherited['parent_archive_sha256'] if inherited else None,qualification='No comparative claim until independent bootstrap/claim-time comparisons. Compact physical-kernel checks retained for each compact run. Frozen heldout evaluation.'))
         write_new(out/'ledger-verify.json',L.verify());export(L);status('heldout-complete-independent-analysis-pending')
     except BaseException as error:
         events=L.events();reviewed={e['payload'].get('run') for e in events if e['kind']=='review'};pending=[e['id'] for e in events if e['kind']=='run_finished' and e['id'] not in reviewed]
