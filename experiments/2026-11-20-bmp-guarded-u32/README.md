@@ -1,0 +1,13 @@
+# Guarded U32 CPU-BMP score-width comparison
+
+This follow-on starts from reviewed PR27 merge `66d7e1e9dfd88954eb52505fa939d68519fc9918`. It asks how much temporary U64 score/bound/selection representation affects corrected resident CPU-BMP latency. The U64 control, guarded U32 treatment and frozen W256 GPU anchor will be measured fresh on the full 8,841,823 passages and the original 500 calibration queries. No gain is assumed; slower/null outcomes are retained.
+
+Status: implementation and CPU-only build preparation. **No retrieval measurement or new CIMS experiment submission is approved or running.** The protocol is in [configs/protocol.json](configs/protocol.json); [source review01](reviews/source-review01.json) records seven local source/model checks and pending Rust compilation.
+
+The [U32 module](code/guarded_u32.rs) uses private guarded-query and validated-index tokens. Search/scoring/bound bodies are mechanically copied from the pinned parent, changing only score widths and callee names. Original IDs/ties and serialized fields remain U64/original types. The [materializer](code/materialize.py) verifies all 18 parent BMP sources, preserves original U64 library bodies and adds immutable context getters. The two adapters share an actual full-index uniqueness/conservative-raw-bound preflight outside timing. Unknown tokens count toward query guards; repeated PISA tokens still encode integer weights. Both end with ordered host U64 scores inside the query timer.
+
+The maximum supported product is 8,160 and nonnegative partial sum 1,044,480 for unique uint8 impacts and <=128 unique cap32 terms. All relevant score/bound intermediates fit U32 under the enforced domain. This is a bounded-domain representation ablation, not a strongest-CPU or unmodified-released-BMP claim. No prefetch, traversal, tie policy, approximation, index layout or thread-count change is bundled with it.
+
+[Build preparation](code/build.py) only materializes the pinned source, builds and runs Rust unit checks. It never opens real retrieval inputs or launches CUDA. Full instrumented runtime rejection/correctness/timing remains a separate registered, reviewed and explicitly approved submission. All failed preparations and measurements must retain fresh directories and provenance.
+
+The 6,480 queries used by the parent frozen evaluation are now exposed. This experiment uses only calibration queries and does not change the parent's reported result. Future reuse of that population is follow-up evaluation, not fresh unseen validation. New teammate adaptive/pruning studies integrated into main are not silently substituted for the frozen GPU anchor.
