@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-18-matched-final-evaluation",
+  "title": "Strict matched full-collection controls and frozen final evaluation",
+  "owner": "vaibhav",
+  "branch": "exp/vaibhav/2026-11-18-matched-final-evaluation",
+  "status": "frozen-evaluation-independently-validated",
+  "parent_experiment": "2026-11-17-gpusparse-u8-storage",
+  "parent_source_commit": "f263feed61a47f9b6317fff45df9788430b0ff2c",
+  "parent_merge_commit": "b31ff7a57b3283884d637a8f8480e85640ae9242",
+  "question": "How do the final exact pruned GPU scorers compare with the stronger compact GPUSparse and CPU-BMP controls under a fresh matched full-collection protocol, and do the frozen choices generalize to heldout queries?",
+  "hypothesis": "No assumed speed gap; all supported systems return identical canonical answers",
+  "motivation": "Close genuine comparison gaps revealed by independent audit and protect final evaluation from calibration tuning",
+  "code_paths": [
+    "code\\project_benchmark_matched.rs",
+    "code\\pruned_expected.py",
+    "code\\run_calibration.py",
+    "code\\verify_collection_ids.rs",
+    "code/run_heldout.py",
+    "code/run_final_evaluation.py",
+    "code/prepare_heldout_queries.py",
+    "code/continuation.py"
+  ],
+  "configuration_files": [
+    "configs/protocol-draft.json",
+    "configs/pruned-runtime-templates.json",
+    "configs/heldout-method.json"
+  ],
+  "declared_changes": [
+    "CPU PISA cap32 text is prepared once outside timer; duplicates counted exactly, unsupported >32 weights or >128 distinct terms rejected",
+    "CPU fresh cursors and canonical retrieval remain timed; ordered numeric-ID/score mapping and allocation included; TREC formatting moved outside timing",
+    "Deterministic lexical token order replaces randomized HashMap traversal, disclosed and correctness checked",
+    "No change to underlying BMP pruning, arithmetic, eligibility or canonical tie selection",
+    "Complete expected runtime rather than subset match; fixed resource eligibility and original-ID preflight; same algorithm bytes for existing pruned/exhaustive/compact scorers"
+  ],
+  "scoring_contract": [
+    "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+    "GSP-CAP32-F32GUARDED-NUMERIC-TIES-v1",
+    "GSP-CAP32-U64-NUMERIC-TIES-v1"
+  ],
+  "input_manifest": "Pinned full-collection parent hashes in protocol/runtime templates; exact deployment manifest recorded before execution",
+  "query_split": "500 calibration;6480 heldout untouched until freeze",
+  "timing_boundary": "Resident parsed cap32 term/weight pairs through fresh per-query preparation/cursors, all retrieval/selection/transfers, ordered original numeric-ID/score top-k in host memory. Exclude file decoding, index load, domain verification, and textual result formatting consistently. Disclose each implementation-specific operation.",
+  "correctness_rule": [
+    "All-document eligibility and numeric-ID ties; exact uint8 weights and cap32 queries",
+    "Independent CPU uint64 oracle for every query, all rounds/processes",
+    "Fresh full-score/schedule checks and existing synthetic boundary/tie/large-score fixtures",
+    "Complete actual-runtime config/behavior match before measured compute through scripts/research.py run",
+    "Deliberate pre-compute runtime rejection checks for every new adapter path",
+    "Compare every BMP original-ID entry, in order, with the 8,841,823 GSP IDs before any scoring; pinned index and GSP hashes bind this preparation observation.",
+    "Compare every BMP original-ID entry, in order, with the 8,841,823 GSP IDs before any scoring; pinned index and GSP hashes bind this preparation observation."
+  ],
+  "measurement_and_analysis_plan": {
+    "per_query": "Median of 20 rounds per process and query",
+    "paired": "Geometric mean query-time ratios paired by process block and query",
+    "uncertainty": "10000 crossed process/query bootstrap draws, fixed seed 20261118; conditional on shared-host session",
+    "descriptive": [
+      "median",
+      "mean",
+      "p95",
+      "p99",
+      "maximum",
+      "own sampled memory and modeled allocations"
+    ],
+    "controls": "All five on full collection. Primary GPU prunets-W256 / compact and prunets-W256 / BMP. Secondary W1024 contrasts, exhaustive control, component controls retained from audited calibration studies. No cross-session median division as a matched claim."
+  },
+  "success_rule": "Complete correctness and fifteen eligible fresh timing processes, independent analysis/claim-time review; then freeze and evaluate",
+  "failure_rule": "Preserve every failure; separately review repairs, max3 technical repairs; resource attempts bounded independently",
+  "next_if_negative": "Retain null/slower outcome without tuning on heldout queries",
+  "recording_ids": [
+    "DEC-20261118-COMPLETION-SEQUENCE",
+    "OBS-20261118-MATCHED-ADAPTER-VALIDATED",
+    "OBS-20261120-HELDOUT-INDEPENDENT-REVIEW",
+    "DEC-20261120-REPORT-THEN-U32"
+  ],
+  "runs": [
+    "20261118-cuda5-adapter-build01",
+    "20261118-cuda5-adapter-fixture01",
+    "20261119-cuda5-matched-calibration06",
+    "20261120-cuda5-heldout-continuation01"
+  ]
+}
