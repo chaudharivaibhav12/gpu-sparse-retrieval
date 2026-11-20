@@ -16,9 +16,15 @@ def materialize(parent,destination,experiment):
     assert manifest['source_commit']=='61c8a00d8323d49a011d8909113a8755906323c9'
     assert not destination.exists(),'Fresh build directory required'
     for name,h in manifest['actual_BMP_sources'].items():assert sha(parent/name)==h,('Parent source changed',name)
+    native=json.loads((experiment/'configs/native-build-inputs.json').read_text());assert native['revision']==manifest['BMP_upstream_revision']
+    for name,record in native['files'].items():
+        b=(experiment/'code/native-build'/name).read_bytes();assert hashlib.sha256(b).hexdigest()==record['sha256']
+        assert hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()==record['git_blob']
     destination.mkdir(parents=True)
     for name in manifest['actual_BMP_sources']:
         p=destination/name;p.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(parent/name,p)
+    for name in native['files']:
+        p=destination/name;p.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(experiment/'code/native-build'/name,p)
     # Only explicitly selected new adapters/library are built. Drop unavailable,
     # unused native CLI target declarations; keep every library/dependency byte.
     cargo=(destination/'Cargo.toml').read_text();cargo,count=re.subn(r'\n\[\[bin\]\]\nname = "(?:ciff2bmp|search)"\npath = "[^"]+"\n','',cargo);assert count==2
@@ -33,7 +39,7 @@ def materialize(parent,destination,experiment):
     assert sha(destination/'Cargo.lock')==manifest['actual_BMP_sources']['Cargo.lock']
     for name,h in manifest['actual_BMP_sources'].items():
         if name not in ['Cargo.toml','src/lib.rs','src/search.rs']:assert hashes[name]==h
-    receipt={'status':'MATERIALIZED_NO_QUERYEXECUTION','parent_backend_source':manifest['source_commit'],'native_revision':manifest['BMP_upstream_revision'],'parent_source_files':manifest['actual_BMP_sources'],'files':hashes,'deltas':['Add guarded U32 module and two compiled-width resident adapters','Add read-only CanonicalContext getters;all original U64 search bodies unchanged','Remove unused nativeCLI target declarations from materialized Cargo only;lock/dependencies unchanged','No index writes or conversions']}
+    receipt={'status':'MATERIALIZED_NO_QUERYEXECUTION','parent_backend_source':manifest['source_commit'],'native_revision':manifest['BMP_upstream_revision'],'parent_source_files':manifest['actual_BMP_sources'],'native_build_inputs':native,'files':hashes,'deltas':['Add guarded U32 module and two compiled-width resident adapters','Add read-only CanonicalContext getters;all original U64 search bodies unchanged','Remove unused nativeCLI target declarations from materialized Cargo only;lock/dependencies unchanged','No index writes or conversions']}
     (destination/'materialization.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf-8',newline='\n');return receipt
 
 def main():

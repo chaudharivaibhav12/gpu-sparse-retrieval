@@ -16,6 +16,7 @@ class Checks(unittest.TestCase):
    self.assertEqual((dest/'src/query/live_block.rs').read_bytes(),(a.parent/'src/query/live_block.rs').read_bytes())
    self.assertEqual((dest/'src/query/topk_heap.rs').read_bytes(),(a.parent/'src/query/topk_heap.rs').read_bytes())
    self.assertEqual((dest/'Cargo.lock').read_bytes(),(a.parent/'Cargo.lock').read_bytes())
+   for name in json.loads((E/'configs/native-build-inputs.json').read_text())['files']:self.assertEqual((dest/name).read_bytes(),(E/'code/native-build'/name).read_bytes())
    with self.assertRaises(AssertionError):mat.materialize(a.parent,dest,E)
  def test_u32_search_has_only_declared_changes(self):
   original=(a.parent/'src/search.rs').read_text();start=original.index('fn search_with_ids(');end=original.index('\n#[cfg(test)]',start);body=original[start:end]

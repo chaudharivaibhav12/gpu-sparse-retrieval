@@ -22,6 +22,13 @@ def main():
         manifest['materialization']=materialize(a.parent,root/'BMP',Path(__file__).resolve().parents[1]);run(['rustc','-vV'],'rustc',root);run(['cargo','--version'],'cargo',root)
         run(['cargo','test','--locked','--offline','--lib','--bin','project_benchmark_u32','--bin','project_benchmark_u64'],'unit-tests',root/'BMP')
         run(['cargo','build','--release','--locked','--offline','--bin','project_benchmark_u32','--bin','project_benchmark_u64'],'release-build',root/'BMP')
+        generated=root/'generated-proto';generated.mkdir();manifest['generated_sources']=[]
+        for file in sorted((root/'BMP/target').glob('*/build/bmp-*/out/common_index_format_v1.rs')):
+            h=sha(file);copy=generated/(h+'.rs')
+            if not copy.exists():copy.write_bytes(file.read_bytes())
+            manifest['generated_sources'].append({'original_path':str(file),'path':str(copy),'sha256':h})
+        assert len(manifest['generated_sources'])>=2,'Both test/release protobuf codegen must be captured'
+        for bits in [32,64]:run([str(root/'BMP/target/release'/('project_benchmark_u'+str(bits))),'--help'],'help-u'+str(bits),root)
         manifest['binaries']={str(bits):{'path':str(root/'BMP/target/release'/('project_benchmark_u'+str(bits))),'sha256':sha(root/'BMP/target/release'/('project_benchmark_u'+str(bits)))} for bits in [32,64]};manifest['status']='BUILD_AND_UNIT_TESTS_PASS_NO_MEASUREMENTS'
     except BaseException as e:manifest['status']='BUILD_PREPARATION_FAILED';manifest['error']=repr(e);raise
     finally:
