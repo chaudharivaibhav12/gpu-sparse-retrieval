@@ -1,0 +1,97 @@
+{
+  "status": "REVIEWED_IMPLEMENTATION_PENDING_CIMS_MEASUREMENT_APPROVAL",
+  "experiment": "2026-11-20-bmp-guarded-u32",
+  "parent_experiment": "2026-11-18-matched-final-evaluation",
+  "parent_merge": "66d7e1e9dfd88954eb52505fa939d68519fc9918",
+  "parent_backend_source": "61c8a00d8323d49a011d8909113a8755906323c9",
+  "scope": {
+    "documents": 8841823,
+    "queries": 500,
+    "split": "calibration",
+    "k": 10,
+    "batch": 1,
+    "cpu": 0,
+    "numa": 0,
+    "rayon_threads": 1,
+    "bmp_block_size": 32,
+    "bounds": "raw",
+    "alpha": 1.0,
+    "beta": 1.0,
+    "gpu_uuid": "GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7",
+    "process_blocks": 3,
+    "warmups": 3,
+    "repeats": 20
+  },
+  "systems": [
+    "bmp64",
+    "bmp32",
+    "prunets256"
+  ],
+  "timing_order": [
+    [
+      "bmp64",
+      "bmp32",
+      "prunets256"
+    ],
+    [
+      "bmp32",
+      "prunets256",
+      "bmp64"
+    ],
+    [
+      "prunets256",
+      "bmp64",
+      "bmp32"
+    ]
+  ],
+  "primary_contrast": [
+    "bmp32",
+    "bmp64"
+  ],
+  "secondary_contrasts": [
+    [
+      "prunets256",
+      "bmp32"
+    ],
+    [
+      "prunets256",
+      "bmp64"
+    ]
+  ],
+  "estimator": "Geometric pairedquery/block time ratios of20roundperquerymedians;10000crossedbootstrapdraws PythonMT19937seed20261118;linear2.5/97.5percentiles;individualconditionalintervals",
+  "runtime_negatives": [
+    "bmp64-score_bits",
+    "bmp32-score_bits"
+  ],
+  "correctness": "BothCPUvariantsandfrozenW256againstindependentfullU64oracle;allreturnedrounds",
+  "resources": {
+    "gpu_free_mib": 10000,
+    "host_available_gib": 34,
+    "other_cpu_cores_mean_max": 4,
+    "bmp_measured_iowait_share_max": 0.01,
+    "own_swap_gib_max": 1,
+    "resource_attempts_per_stage": 3,
+    "poll_seconds": 120,
+    "availability_hours": 72,
+    "runtime_gate_seconds": 600,
+    "post_hash_admission_seconds": 120,
+    "stage_timeout_seconds": 21600
+  },
+  "timing_boundary": "Parentresidentparsedquerythroughfreshcursor/retrieval/selection/orderedhostnumericIDandU64score;guardscan/filedecode/indexload/textformatoutsidealltimers",
+  "null_rule": "Preservenull/sloweroutcomes;do nottuneaway orclaimstrongestCPU",
+  "heldout_rule": "No6480querytuning;alreadyexposedunderparentfreeze;future reuseisfollowupevaluation",
+  "submission": "NoCIMSmeasurementuntilconcretereviewedsource/config/build andexplicitapproval. CPU-onlycompilation/unitchecksareimplementationpreparation,notretrievalmeasurement.",
+  "environment": {
+    "cuda_module": "cuda-12.6",
+    "python_module": "python-3.12",
+    "python_interpreter": "/scratch/vc2836/gpu-project/sessions/pruning-replication-95ae7f1/tmp/gpusparse-setup-92bb87b-v2/venv/bin/python",
+    "python_major_minor": [
+      3,
+      12
+    ],
+    "OMP_NUM_THREADS": "1",
+    "RAYON_NUM_THREADS": "1",
+    "CUDA_VISIBLE_DEVICES": "0",
+    "CUDA_MODULE_LOADING": "LAZY"
+  }
+}

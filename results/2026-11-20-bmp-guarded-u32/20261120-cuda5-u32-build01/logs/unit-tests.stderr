@@ -1,0 +1,83 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling version_check v0.9.5
+   Compiling libc v0.2.191
+   Compiling crossbeam-utils v0.8.23
+   Compiling proc-macro-error-attr v1.0.4
+   Compiling crossbeam-epoch v0.9.21
+   Compiling syn v1.0.109
+   Compiling proc-macro-error v1.0.4
+   Compiling serde_core v1.0.229
+   Compiling autocfg v1.5.1
+   Compiling crossbeam-deque v0.8.8
+   Compiling num-traits v0.2.19
+   Compiling syn v3.0.10
+   Compiling unicode-width v0.1.14
+   Compiling regex-syntax v0.8.11
+   Compiling unicode-segmentation v1.13.3
+   Compiling rayon-core v1.13.0
+   Compiling serde v1.0.229
+   Compiling heck v0.3.3
+   Compiling regex-automata v0.4.18
+   Compiling textwrap v0.11.0
+   Compiling serde_derive v1.0.229
+   Compiling atty v0.2.14
+   Compiling bitflags v1.3.2
+   Compiling fst v0.4.7
+   Compiling protobuf v2.28.0
+   Compiling anyhow v1.0.104
+   Compiling strsim v0.8.0
+   Compiling unicode-width v0.2.3
+   Compiling lazy_static v1.5.1
+   Compiling vec_map v0.8.2
+   Compiling ansi_term v0.12.1
+   Compiling console v0.16.6
+   Compiling clap v2.34.0
+   Compiling structopt-derive v0.4.18
+   Compiling regex v1.13.1
+   Compiling either v1.19.0
+   Compiling number_prefix v0.3.0
+   Compiling indicatif v0.15.0
+   Compiling rayon v1.12.0
+   Compiling structopt v0.3.26
+   Compiling num-integer v0.1.47
+   Compiling bincode v1.3.3
+   Compiling bmp v0.1.0 (/scratch/vc2836/gpu-project/sessions/bmp-guarded-u32-c8d3b14-prep01/results/2026-11-20-bmp-guarded-u32/20261120-cuda5-u32-build01/BMP)
+error: environment variable `OUT_DIR` not defined at compile time
+  --> src/proto/common_index_format_v1.rs:13:18
+   |
+13 | include!(concat!(env!("OUT_DIR"), "/common_index_format_v1.rs"));
+   |                  ^^^^^^^^^^^^^^^
+   |
+   = help: `OUT_DIR` may not be available for the current Cargo target
+   = help: Cargo sets build script variables at run time. Use `std::env::var("OUT_DIR")` instead
+
+error[E0432]: unresolved imports `crate::proto::DocRecord`, `crate::proto::Posting`, `crate::proto::PostingsList`
+  --> src/ciff/mod.rs:14:24
+   |
+14 | pub use crate::proto::{DocRecord, Posting, PostingsList};
+   |                        ^^^^^^^^^  ^^^^^^^  ^^^^^^^^^^^^ no `PostingsList` in `proto`
+   |                        |          |
+   |                        |          no `Posting` in `proto`
+   |                        no `DocRecord` in `proto`
+
+error[E0432]: unresolved imports `common_index_format_v1::DocRecord`, `common_index_format_v1::Header`, `common_index_format_v1::Posting`, `common_index_format_v1::PostingsList`
+  --> src/proto/mod.rs:2:34
+   |
+ 2 | pub use common_index_format_v1::{DocRecord, Header, Posting, PostingsList};
+   |                                  ^^^^^^^^^  ^^^^^^  ^^^^^^^  ^^^^^^^^^^^^ no `PostingsList` in `proto::common_index_format_v1`
+   |                                  |          |       |
+   |                                  |          |       no `Posting` in `proto::common_index_format_v1`
+   |                                  |          no `Header` in `proto::common_index_format_v1`
+   |                                  no `DocRecord` in `proto::common_index_format_v1`
+   |
+note: struct `crate::ciff::Header` exists but is inaccessible
+  --> src/ciff/mod.rs:21:1
+   |
+21 | struct Header {
+   | ^^^^^^^^^^^^^ not accessible
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `bmp` (lib) due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...

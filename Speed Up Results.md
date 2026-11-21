@@ -1,5 +1,20 @@
 # Speed Up Results
 
+## November 20: guarded U32 CPU-BMP, full collection calibration
+
+Guarded U32 BMP reduced paired resident CPU query time by **31.65%**, or **1.463x** speedup over its matched U64 control (conditional 95% interval **1.442–1.484x**). Frozen W256 remained **32.447x** faster than U32 BMP (**31.320–33.604x**). These use all **8,841,823 passages**, the original **500 calibration queries**, k=10/batch=1, CPU 0/Rayon 1, RTX 4070, three rotated process blocks, three warmups and twenty measured rounds. Ratios are paired geometric estimates, not divisions of medians.
+
+| System | Median query/process latency, ms | P95, ms | P99, ms |
+|---|---:|---:|---:|
+| U64 resident BMP |13.892004|39.207262|58.751669|
+| Guarded U32 resident BMP |9.154221|34.173670|54.855932|
+| Frozen W256 GPU |0.272083|1.016268|1.910239|
+
+All 14 stages and1,050,000raw ranked scores passed independent review. Host VmHWM remained about 28.14 GiB for both CPU variants; narrower arithmetic did not halve process memory. Six physical U32/U64 arithmetic/contract comparisons remain mechanically blocked, with separately reviewed bounded-integer equivalence. These are resident-query calibration results with individual intervals conditional on three shared-host blocks; no strongest-CPU, released-BMP or general-hardware claim. [Report](results/2026-11-20-bmp-guarded-u32/20261120-cuda5-u32-calibration01/RESULTS.md).
+
+The parent's 6,480 evaluation queries are already exposed and were not used for this study or further tuning. The dated entries below retain their historical status; earlier statements that held-out queries were unused describe those earlier dates. The [completed parent evaluation](results/2026-11-18-matched-final-evaluation/20261120-cuda5-heldout-continuation01/RESULTS.md) remains unchanged.
+
+
 November 18 compact-control update: Compact document-weight storage reduces paired query time by 1.93% and sampled GPU memory by 36.1% versus the guarded FP32-storage GPUSparse adaptation. The unchanged exhaustive range scorer remains 8.27× faster (conditional 95% interval 8.14–8.39) on all 8,841,823 passages, 500 calibration queries, RTX 4070, k=10 and batch size 1. All 6,480 held-out queries remain unused. [Report](experiments/2026-11-17-gpusparse-u8-storage/report.md). Newer team pruning, CPU and profile results retain their own protocols and qualifications.
 
 

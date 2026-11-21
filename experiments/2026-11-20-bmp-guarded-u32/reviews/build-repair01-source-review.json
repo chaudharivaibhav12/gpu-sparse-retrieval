@@ -1,0 +1,30 @@
+{
+  "status": "BUILD_REPAIR01_SOURCE_REVIEW_PASS_BUILD02_PENDING",
+  "parent_source": "c8d3b1431746ea8fefc87df58b5acd0f506a4354",
+  "failure": "Build01cargo testfailed beforeanytestexecuted:src/proto wrapper needsOUT_DIR generatedby nativebuild.rs,which the18-fileparentbuildsnapshot didnotinclude. No retrieval/GPU/measurement happened.",
+  "diagnosis": "Recoveredbuild.rs andproto/common-index-format-v1.proto fromnative67ad8c683fbc0c30145d1ee42c1dffbed8b12332;currentparentworkingbytes matchnativeGitblobs;SHA256 andGitblob IDs preserved.",
+  "deltas": [
+    "Copyexactpinnednativebuildscript/schema intofreshmaterializedbuild",
+    "Capturetest/releasegeneratedRustsource hashes/bytes",
+    "Runbothreleaseadapters --help toverifyactualCLI withoutinputs",
+    "Pinandverify bothSHA256/GitblobIDs;Cargo.lock/scoring/search/index layout unchanged"
+  ],
+  "separate_review": [
+    "Original18parentRust/Cargohashes retained andchecked",
+    "Fullnewbuildinputlist includesnativebuildscript/schema;no guessedcodegenreplacement",
+    "Freshbuilddirectory prevents staleOUT_DIR source reuse",
+    "Generatedprotobufcontent retainedoutsideephemeral targettree",
+    "Buildfailureargv,returncode andcompletecompilerlogs preserved;no successfulbuildorunitclaim",
+    "Controller implementationremainslocaldraftnotdeployed/approved forqueryexecution"
+  ],
+  "checks": {
+    "local_source_model_checks": 7,
+    "result": "PASS",
+    "Rust": "PENDING"
+  },
+  "preserved_failure_archive_sha256": "577cfeddd68e7973dd02a2a0c490de6c18823a3f6c815e441887073045f4b2e2",
+  "limits": [
+    "FreshGitreadbackdoesnotretroactivelyproveallhistoricalcompilerinputs;oldrawcorrectnessresultsremainindependentlyreplayed",
+    "CPU-onlybuildrepairunderimplementationpreparation;fullCIMSmeasurementstillrequiresapproval"
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-20-bmp-guarded-u32",
+  "title": "Guarded U32 temporary arithmetic in corrected resident CPU-BMP",
+  "owner": "vaibhav",
+  "branch": "exp/vaibhav/2026-11-20-bmp-guarded-u32",
+  "status": "calibration-complete-independently-reviewed",
+  "parent_experiment": "2026-11-18-matched-final-evaluation",
+  "parent_source_commit": "da9905728a2b679990dcb206376d98c2a58f590a",
+  "parent_merge_commit": "66d7e1e9dfd88954eb52505fa939d68519fc9918",
+  "question": "How much does temporary U64 score/bound/selection representation affect corrected resident CPU-BMP latency?",
+  "hypothesis": "No gain assumed; guardedU32 preserves every ordered integer answer under the proven domain.",
+  "motivation": "Address the explicitly disclosed wideU64 CPU representation limitation before furtherGPU optimization.",
+  "code_paths": [
+    "code/guarded_u32.rs",
+    "code/materialize.py",
+    "code/project_benchmark_u64.rs",
+    "code/project_benchmark_u32.rs",
+    "code/expected_cpu.py",
+    "code/build.py",
+    "code/run_study.py",
+    "analysis/analyze.py",
+    "analysis/check_study.py"
+  ],
+  "configuration_files": [
+    "configs/protocol.json",
+    "configs/parent-built-source.json",
+    "configs/input-pins.json",
+    "configs/native-build-inputs.json"
+  ],
+  "declared_changes": {
+    "temporary_arithmetic": "U32 versus U64 accumulators,bounds,thresholds,candidate/heap scores only",
+    "preflight": "Both CPU variants add full actual index uniqueness/conservative raw-bound scan and whole-file query guard outside query timing",
+    "metadata": "Complete width/guard runtime marks and post-run Rust-layout/process-memory report",
+    "source": "Additive read-only context getters;parentU64 algorithm bodies unchanged",
+    "build": "Pinned lock/dependencies;materialized Cargo excludes unused nativeCLI targets"
+  },
+  "scoring_contract": [
+    "GSP-CAP32-U64-NUMERIC-TIES-v1",
+    "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1"
+  ],
+  "input_manifest": "Pinned full-collection parent input identities;exact deployment/build hashes required before registration",
+  "query_split": "500 calibration only;6480 already exposed by parent freeze and never used for tuning",
+  "timing_boundary": "Parent resident parsed query through fresh cursor/retrieval/selection/ordered numeric host IDs and U64 scores;indexload/domainvalidation/filedecoding/textformat excluded",
+  "correctness_rule": "Independent U64 oracle for all outputs;full actual runtime gate;both new CPU width rejections;fixtures and unsupported-domain tests precede performance",
+  "measurement_and_analysis_plan": "configs/protocol.json",
+  "success_rule": "Complete source/build/runtime/raw/provenance/resource checks,3correctness+9eligible timings+2negative gates;independent paired analysis",
+  "failure_rule": "Preserve failures and stop technical/scientific failures;only3frozenresourceattempts perstage under approved controller;newtechnicalsubmissionrequiresapproval",
+  "next_if_negative": "Keep null/slower outcome;do not tune it away or claim strongest CPU",
+  "recording_ids": [
+    "DEC-20261120-U32-IMPLEMENTATION-APPROVED",
+    "DEC-20261120-U32-CALIBRATION01-APPROVED",
+    "OBS-20261120-U32-INDEPENDENT-REVIEW"
+  ],
+  "runs": [
+    "20261120-cuda5-u32-build01",
+    "20261120-cuda5-u32-build02",
+    "20261120-cuda5-u32-calibration01"
+  ],
+  "measured_controller_source_commit": "f413078ddb4e09940e463ce550b314e7e264247c",
+  "cpu_backend_source_commit": "a0d34664ae2193163c65316ffa420e91e7f7b16d",
+  "gpu_backend_source_commit": "61c8a00d8323d49a011d8909113a8755906323c9",
+  "result_summary": "GuardedU32/U64 pairedtime0.683544[0.673837,0.693496];W256/U32 inverse32.447384x[31.319928,33.604467];all14stages/1.05millionrankedscores checked;500calibration only"
+}

@@ -1,0 +1,134 @@
+{
+  "status": "SOURCE_MATERIALIZATION_AND_CLAIM_REVIEW_PASS",
+  "cpu_materialized_files": 23,
+  "compiled_source_unchanged_bindings": [
+    "experiments/2026-11-20-bmp-guarded-u32/code/guarded_u32.rs",
+    "experiments/2026-11-20-bmp-guarded-u32/code/project_benchmark_u32.rs",
+    "experiments/2026-11-20-bmp-guarded-u32/code/project_benchmark_u64.rs",
+    "experiments/2026-11-20-bmp-guarded-u32/code/native-build/build.rs",
+    "experiments/2026-11-20-bmp-guarded-u32/code/native-build/proto/common-index-format-v1.proto"
+  ],
+  "comparisons": [
+    {
+      "left": "bmp32",
+      "right": "bmp64",
+      "block": 0,
+      "comparison": "COMPARISON-df15340d3ea8",
+      "status": "BLOCKED",
+      "delta_count": 6,
+      "contract_mismatches": [
+        "behavior.arithmetic",
+        "behavior.contract"
+      ]
+    },
+    {
+      "left": "bmp32",
+      "right": "bmp64",
+      "block": 1,
+      "comparison": "COMPARISON-f6b50a7ea79f",
+      "status": "BLOCKED",
+      "delta_count": 6,
+      "contract_mismatches": [
+        "behavior.arithmetic",
+        "behavior.contract"
+      ]
+    },
+    {
+      "left": "bmp32",
+      "right": "bmp64",
+      "block": 2,
+      "comparison": "COMPARISON-a48daef94631",
+      "status": "BLOCKED",
+      "delta_count": 6,
+      "contract_mismatches": [
+        "behavior.arithmetic",
+        "behavior.contract"
+      ]
+    },
+    {
+      "left": "prunets256",
+      "right": "bmp32",
+      "block": 0,
+      "comparison": "COMPARISON-4a2cde17a108",
+      "status": "REVIEWABLE",
+      "delta_count": 69,
+      "contract_mismatches": []
+    },
+    {
+      "left": "prunets256",
+      "right": "bmp32",
+      "block": 1,
+      "comparison": "COMPARISON-c0a07f917f73",
+      "status": "REVIEWABLE",
+      "delta_count": 69,
+      "contract_mismatches": []
+    },
+    {
+      "left": "prunets256",
+      "right": "bmp32",
+      "block": 2,
+      "comparison": "COMPARISON-35ece04195e7",
+      "status": "REVIEWABLE",
+      "delta_count": 69,
+      "contract_mismatches": []
+    },
+    {
+      "left": "prunets256",
+      "right": "bmp64",
+      "block": 0,
+      "comparison": "COMPARISON-6d16ea2d0f13",
+      "status": "BLOCKED",
+      "delta_count": 71,
+      "contract_mismatches": [
+        "behavior.arithmetic",
+        "behavior.contract"
+      ]
+    },
+    {
+      "left": "prunets256",
+      "right": "bmp64",
+      "block": 1,
+      "comparison": "COMPARISON-7cd2b6c431e8",
+      "status": "BLOCKED",
+      "delta_count": 71,
+      "contract_mismatches": [
+        "behavior.arithmetic",
+        "behavior.contract"
+      ]
+    },
+    {
+      "left": "prunets256",
+      "right": "bmp64",
+      "block": 2,
+      "comparison": "COMPARISON-d7119e643831",
+      "status": "BLOCKED",
+      "delta_count": 71,
+      "contract_mismatches": [
+        "behavior.arithmetic",
+        "behavior.contract"
+      ]
+    }
+  ],
+  "post_analysis_event_ids": [
+    "COMPARISON-df15340d3ea8",
+    "COMPARISON-f6b50a7ea79f",
+    "COMPARISON-a48daef94631",
+    "COMPARISON-4a2cde17a108",
+    "COMPARISON-c0a07f917f73",
+    "COMPARISON-35ece04195e7",
+    "COMPARISON-6d16ea2d0f13",
+    "COMPARISON-7cd2b6c431e8",
+    "COMPARISON-d7119e643831"
+  ],
+  "bounded_domain": {
+    "maximum_supported_terms": 128,
+    "weight_cap": 32,
+    "impact_cap": 255,
+    "term_document_multiplicity": 1,
+    "theoretical_score_bound": 1044480,
+    "observed_max_terms": 95,
+    "observed_score_bound": 180540,
+    "raw_ranked_scores_equal_oracle": 1050000
+  },
+  "qualification": "Six mechanically BLOCKED U32/U64 comparisons retained. Finite-domain equivalence review supports only this exact cap32 nonnegative integer workload; no broad contract override or strongestCPU/generalhardware claim."
+}

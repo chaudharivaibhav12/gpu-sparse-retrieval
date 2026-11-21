@@ -31,3 +31,5 @@ Add new experiments here on their own branches. Merge index rows through pull re
 - [Full-collection matched baselines](2026-11-15-full-collection-baselines/report.md): complete; exact 8,841,823-passage comparison, independently replayed outputs/provenance/statistics. Range median 0.687415 ms; paired ratios 9.65x versus canonical U64 adaptation and 45.56x versus CSR, with explicit scope/limits and preserved failed attempts.
 
 - [Guarded canonical FP32, full collection](2026-11-16-guarded-fp32-baseline/report.md): complete â€” exact 8,841,823-passage / 500-calibration comparison. FP32/U64 paired ratio 0.872542; range remains 8.43Ã— faster than FP32. All44attempts and earlier failures retained; independent replay and compiled arithmetic verified.
+
+- [Guarded U32 CPU-BMP](2026-11-20-bmp-guarded-u32/README.md): complete, independently reviewed; all 14 stages and 1.05 million ranked scores checked on the full 8,841,823 passages / 500 calibration queries. Paired U32 speedup 1.463x [1.442–1.484] over U64; frozen W256/U32 speedup 32.447x [31.320–33.604]. Bounded-integer and shared-session qualifications retained.
