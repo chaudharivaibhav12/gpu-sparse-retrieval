@@ -439,9 +439,69 @@ struct GpuEvent {
 
 // Unit tests that reuse the kernels define RBP_NO_MAIN before including the file.
 #ifndef RBP_NO_MAIN
+constexpr uint32_t HALF_RANGE_WIDTH=128;
+constexpr uint32_t HALF_FILTER_WARPS=BOUND_THREADS/32;
+static_assert(BOUND_THREADS%32==0,"Half filtering requires whole warps");
+
+struct HalfMax { uint8_t lower,upper; };
+static_assert(sizeof(HalfMax)==2,"Each block holds two adjacent byte maxima");
+
+// One warp checks each coarse survivor. Seeds and ties retain the parent policy.
+__global__ void compact_kept_two_halves(RbpView v,QueryArgs query,const HalfMax* half_max,
+                                        const uint32_t* bound,const uint32_t* mark,uint32_t epoch,
+                                        uint32_t* work,PruneState* state) {
+    const uint32_t lane=threadIdx.x%32;
+    const uint32_t range=blockIdx.x*HALF_FILTER_WARPS+threadIdx.x/32;
+    if (range>=v.ranges || mark[range]==epoch) return;
+    const uint32_t theta=state->theta;
+    if (bound[range]<theta) return;
+
+    if (theta) {
+        uint32_t lower=0,upper=0;
+        for (uint32_t i=lane;i<query.terms;i+=32) {
+            const QueryTerm q=query.term[i];
+            const uint32_t block=find_block(v,q.term,range);
+            if (block!=v.lookup_first[q.term+1]) {
+                const HalfMax impact=half_max[block];
+                lower+=q.weight*uint32_t(impact.lower);
+                upper+=q.weight*uint32_t(impact.upper);
+            }
+        }
+        for (uint32_t offset=16;offset;offset>>=1) {
+            lower+=__shfl_down_sync(0xffffffffu,lower,offset);
+            upper+=__shfl_down_sync(0xffffffffu,upper,offset);
+        }
+        if (lane==0 && lower<theta && upper<theta) return;
+    }
+    if (lane==0) work[state->seeds+atomicAdd(&state->kept,1u)]=range;
+}
+
+// Verify from the forward GSP, independently of the packed half-maxima table.
+static uint64_t source_half_bound(const Index& source,const vector<uint32_t>& weights,
+                                  uint32_t first,uint32_t last,vector<uint8_t>& maxima) {
+    const uint32_t middle=first+min(last-first,HALF_RANGE_WIDTH);
+    const auto half=[&](uint32_t begin,uint32_t end) {
+        fill(maxima.begin(),maxima.end(),0);
+        uint64_t sum=0;
+        for (uint32_t doc=begin;doc<end;++doc) for (uint64_t j=source.offsets[doc];j<source.offsets[doc+1];++j) {
+            const uint32_t term=source.terms[j];
+            const uint8_t impact=source.impacts[j];
+            if (weights[term] && impact>maxima[term]) {
+                sum+=uint64_t(weights[term])*(impact-maxima[term]);
+                maxima[term]=impact;
+            }
+        }
+        return sum;
+    };
+    const uint64_t lower=half(first,middle),upper=half(middle,last);
+    return max(lower,upper);
+}
+
 int main(int argc,char** argv) {
     try {
-        require(argc==15,"Usage: cuda_range_prune_tm RBP QUERIES CSV TOP_TSV LIMIT K GPU VERIFY ROUNDS WARMUPS SCORE_THREADS MERGE_THREADS GSP|- SEEDS");
+        require(argc==15||argc==16,"Usage: cuda_range_prune_tm RBP QUERIES CSV TOP_TSV LIMIT K GPU VERIFY ROUNDS WARMUPS SCORE_THREADS MERGE_THREADS GSP|- SEEDS [two-halves]");
+        const bool two_halves=argc==16;
+        require(!two_halves||string(argv[15])=="two-halves","Unknown range filter");
         const auto parse=[](const char* p) { const string s(p);size_t used=0;auto n=stoull(s,&used);require(!s.empty()&&s[0]!='-'&&used==s.size()&&n<=UINT32_MAX,"Invalid unsigned argument");return uint32_t(n); };
         const uint32_t limit=parse(argv[5]),k=parse(argv[6]),gpu=parse(argv[7]),verify=parse(argv[8]),rounds=parse(argv[9]),warmups=parse(argv[10]),threads=parse(argv[11]),merge_threads=parse(argv[12]);
         const string gsp_path=argv[13];
@@ -461,6 +521,8 @@ int main(int argc,char** argv) {
         require(slots<=RBP_MAX_SLOTS,"Range size / score threads exceeds RBP_MAX_SLOTS slots per thread");
         const uint32_t list_cap=min(k,32*slots);
         const uint32_t multiplicity=rbp_max_multiplicity(index);
+        require(!two_halves || (W==2*HALF_RANGE_WIDTH && !index.postings_cap && multiplicity<=1),
+                "The two-half filter requires uniform W256 positions with unique term/document pairs");
         uint32_t max_terms=0;uint64_t max_score_bound=0;unordered_set<string> qids;
         vector<uint32_t> bound_bits(count,0);  // bit length of each query's conservative bound, for select_seeds
         for (uint32_t qi=0;qi<count;++qi) {
@@ -497,6 +559,20 @@ int main(int argc,char** argv) {
         vector<uint8_t> block_max_host(index.blocks(),0);
         for (size_t b=0;b<index.blocks();++b)
             for (uint32_t j=0;j<index.block_count[b];++j) block_max_host[b]=max(block_max_host[b],index.impacts[size_t(index.block_value_start[b])+j]);
+        vector<HalfMax> half_max_host(two_halves ? index.blocks() : 0);
+        if (two_halves) for (size_t b=0;b<index.blocks();++b) {
+            const uint32_t range=index.lookup_range[b];
+            const uint32_t docs_in_range=index.range_start[range+1]-index.range_start[range];
+            uint32_t previous=0;
+            for (uint32_t j=0;j<index.block_count[b];++j) {
+                const uint32_t pos=rbp_extract(index.encoded.data(),
+                    index.block_bit_start[b]+uint64_t(j)*index.block_width[b],index.block_width[b]);
+                require(pos<docs_in_range && (!j || previous<pos),"Invalid or repeated packed position");
+                previous=pos;
+                uint8_t& highest=pos<HALF_RANGE_WIDTH ? half_max_host[b].lower : half_max_host[b].upper;
+                highest=max(highest,index.impacts[size_t(index.block_value_start[b])+j]);
+            }
+        }
         cuda_checked(cudaSetDevice(gpu));cudaDeviceProp properties{};cuda_checked(cudaGetDeviceProperties(&properties,gpu));
         const size_t shared_bytes=size_t(warps)*list_cap*8+size_t(W)*4;
         require(cudaFuncSetAttribute(score_ranges,cudaFuncAttributeMaxDynamicSharedMemorySize,int(shared_bytes))==cudaSuccess,
@@ -510,6 +586,8 @@ int main(int argc,char** argv) {
         GpuArray<uint16_t> block_count(index.blocks()),tie_rank(N),rank_slot(N),heads(R);
         GpuArray<uint32_t> range_start(index.range_start.size()),bound(R),mark(R),work(R);range_start.upload(index.range_start);
         GpuArray<uint8_t> block_width(index.blocks()),impacts(index.impacts.size()),block_max(index.blocks());
+        GpuArray<HalfMax> half_max(half_max_host.size());
+        if (two_halves) half_max.upload(half_max_host);
         GpuArray<GpuCandidate> candidates(size_t(R)*k),scratch(size_t(warps)*k),merged(k);
         GpuArray<PruneState> state(1);
         lookup_first.upload(index.lookup_first);lookup_range.upload(index.lookup_range);value_start.upload(index.block_value_start);
@@ -519,12 +597,18 @@ int main(int argc,char** argv) {
         if (R) cuda_checked(cudaMemset(mark.ptr,0,size_t(R)*4));
         const RbpView view{lookup_first.ptr,lookup_range.ptr,bit_start.ptr,value_start.ptr,block_count.ptr,block_width.ptr,encoded.ptr,impacts.ptr,ids.ptr,tie_rank.ptr,rank_slot.ptr,range_start.ptr,N,W,R};
         const uint64_t allocation=index.posting_bytes()+ids.count*8+(tie_rank.count+rank_slot.count+heads.count)*2+range_start.count*4
-            +(bound.count+mark.count+work.count)*4+block_max.count+sizeof(PruneState)+(candidates.count+scratch.count+merged.count)*sizeof(GpuCandidate);
+            +(bound.count+mark.count+work.count)*4+block_max.count+half_max.count*sizeof(HalfMax)+sizeof(PruneState)+(candidates.count+scratch.count+merged.count)*sizeof(GpuCandidate);
         string cpu_affinity="unknown",status_line;ifstream status("/proc/self/status");
         while (getline(status,status_line)) if (status_line.rfind("Cpus_allowed_list:",0)==0) { istringstream affinity(status_line.substr(18));affinity>>cpu_affinity; }
+        const string filter_config=two_halves
+            ? ",\"half_range_filter\":\"coarse-survivors-warp-per-range\",\"half_range_positions\":"+to_string(HALF_RANGE_WIDTH)
+              +",\"half_range_max_bytes\":"+to_string(half_max.count*sizeof(HalfMax))
+            : "";
         research_gate("cuda-range-prune",N,count,k,gpu,argv[1],argv[2],
             ",\"batch_size\":1,\"query_argument_bytes\":"+to_string(sizeof(QueryArgs))+",\"vocab\":"+to_string(index.vocab)+",\"nnz\":"+to_string(index.impacts.size())+",\"score_accumulator_bits\":"+to_string(sizeof(uint32_t)*8)+",\"returned_score_bits\":"+to_string(sizeof(GpuCandidate{}.score)*8)+",\"score_limit_exclusive\":"+to_string(uint64_t(UINT32_MAX))+",\"max_conservative_score_bound\":"+to_string(max_score_bound)+",\"max_slots_per_thread\":"+to_string(RBP_MAX_SLOTS)+",\"range_size\":"+to_string(W)+",\"postings_cap\":"+to_string(index.postings_cap)+",\"ranges\":"+to_string(R)+",\"blocks\":"+to_string(index.blocks())+",\"score_threads\":"+to_string(threads)+",\"merge_threads\":"+to_string(merge_threads)+",\"max_supported_k\":"+to_string(RBP_MAX_K)+",\"max_query_terms\":"+to_string(max_terms)+",\"max_supported_terms\":"+to_string(RBP_MAX_TERMS)+",\"max_term_document_multiplicity\":"+to_string(multiplicity)+",\"slots_per_thread\":"+to_string(slots)+",\"warp_list_capacity\":"+to_string(list_cap)+",\"shared_bytes\":"+to_string(shared_bytes)+",\"seed_ranges\":"+to_string(seed_ranges)+",\"score_grid_blocks\":"+to_string(grid)+",\"score_blocks_per_sm\":"+to_string(per_sm)+",\"index_posting_bytes\":"+to_string(index.posting_bytes())+",\"block_max_bytes\":"+to_string(block_max.count)+",\"device_allocation_bytes\":"+to_string(allocation)+",\"verify_scores\":"+to_string(verify)+",\"warmup_rounds\":"+to_string(warmups)+",\"repeats\":"+to_string(rounds)+",\"cpu_affinity\":"+research_quote(cpu_affinity)+",\"index_sha256\":"+research_quote(sha_hex(index.file_sha))+",\"source_gsp_sha256\":"+research_quote(sha_hex(index.source_sha)),
-            ",\"layout\":\"range-split-bitpacked-positions-term-major\",\"schedule\":\"seeded-range-bound-pruning;bound-lt-theta-skipped;persistent-work-list\",\"ranges\":\"boundaries-from-index;uniform-or-postings-capped\",\"bound\":\"weight*block-max-impact*max-multiplicity-uint32\",\"bounds_kernel\":\"term-major-atomic-add\",\"seeds\":\"largest-bounds-ties-lower-range-radix-select-12bit-from-bound-bits-tiled-scan\",\"merge_filter\":\"theta-filtered-lists-below-seeded-theta-dropped\",\"decode\":\"combined-work-list;direct-positions;no-decode-barriers\",\"accumulator\":\"uint32-shared-gated-below-2^32-1-widened-to-uint64\",\"selection\":\"thread-sorted-slots;warp-shuffle-select;one-barrier-rank-scatter;merge-scored-lists-in-last-finishing-block\",\"tie_keys\":\"per-range-original-id-rank-uint16\",\"query_transfer\":\"kernel-argument-by-value\",\"result_transfer\":\"topk-only\"",
+            filter_config+
+            ",\"layout\":\"range-split-bitpacked-positions-term-major\",\"schedule\":\"seeded-range-bound-pruning;bound-lt-theta-skipped;persistent-work-list"+
+            (two_halves ? ";two-half-bound-lt-theta-skipped" : "")+"\",\"ranges\":\"boundaries-from-index;uniform-or-postings-capped\",\"bound\":\"weight*block-max-impact*max-multiplicity-uint32\",\"bounds_kernel\":\"term-major-atomic-add\",\"seeds\":\"largest-bounds-ties-lower-range-radix-select-12bit-from-bound-bits-tiled-scan\",\"merge_filter\":\"theta-filtered-lists-below-seeded-theta-dropped\",\"decode\":\"combined-work-list;direct-positions;no-decode-barriers\",\"accumulator\":\"uint32-shared-gated-below-2^32-1-widened-to-uint64\",\"selection\":\"thread-sorted-slots;warp-shuffle-select;one-barrier-rank-scatter;merge-scored-lists-in-last-finishing-block\",\"tie_keys\":\"per-range-original-id-rank-uint16\",\"query_transfer\":\"kernel-argument-by-value\",\"result_transfer\":\"topk-only\"",
             "uint32-guarded-exact-widened-uint64", "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1");
         require(!filesystem::exists(argv[3])&&!filesystem::exists(argv[4]),"Refusing to overwrite results");
         ofstream csv(argv[3]),top(argv[4]);require(bool(csv)&&bool(top),"Cannot create result files");
@@ -555,7 +639,13 @@ int main(int argc,char** argv) {
                     }
                     select_seeds<<<1,SELECT_THREADS>>>(bound.ptr,R,seed_ranges,bound_bits[qi],epoch,mark.ptr,work.ptr,state.ptr);cuda_checked(cudaGetLastError());
                     if (seeds) { score_ranges<<<seed_grid,threads,shared_bytes>>>(view,args,k,list_cap,0,state.ptr,work.ptr,candidates.ptr,heads.ptr,scratch.ptr,merged.ptr);cuda_checked(cudaGetLastError()); }
-                    compact_kept<<<bound_grid,BOUND_THREADS>>>(bound.ptr,mark.ptr,epoch,R,work.ptr,state.ptr);cuda_checked(cudaGetLastError());
+                    if (two_halves) {
+                        const uint32_t blocks=(R+HALF_FILTER_WARPS-1)/HALF_FILTER_WARPS;
+                        compact_kept_two_halves<<<blocks,BOUND_THREADS>>>(view,args,half_max.ptr,bound.ptr,mark.ptr,epoch,work.ptr,state.ptr);
+                    } else {
+                        compact_kept<<<bound_grid,BOUND_THREADS>>>(bound.ptr,mark.ptr,epoch,R,work.ptr,state.ptr);
+                    }
+                    cuda_checked(cudaGetLastError());
                     score_ranges<<<grid,threads,shared_bytes>>>(view,args,k,list_cap,1,state.ptr,work.ptr,candidates.ptr,heads.ptr,scratch.ptr,merged.ptr);cuda_checked(cudaGetLastError());
                 }
                 cuda_checked(cudaEventRecord(end.event));
@@ -597,8 +687,13 @@ int main(int argc,char** argv) {
                         if (pool.size()>=k) { nth_element(pool.begin(),pool.begin()+(k-1),pool.end(),greater<uint64_t>());theta=pool[k-1]; }
                         uint64_t want_ranges=seeds,want_postings=0,want_merged=seeds;
                         for (uint32_t i=0;i<seeds;++i) want_postings+=post[order[i]];
+                        vector<uint8_t> source_maxima(two_halves && theta ? index.vocab : 0);
                         for (uint32_t i=seeds;i<R;++i) if (ub[order[i]]>=theta) {
-                            ++want_ranges;want_postings+=post[order[i]];
+                            const uint32_t range=order[i];
+                            if (two_halves && theta &&
+                                source_half_bound(source,weights,index.range_start[range],index.range_start[range+1],
+                                                  source_maxima)<theta) continue;
+                            ++want_ranges;want_postings+=post[range];
                             uint64_t best=0;
                             for (uint32_t d=index.range_start[order[i]];d<index.range_start[order[i]+1];++d) best=max(best,reference[d]);
                             want_merged+=best>=theta;  // theta filter: lists of ranges whose best score reaches theta

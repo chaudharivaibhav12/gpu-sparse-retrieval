@@ -1,0 +1,18 @@
+# Two-half filter source review
+
+Parent `66d7e1e9dfd88954eb52505fa939d68519fc9918`, theta-filtered W256 single-query path. Motivation and full-index estimates are recorded in `OBS-20261121-W256-OFFLINE-AUDIT-RESULT`. This is a review of source and local models before a CUDA build or CIMS execution.
+
+## Checks and changes
+
+- The standalone scorer adds one opt-in compaction kernel. The parent three-stage scoring, bounds and seed functions and the batched include path are byte-identical before the standalone-driver guard. The off path uses the original compactor. Moving the new kernel inside the guard during review keeps it out of the batched translation unit.
+- Range selection uses one warp per range. Its early checks depend only on the range or query cutoff and are uniform for all lanes in that warp. All lanes reach each full-mask reduction. Lane zero alone appends a survivor. Warps outside the range count return before loading the index. Epoch marks prevent rescoring seed ranges. The seed state and cutoff come from earlier kernels in the same stream.
+- The loaded format and uniform W256 layout are required in the new mode. The host-side table builder rejects positions outside the range and verifies that positions increase strictly within each term/range list. With unique terms and cap32 weights, the inherited bound on the complete unsigned score also bounds both half sums. No scores or comparisons are narrowed. Absent terms and halves contribute zero.
+- Surviving coarse ranges are removed only when both half sums fall strictly below the existing cutoff. The comparison retains a tie across halves or ranges and permits a lower original ID to win. The zero-cutoff fast path retains all coarse survivors. Each retained range uses the existing full-range scorer. The host verifier computes half bounds from forward GSP rows, independently of the packed table.
+- Two adjacent byte maxima per block add 268,643,738 bytes (256.2 MiB) on the pinned index. The declared treatment allocation is 5,153,200,222 bytes based on the parent's declared allocation. This estimate excludes CUDA context and allocator overhead. Check actual free and peak device memory and host preparation headroom before timing.
+- The expected-runtime generator now checks the archived parent receipt's normalized SHA-256. Local comparison found that control settings equal the parent receipt and that the treatment adds exactly three fields, changes the allocation, and extends the schedule label. Compiler-selected occupancy and the actual CUDA runtime gate still need validation on the target build.
+
+## Validation and limits
+
+- `python -X utf8 tests/check_two_half_filter.py --model-only` passed 40 model checks. A planted case requires removal of a loose coarse-bound survivor while retaining an equal-score winner in a later range. Other cases include a partial final range, empty queries, a missing term, a query with more than two warps of terms, zero seeds, excessive seeds and fewer than k seeded documents.
+- The earlier local audit's four fixture tests passed again. The checkout passed `git diff --check`. A separate source check confirmed that the included portion of the scorer is byte-identical to the parent. The dry-run runtime settings check confirmed the exact memory delta and no unrelated configuration or behavior drift.
+- The local environment has no available CUDA compiler. The GPU fixture runner, compiler behavior, runtime gate and full answer and schedule checks have not run. The first CIMS request should cover build and correctness, with fresh logs and a deliberate incorrect-gate rejection. Compare both modes against the original independent oracle and the published audit counts before registering a separate timing run.

@@ -1,0 +1,17 @@
+# W256 two-half range filter
+
+This experiment asks whether a tighter bound saves more GPU scoring time than it costs. In the pinned full-index CPU audit of the original 500 calibration queries, the extra check could remove 32.96% of posting work. It would add 268,643,738 bytes of resident maxima. This estimates work and storage. The project ledger record `OBS-20261121-W256-OFFLINE-AUDIT-RESULT` preserves the audit, independent replay and evidence archive SHA-256 `b66fed7b4c6dab127d21bf5c1b25d8e08a10232d1c56ee761fd63cd4441342af`.
+
+The parent is the theta-filtered W256 scorer from [the depth and adaptive experiment](../2026-11-19-prune-depth-adaptive/README.md), on main at `66d7e1e9dfd88954eb52505fa939d68519fc9918`. This study adds an optional `two-halves` argument to the single-query driver. With that argument, the existing coarse bound and seeds run first. A warp checks the two 128-position halves of each non-seed coarse survivor while building the score queue. It skips the range only when both bounds are strictly below the seed cutoff. If a range ties the cutoff, it can still win on original numeric passage ID. The existing scoring and final merge kernels then process the retained ranges. The mode requires uniform W256 positions and unique term/document pairs.
+
+Without the extra argument, the driver uses the existing compaction kernel, output schema and runtime settings. With it, the runtime gate reports the new filter, half width, extra allocation and schedule. The packed disk format remains shared. The forward-index verification path independently calculates half bounds to check the treatment schedule.
+
+## Proposed paired run
+
+- Compare the current W256 mode with the treatment using the same reviewed executable. Use the same full W256 index, original 500 calibration queries, k=10, batch 1, 64 seeds and 256 scoring and merge workers on cuda5 RTX 4070.
+- After approval, build with CUDA 12.6 and `nvcc -O3 -lineinfo -arch=sm_89 -std=c++17`. Run the existing parent fixtures and the targeted `tests/check_two_half_filter.py` fixture. Exercise both modes with the runtime gate and deliberately reject a mismatched filter setting. The proposed run must pin the built executable, complete runtime settings and source ancestry before measurement.
+- Check every answer against the pinned independent top-ten oracle. On the full index, compare thresholds and scored range and posting counts against the archived offline calculation. Check memory feasibility with the extra resident maxima. Preserve all warmup and measured outputs and compare the exact ordered IDs and scores.
+- Use three matched process blocks, three warmups and 20 measured rounds with the same host policy and full resident-query through ordered-host-output timing boundary. Predeclare order, resource eligibility and go/no-go rules. Primary outcome is paired full-query wall time. Also report p95, p99, range and posting counts, and peak device memory.
+- The 6,480 exposed evaluation queries stay outside this study. The Git branch stages the experiment source and this protocol outline. CUDA build, GPU fixtures, registered timing settings and deployment approval are pending.
+
+The pinned W256 file SHA-256 is `0ad6531c7698c7541fd9f6d62fb4fa34619e4b765656cccfa3d13fdc64202892`. The calibration query SHA-256 is `150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091`. The oracle SHA-256 is `7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed`.
