@@ -15,6 +15,11 @@ Per query
 - launch_to_kernel_start: kernel GPU start - launch call start
 - copy_api: host time inside the cudaMemcpy of the results (it waits for the kernel)
 - copy_return_after_gpu_end: copy call end - D2H GPU end (sync return latency)
+- d2h: D2H copy duration on the GPU (k x 16-byte candidates, pageable host buffer)
+- kernel_end_to_d2h_start: D2H GPU start - kernel GPU end
+- kernel_end_to_copy_return: copy call end - kernel GPU end (GPU end to result back on the host)
+Measurement P (2026-11-22-range-v3-tune): the kernel may be a template instantiation
+(range_scores<true>); any kernel whose name starts with range_scores is accepted.
 - other_api: host time in other CUDA calls between the query's launch call and its copy call (event records etc.)
 - host_wall_profiled: the driver's own wall time for the query under tracing
 - non_gpu_unprofiled: median unprofiled wall (--unprofiled CSVs, same queries) - gpu_busy
@@ -60,13 +65,14 @@ def main():
         if row["phase"] != "measured":
             continue
         kernels = [o for o in g if o["kind"] == "kernel"]; d2h = g[-1]
-        assert len(kernels) == 1 and kernels[0]["name"] == "range_scores", "expected one range_scores kernel per query"
+        assert len(kernels) == 1 and kernels[0]["name"].split("(")[0].replace("void ", "").startswith("range_scores"), "expected one range_scores kernel per query"
         k = kernels[0]; launch = api_by_corr[k["corr"]]; copy = api_by_corr[d2h["corr"]]
         busy = sum(o["end"] - o["start"] for o in g); span = g[-1]["end"] - min(o["start"] for o in g)
         others = [x for x in api if launch["end"] <= x["start"] and x["end"] <= copy["start"]]
         rec = dict(gpu_busy=busy, kernel=k["end"] - k["start"], copies=busy - (k["end"] - k["start"]), gpu_span=span, gpu_idle_in_span=span - busy,
                    launch_api=launch["end"] - launch["start"], launch_to_kernel_start=k["start"] - launch["start"],
                    copy_api=copy["end"] - copy["start"], copy_return_after_gpu_end=copy["end"] - d2h["end"],
+                   d2h=d2h["end"] - d2h["start"], kernel_end_to_d2h_start=d2h["start"] - k["end"], kernel_end_to_copy_return=copy["end"] - k["end"],
                    other_api=sum(x["end"] - x["start"] for x in others), host_wall_profiled=float(row["query_wall_ms"]) * 1e6)
         per.setdefault(row["query_id"], []).append(rec)
     keys = list(next(iter(per.values()))[0])

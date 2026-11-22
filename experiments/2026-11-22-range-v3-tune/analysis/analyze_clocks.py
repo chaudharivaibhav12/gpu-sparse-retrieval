@@ -63,6 +63,14 @@ STAGES = [
 SITE_GROUP = {"S1": "setup", "S2": "setup", "S3": "decode+add", "S4": "local top-k", "S5": "candidate write + done counter",
               "S6": "candidate write + done counter", "S7": "merge"}
 GROUPS = ["setup", "decode+add", "local top-k", "candidate write + done counter", "merge"]
+# --radix (Measurement P, v3-3 with radix at every k): the same events, read for the radix
+# path. Event 7 (sort_end) marks the end of the radix select and gather, event 8
+# (select_end) the end of the bitonic sort; S4_after -> rank_write_end is the theta
+# atomicMax, two barriers (cut read) and the candidate write. The radix, gather, bitonic and
+# theta barriers have no clock sites of their own: their waits are inside these stage times.
+RADIX_STAGE_NAMES = {"topk_thread_sort": "radix_select_gather", "topk_warp_select": "bitonic_sort",
+                     "rank_and_candidate_write": "candidate_write", "merge_rank_scatter": "merge_scatter"}
+RADIX_SITE_BETWEEN = {"S3": "decode+add -> radix select", "S4": "bitonic sort -> theta + candidate write"}
 
 
 def mean(xs):
@@ -74,7 +82,11 @@ def main():
     p.add_argument("prefix"); p.add_argument("--label", required=True)
     p.add_argument("--output", required=True); p.add_argument("--sites-csv", required=True); p.add_argument("--stages-csv", required=True)
     p.add_argument("--source", help="instrumented scorer source, to label sites with their line numbers")
+    p.add_argument("--radix", action="store_true", help="label stages for the radix instantiation (Measurement P)")
     a = p.parse_args()
+    if a.radix:
+        STAGES[:] = [(RADIX_STAGE_NAMES.get(n, n), f, l, g) for n, f, l, g in STAGES]
+        SITES[:] = [(n, b, af, ln, RADIX_SITE_BETWEEN.get(n, bt)) for n, b, af, ln, bt in SITES]
     lines = site_lines(a.source) if a.source else {}
     meta = json.loads(Path(a.prefix + ".json").read_text())
     R, W, NE, NB = meta["ranges"], meta["warps"], meta["events_per_warp"], meta["block_words"]
@@ -164,7 +176,7 @@ def main():
                          barrier_wait_critical_path_us=sum(x["critical_path_wait_us"] for x in sites if x["stage_group"] == g),
                          barrier_wait_mean_per_warp_us=sum(x["mean_wait_us"] for x in sites if x["stage_group"] == g and x["site"] != "S7"))
     result = dict(
-        label=a.label, meta={k: meta[k] for k in ("ranges", "warps", "measured_rounds", "queries", "k", "range_size", "threads", "split_decode_add")},
+        label=a.label, radix_labels=a.radix, meta={k: meta[k] for k in ("ranges", "warps", "measured_rounds", "queries", "k", "range_size", "threads", "split_decode_add")},
         sm_clock_ghz_median=ghz, sm_clock_ghz_range=[min(ghz_slices), max(ghz_slices)],
         kernel_span_us_median=statistics.median(span_us), block_duration_us_median=statistics.median(block_us),
         merge_tail_us_median=statistics.median(tail_us), blocks_starting_after_first_block_ends_median=statistics.median(second_wave),

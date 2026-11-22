@@ -12,17 +12,25 @@
 #    processes and no replacement; every overlap is still recorded per process.
 UID_SELF=$(id -u)
 REPLACEMENTS_MAX=${REPLACEMENTS_MAX:-3}
+# Measurement P (2026-11-22-range-v3-tune): the wait limit is IDLE_WAIT_MAX seconds (default
+# 1800), and "idle" also requires no other "run_*" script outside this session (pgrep "[r]un_"):
+# another session's run script may be between GPU processes. Only counts are logged.
+IDLE_WAIT_MAX=${IDLE_WAIT_MAX:-1800}
+SID_SELF=$(ps -o sid= -p $$ | tr -d ' ')
+# Our ancestors (e.g. the launching shell, whose command line names this script) are not "other".
+ANCESTORS=" "; _p=$$; while [ -n "$_p" ] && [ "$_p" -gt 1 ] 2>/dev/null; do ANCESTORS="$ANCESTORS$_p "; _p=$(ps -o ppid= -p "$_p" | tr -d ' '); done
 
 wait_idle() {   # $1 tag
-    local tag=$1 waited=0 apps ours
+    local tag=$1 waited=0 apps ours runs
     while :; do
         apps=$(nvidia-smi --query-compute-apps=pid --format=csv,noheader | grep -c . || true)
         ours=$(pgrep -u "$UID_SELF" -fc "[/]scorer |[n]sys profile|[n]cu " || true)
-        echo "$(date -u +%FT%T.%3NZ) $tag compute_apps=$apps our_gpu_jobs=$ours gpu=[$(nvidia-smi --query-gpu=memory.used,utilization.gpu,clocks.sm,temperature.gpu,pstate --format=csv,noheader)]" >> "$RUN/logs/idle-checks.txt"
-        [ "$apps" = 0 ] && [ "$ours" = 0 ] && return 0
+        runs=$(for p in $(pgrep -f "[r]un_" || true); do [[ "$ANCESTORS" == *" $p "* ]] && continue; s=$(ps -o sid= -p "$p" 2>/dev/null | tr -d ' '); [ -z "$s" ] || [ "$s" = "$SID_SELF" ] || echo "$p"; done | grep -c . || true)
+        echo "$(date -u +%FT%T.%3NZ) $tag compute_apps=$apps our_gpu_jobs=$ours other_run_scripts=$runs gpu=[$(nvidia-smi --query-gpu=memory.used,utilization.gpu,clocks.sm,temperature.gpu,pstate --format=csv,noheader)]" >> "$RUN/logs/idle-checks.txt"
+        [ "$apps" = 0 ] && [ "$ours" = 0 ] && [ "$runs" = 0 ] && return 0
         # CONTENDED=1 (exploratory runs only): other users' processes are logged, not waited for.
         [ "${CONTENDED:-0}" = 1 ] && [ "$ours" = 0 ] && return 0
-        [ "$waited" -ge 1800 ] && fail "GPU not idle for 30 minutes before $tag"
+        [ "$waited" -ge "$IDLE_WAIT_MAX" ] && fail "GPU not idle for $IDLE_WAIT_MAX s before $tag"
         sleep 30; waited=$((waited+30))
     done
 }
