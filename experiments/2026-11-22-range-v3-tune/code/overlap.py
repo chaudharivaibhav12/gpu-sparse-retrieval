@@ -37,7 +37,7 @@ def main():
             if e == "-":
                 continue
             pid, cls, mem = e.split(":")
-            if cls == "ours":
+            if cls in ("ours", "oursname"):   # oursname: exited before its owner was read; our scorer path
                 ours.add(pid)
             entries.append((t, pid, cls, mem))
         if lo <= t <= hi:
@@ -66,7 +66,8 @@ def main():
             continue
         pmon_samples += 1
         pid = f[cols.index("pid")] if "pid" in cols else f[3]
-        if pid == "-" or pid in ours:
+        # Measurement E fix: the command column holds "ours" for our scorer binaries, else "-".
+        if pid == "-" or pid in ours or ("command" in cols and len(f) == len(cols) and f[cols.index("command")] == "ours"):
             continue
         o = others.setdefault(pid, dict(source=set(), max_mem_mib=0))
         o["source"].add("pmon")

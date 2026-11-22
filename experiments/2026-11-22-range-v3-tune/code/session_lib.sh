@@ -45,18 +45,26 @@ start_monitors() {
     date +%z > "$RUN/logs/host-utc-offset.txt"
     ( while :; do
         line=""
-        for e in $(nvidia-smi --query-compute-apps=pid,used_memory --format=csv,noheader,nounits | tr -d ' '); do
-            pid=${e%%,*}; mem=${e#*,}
+        # Measurement E fix (amendment 2026-11-22): a process that exits before its owner can
+        # be read is classified by its executable path (never logged): one of our build
+        # directories' scorer binaries -> "oursname"; otherwise "gone".
+        while IFS=, read -r pid mem name; do
+            pid=${pid// /}; mem=${mem// /}; name=${name# }
+            [ -n "$pid" ] || continue
             owner=$(stat -c %u "/proc/$pid" 2>/dev/null || echo gone)
-            if [ "$owner" = "$UID_SELF" ]; then cls=ours; elif [ "$owner" = gone ]; then cls=gone; else cls=other; fi
+            if [ "$owner" = "$UID_SELF" ]; then cls=ours
+            elif [ "$owner" = gone ] && [[ "$name" =~ (^|/)build/[^/]+/[^/]+/scorer$ ]]; then cls=oursname
+            elif [ "$owner" = gone ]; then cls=gone; else cls=other; fi
             line="$line $pid:$cls:$mem"
-        done
+        done < <(nvidia-smi --query-compute-apps=pid,used_memory,process_name --format=csv,noheader,nounits)
         echo "$(date -u +%s.%3N)${line:- -}"
         sleep 0.5
     done ) > "$RUN/logs/gpu-poll.log" 2>&1 &
     POLLER=$!
     # pmon: date time (host local), gpu, pid, type, sm, mem, ..., command; the command column is dropped.
-    ( stdbuf -oL nvidia-smi pmon -s um -d 1 -o DT | awk '{ if ($0 ~ /^#/) print; else { NF--; print }; fflush() }' ) > "$RUN/logs/gpu-pmon.log" 2>&1 &
+    # The command column is replaced by "ours" when the process name is exactly "scorer" (our
+    # binaries), otherwise "-": no other process names are logged.
+    ( stdbuf -oL nvidia-smi pmon -s um -d 1 -o DT | awk '{ if ($0 ~ /^#/) print; else { tag = ($NF == "scorer") ? "ours" : "-"; NF--; print $0, tag }; fflush() }' ) > "$RUN/logs/gpu-pmon.log" 2>&1 &
     PMON=$!
     trap stop_monitors EXIT
 }
