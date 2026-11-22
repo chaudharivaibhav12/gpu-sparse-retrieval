@@ -70,10 +70,11 @@ static const char* RBP_BLOCK_NAMES[RBP_NB]={"gt_start","clk_start","gt_rank_writ
 #if RBP_V3_RADIX && !RBP_V3_THETA
 #error "RBP_V3_RADIX writes its winners through the theta filter (RBP_V3_THETA=1)"
 #endif
-// Version-3 tuning switches (experiment 2026-11-22-range-v3-tune). Off by default:
-// with all of them off the kernel is v3-3.
+// Version-3 tuning switches (experiment 2026-11-22-range-v3-tune). The defaults build the
+// final variant u4m (Measurement E): A with U=4 and D on, B off. v3-3 is
+// -DRBP_V3_UNROLL=1 -DRBP_V3_MERGE_RADIX=0 (SASS a644e9d5125d6e7e on CUDA 12.6).
 #ifndef RBP_V3_UNROLL
-#define RBP_V3_UNROLL 1   // change A: decode U postings per lane, all loads before any use (1, 2 or 4)
+#define RBP_V3_UNROLL 4   // change A: decode U postings per lane, all loads before any use (1, 2 or 4)
 #endif
 static_assert(RBP_V3_UNROLL==1||RBP_V3_UNROLL==2||RBP_V3_UNROLL==4,"RBP_V3_UNROLL must be 1, 2 or 4");
 #if RBP_V3_UNROLL>1 && defined(RBP_SPLIT_DECODE_ADD)
@@ -88,7 +89,7 @@ static_assert(RBP_V3_RADIX_AGG>=0&&RBP_V3_RADIX_AGG<=2,"RBP_V3_RADIX_AGG must be
 #error "RBP_V3_RADIX_AGG changes the radix path (RBP_V3_RADIX=1)"
 #endif
 #ifndef RBP_V3_MERGE_RADIX
-#define RBP_V3_MERGE_RADIX 0   // change D: last-block merge by compaction + radix select + bitonic sort
+#define RBP_V3_MERGE_RADIX 1   // change D: last-block merge by compaction + radix select + bitonic sort
 #endif
 #if RBP_V3_MERGE_RADIX && !(RBP_V3_RADIX && RBP_V3_THETA)
 #error "RBP_V3_MERGE_RADIX uses the theta cut and the radix-select constants (RBP_V3_THETA=1, RBP_V3_RADIX=1)"
