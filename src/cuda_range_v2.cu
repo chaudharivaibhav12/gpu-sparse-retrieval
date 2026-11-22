@@ -38,6 +38,13 @@ __device__ inline uint32_t rbp_smid() { uint32_t s;asm volatile("mov.u32 %0, %%s
 static const char* RBP_EVENT_NAMES[RBP_NE]={"start","lookup_zero_end","S1_after","prefix_end","S2_after","decode_add_end","S3_after",
     "sort_end","select_end","S4_after","rank_write_end","fence_end","S5_after","ticket_end","S6_after",
     "merge_select_end","S7_after","merge_end","end","split_decode_cycles","split_bar1_cycles","split_add_cycles","split_bar2_cycles","merge_start"};
+// Change D's merge reuses slots 19-20 (otherwise the split-decode diagnostic, which needs the
+// v3-3 decode loop) for its sub-stages; merge_select_end = end of the radix select,
+// S7_after = immediately after it (no barrier), merge_end = after the output. The host
+// picks this list when RBP_V3_MERGE_RADIX is on.
+static const char* RBP_EVENT_NAMES_MERGE_RADIX[RBP_NE]={"start","lookup_zero_end","S1_after","prefix_end","S2_after","decode_add_end","S3_after",
+    "sort_end","select_end","S4_after","rank_write_end","fence_end","S5_after","ticket_end","S6_after",
+    "merge_select_end","S7_after","merge_end","end","merge_count_scan_end","merge_compact_end","unused_21","unused_22","merge_start"};
 static const char* RBP_BLOCK_NAMES[RBP_NB]={"gt_start","clk_start","gt_rank_write_end","gt_end","clk_end","smid","is_last","postings"};
 #else
 #define RBP_EV(e)
@@ -283,6 +290,9 @@ __device__ void merge_radix(const RbpView& v,const GpuCandidate* lists,uint32_t 
     uint32_t run=merge_warp_sum[warp]+inclusive-sum;
     for (uint32_t l=begin;l<end;++l) { const uint32_t c=lengths[l];lengths[l]=run;run+=c; }
     __syncthreads();
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(19);
+#endif
     const uint32_t survivors=merge_state[4],want=k<survivors ? k : survivors;
     uint32_t P=1;
     while (P<want) P<<=1;
@@ -298,6 +308,9 @@ __device__ void merge_radix(const RbpView& v,const GpuCandidate* lists,uint32_t 
         }
     }
     __syncthreads();
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(20);
+#endif
     // 4. Radix select of the want-th largest key (same procedure as the range blocks).
     uint64_t threshold=0;   // want == survivors: every key wins
     if (want<survivors) {
@@ -351,6 +364,9 @@ __device__ void merge_radix(const RbpView& v,const GpuCandidate* lists,uint32_t 
         }
         threshold=prefix;
     }
+#ifdef RBP_STAGE_CLOCKS
+    RBP_EV(15);RBP_EV(16);
+#endif
     // 5. Gather the want keys >= threshold into smem[0, want), pad to P, sort descending.
     if (thread==0) merge_state[3]=0;
     __syncthreads();
@@ -1148,7 +1164,8 @@ int main(int argc,char** argv) {
                 <<",\"split_decode_add\":false"
 #endif
                 <<",\"layout\":\"events[round][query][range][warp][event], blocks[round][query][range][word]; missing = 0xffffffffffffffff\",\"event_names\":[";
-            for (uint32_t e=0;e<RBP_NE;++e) meta<<(e ? "," : "")<<'"'<<RBP_EVENT_NAMES[e]<<'"';
+            const char* const* event_names=RBP_V3_MERGE_RADIX ? RBP_EVENT_NAMES_MERGE_RADIX : RBP_EVENT_NAMES;
+            for (uint32_t e=0;e<RBP_NE;++e) meta<<(e ? "," : "")<<'"'<<event_names[e]<<'"';
             meta<<"],\"block_names\":[";
             for (uint32_t e=0;e<RBP_NB;++e) meta<<(e ? "," : "")<<'"'<<RBP_BLOCK_NAMES[e]<<'"';
             meta<<"],\"query_ids\":[";

@@ -2,7 +2,8 @@
 # Build the version-3.4 variants of the range scorer from one commit (default HEAD).
 #   experiments/2026-11-22-range-v3-tune/code/build_variants.sh OUT [LABEL ...]
 # Output: OUT/<label>/{scorer,range_bitpack_tool,src/,commit.txt,flags.txt,ptxas.log,sass.sha256}
-# Environment: COMMIT (HEAD), ARCH (sm_89), COMPILE_ONLY=1 (skip range_bitpack_tool).
+# Environment: COMMIT (HEAD), ARCH (sm_89), COMPILE_ONLY=1 (skip range_bitpack_tool),
+#   EXTRA_NVCC_FLAGS (added to every build and recorded in flags.txt, e.g. -DRBP_STAGE_CLOCKS).
 # Every variant is the same source with compile-time switches (all off = v3-3), except
 # ctrl: main's V2-5 (PR #12 source, 74dd5d3), the team reference, built from its own commit.
 # A label whose switch is not in the commit's source yet is skipped with a message.
@@ -11,6 +12,7 @@ cd "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../../.." && pwd)"
 OUT=$1; shift || true
 COMMIT=$(git rev-parse "${COMMIT:-HEAD}")
 ARCH=${ARCH:-sm_89}
+EXTRA_NVCC_FLAGS=${EXTRA_NVCC_FLAGS:-}
 # label|defines|switch that must exist in the source|commit (empty = COMMIT)
 VARIANTS=(
   "ctrl|||74dd5d303f0cf5690a10f2060f6da536726705dc"
@@ -29,6 +31,7 @@ for entry in "${VARIANTS[@]}"; do
     IFS='|' read -r label defines switch commit <<< "$entry"
     if [ ${#want[@]} -gt 0 ] && [[ ! " ${want[*]} " == *" $label "* ]]; then continue; fi
     commit=${commit:-$COMMIT}
+    defines="$defines $EXTRA_NVCC_FLAGS"
     src=$(git show "$commit:src/cuda_range_v2.cu")
     if [ -n "$switch" ] && ! grep -q "$switch" <<< "$src"; then echo "SKIPPED $label: $switch not in $commit"; continue; fi
     dir=$OUT/$label

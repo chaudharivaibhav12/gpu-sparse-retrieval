@@ -162,5 +162,14 @@
       "estimate": "timing about 20 min of GPU time (99 processes: k=10 ~7 s, k=100 ~9.5 s, k=1000 ~30 s without D and ~10 s with D, from Measurement A and contendedD-02 process durations); gates about 6 min each x 7 (correctness, before timing)"
     },
     "outputs": "results/2026-11-22-range-v3-tune/<run>/ (logs, analysis, manifest); timing CSVs committed; compressed top-k TSVs and other large originals to ~/csciga3033-025/project/run-bulk/2026-11-22-range-v3-tune/<run>/ with SHA-256 in the manifest"
+  },
+  "measurement_P2": {
+    "purpose": "before/after profile of v3-3 and the final variant u4m (A U=4 + D) at W=4096 (owner, 2026-11-22; replaces the Measurement P that never ran)",
+    "design": "as measurement_P (reference 3+20, clocks 3+5, nsys 3+20, ncu 0+1 = 25 launches with the same sections; CPU radix replay), for both variants: 1M documents, W=4096, 256 threads, radix crossover 1, first 25 calibration queries, k = 10, 100, 1000; within each step v3-3 then u4m",
+    "builds": "code/build_variants.sh at the run's HEAD: normal builds v3-3 (SASS must be a644e9d5125d6e7e) and v3-4-u4m (SASS must be 8f8a5d49e0e0ad3f, the build timed in Measurement E); clock builds with EXTRA_NVCC_FLAGS=-DRBP_STAGE_CLOCKS. The D merge has clock events of its own (instrumentation only, under RBP_STAGE_CLOCKS): merge_count_scan_end, merge_compact_end, merge_select_end (= end of the radix select), merge_end; analysis/analyze_clocks.py reports them as merge sub-stages",
+    "correctness": "every GPU step's top-k compared with the CPU oracle; any mismatch stops the run",
+    "report": "stage tables before/after (setup, word-table prefix, decode+add, radix select+gather, bitonic sort, candidate write, threadfence, done ticket, merge select, merge scatter; D merge sub-stages), barrier waits, Nsight Compute stage shares, stall reasons, launch resources (registers, shared memory, blocks/SM, waves), decode-load coalescing and stalls, host vs GPU",
+    "gpu_policy": "as measurement_E timing: idle check before every GPU process (no compute process, none of our GPU jobs, no other run_* script outside the session), retry every 300 s up to 6 h after launch, then stop and report; overlapped processes preserved and rerun (at most 3 per slot); overlap classification as amended",
+    "script": "code/run_profile_p2.sh"
   }
 }

@@ -62,11 +62,17 @@ HEADER_CALL = {("decode+add", "range_bitpack.h"): "const uint32_t position=rbp_e
                ("decode+add", "device_atomic_functions.hpp"): "atomicAdd(&scores[position],term_weight[i]",
                ("radix select", "device_atomic_functions.hpp"): "if ((key&mask)==prefix) atomicAdd(&buckets[",
                ("radix gather", "device_atomic_functions.hpp"): "if (key>=threshold) lists[atomicAdd(&radix_state[3]"}
-LINE_ROLES = {"encoded load": "const uint32_t position=rbp_extract(v.encoded",
-              "impacts load + score atomicAdd": "atomicAdd(&scores[position],term_weight[i]",
-              "radix bucket atomicAdd": "if ((key&mask)==prefix) atomicAdd(&buckets[",
-              "radix key build (pass loop)": "const uint64_t key=(uint64_t(scores[s])<<key_bits)|(rank_top-v.tie_rank[first+s]);",
-              "radix gather atomicAdd": "if (key>=threshold) lists[atomicAdd(&radix_state[3]"}
+# role -> source texts (the first one found in the source is used): v3-3 decode, then the
+# unrolled decode of change A.
+LINE_ROLES = {"encoded load": ["const uint32_t position=rbp_extract(v.encoded", "lo[u]=v.encoded[word];hi[u]=v.encoded[word+1];"],
+              "impacts load + score atomicAdd": ["atomicAdd(&scores[position],term_weight[i]"],
+              "impacts load": ["impact[u]=v.impacts[term_value[i]+j];"],
+              "score atomicAdd": ["atomicAdd(&scores[position],weight[u]*impact[u]);"],
+              "radix bucket atomicAdd": ["if ((key&mask)==prefix) atomicAdd(&buckets["],
+              "radix key build (pass loop)": ["const uint64_t key=(uint64_t(scores[s])<<key_bits)|(rank_top-v.tie_rank[first+s]);"],
+              "radix gather atomicAdd": ["if (key>=threshold) lists[atomicAdd(&radix_state[3]"],
+              "merge radix bucket atomicAdd": ["if ((key&mask)==prefix) atomicAdd(&merge_buckets["],
+              "merge compaction": ["keys[off+e]=(c.score<<32)|uint64_t(0xffffffffu-v.global_rank[c.doc]);"]}
 UNITS = {"ns": 1e-6, "us": 1e-3, "usecond": 1e-3, "ms": 1.0, "msecond": 1.0, "nsecond": 1e-6}
 METRICS = {"achieved_occupancy_pct": "sm__warps_active.avg.pct_of_peak_sustained_active",
            "theoretical_occupancy_pct": "sm__maximum_warps_per_active_cycle_pct",
@@ -159,7 +165,7 @@ def main():
     a = p.parse_args()
     src = Source(a.source)
     call_line = {key: src.find(text) for key, text in HEADER_CALL.items()}
-    role_line = {role: src.find(text) for role, text in LINE_ROLES.items()}
+    role_line = {role: next((ln for ln in (src.find(t) for t in texts) if ln), None) for role, texts in LINE_ROLES.items()}
 
     # Launch-level metrics, duration-weighted over launches, per instantiation.
     raw = list(csv.reader(open(a.raw, newline="")))
@@ -324,7 +330,9 @@ def main():
                   launch=launch, kernel_samples=total, stages=stage_rows,
                   barrier_sites=site_rows, barrier_stall_samples_total=total_bar, barrier_stall_samples_before_first_bar=before_first,
                   decode=dict(encoded=load_summary("encoded load"), impacts=load_summary("impacts load"),
-                              encoded_line=line_summary("encoded load"), impacts_and_add_line=line_summary("impacts load + score atomicAdd")),
+                              encoded_line=line_summary("encoded load"), impacts_and_add_line=line_summary("impacts load + score atomicAdd"),
+                              impacts_line=line_summary("impacts load"), score_add_line=line_summary("score atomicAdd")),
+                  merge_radix=dict(bucket_atomic_line=line_summary("merge radix bucket atomicAdd"), compaction_line=line_summary("merge compaction")),
                   radix=dict(bucket_atomic_line=line_summary("radix bucket atomicAdd"), key_build_line=line_summary("radix key build (pass loop)"),
                              gather_atomic_line=line_summary("radix gather atomicAdd")),
                   attribution=dict(unmapped_instruction_rows=unmapped, header_or_unmapped_inherited_rows=inherited, missing_anchors=src.missing,

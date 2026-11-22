@@ -44,6 +44,9 @@ def site_lines(source):
     lines = Path(source).read_text().splitlines(); out = {}
     for site, n in SITE_MARKER.items():
         at = [i for i, l in enumerate(lines) if "RBP_EV(%d);" % n in l and "#define" not in l]
+        # Change D's merge also records RBP_EV(15) (no barrier follows it); keep the marker that
+        # is followed by a __syncthreads() within two lines.
+        at = [i for i in at if any(lines[j].strip() == "__syncthreads();" for j in range(i + 1, min(i + 3, len(lines))))]
         assert len(at) == 1, (site, len(at))
         out[site] = next(i + 1 for i in range(at[0], len(lines)) if lines[i].strip() == "__syncthreads();")
     return out
@@ -92,6 +95,14 @@ def main():
     R, W, NE, NB = meta["ranges"], meta["warps"], meta["events_per_warp"], meta["block_words"]
     slices = meta["measured_rounds"] * meta["queries"]
     E = {n: i for i, n in enumerate(meta["event_names"])}; B = {n: i for i, n in enumerate(meta["block_names"])}
+    if "merge_count_scan_end" in E:
+        # Change D (RBP_V3_MERGE_RADIX): sub-stages of merge_select (group "merge detail", not summed
+        # into the groups); merge_select = count+scan + compaction + radix select, merge_scatter =
+        # gather + bitonic sort + output.
+        STAGES.extend([("merge_count_scan", "merge_start", "merge_count_scan_end", "merge detail"),
+                       ("merge_compaction", "merge_count_scan_end", "merge_compact_end", "merge detail"),
+                       ("merge_radix_select", "merge_compact_end", "merge_select_end", "merge detail")])
+        SITES[:] = [(n, b, af, ln, "radix select -> gather/sort/output (no barrier; last block only)" if n == "S7" else bt) for n, b, af, ln, bt in SITES]
     ev = array.array("Q"); ev.frombytes(Path(a.prefix + ".events.bin").read_bytes())
     bl = array.array("Q"); bl.frombytes(Path(a.prefix + ".blocks.bin").read_bytes())
     assert len(ev) == slices * R * W * NE and len(bl) == slices * R * NB, "dump size does not match metadata"
@@ -176,7 +187,7 @@ def main():
                          barrier_wait_critical_path_us=sum(x["critical_path_wait_us"] for x in sites if x["stage_group"] == g),
                          barrier_wait_mean_per_warp_us=sum(x["mean_wait_us"] for x in sites if x["stage_group"] == g and x["site"] != "S7"))
     result = dict(
-        label=a.label, radix_labels=a.radix, meta={k: meta[k] for k in ("ranges", "warps", "measured_rounds", "queries", "k", "range_size", "threads", "split_decode_add")},
+        label=a.label, radix_labels=a.radix, merge_radix="merge_count_scan_end" in E, meta={k: meta[k] for k in ("ranges", "warps", "measured_rounds", "queries", "k", "range_size", "threads", "split_decode_add")},
         sm_clock_ghz_median=ghz, sm_clock_ghz_range=[min(ghz_slices), max(ghz_slices)],
         kernel_span_us_median=statistics.median(span_us), block_duration_us_median=statistics.median(block_us),
         merge_tail_us_median=statistics.median(tail_us), blocks_starting_after_first_block_ends_median=statistics.median(second_wave),
