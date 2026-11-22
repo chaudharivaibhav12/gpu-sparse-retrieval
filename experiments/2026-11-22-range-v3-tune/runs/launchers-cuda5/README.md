@@ -1,0 +1,4 @@
+# cuda5 session launchers and logs
+
+- `session_p.sh` / `session_p.log`: Measurement P (run `20261122-cuda5-profileP-01`), launched 2026-11-22T04:18:46Z from `/scratch/ag11163/gsr-tune` (commit 4efdea0); ended `P_FAILED` at 08:22:57Z (GPU not idle for 4 h before the first step).
+- `session_e.sh` / `session_e.log`: Measurement E (gates, then timing), launched 07:17:53Z from `/scratch/ag11163/gsr-tune-build` (commit edffe2c) with a 6 h deadline and 300 s idle checks; waited for P, built the seven variants (08:27-08:30Z), started gate ctrl (`20261122-cuda5-gate-ctrl-01`), and ended `E_FAILED` at 13:20:33Z at the deadline (GPU never idle). The `KeyError: 'radix'` lines are the resource-table step, which did not handle ctrl's untemplated kernel (non-fatal; fixed in `analysis/resources_v34.py` and rerun on the CPU: `analysis/compile-cuda12.6-edffe2c/`).

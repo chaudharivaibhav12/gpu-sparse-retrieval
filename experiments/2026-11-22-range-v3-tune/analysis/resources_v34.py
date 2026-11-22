@@ -32,7 +32,7 @@ def ptxas(path):
         used = re.search(r"Used (\d+) registers.*?(\d+) bytes smem", part)
         if head and used and "range_scores" in head.group(1):
             spill = re.search(r"(\d+) bytes spill stores, (\d+) bytes spill loads", part)
-            inst = "radix" if "ILb1E" in head.group(1) else "warp"
+            inst = "radix" if "ILb1E" in head.group(1) else "warp" if "ILb0E" in head.group(1) else "single"   # single: ctrl (V2-5, no template)
             out[inst] = dict(registers=int(used.group(1)), static_smem=int(used.group(2)),
                              spill_stores=int(spill.group(1)) if spill else 0, spill_loads=int(spill.group(2)) if spill else 0)
     return out
@@ -61,6 +61,9 @@ def main():
             dyn = P * 8 + 256 * 4 + W * 4 if inst == "radix" else WARPS * list_cap * 8 + W * 4
             if merge_radix:
                 dyn = max(dyn, P * 8)
+            if "single" in kern:
+                inst = "single"   # V2-5: one kernel, warp lists at every k (no crossover argument)
+                dyn = WARPS * list_cap * 8 + W * 4
             r = kern[inst]
             b, lim = blocks(r["registers"], r["static_smem"] + dyn)
             ranges = math.ceil(1000000 / W)
