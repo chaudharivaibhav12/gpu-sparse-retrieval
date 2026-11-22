@@ -35,4 +35,22 @@ See [runs/README.md](runs/README.md).
 
 ## Findings and decision
 
-Pending Measurement P.
+**Changes written** (each behind a compile-time switch, off by default; with all switches off the CUDA 12.6 SASS equals the timed v3-3, see [code/sass-identity.md](code/sass-identity.md)):
+
+- A, `RBP_V3_UNROLL` = 2 or 4: unrolled decode ([review](code/review-change-A.json)).
+- B, `RBP_V3_RADIX_AGG` = 1 (skip score-0 keys) or 2 (also warp-aggregated bucket adds) ([review](code/review-change-B.json)).
+- D, `RBP_V3_MERGE_RADIX`: last-block merge by compaction + radix select ([review](code/review-change-D.json)).
+- C (pinned or zero-copy result buffer): not written; the laptop profile showed the result copy is a few microseconds.
+
+All seven variants passed the laptop gates (runs `20261122-laptop-gate-*`).
+
+**Negative result: change B.** Dropped from timing by the owner on the laptop development readings (laptop GPU, CUDA 13.3, 1M, W=4096, crossover 1, 25 queries x 10 rounds, one process; development readings, not results). GPU span relative to v3-3:
+
+| variant | k=10 | k=100 | k=1000 |
+|---|---|---|---|
+| skip0 (B2) | 1.02 | 0.99 | 1.06 |
+| aggskip (B1 + B2) | 1.08 | 1.02 | 1.05 |
+
+The CPU replay explains the mechanism (about 48% zero-score documents; first-pass bucket 0 nearly full), but the radix select is about 8% of the pre-merge critical path, and the extra nonzero count and `__match_any_sync` cost about as much as the skipped work. The code stays behind its switch, off.
+
+**Measurement P** is queued on cuda5 (not re-queued if it times out). **Measurement E** (paired timing of A, D and A + D on cuda5) is registered in [configs/protocol.json](configs/protocol.json).

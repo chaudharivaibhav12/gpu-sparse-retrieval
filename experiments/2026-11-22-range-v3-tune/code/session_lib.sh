@@ -16,6 +16,11 @@ REPLACEMENTS_MAX=${REPLACEMENTS_MAX:-3}
 # 1800), and "idle" also requires no other "run_*" script outside this session (pgrep "[r]un_"):
 # another session's run script may be between GPU processes. Only counts are logged.
 IDLE_WAIT_MAX=${IDLE_WAIT_MAX:-1800}
+# Measurement E: IDLE_POLL (seconds between idle checks, default 30) and IDLE_DEADLINE (UTC
+# epoch seconds; when set, the session stops at the first busy check past it, whatever the
+# per-process wait).
+IDLE_POLL=${IDLE_POLL:-30}
+IDLE_DEADLINE=${IDLE_DEADLINE:-}
 SID_SELF=$(ps -o sid= -p $$ | tr -d ' ')
 # Our ancestors (e.g. the launching shell, whose command line names this script) are not "other".
 ANCESTORS=" "; _p=$$; while [ -n "$_p" ] && [ "$_p" -gt 1 ] 2>/dev/null; do ANCESTORS="$ANCESTORS$_p "; _p=$(ps -o ppid= -p "$_p" | tr -d ' '); done
@@ -30,8 +35,9 @@ wait_idle() {   # $1 tag
         [ "$apps" = 0 ] && [ "$ours" = 0 ] && [ "$runs" = 0 ] && return 0
         # CONTENDED=1 (exploratory runs only): other users' processes are logged, not waited for.
         [ "${CONTENDED:-0}" = 1 ] && [ "$ours" = 0 ] && return 0
-        [ "$waited" -ge "$IDLE_WAIT_MAX" ] && fail "GPU not idle for $IDLE_WAIT_MAX s before $tag"
-        sleep 30; waited=$((waited+30))
+        [ -n "$IDLE_DEADLINE" ] && [ "$(date -u +%s)" -ge "$IDLE_DEADLINE" ] && fail "GPU not idle before $tag at the session deadline $(date -u -d @"$IDLE_DEADLINE" +%FT%TZ)"
+        [ -z "$IDLE_DEADLINE" ] && [ "$waited" -ge "$IDLE_WAIT_MAX" ] && fail "GPU not idle for $IDLE_WAIT_MAX s before $tag"
+        sleep "$IDLE_POLL"; waited=$((waited+IDLE_POLL))
     done
 }
 

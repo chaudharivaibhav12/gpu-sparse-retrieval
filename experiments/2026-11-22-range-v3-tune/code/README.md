@@ -22,3 +22,18 @@ Analysis scripts are in [../analysis/](../analysis/):
 | `radix_cpu.cpp` | new (from v3 `theta_cpu.cpp`) | exact CPU replay of the radix passes: zero-score share, keys per pass, largest bucket, modeled same-bucket depth; merged top-k checked against the oracle |
 | `radix_summary.py` | new | per-k summary of the replay |
 | `analyze_ncu_v2.py`, `theta_counts.py`, `theta_cpu.cpp` | v3, unchanged | records |
+
+Version-3.4 changes and Measurement E:
+
+| file | use |
+|---|---|
+| `review-change-{A,B,D}.json` | per-change reviews, written before each code change |
+| `build_variants.sh` | builds every variant as flag combinations of one commit (ctrl from main `74dd5d3`) |
+| `gate_variant.sh` | laptop development gate (fixtures at both crossovers, 100K/1M x 500 queries) |
+| `gate_cuda5.sh` | official gate on the cuda5 GPU, every step through `session_lib.sh` run_slot (idle check, overlap preserve/rerun) |
+| `run_timing_e.sh` | Measurement E driver (11 cells per k, 3 rotating processes) |
+| `sass-identity.md` | CUDA 12.6 flag-off SASS identity after each change |
+| `../analysis/analyze_timing_e.py` | paired ratios, crossed bootstrap, decision rules E1-E4 |
+| `../analysis/resources_v34.py` | compile-only resource table |
+
+`session_lib.sh` also takes `IDLE_POLL` (seconds between idle checks) and `IDLE_DEADLINE` (UTC epoch; the session stops at the first busy check after it).

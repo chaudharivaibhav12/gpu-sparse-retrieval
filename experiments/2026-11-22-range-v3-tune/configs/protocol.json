@@ -1,6 +1,6 @@
 {
   "experiment_id": "2026-11-22-range-v3-tune",
-  "status": "registered before Measurement P; no kernel change written",
+  "status": "Measurement P registered (queued on cuda5); Measurement E registered before timing",
   "registered_utc": "2026-11-21",
   "owner": "Arnav",
   "recording": "not recorded by the team runtime",
@@ -24,7 +24,11 @@
     "threads": 256,
     "radix_min_k": 1,
     "radix_min_k_reason": "Measurement D adopted uniform radix at W=4096 (v3-3r); with crossover 1 every k runs range_scores<true>",
-    "k": [10, 100, 1000],
+    "k": [
+      10,
+      100,
+      1000
+    ],
     "queries": "data/derived/calibration-500.tsv, first 25 (calibration only; held-out queries are not used)",
     "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1"
   },
@@ -59,5 +63,88 @@
       "logging": "counts and owner class only; no other users' names, commands or paths"
     },
     "outputs": "results/2026-11-22-range-v3-tune/<run>/ with logs, raw, analysis and manifest (SHA-256 of every file); large originals (nsys/ncu reports, SQLite, clock dumps) go to ~/csciga3033-025/project/run-bulk/2026-11-22-range-v3-tune/<run>/ via scripts/package_run.py, hashes in the manifest"
+  },
+  "amendments": [
+    {
+      "date": "2026-11-22",
+      "decision_by": "owner",
+      "text": "Measurement P (20261122-cuda5-profileP-01) stays queued; if it times out (4 h idle wait per process) it is not re-queued. A later step profiles v3-3 and the final variant together."
+    },
+    {
+      "date": "2026-11-22",
+      "decision_by": "owner",
+      "text": "Change B (RBP_V3_RADIX_AGG) is dropped from timing: its code stays behind the switch, off. Recorded as a negative result from laptop development readings (CUDA 13.3, 1M, W=4096, 25 queries, not results): GPU span ratio to v3-3 skip0 1.02/0.99/1.06 and aggskip 1.08/1.02/1.05 at k=10/100/1000. Change C (result copy) was dropped earlier on the laptop profile."
+    }
+  ],
+  "measurement_E": {
+    "purpose": "paired timing of the version-3.4 variants against v3-3 at W=4096 and W=1024, and of every cell against the team reference ctrl (V2-5) at W=1024",
+    "host": "cuda5 (RTX 4070); CUDA 12.6 builds only (module cuda-12.6), nvcc -O3 -lineinfo -arch=sm_89 -std=c++17",
+    "builds": {
+      "script": "code/build_variants.sh (flag combinations, no new code); commit = the run's HEAD, except ctrl = main 74dd5d3 (V2-5)",
+      "variants": {
+        "ctrl": "74dd5d3, no flags",
+        "v3-3": "no flags (SASS a644e9d5125d6e7e)",
+        "v3-4-unroll2": "-DRBP_V3_UNROLL=2",
+        "v3-4-unroll4": "-DRBP_V3_UNROLL=4",
+        "v3-4-mergeradix": "-DRBP_V3_MERGE_RADIX=1",
+        "v3-4-u2m": "-DRBP_V3_UNROLL=2 -DRBP_V3_MERGE_RADIX=1",
+        "v3-4-u4m": "-DRBP_V3_UNROLL=4 -DRBP_V3_MERGE_RADIX=1"
+      },
+      "records": "SASS hash, registers and static shared memory (ptxas) per build; dynamic shared memory and estimated blocks/SM from analysis/resources_v34.py"
+    },
+    "gates": "before timing, every build passes code/gate_cuda5.sh on the cuda5 GPU: fixtures incl. --v3-cases enforce --v34-cases (default crossover, and crossover 1 except ctrl), then 100K and 1M x 500 calibration queries x k=10/100/1000 at W=4096 (crossover 1; ctrl none) and W=1024 (default crossover), exact against the CPU oracle; a failed gate stops the session before timing",
+    "design": {
+      "session": "one cuda5 session: gates, then timing, then analysis (code/run_timing_e.sh)",
+      "documents": 1000000,
+      "threads": 256,
+      "batch": 1,
+      "radix_min_k": "1 (uniform radix) for every v3 cell; ctrl takes no crossover argument",
+      "queries": "data/derived/calibration-500.tsv, all 500; held-out untouched",
+      "rounds": "3 warm-up + 20 measured per process",
+      "cells_per_k": {
+        "W=4096": [
+          "v3-3",
+          "v3-4-unroll2",
+          "v3-4-unroll4",
+          "v3-4-mergeradix",
+          "v3-4-u2m",
+          "v3-4-u4m"
+        ],
+        "W=1024": [
+          "v3-3",
+          "v3-4-mergeradix",
+          "v3-4-u2m",
+          "v3-4-u4m",
+          "ctrl"
+        ]
+      },
+      "k": [
+        10,
+        100,
+        1000
+      ],
+      "order": "one set per k with all 11 cells; 3 processes per cell; process p runs the cell list rotated by p*ceil(11/3) (offsets 0, 4, 8); sets in order k=10, 100, 1000",
+      "correctness": "every timed top-k (all 23 rounds) compared with data/derived/oracle/cpu-top{k}-1000000.tsv; any mismatch stops the run"
+    },
+    "statistic": {
+      "per_process": "median query_wall_ms of each query over the 20 measured rounds",
+      "ratio": "geometric mean over 3 x 500 (process, query) pairs of median_X / median_Y, processes paired by index within a k set",
+      "interval": "crossed bootstrap (processes and queries resampled independently), 10,000 draws, 95% percentile interval, seed 20261122 (new); shared draws across the contrasts of one k",
+      "contrasts": "each cell / v3-3 at the same W; each cell / ctrl at W=1024; W=1024 / W=4096 for v3-3, D, u2m, u4m; u2m / D and u4m / D at each W",
+      "script": "analysis/analyze_timing_e.py"
+    },
+    "decision_rules": {
+      "E1": "a variant is adopted if its ratio to v3-3 (same W) has an upper 95% bound < 1 at some k and no k's lower bound is > 1.02; evaluated at each W the variant is timed at, and it must pass at every such W (unroll2/unroll4: W=4096 only)",
+      "E2": "unroll: U=2 vs U=4, the lower geometric mean across k of the ratio-to-v3-3 point estimates (W=4096) among those passing E1; none if neither passes",
+      "E3": "final variant = u2m or u4m if it passes E1 and its geometric mean of point estimates over the six (W, k) cells is lower than D's (the lower of the two if both qualify); otherwise D if D passes E1; otherwise v3-3 (nothing adopted)",
+      "E4": "for the final variant, per k: recommend W=1024 only if W=1024 / W=4096 (same session, paired) has an upper 95% bound < 1; otherwise W=4096; also report whether one W is best for all k. Label: calibration tuning, to be frozen before held-out evaluation"
+    },
+    "report": "per k: variant | W | pooled median ms | ratio to v3-3 [95%] | ratio to ctrl W=1024 [95%]; E1-E4 outcomes; final variant and W choice",
+    "gpu_policy": {
+      "idle_check": "before every GPU process: no compute process, none of our GPU jobs, no other run_* script outside the session; when busy, retry every 300 s (IDLE_POLL=300) until a deadline 6 h after the session launch (IDLE_DEADLINE), then the session stops and the owner is told",
+      "overlap": "a process that overlaps another user's GPU process is preserved as <tag>-overlap-<n> and rerun (at most 3 replacements per slot, then the session stops)",
+      "estimate": "timing about 20 min of GPU time (99 processes: k=10 ~7 s, k=100 ~9.5 s, k=1000 ~30 s without D and ~10 s with D, from Measurement A and contendedD-02 process durations); gates about 6 min each x 7 (correctness, before timing)"
+    },
+    "outputs": "results/2026-11-22-range-v3-tune/<run>/ (logs, analysis, manifest); timing CSVs committed; compressed top-k TSVs and other large originals to ~/csciga3033-025/project/run-bulk/2026-11-22-range-v3-tune/<run>/ with SHA-256 in the manifest"
   }
 }
