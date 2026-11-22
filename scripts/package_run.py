@@ -60,7 +60,8 @@ def main():
     if (run / "raw/topk-sha256.txt").exists():
         for line in (run / "raw/topk-sha256.txt").read_text().splitlines():
             h, path = line.split(None, 1)
-            topk[path.split("/raw/", 1)[1]] = h
+            path = path.strip()
+            topk[path.split("/raw/", 1)[1] if "/raw/" in path else path[len("raw/"):] if path.startswith("raw/") else path] = h
 
     def custody(rel, digest):
         places = ["owner local archive run-bulk/%s/%s/%s" % (exp, run_id, rel)]
