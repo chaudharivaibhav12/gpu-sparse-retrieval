@@ -1,0 +1,736 @@
+{
+  "run": "/scratch/psp8502/runs/2026-11-19-prune-depth-adaptive/20261118-cuda5-da-02",
+  "processes": 3,
+  "warmups": 3,
+  "rounds": 20,
+  "queries": 500,
+  "development": false,
+  "cpu_limit_cores": 4.0,
+  "control": "v2-w1024-k10",
+  "estimator": "per (process, query) median of the measured rounds; paired ratios by process index and query; geometric mean; crossed process/query bootstrap, 10000 draws, seed 20261118",
+  "reading": "'A / B' is how many times longer A takes than B: above 1, B is faster",
+  "configurations": {
+    "v2-w1024-k10": {
+      "query_process_medians_ms": {
+        "median": 0.6879182500000001,
+        "mean": 0.719098114,
+        "p95": 0.9613280499999999,
+        "p99": 1.0825483,
+        "max": 1.169225
+      },
+      "per_process_median_ms": [
+        0.68540975,
+        0.6889827500000001,
+        0.688806
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.2232847576932281,
+        1.2122506751052633,
+        1.7548021035373584
+      ]
+    },
+    "prunets-w256-s64-k10": {
+      "query_process_medians_ms": {
+        "median": 0.27254825,
+        "mean": 0.375789155,
+        "p95": 1.0159189999999996,
+        "p99": 1.9094063999999997,
+        "max": 2.147895
+      },
+      "per_process_median_ms": [
+        0.272217,
+        0.27295925,
+        0.27510599999999996
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.20297624755617805,
+        1.2137318061974542,
+        0.38529062261677205
+      ],
+      "scored_range_fraction": {
+        "median": 0.06276962274530241,
+        "mean": 0.09764260690813284,
+        "p90": 0.22374706853122558
+      },
+      "scored_postings_per_query": {
+        "median": 3127767.5,
+        "mean": 4344529.738
+      }
+    },
+    "prunetm-w256-s64-k10": {
+      "query_process_medians_ms": {
+        "median": 0.23736249999999998,
+        "mean": 0.32472553233333334,
+        "p95": 0.8523237749999996,
+        "p99": 1.6222402999999996,
+        "max": 1.850975
+      },
+      "per_process_median_ms": [
+        0.2373005,
+        0.236944,
+        0.23880975000000002
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.20596901801388107,
+        1.8784226123812962,
+        0.34782133833342266
+      ],
+      "scored_range_fraction": {
+        "median": 0.06276962274530241,
+        "mean": 0.09764260690813284,
+        "p90": 0.22374706853122558
+      },
+      "scored_postings_per_query": {
+        "median": 3127767.5,
+        "mean": 4344529.738
+      },
+      "merged_lists_per_query": {
+        "median": 65.0,
+        "mean": 68.854
+      }
+    },
+    "prunetm-w1024-s64-k10": {
+      "query_process_medians_ms": {
+        "median": 0.31829375,
+        "mean": 0.3520767146666667,
+        "p95": 0.6982175999999993,
+        "p99": 0.88531005,
+        "max": 0.9359515
+      },
+      "per_process_median_ms": [
+        0.3184765,
+        0.31776324999999994,
+        0.32091175000000005
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.4850231322401979,
+        2.32873506022569,
+        0.3911046280235992
+      ],
+      "scored_range_fraction": {
+        "median": 0.3451650260567458,
+        "mean": 0.3795715112912565,
+        "p90": 0.7085350318471338
+      },
+      "scored_postings_per_query": {
+        "median": 8866593.0,
+        "mean": 10445338.16
+      },
+      "merged_lists_per_query": {
+        "median": 65.0,
+        "mean": 72.734
+      }
+    },
+    "prunetma-w256-1024-s64-p220-k10": {
+      "query_process_medians_ms": {
+        "median": 0.24759699999999998,
+        "mean": 0.31410521166666666,
+        "p95": 0.7450769999999999,
+        "p99": 0.9505334599999999,
+        "max": 1.0477150000000002
+      },
+      "per_process_median_ms": [
+        0.24822699999999998,
+        0.24522275,
+        0.24894149999999998
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.843111421484262,
+        1.4635965333730796,
+        2.082882289539975
+      ],
+      "scored_range_fraction": {
+        "median": 0.06276962274530241,
+        "mean": 0.14376396795425386,
+        "p90": 0.5761899247249568
+      },
+      "scored_postings_per_query": {
+        "median": 3127767.5,
+        "mean": 5145698.182
+      },
+      "merged_lists_per_query": {
+        "median": 65.0,
+        "mean": 71.226
+      },
+      "switched_queries": 53
+    },
+    "v2-w1024-k100": {
+      "query_process_medians_ms": {
+        "median": 2.6865699999999997,
+        "mean": 2.70486336,
+        "p95": 2.8727052499999997,
+        "p99": 2.9559729,
+        "max": 3.02667
+      },
+      "per_process_median_ms": [
+        2.6858275,
+        2.688535,
+        2.684995
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.9527491928954617,
+        1.6108867676079226,
+        1.667027933813959
+      ]
+    },
+    "prunets-w1024-s64-k100": {
+      "query_process_medians_ms": {
+        "median": 1.8618549999999998,
+        "mean": 1.8102431966666666,
+        "p95": 2.8454094999999997,
+        "p99": 3.02943185,
+        "max": 10.5674
+      },
+      "per_process_median_ms": [
+        1.876405,
+        1.8541375,
+        1.8510849999999999
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.9890107119895476,
+        0.7670490280971985,
+        1.685706037302735
+      ],
+      "scored_range_fraction": {
+        "median": 0.6077012159814708,
+        "mean": 0.5859258830341633,
+        "p90": 0.883358425014476
+      },
+      "scored_postings_per_query": {
+        "median": 11828676.0,
+        "mean": 13192495.188
+      }
+    },
+    "prunetm-w1024-s64-k100": {
+      "query_process_medians_ms": {
+        "median": 1.2239425000000002,
+        "mean": 1.2049705073333332,
+        "p95": 1.8947142499999998,
+        "p99": 2.1899811000000002,
+        "max": 2.3864900000000002
+      },
+      "per_process_median_ms": [
+        1.227995,
+        1.2267425,
+        1.2225650000000001
+      ],
+      "other_cpu_cores_mean_per_process": [
+        1.2569325947003671,
+        1.1928413353244764,
+        1.205228839149004
+      ],
+      "scored_range_fraction": {
+        "median": 0.6077012159814708,
+        "mean": 0.5859258830341633,
+        "p90": 0.883358425014476
+      },
+      "scored_postings_per_query": {
+        "median": 11828676.0,
+        "mean": 13192495.188
+      },
+      "merged_lists_per_query": {
+        "median": 94.0,
+        "mean": 191.136
+      }
+    },
+    "prunets-w256-s64-k100": {
+      "query_process_medians_ms": {
+        "median": 1.3186675,
+        "mean": 1.7013434793333333,
+        "p95": 4.188832999999999,
+        "p99": 5.831227050000001,
+        "max": 15.048549999999999
+      },
+      "per_process_median_ms": [
+        1.3184900000000002,
+        1.3239150000000002,
+        1.3137975000000002
+      ],
+      "other_cpu_cores_mean_per_process": [
+        1.1559711560441552,
+        0.989391551576732,
+        2.140258110267687
+      ],
+      "scored_range_fraction": {
+        "median": 0.20167057529169924,
+        "mean": 0.24402918440024318,
+        "p90": 0.49861605721068947
+      },
+      "scored_postings_per_query": {
+        "median": 6989713.5,
+        "mean": 8373242.906
+      }
+    },
+    "prunetm-w256-s64-k100": {
+      "query_process_medians_ms": {
+        "median": 0.6942505,
+        "mean": 0.8287045013333333,
+        "p95": 1.8290349999999993,
+        "p99": 2.9359018499999987,
+        "max": 3.4620949999999997
+      },
+      "per_process_median_ms": [
+        0.69450875,
+        0.6956165000000001,
+        0.6928924999999999
+      ],
+      "other_cpu_cores_mean_per_process": [
+        1.237489061628886,
+        0.9259241972575328,
+        2.310860231561997
+      ],
+      "scored_range_fraction": {
+        "median": 0.20167057529169924,
+        "mean": 0.24402918440024318,
+        "p90": 0.49861605721068947
+      },
+      "scored_postings_per_query": {
+        "median": 6989713.5,
+        "mean": 8373242.906
+      },
+      "merged_lists_per_query": {
+        "median": 112.0,
+        "mean": 254.624
+      }
+    },
+    "prunetma-w256-1024-s64-p220-k100": {
+      "query_process_medians_ms": {
+        "median": 0.70737125,
+        "mean": 1.0562495573333335,
+        "p95": 2.049859,
+        "p99": 2.3831219,
+        "max": 7.8446549999999995
+      },
+      "per_process_median_ms": [
+        0.70815625,
+        0.7073309999999999,
+        0.706604
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.5524209005735145,
+        0.9398696634625847,
+        1.6209510166541634
+      ],
+      "scored_range_fraction": {
+        "median": 0.20167057529169924,
+        "mean": 0.4250958927910986,
+        "p90": 0.883358425014476
+      },
+      "scored_postings_per_query": {
+        "median": 8011740.5,
+        "mean": 10636927.784
+      },
+      "merged_lists_per_query": {
+        "median": 102.5,
+        "mean": 203.862
+      },
+      "switched_queries": 231
+    },
+    "v2-w1024-k1000": {
+      "query_process_medians_ms": {
+        "median": 12.37985,
+        "mean": 12.387256466666665,
+        "p95": 12.60964,
+        "p99": 12.734209,
+        "max": 12.844100000000001
+      },
+      "per_process_median_ms": [
+        12.379449999999999,
+        12.380099999999999,
+        12.38005
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.6832864551492367,
+        0.6228982416201946,
+        1.425645500469335
+      ]
+    },
+    "prunets-w1024-s64-k1000": {
+      "query_process_medians_ms": {
+        "median": 11.27025,
+        "mean": 10.470749476666667,
+        "p95": 13.02991,
+        "p99": 13.213785499999998,
+        "max": 13.50315
+      },
+      "per_process_median_ms": [
+        11.271975000000001,
+        11.267600000000002,
+        11.278575
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.2255628874706031,
+        0.22841697789115362,
+        1.8183760284767765
+      ],
+      "scored_range_fraction": {
+        "median": 0.8543717429067748,
+        "mean": 0.7862621887666473,
+        "p90": 0.9711754487550666
+      },
+      "scored_postings_per_query": {
+        "median": 13587400.0,
+        "mean": 14888985.856
+      }
+    },
+    "prunetm-w1024-s64-k1000": {
+      "query_process_medians_ms": {
+        "median": 3.3635900000000003,
+        "mean": 4.037956536666667,
+        "p95": 8.866603499999995,
+        "p99": 14.896448499999998,
+        "max": 19.53785
+      },
+      "per_process_median_ms": [
+        3.365755,
+        3.349065,
+        3.360795
+      ],
+      "other_cpu_cores_mean_per_process": [
+        1.6191375312069254,
+        0.22222987557685533,
+        1.5041513567240121
+      ],
+      "scored_range_fraction": {
+        "median": 0.8543717429067748,
+        "mean": 0.7862621887666473,
+        "p90": 0.9711754487550666
+      },
+      "scored_postings_per_query": {
+        "median": 13587400.0,
+        "mean": 14888985.856
+      },
+      "merged_lists_per_query": {
+        "median": 509.5,
+        "mean": 1056.294
+      }
+    },
+    "prunets-w256-s64-k1000": {
+      "query_process_medians_ms": {
+        "median": 21.92055,
+        "mean": 21.398790356666666,
+        "p95": 36.90958499999999,
+        "p99": 39.3576585,
+        "max": 40.76545
+      },
+      "per_process_median_ms": [
+        21.882825,
+        21.91245,
+        21.959275
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.6815087587203592,
+        0.6253012793089324,
+        2.0505100309320476
+      ],
+      "scored_range_fraction": {
+        "median": 0.5223804974087264,
+        "mean": 0.51882972871247,
+        "p90": 0.830750745534034
+      },
+      "scored_postings_per_query": {
+        "median": 11273449.0,
+        "mean": 12830604.99
+      }
+    },
+    "prunetm-w256-s64-k1000": {
+      "query_process_medians_ms": {
+        "median": 3.2183125,
+        "mean": 4.92107016,
+        "p95": 14.410217499999984,
+        "p99": 22.856477999999992,
+        "max": 35.928399999999996
+      },
+      "per_process_median_ms": [
+        3.221825,
+        3.2201025000000003,
+        3.2170925
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.5535620749873659,
+        1.1793341786034317,
+        2.1914426737991954
+      ],
+      "scored_range_fraction": {
+        "median": 0.5223804974087264,
+        "mean": 0.51882972871247,
+        "p90": 0.830750745534034
+      },
+      "scored_postings_per_query": {
+        "median": 11273449.0,
+        "mean": 12830604.99
+      },
+      "merged_lists_per_query": {
+        "median": 1452.0,
+        "mean": 2974.184
+      }
+    },
+    "prunetma-w256-1024-s64-p220-k1000": {
+      "query_process_medians_ms": {
+        "median": 3.9807799999999998,
+        "mean": 4.33005936,
+        "p95": 8.2510605,
+        "p99": 11.25930249999999,
+        "max": 13.23475
+      },
+      "per_process_median_ms": [
+        3.98305,
+        3.9735050000000003,
+        3.9868425
+      ],
+      "other_cpu_cores_mean_per_process": [
+        0.22490614845425333,
+        1.3625203042096639,
+        1.2553773901173106
+      ],
+      "scored_range_fraction": {
+        "median": 0.8543717429067748,
+        "mean": 0.7573728873478925,
+        "p90": 0.9711754487550666
+      },
+      "scored_postings_per_query": {
+        "median": 13522611.5,
+        "mean": 14620809.662
+      },
+      "merged_lists_per_query": {
+        "median": 538.0,
+        "mean": 1077.756
+      },
+      "switched_queries": 447
+    }
+  },
+  "contrasts": {
+    "prunets-w256-s64-k10 / prunetm-w256-s64-k10": {
+      "ratio": 1.1348601613003684,
+      "interval_95": [
+        1.129287317387966,
+        1.140577019760572
+      ],
+      "pairs": 1500,
+      "group": "check-merge-k10"
+    },
+    "prunets-w1024-s64-k100 / prunetm-w1024-s64-k100": {
+      "ratio": 1.4748258421288196,
+      "interval_95": [
+        1.4628526573503038,
+        1.4906628607027317
+      ],
+      "pairs": 1500,
+      "group": "primary-merge"
+    },
+    "prunets-w256-s64-k100 / prunetm-w256-s64-k100": {
+      "ratio": 1.8601670045115553,
+      "interval_95": [
+        1.8255405077593432,
+        1.8994589977817464
+      ],
+      "pairs": 1500,
+      "group": "primary-merge"
+    },
+    "prunets-w1024-s64-k1000 / prunetm-w1024-s64-k1000": {
+      "ratio": 2.7861813562469298,
+      "interval_95": [
+        2.6406464906557114,
+        2.9006848369793152
+      ],
+      "pairs": 1500,
+      "group": "primary-merge"
+    },
+    "prunets-w256-s64-k1000 / prunetm-w256-s64-k1000": {
+      "ratio": 4.847145231480314,
+      "interval_95": [
+        4.663860307318657,
+        5.035803397225612
+      ],
+      "pairs": 1500,
+      "group": "primary-merge"
+    },
+    "prunetm-w1024-s64-k10 / prunetma-w256-1024-s64-p220-k10": {
+      "ratio": 1.1688156242578378,
+      "interval_95": [
+        1.1495974311750214,
+        1.1887829251786668
+      ],
+      "pairs": 1500,
+      "group": "primary-adaptive"
+    },
+    "prunetm-w256-s64-k10 / prunetma-w256-1024-s64-p220-k10": {
+      "ratio": 0.9792443195405527,
+      "interval_95": [
+        0.9713275020965465,
+        0.9881280238917103
+      ],
+      "pairs": 1500,
+      "group": "secondary-adaptive"
+    },
+    "prunetm-w256-s64-k100 / prunetma-w256-1024-s64-p220-k100": {
+      "ratio": 0.8253229277300305,
+      "interval_95": [
+        0.8079891096289894,
+        0.8433074388408521
+      ],
+      "pairs": 1500,
+      "group": "secondary-adaptive"
+    },
+    "prunetm-w1024-s64-k100 / prunetma-w256-1024-s64-p220-k100": {
+      "ratio": 1.315370961658008,
+      "interval_95": [
+        1.2741186573032328,
+        1.3578304633319116
+      ],
+      "pairs": 1500,
+      "group": "secondary-adaptive"
+    },
+    "prunetm-w256-s64-k1000 / prunetma-w256-1024-s64-p220-k1000": {
+      "ratio": 0.9597038132682653,
+      "interval_95": [
+        0.931649218280767,
+        0.9892456566786634
+      ],
+      "pairs": 1500,
+      "group": "secondary-adaptive"
+    },
+    "prunetm-w1024-s64-k1000 / prunetma-w256-1024-s64-p220-k1000": {
+      "ratio": 0.9092010936558215,
+      "interval_95": [
+        0.8794627277775336,
+        0.9525929730504787
+      ],
+      "pairs": 1500,
+      "group": "secondary-adaptive"
+    },
+    "v2-w1024-k10 / prunets-w256-s64-k10": {
+      "ratio": 2.371727672468372,
+      "interval_95": [
+        2.263127104432701,
+        2.486481814042128
+      ],
+      "pairs": 1500,
+      "group": "replication"
+    },
+    "v2-w1024-k10 / prunetm-w256-s64-k10": {
+      "ratio": 2.6915792489380044,
+      "interval_95": [
+        2.574942762722998,
+        2.8097137577396203
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024-k10 / prunetm-w1024-s64-k10": {
+      "ratio": 2.2550294806243416,
+      "interval_95": [
+        2.1856106212556474,
+        2.3270682730776087
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024-k10 / prunetma-w256-1024-s64-p220-k10": {
+      "ratio": 2.635713690115768,
+      "interval_95": [
+        2.533328741076421,
+        2.73665388703244
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024-k100 / prunets-w1024-s64-k100": {
+      "ratio": 1.6324737417371022,
+      "interval_95": [
+        1.5728099110547118,
+        1.6970150508025776
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024-k100 / prunetm-w1024-s64-k100": {
+      "ratio": 2.407614460910609,
+      "interval_95": [
+        2.329490558827049,
+        2.4881047921505175
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024-k100 / prunets-w256-s64-k100": {
+      "ratio": 2.062810562434778,
+      "interval_95": [
+        1.9384773627386427,
+        2.1956756977135847
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024-k100 / prunetm-w256-s64-k100": {
+      "ratio": 3.837172144799101,
+      "interval_95": [
+        3.6596534388777484,
+        4.018957357989464
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024-k100 / prunetma-w256-1024-s64-p220-k100": {
+      "ratio": 3.1669061487497134,
+      "interval_95": [
+        2.9904140080928454,
+        3.3513103421396413
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024-k1000 / prunets-w1024-s64-k1000": {
+      "ratio": 1.2239021766801872,
+      "interval_95": [
+        1.1946321442806491,
+        1.2547704612988122
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024-k1000 / prunetm-w1024-s64-k1000": {
+      "ratio": 3.410013426536375,
+      "interval_95": [
+        3.217721053023043,
+        3.575123112757167
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024-k1000 / prunets-w256-s64-k1000": {
+      "ratio": 0.6664886924643763,
+      "interval_95": [
+        0.6336424647401199,
+        0.7014784797483171
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024-k1000 / prunetm-w256-s64-k1000": {
+      "ratio": 3.2305674875142523,
+      "interval_95": [
+        3.051460390564573,
+        3.4151659039183913
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    },
+    "v2-w1024-k1000 / prunetma-w256-1024-s64-p220-k1000": {
+      "ratio": 3.100387936787906,
+      "interval_95": [
+        2.9929316269308974,
+        3.2086605750980293
+      ],
+      "pairs": 1500,
+      "group": "secondary"
+    }
+  },
+  "schedule_identical": {
+    "w256-k10": true,
+    "w1024-k100": true,
+    "w256-k100": true,
+    "w1024-k1000": true,
+    "w256-k1000": true
+  }
+}

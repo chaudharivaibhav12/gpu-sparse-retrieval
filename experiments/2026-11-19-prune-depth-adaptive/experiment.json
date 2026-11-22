@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-19-prune-depth-adaptive",
+  "title": "Deeper top-k with a theta-filtered merge, and adaptive range size",
+  "owner": "parva",
+  "branch": "exp/parva/2026-11-19-prune-depth-adaptive",
+  "status": "completed 2026-11-18: recorded run 20261118-cuda5-da-02 (da-01 stopped, reused); prunetm adopted; prunetma the balanced freeze configuration",
+  "parent_experiment": "2026-11-18-prune-seed-select",
+  "parent_source_commit": "574e1a8",
+  "question": "(A) Does a theta-filtered merge speed up the pruned scorer at k = 100 and 1000? (B) Does an adaptive range size beat fixed 1024 at k = 10 with a similar tail?",
+  "hypothesis": "(A) yes at depth, more at range size 256 and k = 1000, none at k = 10. (B) about 1.18x over fixed 1024 with a similar p99 (model of run ts-01).",
+  "motivation": "GPUSparse's headline is k = 1000 (merge-dominated); Arnav's theta-filtered merge idea; run ts-01's tail at range size 256.",
+  "code_paths": [
+    "src/cuda_range_prune_tm.cu",
+    "src/cuda_range_prune_ta.cu",
+    "tests/check_range_prune.py",
+    "tests/check_range_prune_adaptive.py",
+    "experiments/2026-11-19-prune-depth-adaptive/code/run.sh",
+    "experiments/2026-11-19-prune-depth-adaptive/code/expect.py",
+    "experiments/2026-11-19-prune-depth-adaptive/code/gate.py",
+    "experiments/2026-11-19-prune-depth-adaptive/analysis/analyze.py"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-19-prune-depth-adaptive/configs/protocol.json",
+    "experiments/2026-11-19-prune-depth-adaptive/configs/configs.tsv"
+  ],
+  "declared_changes": {
+    "new_scorers": "src/cuda_range_prune_tm.cu (theta-filtered merge), src/cuda_range_prune_ta.cu (adaptive range size)",
+    "new_test": "tests/check_range_prune_adaptive.py",
+    "changed_test": "tests/check_range_prune.py: merged-list model, checked only for scorers that report merged_lists",
+    "control": "src/cuda_range_v2.cu and src/cuda_range_prune_ts.cu unchanged",
+    "shared_files": "tests/check_range_prune.py (additive check)"
+  },
+  "scoring_contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "query_split": "calibration-500 only; held-out untouched",
+  "correctness_rule": "Every configuration's top-k equals the CPU reference at its depth for every query; VERIFY=1 schedules (incl. merged lists and the switch) equal the host recomputation; prunets and prunetm schedules identical.",
+  "success_rule": "A complete run under the registered protocol; reported whatever the ratios are.",
+  "failure_rule": "Any mismatch or rejected expected run; ineligible processes are replaced.",
+  "recording_ids": [],
+  "runs": [
+    {
+      "run_id": "20261118-cuda5-da-02",
+      "kind": "recorded",
+      "host": "cuda5",
+      "source_commit": "99fd231",
+      "status": "completed",
+      "readme": "experiments/2026-11-19-prune-depth-adaptive/runs/20261118-cuda5-da-02/README.md",
+      "results": "results/2026-11-19-prune-depth-adaptive/20261118-cuda5-da-02",
+      "reuse_from": "20261118-cuda5-da-01",
+      "correctness": "51 of 51 timing comparisons equal the CPU reference at their depth; da-01 correctness (17 configurations, 5 with VERIFY=1) reused",
+      "ineligible_processes": 15,
+      "median_ms": {
+        "v2-w1024-k10": 0.688,
+        "prunets-w256-s64-k10": 0.273,
+        "prunetm-w256-s64-k10": 0.237,
+        "prunetm-w1024-s64-k10": 0.318,
+        "prunetma-w256-1024-s64-p220-k10": 0.248,
+        "v2-w1024-k100": 2.687,
+        "prunets-w1024-s64-k100": 1.862,
+        "prunetm-w1024-s64-k100": 1.224,
+        "prunets-w256-s64-k100": 1.319,
+        "prunetm-w256-s64-k100": 0.694,
+        "prunetma-w256-1024-s64-p220-k100": 0.707,
+        "v2-w1024-k1000": 12.38,
+        "prunets-w1024-s64-k1000": 11.27,
+        "prunetm-w1024-s64-k1000": 3.364,
+        "prunets-w256-s64-k1000": 21.921,
+        "prunetm-w256-s64-k1000": 3.218,
+        "prunetma-w256-1024-s64-p220-k1000": 3.981
+      },
+      "p99_ms": {
+        "v2-w1024-k10": 1.083,
+        "prunets-w256-s64-k10": 1.909,
+        "prunetm-w256-s64-k10": 1.622,
+        "prunetm-w1024-s64-k10": 0.885,
+        "prunetma-w256-1024-s64-p220-k10": 0.951,
+        "v2-w1024-k100": 2.956,
+        "prunets-w1024-s64-k100": 3.029,
+        "prunetm-w1024-s64-k100": 2.19,
+        "prunets-w256-s64-k100": 5.831,
+        "prunetm-w256-s64-k100": 2.936,
+        "prunetma-w256-1024-s64-p220-k100": 2.383,
+        "v2-w1024-k1000": 12.734,
+        "prunets-w1024-s64-k1000": 13.214,
+        "prunetm-w1024-s64-k1000": 14.896,
+        "prunets-w256-s64-k1000": 39.358,
+        "prunetm-w256-s64-k1000": 22.856,
+        "prunetma-w256-1024-s64-p220-k1000": 11.259
+      },
+      "contrasts": {
+        "prunets-w256-s64-k10 / prunetm-w256-s64-k10": {
+          "ratio": 1.135,
+          "interval_95": [
+            1.129,
+            1.141
+          ],
+          "group": "check-merge-k10"
+        },
+        "prunets-w1024-s64-k100 / prunetm-w1024-s64-k100": {
+          "ratio": 1.475,
+          "interval_95": [
+            1.463,
+            1.491
+          ],
+          "group": "primary-merge"
+        },
+        "prunets-w256-s64-k100 / prunetm-w256-s64-k100": {
+          "ratio": 1.86,
+          "interval_95": [
+            1.826,
+            1.899
+          ],
+          "group": "primary-merge"
+        },
+        "prunets-w1024-s64-k1000 / prunetm-w1024-s64-k1000": {
+          "ratio": 2.786,
+          "interval_95": [
+            2.641,
+            2.901
+          ],
+          "group": "primary-merge"
+        },
+        "prunets-w256-s64-k1000 / prunetm-w256-s64-k1000": {
+          "ratio": 4.847,
+          "interval_95": [
+            4.664,
+            5.036
+          ],
+          "group": "primary-merge"
+        },
+        "prunetm-w1024-s64-k10 / prunetma-w256-1024-s64-p220-k10": {
+          "ratio": 1.169,
+          "interval_95": [
+            1.15,
+            1.189
+          ],
+          "group": "primary-adaptive"
+        },
+        "prunetm-w256-s64-k10 / prunetma-w256-1024-s64-p220-k10": {
+          "ratio": 0.979,
+          "interval_95": [
+            0.971,
+            0.988
+          ],
+          "group": "secondary-adaptive"
+        },
+        "prunetm-w256-s64-k100 / prunetma-w256-1024-s64-p220-k100": {
+          "ratio": 0.825,
+          "interval_95": [
+            0.808,
+            0.843
+          ],
+          "group": "secondary-adaptive"
+        },
+        "prunetm-w1024-s64-k100 / prunetma-w256-1024-s64-p220-k100": {
+          "ratio": 1.315,
+          "interval_95": [
+            1.274,
+            1.358
+          ],
+          "group": "secondary-adaptive"
+        },
+        "prunetm-w256-s64-k1000 / prunetma-w256-1024-s64-p220-k1000": {
+          "ratio": 0.96,
+          "interval_95": [
+            0.932,
+            0.989
+          ],
+          "group": "secondary-adaptive"
+        },
+        "prunetm-w1024-s64-k1000 / prunetma-w256-1024-s64-p220-k1000": {
+          "ratio": 0.909,
+          "interval_95": [
+            0.879,
+            0.953
+          ],
+          "group": "secondary-adaptive"
+        },
+        "v2-w1024-k10 / prunets-w256-s64-k10": {
+          "ratio": 2.372,
+          "interval_95": [
+            2.263,
+            2.486
+          ],
+          "group": "replication"
+        },
+        "v2-w1024-k10 / prunetm-w256-s64-k10": {
+          "ratio": 2.692,
+          "interval_95": [
+            2.575,
+            2.81
+          ],
+          "group": "secondary"
+        },
+        "v2-w1024-k10 / prunetm-w1024-s64-k10": {
+          "ratio": 2.255,
+          "interval_95": [
+            2.186,
+            2.327
+          ],
+          "group": "secondary"
+        },
+        "v2-w1024-k10 / prunetma-w256-1024-s64-p220-k10": {
+          "ratio": 2.636,
+          "interval_95": [
+            2.533,
+            2.737
+          ],
+          "group": "secondary"
+        },
+        "v2-w1024-k100 / prunets-w1024-s64-k100": {
+          "ratio": 1.632,
+          "interval_95": [
+            1.573,
+            1.697
+          ],
+          "group": "secondary"
+        },
+        "v2-w1024-k100 / prunetm-w1024-s64-k100": {
+          "ratio": 2.408,
+          "interval_95": [
+            2.329,
+            2.488
+          ],
+          "group": "secondary"
+        },
+        "v2-w1024-k100 / prunets-w256-s64-k100": {
+          "ratio": 2.063,
+          "interval_95": [
+            1.938,
+            2.196
+          ],
+          "group": "secondary"
+        },
+        "v2-w1024-k100 / prunetm-w256-s64-k100": {
+          "ratio": 3.837,
+          "interval_95": [
+            3.66,
+            4.019
+          ],
+          "group": "secondary"
+        },
+        "v2-w1024-k100 / prunetma-w256-1024-s64-p220-k100": {
+          "ratio": 3.167,
+          "interval_95": [
+            2.99,
+            3.351
+          ],
+          "group": "secondary"
+        },
+        "v2-w1024-k1000 / prunets-w1024-s64-k1000": {
+          "ratio": 1.224,
+          "interval_95": [
+            1.195,
+            1.255
+          ],
+          "group": "secondary"
+        },
+        "v2-w1024-k1000 / prunetm-w1024-s64-k1000": {
+          "ratio": 3.41,
+          "interval_95": [
+            3.218,
+            3.575
+          ],
+          "group": "secondary"
+        },
+        "v2-w1024-k1000 / prunets-w256-s64-k1000": {
+          "ratio": 0.666,
+          "interval_95": [
+            0.634,
+            0.701
+          ],
+          "group": "secondary"
+        },
+        "v2-w1024-k1000 / prunetm-w256-s64-k1000": {
+          "ratio": 3.231,
+          "interval_95": [
+            3.051,
+            3.415
+          ],
+          "group": "secondary"
+        },
+        "v2-w1024-k1000 / prunetma-w256-1024-s64-p220-k1000": {
+          "ratio": 3.1,
+          "interval_95": [
+            2.993,
+            3.209
+          ],
+          "group": "secondary"
+        }
+      }
+    },
+    {
+      "run_id": "20261118-cuda5-da-01",
+      "kind": "recorded",
+      "host": "cuda5",
+      "source_commit": "3b0e99c",
+      "status": "stopped during timing (throughput, amendment 1); fixtures and correctness passed and reused by da-02; not analysed",
+      "readme": "experiments/2026-11-19-prune-depth-adaptive/runs/20261118-cuda5-da-01/README.md",
+      "results": "results/2026-11-19-prune-depth-adaptive/20261118-cuda5-da-01"
+    },
+    {
+      "run_id": "dev",
+      "kind": "development",
+      "status": "references, fixtures and smoke tests; not results",
+      "readme": "experiments/2026-11-19-prune-depth-adaptive/runs/dev/README.md"
+    }
+  ]
+}

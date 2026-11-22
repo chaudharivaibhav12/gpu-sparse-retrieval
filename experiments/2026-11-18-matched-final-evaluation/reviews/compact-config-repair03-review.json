@@ -1,0 +1,25 @@
+{
+  "status": "PASS separate source review and43local checks; exact-source Linux preparation required",
+  "repair_attempt": 3,
+  "max_reviewed_repairs": 3,
+  "parent_source": "f30da4f3ccad4717effc7ec4351cf4c7b16ff6e0",
+  "failure": "Compact expected-config assembly raised KeyError(gpu_name) after three CUDA correctness processes; no performance stage reached. Raw library/version probe intentionally excludes device properties.",
+  "fix": [
+    "Keep raw package before/after comparison intact",
+    "Add a distinct resolver environment containing actual frozen parent GPU name/capability",
+    "Preserve actual runtime hardware reporting and complete-state rejection",
+    "Resolve all five correctness and timing configurations before any long correctness process"
+  ],
+  "config_behavior_delta": "No scoring, source kernels, inputs, query weights, selection, device, k, batch, threads/ranges/seeds, warmups or timing boundaries change. This restores required expected metadata fields, not guessed defaults.",
+  "validation": [
+    "4 compact factory checks include the exact missing-key regression and roundtrip of successful actual parent runtime",
+    "15 controller safety/output checks pass",
+    "24 complete pruned runtime checks pass",
+    "AST and diff review; no heldout access"
+  ],
+  "source_sha256": "eb3436a0331799769f8b4d03d5386dd754af4c0f5f65648b531a9e3f21651c80",
+  "limitations": [
+    "Fresh Linux build/factory preflight still required",
+    "No further automatic technical repair beyond this third attempt without new authorization"
+  ]
+}

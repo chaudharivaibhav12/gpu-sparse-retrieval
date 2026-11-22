@@ -1,0 +1,90 @@
+{
+  "status": "Registered calibration design; complete source review and CPU-only build/live monitor checks precede measurement. NOT a heldout freeze.",
+  "parent_experiment": "2026-11-17-gpusparse-u8-storage",
+  "parent_merge": "b31ff7a57b3283884d637a8f8480e85640ae9242",
+  "question": "How do the final exact pruned GPU scorers compare with the stronger compact GPUSparse and CPU-BMP controls under a fresh matched full-collection protocol, and do the frozen choices generalize to heldout queries?",
+  "stages": [
+    "Build and independently validate the matched CPU boundary adapter on synthetic calibration fixtures",
+    "Strictly matched full-collection 500-query calibration comparison; repair technical failures only, preserve outcomes",
+    "Record immutable source/config/split/analysis freeze after calibration validation and before any heldout content access",
+    "Full 6480-query heldout exactness and performance evaluation, independent analysis and publication"
+  ],
+  "systems": [
+    "prunets W256 S64 T256 primary latency choice from calibration",
+    "prunets W1024 S64 T256 secondary tail tradeoff",
+    "unchanged exhaustive range W1024 T256",
+    "guarded exact FP32 compact uint8-storage adapted GPUSparse BLOCK_PL512",
+    "corrected exact resident CPU-BMP raw B32 alpha=beta=1 Rayon1"
+  ],
+  "scope": {
+    "documents": 8841823,
+    "calibration_queries": 500,
+    "heldout_queries": 6480,
+    "k": 10,
+    "batch_size": 1,
+    "gpu": "RTX4070 UUID GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7",
+    "cpu": 0,
+    "numa_node": 0,
+    "process_repetitions": 3,
+    "warmups": 3,
+    "measured_rounds": 20
+  },
+  "timing_boundary": "Resident parsed cap32 term/weight pairs through fresh per-query preparation/cursors, all retrieval/selection/transfers, ordered original numeric-ID/score top-k in host memory. Exclude file decoding, index load, domain verification, and textual result formatting consistently. Disclose each implementation-specific operation.",
+  "correctness": [
+    "All-document eligibility and numeric-ID ties; exact uint8 weights and cap32 queries",
+    "Independent CPU uint64 oracle for every query, all rounds/processes",
+    "Fresh full-score/schedule checks and existing synthetic boundary/tie/large-score fixtures",
+    "Complete actual-runtime config/behavior match before measured compute through scripts/research.py run",
+    "Deliberate pre-compute runtime rejection checks for every new adapter path",
+    "Compare every BMP original-ID entry, in order, with the 8,841,823 GSP IDs before any scoring; pinned index and GSP hashes bind this preparation observation.",
+    "Compare every BMP original-ID entry, in order, with the 8,841,823 GSP IDs before any scoring; pinned index and GSP hashes bind this preparation observation."
+  ],
+  "resources": {
+    "host_free_gib_before_BMP": 34,
+    "GPU_rule": "No foreign context at admission or sampled during timing; never stop another user",
+    "cpu_other_cores_max": 4.0,
+    "BMP_measured_iowait_share_max": 0.01,
+    "own_process_swap_stop_gib": 1,
+    "poll_seconds": 120,
+    "deadline_hours": 24,
+    "retry_rule": "Preserve failed attempts; inspect, repair and separately review; max three reviewed technical repairs. Do not tune away a valid slower/null result.",
+    "resource_replacements": "At most three fresh attempts for a timing stage rejected solely by resource eligibility. Preserve all attempts; technical/output failures stop for reviewed repair rather than unchanged automatic retry.",
+    "gpu_free_mib_before_every_stage": 10000,
+    "numa": "numactl --physcpubind=0 --localalloc for every measured process"
+  },
+  "schedule": "Rotating process-block order; sequential systems, no concurrency; all five configurations measured fresh in the same study. Wait for resources between stages outside timing. Preserve excluded attempts.",
+  "analysis": {
+    "per_query": "Median of 20 rounds per process and query",
+    "paired": "Geometric mean query-time ratios paired by process block and query",
+    "uncertainty": "10000 crossed process/query bootstrap draws, fixed seed 20261118; conditional on shared-host session",
+    "descriptive": [
+      "median",
+      "mean",
+      "p95",
+      "p99",
+      "maximum",
+      "own sampled memory and modeled allocations"
+    ],
+    "controls": "All five on full collection. Primary GPU prunets-W256 / compact and prunets-W256 / BMP. Secondary W1024 contrasts, exhaustive control, component controls retained from audited calibration studies. No cross-session median division as a matched claim."
+  },
+  "heldout_rule": "No query content, weights, output or query-dependent tuning before freeze. Record split membership hashes and disjointness at freeze; after evaluation any tuning is post-evaluation and cannot be advertised as heldout.",
+  "new_adapter_delta": [
+    "CPU PISA cap32 text is prepared once outside timer; duplicates counted exactly, unsupported >32 weights or >128 distinct terms rejected",
+    "CPU fresh cursors and canonical retrieval remain timed; ordered numeric-ID/score mapping and allocation included; TREC formatting moved outside timing",
+    "Deterministic lexical token order replaces randomized HashMap traversal, disclosed and correctness checked",
+    "No change to underlying BMP pruning, arithmetic, eligibility or canonical tie selection"
+  ],
+  "pending": [
+    "CPU-only build/helper fixtures/live Linux monitor validation for the exact final controller source",
+    "Fresh full calibration with all fifteen eligible timing processes",
+    "Independent raw/statistical/claim-time review",
+    "Final immutable method/analysis/split freeze, then6480-query heldout evaluation"
+  ],
+  "post_hash_admission": {
+    "reason": "Repair03 OOM before runtime report; competing contexts observed, allocation cause unproved",
+    "guard": "After private runner input hashes, before exec: same UUID, no GPU contexts, >=10000MiB GPUfree, >=34GiB host, <=4busy CPU cores, one-second CPU sample",
+    "budget_seconds": 120,
+    "resource_timeout": "Exit75, no runtime and no query output; preserve failed runner attempt and retry stage with fresh directory under existing three-attempt resource cap",
+    "limits": "No reservation; no OOM auto-retry or relaxed runtime gate. Arbitrary failures stop for inspection. No algorithm, timing-boundary or query split changes."
+  }
+}

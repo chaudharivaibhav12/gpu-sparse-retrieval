@@ -1,0 +1,1093 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-19-prune-batch",
+  "run_id": "20261119-cuda5-pb-02",
+  "status": "completed-timing",
+  "scope": "host cuda5; GPU GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7; 8841823 documents; 500 calibration queries; k=10; multi-query drivers; configurations v2batch-sequential-b32 v2batch-batched-b32 tmb-w256-sequential-b32 tmb-w256-streams-b8 tmb-w256-streams-b32 tmb-w1024-sequential-b32 tmb-w1024-streams-b32; fixtures, gate and correctness checks then 3 processes each in rotating order; 3 warm-up + 20 measured rounds; CPU_LIMIT 4.0 cores; CORE_LIMIT 0.05 cores on the pinned core (amendment 1); replacements v2batch-sequential-b32=0 v2batch-batched-b32=0 tmb-w256-sequential-b32=0 tmb-w256-streams-b8=0 tmb-w256-streams-b32=0 tmb-w1024-sequential-b32=0 tmb-w1024-streams-b32=0 ; binaries, fixtures and correctness reused from 20261119-cuda5-pb-01 (logs/reuse.txt)",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "1059a85ab15230ba8c8bdb7ddbdc42fe7ef781ea",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17; g++ -O3 -std=c++17 -pthread",
+    "source_sha256": {
+      "src/cuda_range_v2.cu": "a8058952b7dbfe5b810183fbe708838464b11e82995f09d98cf06d28564e6e56",
+      "src/cuda_range_batch.cu": "8e6561b84de314bd9c85d78503865ba39c5e5ecbf7d928c463b562e73b7c7cf4",
+      "src/cuda_range_prune_tm.cu": "baf84e448787447b94339a003cd1769f15624f017fe75bf2a67680e869891c1b",
+      "src/cuda_range_prune_tmb.cu": "0cdc8c3f30c4c490fbb19b1a99cc1482993b12f9bf97b81f8179e60f20438b08",
+      "src/cpu_pilot.cpp": "0a00ad02bd0b1b1a84dccc3d15a64208190b551c30bd83fefe99ab282efba865",
+      "src/range_bitpack.h": "98fb4ae1e2f3a01bc214d749c47eaa59dbeb17ad0726cc2a18fd1125d9c9c37c",
+      "src/range_bitpack_tool.cpp": "efbe1d3d0fb0627246c338903ace4d80b84e7937796ee309b71b48e86ea2e41f",
+      "src/cuda_topk.cuh": "1c611c05f455e53efce643a9e52d9934cf4038fae3784547f0afb09106e9c8dd",
+      "src/research_runtime.h": "949757134d97142fa1f5d6e56a79cc61b596d706c0c0ea1577485ca0325d1c59",
+      "tests/check_range_bitpack.py": "12c65d6e53e901ead26a412d59860de48fe51b1225a03239832b4d66ac77f7de",
+      "tests/check_range_prune.py": "88f709466192bcdc774ba6358954571d6e26baab5d23fcfd7b60ca75c9d476c0",
+      "tests/check_range_batch.py": "61aca820f8ccf98a4c82566641bb6cbd934863b6fed5a73f2e2f0f5a74e67070",
+      "tests/check_range_prune_batch.py": "600771b44d080a592b6e5e46e3e1532a2f582f36e253d898fdacca36493f8e20",
+      "experiments/2026-11-19-prune-batch/configs/configs.tsv": "dfbb01bd26fe5c647ee82ec18f63ccc647f05ee6fe7cd8a4ac1a67fa4a4cb33d",
+      "experiments/2026-11-19-prune-batch/code/gate.py": "13a414df32702ca6312681a61783ac80498fd104febbb59f947d41939b1dff82",
+      "experiments/2026-11-19-prune-batch/code/expect.py": "1c9df3f72b4409c3ef333aa79318156c7c8bc317fc0c8d63173fd577721784de",
+      "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py": "ca43fb45ed74e0fc8d24c14898ac8ae3d32c7ebd3f805b55f6d59db87378d18e",
+      "experiments/2026-11-19-prune-batch/analysis/analyze.py": "cf3466d66eef2fc92a280b28f09d636d2f0a67a7ae576c26975b15356b86966b",
+      "experiments/2026-11-19-prune-batch/code/run.sh": "5f49d99f910acae5113bace1aec7a3cd086f06f1b0a497cbebdb4682bfb18701"
+    },
+    "binary_sha256": {
+      "build/20261119-cuda5-pb-02/cuda_range_batch": "151eacd4b8fa7f847ce2aff0964cdd5d5dba0db830997611f8916807b10d4226",
+      "build/20261119-cuda5-pb-02/cuda_range_prune_tmb": "aadfcbe6f26c4849ef38f1d673bbf6be50e5f1012291d345caf29f8f853ada87",
+      "build/20261119-cuda5-pb-02/range_bitpack_tool": "9ce426d0a07cb8a3bc7ecf9816376f355060ea09f622de92e1b885145b4760e6"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "/scratch/psp8502/full/full-8841823.gsp": {
+      "sha256": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac",
+      "bytes": 5388181537
+    },
+    "/scratch/psp8502/full/full-8841823-w1024.rbp": {
+      "sha256": "c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab",
+      "bytes": 3638491070
+    },
+    "/scratch/psp8502/full/full-8841823-w512.rbp": {
+      "sha256": "d35a69909ea2507e29ac6c27edc96b4ca259e69614f9aca5029c6801d3f408a0",
+      "bytes": 4078820119
+    },
+    "/scratch/psp8502/full/full-8841823-w256.rbp": {
+      "sha256": "0ad6531c7698c7541fd9f6d62fb4fa34619e4b765656cccfa3d13fdc64202892",
+      "bytes": 4705954185
+    },
+    "/scratch/psp8502/full/oracle/cpu-top10-8841823.tsv": {
+      "sha256": "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed",
+      "bytes": 116558
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_12.6.r12.6/compiler.35059454_0"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w256-streams-b32 --rounds 1 --warmups 0 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --seeds 16 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/reject-prune-seeds.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/reject-prune-seeds.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/reject-prune-seeds.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 0 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/reject-prune-seeds.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/reject-prune-seeds.tsv 500 10 0 0 1 0 256 256 - 64 streams 32",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py v2batch-batched-b32 --rounds 1 --warmups 0 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/reject-v2-threads.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/reject-v2-threads.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/reject-v2-threads.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=0 build/20261119-cuda5-pb-02/cuda_range_batch /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/reject-v2-threads.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/reject-v2-threads.tsv 500 10 0 0 1 0 128 batched 32 -",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py v2batch-sequential-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-v2batch-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-v2batch-sequential-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-v2batch-sequential-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_batch /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-v2batch-sequential-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-v2batch-sequential-b32.tsv 500 10 0 0 20 3 256 sequential 32 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-v2batch-sequential-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r0-v2batch-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py v2batch-batched-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-v2batch-batched-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-v2batch-batched-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-v2batch-batched-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_batch /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-v2batch-batched-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-v2batch-batched-b32.tsv 500 10 0 0 20 3 256 batched 32 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-v2batch-batched-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r0-v2batch-batched-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w256-sequential-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-tmb-w256-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-tmb-w256-sequential-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w256-sequential-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w256-sequential-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w256-sequential-b32.tsv 500 10 0 0 20 3 256 256 - 64 sequential 32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w256-sequential-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r0-tmb-w256-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w256-streams-b8 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-tmb-w256-streams-b8.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-tmb-w256-streams-b8.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w256-streams-b8.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w256-streams-b8.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w256-streams-b8.tsv 500 10 0 0 20 3 256 256 - 64 streams 8",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w256-streams-b8.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r0-tmb-w256-streams-b8.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w256-streams-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-tmb-w256-streams-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-tmb-w256-streams-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w256-streams-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w256-streams-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w256-streams-b32.tsv 500 10 0 0 20 3 256 256 - 64 streams 32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w256-streams-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r0-tmb-w256-streams-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w1024-sequential-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-tmb-w1024-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-tmb-w1024-sequential-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w1024-sequential-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 6 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=6 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w1024-sequential-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w1024-sequential-b32.tsv 500 10 0 0 20 3 256 256 - 64 sequential 32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w1024-sequential-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r0-tmb-w1024-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w1024-streams-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-tmb-w1024-streams-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r0-tmb-w1024-streams-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w1024-streams-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w1024-streams-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w1024-streams-b32.tsv 500 10 0 0 20 3 256 256 - 64 streams 32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r0-tmb-w1024-streams-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r0-tmb-w1024-streams-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w256-streams-b8 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-tmb-w256-streams-b8.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-tmb-w256-streams-b8.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w256-streams-b8.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w256-streams-b8.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w256-streams-b8.tsv 500 10 0 0 20 3 256 256 - 64 streams 8",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w256-streams-b8.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r1-tmb-w256-streams-b8.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w256-streams-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-tmb-w256-streams-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-tmb-w256-streams-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w256-streams-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w256-streams-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w256-streams-b32.tsv 500 10 0 0 20 3 256 256 - 64 streams 32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w256-streams-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r1-tmb-w256-streams-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w1024-sequential-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-tmb-w1024-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-tmb-w1024-sequential-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w1024-sequential-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w1024-sequential-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w1024-sequential-b32.tsv 500 10 0 0 20 3 256 256 - 64 sequential 32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w1024-sequential-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r1-tmb-w1024-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w1024-streams-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-tmb-w1024-streams-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-tmb-w1024-streams-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w1024-streams-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w1024-streams-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w1024-streams-b32.tsv 500 10 0 0 20 3 256 256 - 64 streams 32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w1024-streams-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r1-tmb-w1024-streams-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py v2batch-sequential-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-v2batch-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-v2batch-sequential-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-v2batch-sequential-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 4 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=4 --localalloc build/20261119-cuda5-pb-02/cuda_range_batch /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-v2batch-sequential-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-v2batch-sequential-b32.tsv 500 10 0 0 20 3 256 sequential 32 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-v2batch-sequential-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r1-v2batch-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py v2batch-batched-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-v2batch-batched-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-v2batch-batched-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-v2batch-batched-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_batch /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-v2batch-batched-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-v2batch-batched-b32.tsv 500 10 0 0 20 3 256 batched 32 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-v2batch-batched-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r1-v2batch-batched-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w256-sequential-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-tmb-w256-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r1-tmb-w256-sequential-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w256-sequential-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w256-sequential-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w256-sequential-b32.tsv 500 10 0 0 20 3 256 256 - 64 sequential 32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r1-tmb-w256-sequential-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r1-tmb-w256-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w1024-sequential-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-tmb-w1024-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-tmb-w1024-sequential-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w1024-sequential-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w1024-sequential-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w1024-sequential-b32.tsv 500 10 0 0 20 3 256 256 - 64 sequential 32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w1024-sequential-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r2-tmb-w1024-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w1024-streams-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-tmb-w1024-streams-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-tmb-w1024-streams-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w1024-streams-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w1024-streams-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w1024-streams-b32.tsv 500 10 0 0 20 3 256 256 - 64 streams 32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w1024-streams-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r2-tmb-w1024-streams-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py v2batch-sequential-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-v2batch-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-v2batch-sequential-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-v2batch-sequential-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_batch /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-v2batch-sequential-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-v2batch-sequential-b32.tsv 500 10 0 0 20 3 256 sequential 32 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-v2batch-sequential-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r2-v2batch-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py v2batch-batched-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w1024.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-v2batch-batched-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-v2batch-batched-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-v2batch-batched-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_batch /scratch/psp8502/full/full-8841823-w1024.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-v2batch-batched-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-v2batch-batched-b32.tsv 500 10 0 0 20 3 256 batched 32 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-v2batch-batched-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r2-v2batch-batched-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w256-sequential-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-tmb-w256-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-tmb-w256-sequential-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w256-sequential-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w256-sequential-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w256-sequential-b32.tsv 500 10 0 0 20 3 256 256 - 64 sequential 32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w256-sequential-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r2-tmb-w256-sequential-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w256-streams-b8 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-tmb-w256-streams-b8.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-tmb-w256-streams-b8.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w256-streams-b8.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w256-streams-b8.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w256-streams-b8.tsv 500 10 0 0 20 3 256 256 - 64 streams 8",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w256-streams-b8.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r2-tmb-w256-streams-b8.json",
+    "python3 experiments/2026-11-19-prune-batch/code/expect.py tmb-w256-streams-b32 --rounds 20 --warmups 3 --limit 500 --verify 0 --index /scratch/psp8502/full/full-8841823-w256.rbp --queries data/derived/calibration-500.tsv --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-tmb-w256-streams-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/code/gate.py --expect /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/expect/timing-r2-tmb-w256-streams-b32.json --receipt /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w256-streams-b32.receipt.json --gpu-uuid GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 --sampler-cpu 15 --scorer-cpu 2 -- env CUDA_VISIBLE_DEVICES=GPU-ab7b89ba-5664-fd05-e352-a4bc034e5ff7 numactl --physcpubind=2 --localalloc build/20261119-cuda5-pb-02/cuda_range_prune_tmb /scratch/psp8502/full/full-8841823-w256.rbp data/derived/calibration-500.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w256-streams-b32.csv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w256-streams-b32.tsv 500 10 0 0 20 3 256 256 - 64 streams 32",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py /scratch/psp8502/full/oracle/cpu-top10-8841823.tsv /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/raw/timing-r2-tmb-w256-streams-b32.tsv --queries 500 --k 10 --groups-per-query 23 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/compare-timing-r2-tmb-w256-streams-b32.json",
+    "python3 experiments/2026-11-19-prune-batch/analysis/analyze.py /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02 --processes 3 --warmups 3 --rounds 20 --cpu-limit 4.0 --core-limit 0.05 --output /scratch/psp8502/runs/2026-11-19-prune-batch/20261119-cuda5-pb-02/analysis/statistics.json"
+  ],
+  "artifacts": {
+    "analysis/compare-timing-r0-tmb-w1024-sequential-b32.json": {
+      "sha256": "14c7ba36de42d5a7f8bd30bbfe6f9efda82b8455c0f4e593d27184c6120ac103",
+      "bytes": 372
+    },
+    "analysis/compare-timing-r0-tmb-w1024-streams-b32.json": {
+      "sha256": "f299d62d3fd5d530f23462e82d932f890c36e238a813d3235208cae2cac2d410",
+      "bytes": 369
+    },
+    "analysis/compare-timing-r0-tmb-w256-sequential-b32.json": {
+      "sha256": "371c8e189bd110947059991b742f2f3c3ebeeecf8d0f4854297d12e11875c2f4",
+      "bytes": 371
+    },
+    "analysis/compare-timing-r0-tmb-w256-streams-b32.json": {
+      "sha256": "3eb8702010ec20b5636b71caaf534904923766aae61db69db0e85f861a7ac6fe",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r0-tmb-w256-streams-b8.json": {
+      "sha256": "c97345c287cf77944d296beb9deb6f5ff63da74b6c08b420637c2fe3545dd8c4",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r0-v2batch-batched-b32.json": {
+      "sha256": "9d2781de8338570570febd796077fce5258f0ca63c8b58de3fcc3543fd05db48",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r0-v2batch-sequential-b32.json": {
+      "sha256": "ef10ebec0d4f6bb00576a090e2120d39d5ec9d3c1c2271821c3429e24887e0a8",
+      "bytes": 370
+    },
+    "analysis/compare-timing-r1-tmb-w1024-sequential-b32.json": {
+      "sha256": "48e3561b3eb7106ef5246705edf68004212842bdaae497efa382551229e10341",
+      "bytes": 372
+    },
+    "analysis/compare-timing-r1-tmb-w1024-streams-b32.json": {
+      "sha256": "af2831871bfb9280e4789de350d8f8bb821b15090fb4f0abf24f2e112bbed8f4",
+      "bytes": 369
+    },
+    "analysis/compare-timing-r1-tmb-w256-sequential-b32.json": {
+      "sha256": "a28913800e12f000e5a7155ced11b887c08c6de9231251aa35912abf9fd8dd86",
+      "bytes": 371
+    },
+    "analysis/compare-timing-r1-tmb-w256-streams-b32.json": {
+      "sha256": "2276b2c60090b1d5bb283a5766b9e2ae170ec64b30ab60a47ef922194d39ea50",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r1-tmb-w256-streams-b8.json": {
+      "sha256": "39c9d8ee9723e3b3589c7035ac3e33fe793c642faf1e88d4fbe614266a7111cf",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r1-v2batch-batched-b32.json": {
+      "sha256": "fd5f6c438299a161b2b77040e2b12afbde8799ea4e8b24b23d62ed7e182588c0",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r1-v2batch-sequential-b32.json": {
+      "sha256": "b4764a508ba43d4247924b819d117a149f913e9b688991d226b3da3ffcdb20ba",
+      "bytes": 370
+    },
+    "analysis/compare-timing-r2-tmb-w1024-sequential-b32.json": {
+      "sha256": "a5121d9d3cff1c72435db4a5729cbd645b972760849564326f873e9a64bfe073",
+      "bytes": 372
+    },
+    "analysis/compare-timing-r2-tmb-w1024-streams-b32.json": {
+      "sha256": "e762dc94ea05a4ed90a7f715d054cb6f3163fdc49a2e338852a085a5e430fb77",
+      "bytes": 369
+    },
+    "analysis/compare-timing-r2-tmb-w256-sequential-b32.json": {
+      "sha256": "b5c8a8a208ac267be0ea55c541a8c5c6faedc03448106dbe5b40df30cef1ca48",
+      "bytes": 371
+    },
+    "analysis/compare-timing-r2-tmb-w256-streams-b32.json": {
+      "sha256": "ff0a2a6dd475a510441ee343048ddd944be977cb160b253bb5a2b9c80fa88a52",
+      "bytes": 368
+    },
+    "analysis/compare-timing-r2-tmb-w256-streams-b8.json": {
+      "sha256": "9713e7e620b49434bae94e0505a04a4e26c0350b81c8dd08bf244f86a8c6528b",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r2-v2batch-batched-b32.json": {
+      "sha256": "9f03307dedb19bccc7916334a6bc2339f36e6c59d5f806547eb10db42b7b40df",
+      "bytes": 367
+    },
+    "analysis/compare-timing-r2-v2batch-sequential-b32.json": {
+      "sha256": "5744b360d8a08f97725afa6d03374ac5d378dea5d717c60102643922c381b136",
+      "bytes": 370
+    },
+    "analysis/statistics.json": {
+      "sha256": "b8bc6844c1ff50750a07acba51c54b704134b35dcb67ef12406b0a0d496496b4",
+      "bytes": 7958
+    },
+    "configs.tsv": {
+      "sha256": "dfbb01bd26fe5c647ee82ec18f63ccc647f05ee6fe7cd8a4ac1a67fa4a4cb33d",
+      "bytes": 742
+    },
+    "expect/reject-prune-seeds.json": {
+      "sha256": "51c005693022d009261216b8c069ccdcf56230c6a28808dd96c7ba86a4d476a6",
+      "bytes": 1661
+    },
+    "expect/reject-v2-threads.json": {
+      "sha256": "3c019d42eaba5b3441d21d10aa91f1e690303961f1d157dbaf2f494ddec59d28",
+      "bytes": 1341
+    },
+    "expect/timing-r0-tmb-w1024-sequential-b32.json": {
+      "sha256": "7b8a58d7c3f981cab23b01ff498396f057b06b68176345336f496567ed187725",
+      "bytes": 1655
+    },
+    "expect/timing-r0-tmb-w1024-streams-b32.json": {
+      "sha256": "14c237e1a9a4a3f4a02682a8e10e7aade02cbc59456a7bd105c0768eeb950d1d",
+      "bytes": 1663
+    },
+    "expect/timing-r0-tmb-w256-sequential-b32.json": {
+      "sha256": "33fb93e26f356d52abb76273f6703788934158a37e8f5d37e3c647875297b8cd",
+      "bytes": 1654
+    },
+    "expect/timing-r0-tmb-w256-streams-b32.json": {
+      "sha256": "b75435ec732e4415332ce944f2beedce2ea7d0628db43f378d4d5fe3445d7c83",
+      "bytes": 1662
+    },
+    "expect/timing-r0-tmb-w256-streams-b8.json": {
+      "sha256": "4f3895aa4be8f9a92eff5bf75deaa366491f7860fcd906d88ecd430beebe128c",
+      "bytes": 1661
+    },
+    "expect/timing-r0-v2batch-batched-b32.json": {
+      "sha256": "c91a09dd3b2fde6c006c3015cc32975efefb020589244b1f143b70d98c21e9db",
+      "bytes": 1342
+    },
+    "expect/timing-r0-v2batch-sequential-b32.json": {
+      "sha256": "17ce7e86aeff27c2b6ddc9a3908735a4c56e0dc06d7606bebb6b4c72a152fbc6",
+      "bytes": 1349
+    },
+    "expect/timing-r1-tmb-w1024-sequential-b32.json": {
+      "sha256": "7b8a58d7c3f981cab23b01ff498396f057b06b68176345336f496567ed187725",
+      "bytes": 1655
+    },
+    "expect/timing-r1-tmb-w1024-streams-b32.json": {
+      "sha256": "14c237e1a9a4a3f4a02682a8e10e7aade02cbc59456a7bd105c0768eeb950d1d",
+      "bytes": 1663
+    },
+    "expect/timing-r1-tmb-w256-sequential-b32.json": {
+      "sha256": "33fb93e26f356d52abb76273f6703788934158a37e8f5d37e3c647875297b8cd",
+      "bytes": 1654
+    },
+    "expect/timing-r1-tmb-w256-streams-b32.json": {
+      "sha256": "b75435ec732e4415332ce944f2beedce2ea7d0628db43f378d4d5fe3445d7c83",
+      "bytes": 1662
+    },
+    "expect/timing-r1-tmb-w256-streams-b8.json": {
+      "sha256": "4f3895aa4be8f9a92eff5bf75deaa366491f7860fcd906d88ecd430beebe128c",
+      "bytes": 1661
+    },
+    "expect/timing-r1-v2batch-batched-b32.json": {
+      "sha256": "c91a09dd3b2fde6c006c3015cc32975efefb020589244b1f143b70d98c21e9db",
+      "bytes": 1342
+    },
+    "expect/timing-r1-v2batch-sequential-b32.json": {
+      "sha256": "17ce7e86aeff27c2b6ddc9a3908735a4c56e0dc06d7606bebb6b4c72a152fbc6",
+      "bytes": 1349
+    },
+    "expect/timing-r2-tmb-w1024-sequential-b32.json": {
+      "sha256": "7b8a58d7c3f981cab23b01ff498396f057b06b68176345336f496567ed187725",
+      "bytes": 1655
+    },
+    "expect/timing-r2-tmb-w1024-streams-b32.json": {
+      "sha256": "14c237e1a9a4a3f4a02682a8e10e7aade02cbc59456a7bd105c0768eeb950d1d",
+      "bytes": 1663
+    },
+    "expect/timing-r2-tmb-w256-sequential-b32.json": {
+      "sha256": "33fb93e26f356d52abb76273f6703788934158a37e8f5d37e3c647875297b8cd",
+      "bytes": 1654
+    },
+    "expect/timing-r2-tmb-w256-streams-b32.json": {
+      "sha256": "b75435ec732e4415332ce944f2beedce2ea7d0628db43f378d4d5fe3445d7c83",
+      "bytes": 1662
+    },
+    "expect/timing-r2-tmb-w256-streams-b8.json": {
+      "sha256": "4f3895aa4be8f9a92eff5bf75deaa366491f7860fcd906d88ecd430beebe128c",
+      "bytes": 1661
+    },
+    "expect/timing-r2-v2batch-batched-b32.json": {
+      "sha256": "c91a09dd3b2fde6c006c3015cc32975efefb020589244b1f143b70d98c21e9db",
+      "bytes": 1342
+    },
+    "expect/timing-r2-v2batch-sequential-b32.json": {
+      "sha256": "17ce7e86aeff27c2b6ddc9a3908735a4c56e0dc06d7606bebb6b4c72a152fbc6",
+      "bytes": 1349
+    },
+    "logs/analyze.log": {
+      "sha256": "52f2cf676d2a4d49b2c17ce3d0e9f5ac73f415379da2b6ef198de74320cde457",
+      "bytes": 1402
+    },
+    "logs/binaries-sha256.txt": {
+      "sha256": "2329b74758359aa2b7f221cdfc44587989583ce11fb2cd4ae3b183497ab4d156",
+      "bytes": 336
+    },
+    "logs/commands.txt": {
+      "sha256": "b62e8ab32b0ec0326108dd5fdd9262039d59332785d4d52e8eb1fdc211bff254",
+      "bytes": 36302
+    },
+    "logs/commit.txt": {
+      "sha256": "a48f4ee962ce1219c7a52d307f9f470b104771da8b8fd33141d21d5d4dbe14df",
+      "bytes": 41
+    },
+    "logs/environment.txt": {
+      "sha256": "d08ec3dd7d749809aa2a92b97647fef0d71475032f851085c5ed8b2f1f81654f",
+      "bytes": 987
+    },
+    "logs/gate.txt": {
+      "sha256": "f1924a6776e31a5f3cba0b8191e6f3c6685a241452e8176dde4f0b5a88568f64",
+      "bytes": 1949
+    },
+    "logs/inputs-sha256.txt": {
+      "sha256": "7fd29e93cde7dc879e7d0108b657712c895694bcb00c50f9239fd4cfe40b6963",
+      "bytes": 652
+    },
+    "logs/order.txt": {
+      "sha256": "78218aca4e99a8fcbeba6af8c561062836c8af7cf24a83851f7b55c0d82b6200",
+      "bytes": 724
+    },
+    "logs/quiet-timing-r0-tmb-w1024-sequential-b32.txt": {
+      "sha256": "469278a7ceb50c642cd7bf894c96adc69e645ae13ed3cd45fb2ee8790ee42eec",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r0-tmb-w1024-streams-b32.txt": {
+      "sha256": "6143e18b241362877d76b204ddfd6ed11a1c61b2a687e9015cfc544bd9bc9567",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r0-tmb-w256-sequential-b32.txt": {
+      "sha256": "4389e245353de6e37aba4fe454daa8a588c4913013c1edaa2e0859f6f354d750",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r0-tmb-w256-streams-b32.txt": {
+      "sha256": "f2b16334cd840a31ee14062b86a8639a339f12d1734ff1c95fc2bde4827e2f13",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r0-tmb-w256-streams-b8.txt": {
+      "sha256": "e08ac121006711a8a7872bc7a54f5b79f8936203f0a91c398cacddde42c0b11a",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r0-v2batch-batched-b32.txt": {
+      "sha256": "0fbcdedd78d46c787451c55bb5e5bbfe282dfdbe3f3ccf95f70afa8cb994fc23",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r0-v2batch-sequential-b32.txt": {
+      "sha256": "4355920a2ed04b916e3bd0f3869c27c61df56269c5eae418d328c2c2ed712fda",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r1-tmb-w1024-sequential-b32.txt": {
+      "sha256": "1b913b52c08b30bd6056ba6bcbb1e7faa88c2c407a8b9e1e293bac314e3657ca",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r1-tmb-w1024-streams-b32.txt": {
+      "sha256": "67deddd75e998da73a8c5d3dde69e1eef1d1a120db870cd090bf3c171f7f25a4",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r1-tmb-w256-sequential-b32.txt": {
+      "sha256": "4495e97474a48a9c0e9c0f348d06b68808bdaa5fc487c8e7ec1e0cc5ba5ed587",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r1-tmb-w256-streams-b32.txt": {
+      "sha256": "100316dc4a3eb1425611338ad9157557ad13c0d1c5bdf147a506f1eaf23eed3a",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r1-tmb-w256-streams-b8.txt": {
+      "sha256": "9b583d805634668800fefc317fc5354f6def56d92a044fc8c1449963daffc93c",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r1-v2batch-batched-b32.txt": {
+      "sha256": "d8c7d19f1762bcb733f97e2b0caf9f3840caea2c8fc8e54a63ccf29d653b9183",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r1-v2batch-sequential-b32.txt": {
+      "sha256": "4c603b01e70632cd839d4757a2c2406714d4bf018e82fb609df274f41574984e",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r2-tmb-w1024-sequential-b32.txt": {
+      "sha256": "417165cf52ebb4e0e8bc12da2da522ac0e6b5e91b96175906e4e2bc54553870f",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r2-tmb-w1024-streams-b32.txt": {
+      "sha256": "d04c4d2fde685af8ca334701065164af663039cee49ddc0dceeee16d17fbddef",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r2-tmb-w256-sequential-b32.txt": {
+      "sha256": "289e2ee9b850167c56392b9c7e342ea9900e9566664e97f82733fd099ae8b33a",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r2-tmb-w256-streams-b32.txt": {
+      "sha256": "9a9fcc66454de97f480a0c0cb1f6ce0e98bf7464e22203a26d042135c773c944",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r2-tmb-w256-streams-b8.txt": {
+      "sha256": "404e5ee28b379a799852377b8fff94bf0d0fea952237969709a99c027b1e549e",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r2-v2batch-batched-b32.txt": {
+      "sha256": "e7a67a97d0330595fc0265435da5363f750c57ae75f2abb2a295955fa58ac533",
+      "bytes": 106
+    },
+    "logs/quiet-timing-r2-v2batch-sequential-b32.txt": {
+      "sha256": "e7e0b4d87831061b71dc04ccabeb88c4843497718a0fb9b75854184a49fceb90",
+      "bytes": 106
+    },
+    "logs/reuse.txt": {
+      "sha256": "6f131a5793efe07a463cbb40444026f3ebf780cae80e63b7814217efbd0a19f8",
+      "bytes": 2179
+    },
+    "logs/stages.txt": {
+      "sha256": "269cdd9d34dff30adae5f634ff5802bfae31b82ba52eee6d58ffb67ca183ac74",
+      "bytes": 1730
+    },
+    "logs/started-epoch.txt": {
+      "sha256": "f07f7d97624d8851e42cf9ee181ff1e5eba1a7c0830ffd24e2813447b414951f",
+      "bytes": 11
+    },
+    "raw/reject-prune-seeds.receipt.json": {
+      "sha256": "48d03ba403a7ecc0eded36631af13e45ef945d1a0d52def966dc8b397903bb8c",
+      "bytes": 6489
+    },
+    "raw/reject-prune-seeds.receipt.log": {
+      "sha256": "8bd69e1c3eacf3b98b432d263883ae37b4f5ec7af1d229fd8009cb5f6681638a",
+      "bytes": 38
+    },
+    "raw/reject-prune-seeds.receipt.runtime/reject": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/reject-prune-seeds.receipt.runtime/runtime.json": {
+      "sha256": "f8f78fca1be0638aeeecf8a02b61b27f38cca617b8e40033fe6382861ca84bce",
+      "bytes": 2030
+    },
+    "raw/reject-prune-seeds.receipt.sampler.log": {
+      "sha256": "820b2546c030ead813945381b73e827fd8aa58ec1b618da333e20d2800ddbf37",
+      "bytes": 38518
+    },
+    "raw/reject-v2-threads.receipt.json": {
+      "sha256": "426f928ecf38e6ba776b09fdc005cebf5be316541cb49b783a0f35f1f565cf03",
+      "bytes": 5377
+    },
+    "raw/reject-v2-threads.receipt.log": {
+      "sha256": "8bd69e1c3eacf3b98b432d263883ae37b4f5ec7af1d229fd8009cb5f6681638a",
+      "bytes": 38
+    },
+    "raw/reject-v2-threads.receipt.runtime/reject": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/reject-v2-threads.receipt.runtime/runtime.json": {
+      "sha256": "43bb3437df80a8ec2b338cf52908562096c0dcea55cf306ea7d9842aabbb55e7",
+      "bytes": 1802
+    },
+    "raw/reject-v2-threads.receipt.sampler.log": {
+      "sha256": "0b5eb6883a07b61792c3aa814be77dfdb4d69de16ff7bc05a35b98050b42fa63",
+      "bytes": 19697
+    },
+    "raw/timing-r0-tmb-w1024-sequential-b32.csv": {
+      "sha256": "3d571db21eeebb632868423536d65afbef031655e05a9475fc5ea34566a8f647",
+      "bytes": 2213224
+    },
+    "raw/timing-r0-tmb-w1024-sequential-b32.receipt.json": {
+      "sha256": "3c40a874c64fd8960ae6d7f5c81c112d6bcb57e09885835b839c26db7e3c8a5e",
+      "bytes": 6468
+    },
+    "raw/timing-r0-tmb-w1024-sequential-b32.receipt.log": {
+      "sha256": "ea4c946f9970354deaa2de8453c14c5608024ff70c2e07599a8baadfeee6b549",
+      "bytes": 958
+    },
+    "raw/timing-r0-tmb-w1024-sequential-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-tmb-w1024-sequential-b32.receipt.runtime/runtime.json": {
+      "sha256": "60738428182ab0cfc0b1e03b452ad085a9e3c4fd54101095b15a6b12d4d88583",
+      "bytes": 2023
+    },
+    "raw/timing-r0-tmb-w1024-sequential-b32.receipt.sampler.log": {
+      "sha256": "e07d40531cb9e8e73d2ce1b652f97ab8d52b73afab0374e22923cce4589a15b7",
+      "bytes": 16383
+    },
+    "raw/timing-r0-tmb-w1024-sequential-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r0-tmb-w1024-streams-b32.csv": {
+      "sha256": "634b5b59e2c249908b97bd1b8137884457f4988c2a81c455a0c601e8cf2498e6",
+      "bytes": 2180696
+    },
+    "raw/timing-r0-tmb-w1024-streams-b32.receipt.json": {
+      "sha256": "e94115c82f09374923746eecc8e88c59641c68b68c4501f65b8feafa1dbc13a6",
+      "bytes": 6472
+    },
+    "raw/timing-r0-tmb-w1024-streams-b32.receipt.log": {
+      "sha256": "0cfd532a3c7e6be652c504c368abaca4566e5f58d4da2382058031775ab5d5b7",
+      "bytes": 952
+    },
+    "raw/timing-r0-tmb-w1024-streams-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-tmb-w1024-streams-b32.receipt.runtime/runtime.json": {
+      "sha256": "9fc5c1c06f583fff34ac48760556237d33d25fcd844e651190c2ee7a92dc117a",
+      "bytes": 2031
+    },
+    "raw/timing-r0-tmb-w1024-streams-b32.receipt.sampler.log": {
+      "sha256": "655814f13f0a3f531eb88618d6a133446fccf0d6bce2624c0f1f69e05fb4996c",
+      "bytes": 16031
+    },
+    "raw/timing-r0-tmb-w1024-streams-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r0-tmb-w256-sequential-b32.csv": {
+      "sha256": "733c8113dbb4ef17552eb8494a66a5a8075a1367ae171e52c62add7e5acebaa2",
+      "bytes": 2206576
+    },
+    "raw/timing-r0-tmb-w256-sequential-b32.receipt.json": {
+      "sha256": "fb83f9a60a28540e58baff08f0fb3cb0a7a6c7494446b495a9345b780a5b8104",
+      "bytes": 6467
+    },
+    "raw/timing-r0-tmb-w256-sequential-b32.receipt.log": {
+      "sha256": "7f1937bcc6959679a3887b091d703ca64ddd4f16359c1ea4de4b4f5bfa0e51e3",
+      "bytes": 958
+    },
+    "raw/timing-r0-tmb-w256-sequential-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-tmb-w256-sequential-b32.receipt.runtime/runtime.json": {
+      "sha256": "c08c3f918d7033484d22de0e2fd01dfd63be6850bf0b0d32a3a3f895c0f4a722",
+      "bytes": 2023
+    },
+    "raw/timing-r0-tmb-w256-sequential-b32.receipt.sampler.log": {
+      "sha256": "3d13beed63b8d41c930059079ccadd2250ca0a7c2959c8c6b595c6bbd6155714",
+      "bytes": 21403
+    },
+    "raw/timing-r0-tmb-w256-sequential-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r0-tmb-w256-streams-b32.csv": {
+      "sha256": "a1d9f13ef9d3b0b2722a4655ea4970303a7eeb2ed83b3bd73f85c41f997331f1",
+      "bytes": 2175337
+    },
+    "raw/timing-r0-tmb-w256-streams-b32.receipt.json": {
+      "sha256": "7618252be3dec2f7fa8fd4ef11bf24bff57d39cce7278abe24706fb6fd007ec5",
+      "bytes": 6474
+    },
+    "raw/timing-r0-tmb-w256-streams-b32.receipt.log": {
+      "sha256": "257b3d34b2905d5f602115d0911e9e43b250a901a5d098d2790308ab4e7a28eb",
+      "bytes": 952
+    },
+    "raw/timing-r0-tmb-w256-streams-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-tmb-w256-streams-b32.receipt.runtime/runtime.json": {
+      "sha256": "01f25e4eb6b553468d9e7d988b31eb25b2aac52d7099be352a964805b047b3a0",
+      "bytes": 2031
+    },
+    "raw/timing-r0-tmb-w256-streams-b32.receipt.sampler.log": {
+      "sha256": "aaf760d8e1833c34c5c066e252f40aee94f724236fc51190760bd9344d6d4921",
+      "bytes": 20877
+    },
+    "raw/timing-r0-tmb-w256-streams-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r0-tmb-w256-streams-b8.csv": {
+      "sha256": "2a6108da67a84211f4a5a47b178f906e9e74f004057a1f5224811fee4f6ea5bb",
+      "bytes": 2160387
+    },
+    "raw/timing-r0-tmb-w256-streams-b8.receipt.json": {
+      "sha256": "62c387b4a9f9e73806d57ad86456c2c9f59fbdba46ffd09ae93ed119984b3f71",
+      "bytes": 6468
+    },
+    "raw/timing-r0-tmb-w256-streams-b8.receipt.log": {
+      "sha256": "6b987cd52f5fd8d4ee110833351c0ea76d7c04ec8c285d7ad59c0209dd681d02",
+      "bytes": 950
+    },
+    "raw/timing-r0-tmb-w256-streams-b8.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-tmb-w256-streams-b8.receipt.runtime/runtime.json": {
+      "sha256": "d6068c1076751bc5f1d69d663fe9ce78aeb14cef909e4ce3c3c61b5365db21ea",
+      "bytes": 2030
+    },
+    "raw/timing-r0-tmb-w256-streams-b8.receipt.sampler.log": {
+      "sha256": "5df0c44c7046e4eb0f6ba68d49678c47cb0d571af2a5dacd9317908a6ff8b202",
+      "bytes": 20877
+    },
+    "raw/timing-r0-tmb-w256-streams-b8.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r0-v2batch-batched-b32.csv": {
+      "sha256": "f48146d9f06c3a52a3591199806eefed253e9e7b30e196109973f94cb9b2fbbe",
+      "bytes": 1749642
+    },
+    "raw/timing-r0-v2batch-batched-b32.receipt.json": {
+      "sha256": "d9d8281fa8ce742b361ff448065b39577f35426e46767d4d66d873fb013773de",
+      "bytes": 5844
+    },
+    "raw/timing-r0-v2batch-batched-b32.receipt.log": {
+      "sha256": "9457d7a58f95a9dafe6a53083fd90c4e285c505e72658a2c663db3cc55708983",
+      "bytes": 1115
+    },
+    "raw/timing-r0-v2batch-batched-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-v2batch-batched-b32.receipt.runtime/runtime.json": {
+      "sha256": "dc37fac452b81b50f51a8c85ea86a40b29ec952f38214a72016c12ae070a4636",
+      "bytes": 1803
+    },
+    "raw/timing-r0-v2batch-batched-b32.receipt.sampler.log": {
+      "sha256": "da2966c9cf84c2eb0c4d2ab3965903c05b174961ad1f28520eb2474c3488d89f",
+      "bytes": 16574
+    },
+    "raw/timing-r0-v2batch-batched-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r0-v2batch-sequential-b32.csv": {
+      "sha256": "4a64a8cc75211c33a9c5eafb672adba5435ab0c21b8a3c259475cb0d060a68ed",
+      "bytes": 1782746
+    },
+    "raw/timing-r0-v2batch-sequential-b32.receipt.json": {
+      "sha256": "6a340c4e24fe480eed6b75af6f1c06cd32e5feecadca7b7da4868014976ffd0f",
+      "bytes": 5846
+    },
+    "raw/timing-r0-v2batch-sequential-b32.receipt.log": {
+      "sha256": "beb57a8dc280b51b166b463c07f372c7107c9566b11d096303606ed6261beaf0",
+      "bytes": 1121
+    },
+    "raw/timing-r0-v2batch-sequential-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r0-v2batch-sequential-b32.receipt.runtime/runtime.json": {
+      "sha256": "1d1ed2f3fa1a623988fd297dc7edf8bb6897c126f94fba086b36ad0a8d5b3772",
+      "bytes": 1789
+    },
+    "raw/timing-r0-v2batch-sequential-b32.receipt.sampler.log": {
+      "sha256": "2cdbfbff45f73eca8876cafa26eea8a2ca9027f17e6f3b28a9f508ac63c300d8",
+      "bytes": 17101
+    },
+    "raw/timing-r0-v2batch-sequential-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r1-tmb-w1024-sequential-b32.csv": {
+      "sha256": "7f37f7a9618a8aaf45b4759ad4aeb73dac28a97b386b53211860fecfb43e31f7",
+      "bytes": 2213664
+    },
+    "raw/timing-r1-tmb-w1024-sequential-b32.receipt.json": {
+      "sha256": "025efff4e7767b4db762d46a03a6b313665e60fd575c811a15c41322b72a1c32",
+      "bytes": 6471
+    },
+    "raw/timing-r1-tmb-w1024-sequential-b32.receipt.log": {
+      "sha256": "ea4c946f9970354deaa2de8453c14c5608024ff70c2e07599a8baadfeee6b549",
+      "bytes": 958
+    },
+    "raw/timing-r1-tmb-w1024-sequential-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-tmb-w1024-sequential-b32.receipt.runtime/runtime.json": {
+      "sha256": "44228de8bf2315d37ea7880cd6c0f98a181a855ac7882f077e10f2c3ed790e38",
+      "bytes": 2023
+    },
+    "raw/timing-r1-tmb-w1024-sequential-b32.receipt.sampler.log": {
+      "sha256": "a1be1a48a84f92a1ac25b12bfadb3f79c3ed504db21d199728bd977d8996b6a9",
+      "bytes": 16383
+    },
+    "raw/timing-r1-tmb-w1024-sequential-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r1-tmb-w1024-streams-b32.csv": {
+      "sha256": "6d31033856a6009d1adc7aa4c8d26276868c986a749d4aa9487364640632a301",
+      "bytes": 2181023
+    },
+    "raw/timing-r1-tmb-w1024-streams-b32.receipt.json": {
+      "sha256": "d4e25d210143169bd16a4ce89058b6822a166006987e9083ed119f4614b34a12",
+      "bytes": 6441
+    },
+    "raw/timing-r1-tmb-w1024-streams-b32.receipt.log": {
+      "sha256": "0cfd532a3c7e6be652c504c368abaca4566e5f58d4da2382058031775ab5d5b7",
+      "bytes": 952
+    },
+    "raw/timing-r1-tmb-w1024-streams-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-tmb-w1024-streams-b32.receipt.runtime/runtime.json": {
+      "sha256": "9fc5c1c06f583fff34ac48760556237d33d25fcd844e651190c2ee7a92dc117a",
+      "bytes": 2031
+    },
+    "raw/timing-r1-tmb-w1024-streams-b32.receipt.sampler.log": {
+      "sha256": "6d8986901325d9a072fbd4263d2304862ffeeec1220db8e46c4bfed6036d7f4d",
+      "bytes": 16031
+    },
+    "raw/timing-r1-tmb-w1024-streams-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r1-tmb-w256-sequential-b32.csv": {
+      "sha256": "a9789158ba290e56ce9c6adf66c886d423eb89eb22258b60f7c0c7b7b923a50c",
+      "bytes": 2206481
+    },
+    "raw/timing-r1-tmb-w256-sequential-b32.receipt.json": {
+      "sha256": "e42cacb1fee645cd7ca606ecd4b841d24d0bfc42c1647841a2df54b605983355",
+      "bytes": 6467
+    },
+    "raw/timing-r1-tmb-w256-sequential-b32.receipt.log": {
+      "sha256": "7f1937bcc6959679a3887b091d703ca64ddd4f16359c1ea4de4b4f5bfa0e51e3",
+      "bytes": 958
+    },
+    "raw/timing-r1-tmb-w256-sequential-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-tmb-w256-sequential-b32.receipt.runtime/runtime.json": {
+      "sha256": "c08c3f918d7033484d22de0e2fd01dfd63be6850bf0b0d32a3a3f895c0f4a722",
+      "bytes": 2023
+    },
+    "raw/timing-r1-tmb-w256-sequential-b32.receipt.sampler.log": {
+      "sha256": "ccc61f101032ab01d67c013280f70b7fbe4659fdf3ca03298bf7295169fc0564",
+      "bytes": 21229
+    },
+    "raw/timing-r1-tmb-w256-sequential-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r1-tmb-w256-streams-b32.csv": {
+      "sha256": "ea52e168491c1edda694d05ec48bf9134fd7bd25eb51d37bbee32783a35d274e",
+      "bytes": 2175325
+    },
+    "raw/timing-r1-tmb-w256-streams-b32.receipt.json": {
+      "sha256": "ef30675cb820e79f803cbbad541a59dfe4b0b04e344a2078604d4ea01a3db508",
+      "bytes": 6470
+    },
+    "raw/timing-r1-tmb-w256-streams-b32.receipt.log": {
+      "sha256": "257b3d34b2905d5f602115d0911e9e43b250a901a5d098d2790308ab4e7a28eb",
+      "bytes": 952
+    },
+    "raw/timing-r1-tmb-w256-streams-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-tmb-w256-streams-b32.receipt.runtime/runtime.json": {
+      "sha256": "01f25e4eb6b553468d9e7d988b31eb25b2aac52d7099be352a964805b047b3a0",
+      "bytes": 2031
+    },
+    "raw/timing-r1-tmb-w256-streams-b32.receipt.sampler.log": {
+      "sha256": "4ff68804164876b18dd950f8241a1fb30826015ee73af7938daf214fa0df371c",
+      "bytes": 21396
+    },
+    "raw/timing-r1-tmb-w256-streams-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r1-tmb-w256-streams-b8.csv": {
+      "sha256": "4c5dcec899660770af0fe35e162f4ea5682a06e3542c7ba9cc91eaa0c66268dd",
+      "bytes": 2160524
+    },
+    "raw/timing-r1-tmb-w256-streams-b8.receipt.json": {
+      "sha256": "c2d8f2ffd359773dc285fce81aa3e9d6d2eb7752b1d328298c97dae9e99d172b",
+      "bytes": 6466
+    },
+    "raw/timing-r1-tmb-w256-streams-b8.receipt.log": {
+      "sha256": "6b987cd52f5fd8d4ee110833351c0ea76d7c04ec8c285d7ad59c0209dd681d02",
+      "bytes": 950
+    },
+    "raw/timing-r1-tmb-w256-streams-b8.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-tmb-w256-streams-b8.receipt.runtime/runtime.json": {
+      "sha256": "d6068c1076751bc5f1d69d663fe9ce78aeb14cef909e4ce3c3c61b5365db21ea",
+      "bytes": 2030
+    },
+    "raw/timing-r1-tmb-w256-streams-b8.receipt.sampler.log": {
+      "sha256": "994f52a8ec2a97e24413c7c8ab71fac62a991688486e1e1688fe097fc8acff3a",
+      "bytes": 20877
+    },
+    "raw/timing-r1-tmb-w256-streams-b8.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r1-v2batch-batched-b32.csv": {
+      "sha256": "b46f7eb284e01655de9d3e25ec8c2c8aad91255a260c2215abe58e885b124a44",
+      "bytes": 1749018
+    },
+    "raw/timing-r1-v2batch-batched-b32.receipt.json": {
+      "sha256": "dfb3ca7dd7b42b97ea8ffabdbefaa9d764c55a21304b9f3740e89b0341610849",
+      "bytes": 5842
+    },
+    "raw/timing-r1-v2batch-batched-b32.receipt.log": {
+      "sha256": "9457d7a58f95a9dafe6a53083fd90c4e285c505e72658a2c663db3cc55708983",
+      "bytes": 1115
+    },
+    "raw/timing-r1-v2batch-batched-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-v2batch-batched-b32.receipt.runtime/runtime.json": {
+      "sha256": "dc37fac452b81b50f51a8c85ea86a40b29ec952f38214a72016c12ae070a4636",
+      "bytes": 1803
+    },
+    "raw/timing-r1-v2batch-batched-b32.receipt.sampler.log": {
+      "sha256": "93f38d9e7328ea14f834ba3019c9cdd89b0a4f542c6f859b55d28733eb8b1df3",
+      "bytes": 16571
+    },
+    "raw/timing-r1-v2batch-batched-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r1-v2batch-sequential-b32.csv": {
+      "sha256": "2d834d6bc0a9ec7afabb5d8dce1915eacc73fa395e6372c3e99fc9c9a9f5043e",
+      "bytes": 1783021
+    },
+    "raw/timing-r1-v2batch-sequential-b32.receipt.json": {
+      "sha256": "eb0272ac8a1383826ad0db0807db3a0e37a73b2471b548dd56aafcca69b3d0a2",
+      "bytes": 5843
+    },
+    "raw/timing-r1-v2batch-sequential-b32.receipt.log": {
+      "sha256": "beb57a8dc280b51b166b463c07f372c7107c9566b11d096303606ed6261beaf0",
+      "bytes": 1121
+    },
+    "raw/timing-r1-v2batch-sequential-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r1-v2batch-sequential-b32.receipt.runtime/runtime.json": {
+      "sha256": "700421b7d41c4c2c4508ae5ff5b54c314764a0a9a2fad98a3bffd94752009051",
+      "bytes": 1789
+    },
+    "raw/timing-r1-v2batch-sequential-b32.receipt.sampler.log": {
+      "sha256": "30b1f38f8755852a21f46f3c7f2eb01bf77a67abee6f72e47c51a92b5fc98bd9",
+      "bytes": 17100
+    },
+    "raw/timing-r1-v2batch-sequential-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r2-tmb-w1024-sequential-b32.csv": {
+      "sha256": "40a66f118c99e384008957771b084a04e474a253032c9ce6a360ef1cb9859271",
+      "bytes": 2213527
+    },
+    "raw/timing-r2-tmb-w1024-sequential-b32.receipt.json": {
+      "sha256": "f14e73a4a8b8e85863b6169d53b1c9e26605982a006b43822071a09bc2645356",
+      "bytes": 6434
+    },
+    "raw/timing-r2-tmb-w1024-sequential-b32.receipt.log": {
+      "sha256": "ea4c946f9970354deaa2de8453c14c5608024ff70c2e07599a8baadfeee6b549",
+      "bytes": 958
+    },
+    "raw/timing-r2-tmb-w1024-sequential-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-tmb-w1024-sequential-b32.receipt.runtime/runtime.json": {
+      "sha256": "44228de8bf2315d37ea7880cd6c0f98a181a855ac7882f077e10f2c3ed790e38",
+      "bytes": 2023
+    },
+    "raw/timing-r2-tmb-w1024-sequential-b32.receipt.sampler.log": {
+      "sha256": "dd445a868d17dd038956ed9bdcc63f047a13361c7d39bafb046a5be5a773cba6",
+      "bytes": 16383
+    },
+    "raw/timing-r2-tmb-w1024-sequential-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r2-tmb-w1024-streams-b32.csv": {
+      "sha256": "cbd0bcc1b0947f54f6c3d95f3e51313e8951e15222bb00421764025d3b712183",
+      "bytes": 2180826
+    },
+    "raw/timing-r2-tmb-w1024-streams-b32.receipt.json": {
+      "sha256": "01f1a81839f440c8205d5b0942e113f5212ca51cbe991f20569d2b4bd0c5b6a6",
+      "bytes": 6471
+    },
+    "raw/timing-r2-tmb-w1024-streams-b32.receipt.log": {
+      "sha256": "0cfd532a3c7e6be652c504c368abaca4566e5f58d4da2382058031775ab5d5b7",
+      "bytes": 952
+    },
+    "raw/timing-r2-tmb-w1024-streams-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-tmb-w1024-streams-b32.receipt.runtime/runtime.json": {
+      "sha256": "9fc5c1c06f583fff34ac48760556237d33d25fcd844e651190c2ee7a92dc117a",
+      "bytes": 2031
+    },
+    "raw/timing-r2-tmb-w1024-streams-b32.receipt.sampler.log": {
+      "sha256": "f82fbdd5d48236f2a96ddd00f85dec5038a74363145260732eb16565722d36de",
+      "bytes": 16114
+    },
+    "raw/timing-r2-tmb-w1024-streams-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r2-tmb-w256-sequential-b32.csv": {
+      "sha256": "4ce520cc53b6814588e93da99d98deb0049fc10823b77cd5d90a9f0480d950d3",
+      "bytes": 2206333
+    },
+    "raw/timing-r2-tmb-w256-sequential-b32.receipt.json": {
+      "sha256": "a0f223a6802560a538bbe1f2e330d805d1b77a0365ade9074eb11a2a6f3bd541",
+      "bytes": 6468
+    },
+    "raw/timing-r2-tmb-w256-sequential-b32.receipt.log": {
+      "sha256": "7f1937bcc6959679a3887b091d703ca64ddd4f16359c1ea4de4b4f5bfa0e51e3",
+      "bytes": 958
+    },
+    "raw/timing-r2-tmb-w256-sequential-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-tmb-w256-sequential-b32.receipt.runtime/runtime.json": {
+      "sha256": "c08c3f918d7033484d22de0e2fd01dfd63be6850bf0b0d32a3a3f895c0f4a722",
+      "bytes": 2023
+    },
+    "raw/timing-r2-tmb-w256-sequential-b32.receipt.sampler.log": {
+      "sha256": "e5cbc7aa96290b6563cb44cf8b6107045b1d59168f8f2a251f51077b2e622397",
+      "bytes": 21229
+    },
+    "raw/timing-r2-tmb-w256-sequential-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r2-tmb-w256-streams-b32.csv": {
+      "sha256": "04b6e769b4397b3318d65e2a141491c07f19ebd8951ddb562546ec330a568a5b",
+      "bytes": 2175576
+    },
+    "raw/timing-r2-tmb-w256-streams-b32.receipt.json": {
+      "sha256": "fbf28afb68f88bad998496c729507176b31606e58a27be6d68c4c096c2108b2a",
+      "bytes": 6474
+    },
+    "raw/timing-r2-tmb-w256-streams-b32.receipt.log": {
+      "sha256": "257b3d34b2905d5f602115d0911e9e43b250a901a5d098d2790308ab4e7a28eb",
+      "bytes": 952
+    },
+    "raw/timing-r2-tmb-w256-streams-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-tmb-w256-streams-b32.receipt.runtime/runtime.json": {
+      "sha256": "01f25e4eb6b553468d9e7d988b31eb25b2aac52d7099be352a964805b047b3a0",
+      "bytes": 2031
+    },
+    "raw/timing-r2-tmb-w256-streams-b32.receipt.sampler.log": {
+      "sha256": "a854f8f2c80f4a13aa978334b66c1764be2f734a0b2b1bbe6ad9ce8e2e1ec7b0",
+      "bytes": 20786
+    },
+    "raw/timing-r2-tmb-w256-streams-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r2-tmb-w256-streams-b8.csv": {
+      "sha256": "d47595fa1ee0312e44050d1ab8e85d8bd877cbd95a5d5d84ebe9dc3206a2f701",
+      "bytes": 2160608
+    },
+    "raw/timing-r2-tmb-w256-streams-b8.receipt.json": {
+      "sha256": "d11edb74bf190c27f5506b69d151ba35c7cbf00eaf09f41b766b42b8b3b4ce06",
+      "bytes": 6466
+    },
+    "raw/timing-r2-tmb-w256-streams-b8.receipt.log": {
+      "sha256": "6b987cd52f5fd8d4ee110833351c0ea76d7c04ec8c285d7ad59c0209dd681d02",
+      "bytes": 950
+    },
+    "raw/timing-r2-tmb-w256-streams-b8.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-tmb-w256-streams-b8.receipt.runtime/runtime.json": {
+      "sha256": "d6068c1076751bc5f1d69d663fe9ce78aeb14cef909e4ce3c3c61b5365db21ea",
+      "bytes": 2030
+    },
+    "raw/timing-r2-tmb-w256-streams-b8.receipt.sampler.log": {
+      "sha256": "2c6f23ee5bc4ed7d49f3de0455df40f07696f574a092569dafb0cb4182a20829",
+      "bytes": 20878
+    },
+    "raw/timing-r2-tmb-w256-streams-b8.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r2-v2batch-batched-b32.csv": {
+      "sha256": "5a21220c9f1ed5b652ee221b76331d98247d22ce92e11d2fa9c3efbe780cf69b",
+      "bytes": 1749067
+    },
+    "raw/timing-r2-v2batch-batched-b32.receipt.json": {
+      "sha256": "7f1402af3247f30546ab096a8a7dba74fd01f402f08ca213e0f07f0359b5ba79",
+      "bytes": 5842
+    },
+    "raw/timing-r2-v2batch-batched-b32.receipt.log": {
+      "sha256": "9457d7a58f95a9dafe6a53083fd90c4e285c505e72658a2c663db3cc55708983",
+      "bytes": 1115
+    },
+    "raw/timing-r2-v2batch-batched-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-v2batch-batched-b32.receipt.runtime/runtime.json": {
+      "sha256": "dc37fac452b81b50f51a8c85ea86a40b29ec952f38214a72016c12ae070a4636",
+      "bytes": 1803
+    },
+    "raw/timing-r2-v2batch-batched-b32.receipt.sampler.log": {
+      "sha256": "20053bff28b11d87c8043a3289383202033c91dffb3a77521425ce6a19caa4f9",
+      "bytes": 16572
+    },
+    "raw/timing-r2-v2batch-batched-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/timing-r2-v2batch-sequential-b32.csv": {
+      "sha256": "a6d97067292271159674793b4e636622044663d57bb8edf6e56816acc9d1a5d9",
+      "bytes": 1782383
+    },
+    "raw/timing-r2-v2batch-sequential-b32.receipt.json": {
+      "sha256": "1a3aa4e712b35f832d6666ac560bcdd5300eb22d0d99d0bbb4b270b8539e1cf9",
+      "bytes": 5843
+    },
+    "raw/timing-r2-v2batch-sequential-b32.receipt.log": {
+      "sha256": "beb57a8dc280b51b166b463c07f372c7107c9566b11d096303606ed6261beaf0",
+      "bytes": 1121
+    },
+    "raw/timing-r2-v2batch-sequential-b32.receipt.runtime/continue": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "raw/timing-r2-v2batch-sequential-b32.receipt.runtime/runtime.json": {
+      "sha256": "1d1ed2f3fa1a623988fd297dc7edf8bb6897c126f94fba086b36ad0a8d5b3772",
+      "bytes": 1789
+    },
+    "raw/timing-r2-v2batch-sequential-b32.receipt.sampler.log": {
+      "sha256": "dc518ee1a1eeae8acd81d61991714180f57aca09a1dab8228bcb54fe474d6d3a",
+      "bytes": 17099
+    },
+    "raw/timing-r2-v2batch-sequential-b32.tsv.xz": {
+      "sha256": "8b25cc28c12da640b16540e9c5cbc8cd224f1be3a255da1f208b676926acf3e4",
+      "bytes": 110992
+    },
+    "raw/top-sha256.txt": {
+      "sha256": "b474a811e1a348628b57aea70b175403318df344040e57f9b5a510ad649eb1e2",
+      "bytes": 3615
+    }
+  }
+}
