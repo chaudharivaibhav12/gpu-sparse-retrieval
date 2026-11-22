@@ -1,0 +1,473 @@
+{
+  "label": "ncu-k1000-v3-3",
+  "kernel": "range_scores<",
+  "launches_in_source_export": 25,
+  "duplicate_blocks_skipped": 25,
+  "launch": {
+    "range_scores<1>": {
+      "launches": 25,
+      "ncu_duration_ms_mean": 1.2040384,
+      "ncu_duration_ms_median": 1.193152,
+      "launch": {
+        "grid_size": 245.0,
+        "block_size": 256.0,
+        "sm_count": 46.0,
+        "registers_per_thread": 40.0,
+        "registers_per_thread_allocated": 10240.0,
+        "shared_mem_per_block_static": 4.016,
+        "shared_mem_per_block_dynamic": 25.6,
+        "shared_mem_per_block_driver": 1.024,
+        "shared_mem_per_block_allocated": 30.72,
+        "shared_mem_config_size": 102.4,
+        "occupancy_limit_blocks": 24.0,
+        "occupancy_limit_registers": 6.0,
+        "occupancy_limit_shared_mem": 3.0,
+        "occupancy_limit_warps": 6.0,
+        "waves_per_multiprocessor": 1.78
+      },
+      "blocks_per_sm": 3.0,
+      "metrics": {
+        "achieved_occupancy_pct": 39.15630012873582,
+        "theoretical_occupancy_pct": 50.0,
+        "threads_per_warp_instruction": 30.423936289075165,
+        "sm_throughput_pct": 4.646185790401369,
+        "memory_throughput_pct": 4.665432506008047,
+        "dram_throughput_pct": 1.5678864701436765
+      },
+      "stall_cycles_per_issued_instruction": {
+        "long_scoreboard": 4.098503923036607,
+        "wait": 2.7947340042279047,
+        "barrier": 2.6032886934784805,
+        "short_scoreboard": 2.102251282010939,
+        "selected": 0.999974472859869,
+        "branch_resolving": 0.9632748253908181,
+        "not_selected": 0.39432701642472534,
+        "math_pipe_throttle": 0.24430743654581116,
+        "mio_throttle": 0.24145106257341956,
+        "no_instruction": 0.21675557362369838,
+        "imc_miss": 0.10507807987306717,
+        "membar": 0.06846680250995316,
+        "dispatch_stall": 0.038324174946181115,
+        "misc": 0.024676427735992473,
+        "lg_throttle": 0.002238418932552317,
+        "drain": 0.0005032819981821178,
+        "tex_throttle": 3.350046510144527e-06,
+        "sleeping": 0.0
+      }
+    }
+  },
+  "kernel_samples": 302607.0,
+  "stages": {
+    "decode": {
+      "share_of_kernel_samples": 0.24039430680717894,
+      "samples": 72745.0,
+      "active_threads_per_warp_instruction": 31.852748415232856
+    },
+    "bitonic sort": {
+      "share_of_kernel_samples": 0.18552115450072207,
+      "samples": 56140.0,
+      "active_threads_per_warp_instruction": 31.998151534406365
+    },
+    "radix select": {
+      "share_of_kernel_samples": 0.18248421219601663,
+      "samples": 55221.0,
+      "active_threads_per_warp_instruction": 31.15621118809125
+    },
+    "merge": {
+      "share_of_kernel_samples": 0.09557611026843398,
+      "samples": 28922.0,
+      "active_threads_per_warp_instruction": 23.104502178091792
+    },
+    "radix gather": {
+      "share_of_kernel_samples": 0.04405714342364849,
+      "samples": 13332.0,
+      "active_threads_per_warp_instruction": 22.542997586893012
+    },
+    "candidate write": {
+      "share_of_kernel_samples": 0.028928610375834003,
+      "samples": 8754.0,
+      "active_threads_per_warp_instruction": 30.486023562737817
+    },
+    "setup: term lookup": {
+      "share_of_kernel_samples": 0.010224482579715605,
+      "samples": 3094.0,
+      "active_threads_per_warp_instruction": 23.65035875905034
+    },
+    "setup: prologue": {
+      "share_of_kernel_samples": 0.007025614080308783,
+      "samples": 2126.0,
+      "active_threads_per_warp_instruction": 31.797385620915033
+    },
+    "candidate write: threadfence": {
+      "share_of_kernel_samples": 0.004798302749110232,
+      "samples": 1452.0,
+      "active_threads_per_warp_instruction": 29.547738693467338
+    },
+    "setup: zero scores": {
+      "share_of_kernel_samples": 0.004728905808523927,
+      "samples": 1431.0,
+      "active_threads_per_warp_instruction": 32.0
+    },
+    "setup: word-table prefix": {
+      "share_of_kernel_samples": 0.0015729973199562469,
+      "samples": 476.0,
+      "active_threads_per_warp_instruction": 18.53248431155408
+    },
+    "done ticket": {
+      "share_of_kernel_samples": 0.0015498650064274784,
+      "samples": 469.0,
+      "active_threads_per_warp_instruction": 14.75925925925926
+    },
+    "add": {
+      "share_of_kernel_samples": 0.0011533110602200214,
+      "samples": 349.0,
+      "active_threads_per_warp_instruction": 31.92605168558145
+    },
+    "local top-k: warp lists": {
+      "share_of_kernel_samples": 0.0004725601192305532,
+      "samples": 143.0,
+      "active_threads_per_warp_instruction": 32.0
+    },
+    "barrier waits (all sites)": {
+      "share_of_kernel_samples": 0.19151242370467306,
+      "samples": 57953.0
+    }
+  },
+  "barrier_sites": [
+    {
+      "line": 228,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 200.0,
+      "barrier_stall_samples": 19755.0,
+      "share_of_barrier_stall_samples": 0.3408796783600504,
+      "share_of_kernel_samples": 0.06528269339440264
+    },
+    {
+      "line": 466,
+      "stage": "setup: zero scores",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 10977.0,
+      "share_of_barrier_stall_samples": 0.18941210981312442,
+      "share_of_kernel_samples": 0.036274772229327144
+    },
+    {
+      "line": 479,
+      "stage": "setup: word-table prefix",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 1141.0,
+      "share_of_barrier_stall_samples": 0.019688368160405846,
+      "share_of_kernel_samples": 0.0037705671051892387
+    },
+    {
+      "line": 568,
+      "stage": "decode",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 1619.0,
+      "share_of_barrier_stall_samples": 0.027936431246009696,
+      "share_of_kernel_samples": 0.0053501736575822766
+    },
+    {
+      "line": 614,
+      "stage": "radix select",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 48800.0,
+      "barrier_stall_samples": 462.0,
+      "share_of_barrier_stall_samples": 0.007971977291943471,
+      "share_of_kernel_samples": 0.0015267326928987102
+    },
+    {
+      "line": 630,
+      "stage": "radix select",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 153232.0,
+      "barrier_stall_samples": 273.0,
+      "share_of_barrier_stall_samples": 0.004710713854330233,
+      "share_of_kernel_samples": 0.0009021602276219652
+    },
+    {
+      "line": 661,
+      "stage": "radix select",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 153232.0,
+      "barrier_stall_samples": 2693.0,
+      "share_of_barrier_stall_samples": 0.046468690145462704,
+      "share_of_kernel_samples": 0.008899331476139019
+    },
+    {
+      "line": 684,
+      "stage": "radix select",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 153232.0,
+      "barrier_stall_samples": 5006.0,
+      "share_of_barrier_stall_samples": 0.08638034269149138,
+      "share_of_kernel_samples": 0.016542908789287755
+    },
+    {
+      "line": 689,
+      "stage": "radix select",
+      "source": "__syncthreads();   // radix_state and buckets are reused by the next pass",
+      "bar_instructions": 1,
+      "bar_warp_executions": 153232.0,
+      "barrier_stall_samples": 104.0,
+      "share_of_barrier_stall_samples": 0.0017945576587924698,
+      "share_of_kernel_samples": 0.0003436800867131296
+    },
+    {
+      "line": 696,
+      "stage": "radix gather",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 96.0,
+      "share_of_barrier_stall_samples": 0.0016565147619622797,
+      "share_of_kernel_samples": 0.00031724315696596576
+    },
+    {
+      "line": 711,
+      "stage": "radix gather",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 1037.0,
+      "share_of_barrier_stall_samples": 0.017893810501613375,
+      "share_of_kernel_samples": 0.003426887018476109
+    },
+    {
+      "line": 722,
+      "stage": "bitonic sort",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 2695000.0,
+      "barrier_stall_samples": 9105.0,
+      "share_of_barrier_stall_samples": 0.15711007195485996,
+      "share_of_kernel_samples": 0.030088530668490814
+    },
+    {
+      "line": 765,
+      "stage": "local top-k: warp lists",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 87.0,
+      "share_of_barrier_stall_samples": 0.0015012165030283161,
+      "share_of_kernel_samples": 0.0002875016110004065
+    },
+    {
+      "line": 781,
+      "stage": "candidate write",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 333.0,
+      "share_of_barrier_stall_samples": 0.005746035580556658,
+      "share_of_kernel_samples": 0.0011004372007256938
+    },
+    {
+      "line": 783,
+      "stage": "candidate write",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 744.0,
+      "share_of_barrier_stall_samples": 0.012837989405207669,
+      "share_of_kernel_samples": 0.0024586344664862345
+    },
+    {
+      "line": 857,
+      "stage": "candidate write: threadfence",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 2359.0,
+      "share_of_barrier_stall_samples": 0.04070539920280227,
+      "share_of_kernel_samples": 0.007795589659194929
+    },
+    {
+      "line": 875,
+      "stage": "done ticket",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 2153.0,
+      "share_of_barrier_stall_samples": 0.03715079460942488,
+      "share_of_kernel_samples": 0.007114838718205461
+    },
+    {
+      "line": 887,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 200.0,
+      "barrier_stall_samples": 9.0,
+      "share_of_barrier_stall_samples": 0.00015529825893396374,
+      "share_of_kernel_samples": 2.974154596555929e-05
+    }
+  ],
+  "barrier_stall_samples_total": 57953.0,
+  "barrier_stall_samples_before_first_bar": 0,
+  "decode": {
+    "encoded": {
+      "instructions": [
+        "LDG.E R19, [R12.64] @0x7f2abf27f820",
+        "LDG.E R12, [R6.64] @0x7f2abf27fb30"
+      ],
+      "requests": 1289644.0,
+      "sectors": 3361734.0,
+      "sectors_per_request": 2.606714721271917,
+      "ideal_sectors_per_request": 2.577559388482403,
+      "samples_on_load_instructions": 208.0,
+      "stall_reasons_on_load_instructions": {
+        "lg": 0.004807692307692308,
+        "mio": 0.0673076923076923,
+        "not_selected": 0.11057692307692307,
+        "selected": 0.2644230769230769,
+        "wait": 0.5528846153846154
+      }
+    },
+    "impacts": {
+      "instructions": [
+        "LDG.E.U8 R7, [R6.64] @0x7f2abf27f850",
+        "LDG.E.U8 R4, [R4.64] @0x7f2abf27fb60"
+      ],
+      "requests": 1289644.0,
+      "sectors": 2741985.0,
+      "sectors_per_request": 2.1261565207142437,
+      "ideal_sectors_per_request": 1.0,
+      "samples_on_load_instructions": 338.0,
+      "stall_reasons_on_load_instructions": {
+        "mio": 0.04437869822485207,
+        "not_selected": 0.12130177514792899,
+        "selected": 0.14497041420118342,
+        "wait": 0.6893491124260355
+      }
+    },
+    "encoded_line": {
+      "line": 561,
+      "source": "const uint32_t position=rbp_extract(v.encoded,term_bit[i]+uint64_t(j)*term_width[i],term_width[i]);",
+      "stages": [
+        "decode"
+      ],
+      "samples": 36435.0,
+      "share_of_kernel_samples": 0.1204036919172392,
+      "opcodes": [
+        "@P0",
+        "IADD3",
+        "IADD3.X",
+        "IMAD.IADD",
+        "IMAD.MOV.U32",
+        "IMAD.WIDE.U32",
+        "ISETP.GE.U32.AND",
+        "ISETP.NE.AND",
+        "LDG.E",
+        "LDS",
+        "LDS.64",
+        "LOP3.LUT",
+        "SEL",
+        "SHF.L.U32",
+        "SHF.R.U32.HI",
+        "SHF.R.U64",
+        "UMOV",
+        "YIELD"
+      ],
+      "stall_reasons_share_of_line": {
+        "long_sb": 0.8693014958144641,
+        "wait": 0.05491972004940305,
+        "selected": 0.038012899684369425,
+        "not_selected": 0.014134760532455057,
+        "math": 0.01182928502813229,
+        "dispatch": 0.006340057636887608,
+        "short_sb": 0.0033484287086592564,
+        "mio": 0.0020584602717167557,
+        "lg": 5.4892273912446824e-05
+      }
+    },
+    "impacts_and_add_line": {
+      "line": 562,
+      "source": "atomicAdd(&scores[position],term_weight[i]*uint32_t(v.impacts[term_value[i]+j]));",
+      "stages": [
+        "add",
+        "decode"
+      ],
+      "samples": 3458.0,
+      "share_of_kernel_samples": 0.011427362883211558,
+      "opcodes": [
+        "ATOMS.ADD",
+        "IADD3",
+        "IMAD",
+        "IMAD.IADD",
+        "IMAD.X",
+        "LDG.E.U8",
+        "LDS"
+      ],
+      "stall_reasons_share_of_line": {
+        "long_sb": 0.52834008097166,
+        "wait": 0.25216888374783114,
+        "selected": 0.14112203585887798,
+        "mio": 0.03643724696356275,
+        "not_selected": 0.03152111046847889,
+        "dispatch": 0.006072874493927126,
+        "short_sb": 0.002313475997686524,
+        "math": 0.0020242914979757085
+      }
+    },
+    "impacts_line": null,
+    "score_add_line": null
+  },
+  "merge_radix": {
+    "bucket_atomic_line": null,
+    "compaction_line": null
+  },
+  "radix": {
+    "bucket_atomic_line": null,
+    "key_build_line": null,
+    "gather_atomic_line": null
+  },
+  "attribution": {
+    "unmapped_instruction_rows": 0,
+    "header_or_unmapped_inherited_rows": 441,
+    "missing_anchors": [],
+    "header_call_lines": {
+      "decode+add|range_bitpack.h": 561,
+      "decode+add|device_atomic_functions.hpp": 562,
+      "radix select|device_atomic_functions.hpp": null,
+      "radix gather|device_atomic_functions.hpp": null
+    },
+    "role_lines": {
+      "encoded load": [
+        561,
+        539
+      ],
+      "impacts load + score atomicAdd": [
+        562
+      ],
+      "impacts load": [
+        540
+      ],
+      "score atomicAdd": [
+        548
+      ],
+      "radix bucket atomicAdd": [],
+      "radix key build (pass loop)": [],
+      "radix gather atomicAdd": [],
+      "merge radix bucket atomicAdd": [
+        334
+      ],
+      "merge compaction": [
+        307
+      ]
+    }
+  },
+  "qualification": "Every SASS instruction gets a source line of the scorer: the\nline it correlates to in cuda_range_v2.cu; an instruction that correlates\nonly to a header inherits the stage of the preceding mapped instruction in\naddress order (inlined code is contiguous) and is assigned to the call line\nof that header in that stage: range_bitpack.h in decode -> the rbp_extract\n(encoded load) line; device_atomic_functions.hpp in decode -> the score\natomicAdd line, in radix select -> the bucket atomicAdd line, in radix gather\n-> the gather atomicAdd line; otherwise the preceding instruction's line.\nStages run from one anchor line (text match) to the next. Inside decode+add,\nshared atomics (ATOMS*, RED.*SHARED) count as \"add\", everything else as\n\"decode\". Nsight attributes a warp waiting at a barrier to the instruction\nafter the BAR, so every stall_barrier sample goes to the most recent\npreceding BAR instruction in address order and through it to that BAR's\nsource line (one barrier site per line). Identical repeated source blocks of\none launch are counted once. Nsight Compute replays each kernel at locked\nbase clocks with flushed caches: values are sampling shares and counts, not\nnormal-clock times.\n\nCoalescing (SourceCounters): for a global load, requests = warp-level\ninstructions executed, sectors = L2 Theoretical Sectors Global; sectors per\nrequest against the ideal (L2 Theoretical Sectors Global Ideal)."
+}

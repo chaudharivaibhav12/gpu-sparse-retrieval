@@ -1,0 +1,25 @@
+{
+  "label": "nsys-k1000-v3-4-u4m",
+  "queries": 25,
+  "measured_rounds": 20,
+  "medians_us": {
+    "gpu_busy_us": 164.994,
+    "kernel_us": 162.578,
+    "copies_us": 2.432,
+    "gpu_span_us": 174.642,
+    "gpu_idle_in_span_us": 6.096,
+    "launch_api_us": 13.283,
+    "launch_to_kernel_start_us": 12.693,
+    "copy_api_us": 178.922,
+    "copy_return_after_gpu_end_us": 10.4635,
+    "d2h_us": 2.432,
+    "kernel_end_to_d2h_start_us": 6.096,
+    "kernel_end_to_copy_return_us": 19.3015,
+    "other_api_us": 4.3335,
+    "host_wall_profiled_us": 208.2185,
+    "unprofiled_wall_us": 190.3785,
+    "non_gpu_unprofiled_us": 28.30899999999997
+  },
+  "gpu_share_of_unprofiled_wall": 0.8563428613533612,
+  "definitions": "- gpu_busy: kernel + copy durations (CUPTI timestamps, normal clocks)\n- gpu_span: first GPU start to last GPU end; gpu_idle_in_span = span - busy\n- launch_api: host time inside cudaLaunchKernel for the query's kernel\n- launch_to_kernel_start: kernel GPU start - launch call start\n- copy_api: host time inside the cudaMemcpy of the results (it waits for the kernel)\n- copy_return_after_gpu_end: copy call end - D2H GPU end (sync return latency)\n- d2h: D2H copy duration on the GPU (k x 16-byte candidates, pageable host buffer)\n- kernel_end_to_d2h_start: D2H GPU start - kernel GPU end\n- kernel_end_to_copy_return: copy call end - kernel GPU end (GPU end to result back on the host)\nMeasurement P (2026-11-22-range-v3-tune): the kernel may be a template instantiation\n(range_scores<true>); any kernel whose name starts with range_scores is accepted.\n- other_api: host time in other CUDA calls between the query's launch call and its copy call (event records etc.)\n- host_wall_profiled: the driver's own wall time for the query under tracing\n- non_gpu_unprofiled: median unprofiled wall (--unprofiled CSVs, same queries) - gpu_busy"
+}

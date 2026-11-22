@@ -165,7 +165,10 @@ def main():
     a = p.parse_args()
     src = Source(a.source)
     call_line = {key: src.find(text) for key, text in HEADER_CALL.items()}
-    role_line = {role: next((ln for ln in (src.find(t) for t in texts) if ln), None) for role, texts in LINE_ROLES.items()}
+    # every candidate line found in the source belongs to its role (a variant compiles only one
+    # of them; the others carry no instructions)
+    role_lines = {role: [ln for ln in (src.find(t) for t in texts) if ln] for role, texts in LINE_ROLES.items()}
+    role_line = {role: (lines[0] if lines else None) for role, lines in role_lines.items()}
 
     # Launch-level metrics, duration-weighted over launches, per instantiation.
     raw = list(csv.reader(open(a.raw, newline="")))
@@ -275,7 +278,7 @@ def main():
                               share_of_kernel_samples=s["barrier_stall_samples"] / total))
 
     # Global loads/stores/atomics: coalescing.
-    role_of = {v: k for k, v in role_line.items() if v}
+    role_of = {ln: role for role, lines in role_lines.items() for ln in lines}
     mem_rows = []
     for e in rows:
         if not e["opcode"].startswith(("LDG", "STG", "ATOMG", "REDG", "RED.E", "ATOM.E")) or e["opcode"].startswith("RED.E.ADD.STRONG.SHARED"):
@@ -306,10 +309,10 @@ def main():
                               role=role_of.get(L["line"], "")))
 
     def line_summary(role):
-        ln = role_line.get(role)
-        sel = [L for L in line_rows if L["line"] == ln]
+        sel = [L for L in line_rows if L["line"] in role_lines.get(role, []) and L["samples"] > 0]
         if not sel:
             return None
+        ln = sel[0]["line"]
         samples = sum(L["samples"] for L in sel)
         reasons = {n: sum(L[n] for L in sel) for n in stall_names}
         return dict(line=ln, source=src.text(ln), stages=sorted({L["stage"] for L in sel}), samples=samples, share_of_kernel_samples=samples / total,
@@ -336,7 +339,7 @@ def main():
                   radix=dict(bucket_atomic_line=line_summary("radix bucket atomicAdd"), key_build_line=line_summary("radix key build (pass loop)"),
                              gather_atomic_line=line_summary("radix gather atomicAdd")),
                   attribution=dict(unmapped_instruction_rows=unmapped, header_or_unmapped_inherited_rows=inherited, missing_anchors=src.missing,
-                                   header_call_lines={"%s|%s" % k: v for k, v in call_line.items()}, role_lines=role_line),
+                                   header_call_lines={"%s|%s" % k: v for k, v in call_line.items()}, role_lines=role_lines),
                   qualification=__doc__.split("Attribution.", 1)[1].strip())
     Path(a.output).write_text(json.dumps(result, indent=2, default=lambda o: sorted(o) if isinstance(o, set) else str(o)) + "\n")
     for name, data in (("barriers", site_rows), ("global-loads", mem_rows), ("lines", line_rows)):

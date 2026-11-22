@@ -88,9 +88,103 @@ Combination / D at W=4096: u4m/D 0.823 [0.799, 0.842], 0.846 [0.842, 0.851], 0.9
 
 **Not adopted, recorded.** v3-3 at W=1024 is the fastest k=10 cell (0.0907 ms against u4m at W=4096 0.0987 ms; ratio to ctrl 0.827 vs 0.911). Using it for k=10 would need a second index (W=1024) and a second code path (the v3-3 merge), so it is not adopted. D loses at W=1024, k=10 (1.134 x v3-3; u4m 1.065): with 977 ranges and k=10 the merge's fixed costs (per-range survivor search, prefix sum over 977 ranges, compaction, a radix select over a few thousand keys, several barriers) exceed the small warp-shuffle merge it replaces.
 
-## 4. Before/after profile: v3-3 vs u4m (Measurement P2)
+## 4. Before/after profile: v3-3 vs u4m (Measurement P2, run `20261122-cuda5-profileP2-01`)
 
-(filled after Measurement P2: stage tables, barrier waits, Nsight Compute stage shares and stalls, decode-load coalescing, host vs GPU.)
+cuda5, 1M documents, W=4096, 256 threads, radix crossover 1, first 25 calibration queries; per variant and k: reference (3+20 rounds), clock build (3+5), Nsight Systems (3+20), Nsight Compute (25 launches, locked base clocks, flushed caches). Builds: v3-3 SASS `a644e9d5`, u4m `8f8a5d49` (the builds timed in Measurement E); clock builds `9de21903` / `e9a130d9`. No overlaps; every top-k exact. Clock-build times are at the measured SM clock (about 2.45-2.53 GHz) and include instrumentation overhead; Nsight Compute values are sample shares at base clocks. The Nsight Compute decode summaries come from a re-run of the analysis after an attribution fix ([RERUN.md](../../results/2026-11-22-range-v3-tune/20261122-cuda5-profileP2-01/analysis/RERUN.md)).
+
+#### Stages, critical path (µs, clock builds; slowest pre-merge block's slowest warp per stage, median over slices)
+
+| stage | k=10 v3-3 | k=10 u4m | k=100 v3-3 | k=100 u4m | k=1000 v3-3 | k=1000 u4m |
+|---|---|---|---|---|---|---|
+| setup (lookup + zero) | 3.9 | 3.9 | 3.9 | 4.0 | 3.4 | 3.7 |
+| word-table prefix | 0.4 | 0.4 | 0.4 | 0.4 | 0.4 | 0.4 |
+| decode+add | 78.6 | 54.9 | 79.9 | 54.9 | 81.5 | 55.7 |
+| radix select+gather | 6.7 | 6.9 | 8.3 | 8.4 | 8.6 | 10.1 |
+| bitonic sort | 0.9 | 0.9 | 2.2 | 2.2 | 7.6 | 7.8 |
+| candidate write (θ) | 1.3 | 1.2 | 1.1 | 1.0 | 2.6 | 2.8 |
+| threadfence | 0.4 | 0.4 | 0.4 | 0.4 | 0.4 | 0.4 |
+| done ticket | 0.5 | 0.5 | 0.5 | 0.5 | 0.5 | 0.5 |
+| merge select | 6.6 | 5.5 | 62.0 | 9.4 | 589.1 | 46.5 |
+| merge scatter | 1.1 | 1.6 | 8.2 | 3.1 | 196.8 | 15.4 |
+| ↳ D: survivor count + scan | – | 1.5 | – | 2.1 | – | 2.7 |
+| ↳ D: compaction | – | 2.8 | – | 6.0 | – | 28.5 |
+| ↳ D: radix select | – | 1.0 | – | 1.6 | – | 14.8 |
+| **merge tail (globaltimer)** | 8.2 | 8.2 | 65.5 | 13.3 | 641.0 | 67.6 |
+| **kernel span (globaltimer)** | 104.4 | 84.0 | 166.9 | 95.2 | 789.5 | 165.9 |
+| pre-merge critical path (sum) | 92.6 | 69.2 | 96.6 | 71.9 | 105.0 | 81.4 |
+
+Mean per block (µs) for decode+add: k=10 v3-3 14.1, u4m 10.8; k=100 v3-3 14.3, u4m 10.9; k=1000 v3-3 13.9, u4m 10.1. SM clock (GHz): k=10 2.47/2.45, k=100 2.45/2.44, k=1000 2.53/2.47.
+
+#### Barrier waits at the instrumented sites (µs, critical path)
+
+| site | between | k=10 v3-3 | k=10 u4m | k=100 v3-3 | k=100 u4m | k=1000 v3-3 | k=1000 u4m |
+|---|---|---|---|---|---|---|---|
+| S1 | setup: lookup+zero -> word-table prefix | 3.21 | 3.28 | 3.18 | 3.27 | 2.84 | 3.10 |
+| S2 | setup: word-table prefix -> decode+add | 0.38 | 0.38 | 0.38 | 0.37 | 0.34 | 0.37 |
+| S3 | decode+add -> radix select | 0.83 | 0.69 | 0.83 | 0.73 | 0.81 | 0.69 |
+| S4 | bitonic sort -> theta + candidate write | 0.06 | 0.07 | 0.07 | 0.07 | 0.06 | 0.07 |
+| S5 | candidate write+threadfence -> done ticket | 1.08 | 1.09 | 0.83 | 0.83 | 0.58 | 0.62 |
+| S6 | done ticket -> merge decision | 0.45 | 0.46 | 0.46 | 0.46 | 0.45 | 0.45 |
+| S7 | merge select -> merge rank/scatter (last block only) | 5.82 | 0.06 | 60.08 | 0.06 | 559.20 | 0.06 |
+
+Barrier share of warp time: k=10 14.3% / 15.5%; k=100 12.8% / 13.4%; k=1000 11.2% / 9.4% (v3-3 / u4m).
+
+#### Nsight Compute: sample share by stage (% of kernel samples)
+
+| stage | k=10 v3-3 | k=10 u4m | k=100 v3-3 | k=100 u4m | k=1000 v3-3 | k=1000 u4m |
+|---|---|---|---|---|---|---|
+| decode | 41.7 | 34.3 | 37.0 | 30.5 | 24.0 | 21.7 |
+| radix select | 27.9 | 31.4 | 27.0 | 31.1 | 18.2 | 23.3 |
+| bitonic sort | 1.5 | 1.7 | 4.0 | 4.5 | 18.6 | 24.0 |
+| barrier waits (all sites) | 16.8 | 18.5 | 19.2 | 20.1 | 19.2 | 16.2 |
+| merge | 0.2 | 0.4 | 1.2 | 0.5 | 9.6 | 1.5 |
+| radix gather | 6.3 | 7.1 | 6.0 | 7.0 | 4.4 | 5.6 |
+| candidate write | 0.4 | 0.5 | 0.7 | 0.9 | 2.9 | 3.6 |
+| setup: term lookup | 1.7 | 2.0 | 1.5 | 1.7 | 1.0 | 1.3 |
+| setup: prologue | 1.3 | 1.6 | 1.1 | 1.5 | 0.7 | 1.0 |
+| setup: zero scores | 0.8 | 0.9 | 0.7 | 0.8 | 0.5 | 0.6 |
+| candidate write: threadfence | 0.8 | 0.8 | 0.8 | 0.8 | 0.5 | 0.6 |
+
+#### Resources and throughput (Nsight Compute launch statistics, base clocks)
+
+| k | variant | registers | static / dynamic / driver smem (B) | blocks/SM | waves | achieved occupancy % | DRAM % | top stalls (cycles per issued instruction) | ncu duration ms |
+|---|---|---|---|---|---|---|---|---|---|
+| 10 | v3-3 | 40 | 4016 / 17536 / 1024 | 4 | 1.33 | 51.0 | 9.0 | long_scoreboard 6.7, barrier 2.9, wait 2.6 | 0.144 |
+| 10 | u4m | 48 | 5312 / 17536 / 1024 | 4 | 1.33 | 52.7 | 11.2 | long_scoreboard 4.3, barrier 2.8, wait 2.8 | 0.116 |
+| 100 | v3-3 | 40 | 4016 / 18432 / 1024 | 4 | 1.33 | 50.9 | 5.9 | long_scoreboard 6.1, barrier 3.1, wait 2.6 | 0.229 |
+| 100 | u4m | 48 | 5312 / 18432 / 1024 | 4 | 1.33 | 52.8 | 10.5 | long_scoreboard 3.9, barrier 2.9, wait 2.8 | 0.129 |
+| 1000 | v3-3 | 40 | 4016 / 25600 / 1024 | 3 | 1.78 | 39.2 | 1.6 | long_scoreboard 4.1, wait 2.8, barrier 2.6 | 1.204 |
+| 1000 | u4m | 48 | 5312 / 25600 / 1024 | 3 | 1.78 | 44.3 | 8.2 | wait 2.9, long_scoreboard 2.8, short_scoreboard 2.3 | 0.228 |
+
+#### Decode loads (Nsight Compute source counters)
+
+| k | variant | encoded: requests, sectors/request (ideal) | impacts: requests, sectors/request (ideal) | encoded line: share of samples, long_sb share |
+|---|---|---|---|---|
+| 10 | v3-3 | 1289644, 2.61 (2.58) | 1289644, 2.13 (1.00) | 20.8%, 86.4% |
+| 10 | u4m | 2579288, 2.61 (2.58) | 1289644, 2.13 (1.00) | 1.0%, 0.0% |
+| 100 | v3-3 | 1289644, 2.61 (2.58) | 1289644, 2.13 (1.00) | 18.6%, 86.1% |
+| 100 | u4m | 2579288, 2.61 (2.58) | 1289644, 2.13 (1.00) | 0.9%, 0.0% |
+| 1000 | v3-3 | 1289644, 2.61 (2.58) | 1289644, 2.13 (1.00) | 12.0%, 86.9% |
+| 1000 | u4m | 2579288, 2.61 (2.58) | 1289644, 2.13 (1.00) | 0.6%, 0.0% |
+
+#### Host versus GPU per query (Nsight Systems, median over queries, µs)
+
+| k | variant | unprofiled wall | launch api | launch to kernel start | kernel | d2h | kernel end to copy return | non gpu unprofiled |
+|---|---|---|---|---|---|---|---|---|
+| 10 | v3-3 | 123.0 | 12.7 | 12.2 | 102.9 | 0.9 | 13.3 | 21.2 |
+| 10 | u4m | 105.8 | 13.5 | 12.9 | 81.1 | 0.9 | 12.1 | 20.6 |
+| 100 | v3-3 | 193.3 | 12.8 | 12.3 | 166.1 | 0.9 | 12.5 | 25.0 |
+| 100 | u4m | 116.7 | 12.6 | 12.1 | 90.9 | 0.9 | 12.6 | 22.8 |
+| 1000 | v3-3 | 880.5 | 13.5 | 12.8 | 843.9 | 2.4 | 22.1 | 33.9 |
+| 1000 | u4m | 190.4 | 13.3 | 12.7 | 162.6 | 2.4 | 19.3 | 28.3 |
+
+
+#### Where decode time goes (Nsight Compute samples in the decode loop, k=10; the other k agree)
+
+| variant | top lines by share of decode samples |
+|---|---|
+| v3-3 | `rbp_extract` (encoded load + use) 49% (86% long scoreboard); term binary search 33% (`count_start` compare 19%, loop 14%); loop control 6%; impact load + atomicAdd 4% (57% long scoreboard) |
+| u4m | term binary search 56% (`count_start` compare 28%, loop 24%, midpoint 4%), no memory stall; position extraction (first use of the loaded words) 17% (90% long scoreboard); validity check 5% |
 
 ## 5. Registers, shared memory and blocks per SM
 
@@ -129,8 +223,18 @@ The mechanism is real: the exact CPU replay of the radix passes (25 queries x 24
 
 ## 8. Default build and final gates
 
-(filled after the CUDA 12.6 SASS check and the cuda5 gate of the default build.)
+Since commit `37d1ffe` the defaults of `src/cuda_range_v2.cu` are `RBP_V3_UNROLL=4`, `RBP_V3_MERGE_RADIX=1`, `RBP_V3_RADIX_AGG=0` (u4m); v3-3 is `-DRBP_V3_UNROLL=1 -DRBP_V3_MERGE_RADIX=0`.
+
+- CUDA 12.6 (cuda5, `session_final.sh`): default build SASS `8f8a5d49e0e0ad3f` = the u4m build timed in Measurement E; the explicit v3-3 build is still `a644e9d5125d6e7e`.
+- Official cuda5 gate of the default build (`20261122-cuda5-gate-v3-4-default-01`, contended per amendment): passed (fixtures incl. v3 and v3-4 cases at both crossovers; 100K and 1M x 500 calibration queries x k=10/100/1000 at W=4096 and W=1024, exact).
+- Laptop gate of the default build (`20261122-laptop-gate-v3-4-default-01`, CUDA 13.3, development hardware): passed (216 fixture runs; 134/134 v3/v3-4 cases at each crossover; 12/12 real-data runs exact); its SASS equals the laptop u4m build (`c0d3abde`).
 
 ## 9. Diagnostic interpretation
 
-(filled after Measurement P2.)
+- **D removed the merge bottleneck.** In v3-3 the last block's warp-shuffle merge (`merge_lists`) grows with k: merge tail 8, 66 and 641 µs at k = 10, 100, 1000 (clock build), about 80% of the kernel at k=1000, and most of it is warps waiting at the merge's one barrier (S7: 560 µs at k=1000) while warp 0's selection rounds run. D replaces it with a block-wide pipeline whose cost scales with the number of survivors, not with k rounds: merge tail 8, 13 and 68 µs. At k=1000 the remaining merge time is mostly compaction (28.5 µs: reading every surviving 24-byte candidate from global memory) and the radix select over the survivors (14.8 µs). D gives nothing at k=10 at W=4096 (the old merge was already only 8 µs) and loses at W=1024, k=10, where its fixed costs over 977 ranges exceed the small merge it replaces.
+- **A hid load latency in decode.** decode+add on the critical path falls from about 79-82 µs to 55-56 µs at every k (mean per block 14 -> 10-11 µs). In v3-3 the encoded-word load was immediately consumed and the line holding it carried 49% of decode samples, 86% of them long-scoreboard stalls; with four postings' loads issued before any use, the load lines carry about 1% of samples and the remaining wait (17% of decode samples) sits at the first use of the loaded words. Coalescing did not change (2.61 sectors per encoded request against an ideal of 2.58; impacts 2.13 against 1.00) and DRAM throughput stays low (8-11% of peak), so decode remains latency-bound rather than bandwidth-bound. u4m always loads both encoded words, doubling encoded load instructions (2.58 M vs 1.29 M warp requests), which costs nothing measurable.
+- **The next bottleneck in decode is the term lookup.** In u4m, 56% of decode samples are the per-posting binary search over `count_start` (which term owns work-list item g), with no memory stalls: pure instruction and shared-memory work, repeated for every posting. A per-warp or per-tile term cursor (the term changes rarely between consecutive items) would remove most of it; this is the clearest target for a next change.
+- **What is left on the critical path (u4m, W=4096).** Pre-merge critical path about 69-81 µs: decode+add 55-56 µs, radix select+gather 7-10 µs, bitonic sort 1-8 µs (grows with k), setup about 4 µs plus the S1 barrier about 3 µs. With 245 ranges and 4 blocks per SM (shared memory limit; 3 at k=1000), the launch is 1.33 waves (1.78 at k=1000): the slowest ranges of the second wave set the kernel time, so the densest ranges matter more than the average.
+- **Radix contention (change B) is real but small.** The replay shows nearly fully serialized bucket atomics in pass 1, yet the radix select+gather is about 7-10 µs on the critical path; B's extra work cost about as much as it saved (section 6). The radix stages' sample share rises in u4m (27.9% -> 31.4% at k=10) only because decode shrank.
+- **Host side.** Per query outside the kernel: launch API about 13 µs, launch to kernel start about 12 µs, D2H copy 1-2.4 µs, kernel end to copy return 12-22 µs; unprofiled wall minus GPU busy is 21-34 µs. At k=10 this host share (about 20% of the 106 µs u4m wall) is now comparable to the time the decode change saved; change C (pinned/zero-copy results) would address only the copy part (a few µs).
+- **Resources.** u4m uses 48 registers (v3-3 40) and 1.3 KB more static shared memory; achieved occupancy is unchanged or higher (51 -> 53% at k=10, 39 -> 44% at k=1000) because shared memory, not registers, limits residency at W=4096.

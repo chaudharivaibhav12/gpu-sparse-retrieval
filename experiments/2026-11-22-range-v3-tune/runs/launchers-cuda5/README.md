@@ -5,3 +5,5 @@
 - `session_e2.sh` / `.log`: Measurement E session 2 (14:00Z, commit edffe2c): gate ctrl-02 stopped by hand at 17:50Z (false overlaps).
 - `session_e3.sh` / `.log`: session 3 (17:51Z, commit 7968051, overlap fix): gate ctrl-03 passed; stopped by hand at 18:10Z when the gate rule became contended.
 - `session_e4.sh` / `.log`: session 4 (18:11Z, commit f1e2811): six contended gates passed (18:20-18:51Z), timing 18:51-20:46Z, analysis, manifest; `E4_DONE` 20:48Z. `gate4-v3-4-u4m.log` and `timing-e.log` are the last gate's and the timing driver's console logs.
+- `session_p2.sh` / `.log`, `profile-p2.log`: Measurement P2 (21:16Z, commit 105fcea): builds (normal + clock) of v3-3 and u4m, profile, analysis; `P2_DONE` 22:42Z, no overlaps.
+- `session_final.sh` / `.log`, `gate-final.log`: after P2, checkout of the default commit 37d1ffe, CUDA 12.6 SASS identity (default = u4m 8f8a5d49e0e0ad3f; v3-3 a644e9d5125d6e7e), contended cuda5 gate of the default build; `FINAL_DONE` 22:49Z. `session_final-failedlaunch.log` is a first launch that failed before doing anything (the script had not been copied because the bundle step failed).
