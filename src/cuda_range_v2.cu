@@ -63,6 +63,15 @@ static const char* RBP_BLOCK_NAMES[RBP_NB]={"gt_start","clk_start","gt_rank_writ
 #if RBP_V3_RADIX && !RBP_V3_THETA
 #error "RBP_V3_RADIX writes its winners through the theta filter (RBP_V3_THETA=1)"
 #endif
+// Version-3 tuning switches (experiment 2026-11-22-range-v3-tune). Off by default:
+// with all of them off the kernel is v3-3.
+#ifndef RBP_V3_UNROLL
+#define RBP_V3_UNROLL 1   // change A: decode U postings per lane, all loads before any use (1, 2 or 4)
+#endif
+static_assert(RBP_V3_UNROLL==1||RBP_V3_UNROLL==2||RBP_V3_UNROLL==4,"RBP_V3_UNROLL must be 1, 2 or 4");
+#if RBP_V3_UNROLL>1 && defined(RBP_SPLIT_DECODE_ADD)
+#error "RBP_SPLIT_DECODE_ADD and RBP_V3_UNROLL are separate decode paths"
+#endif
 #if RBP_V3_RADIX
 #ifndef RBP_RADIX_BITS
 #define RBP_RADIX_BITS 8  // digit width of the radix selection (8 or 11)
@@ -324,6 +333,37 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
         split_decode+=t1-t0;split_bar1+=t2-t1;split_add+=t3-t2;split_bar2+=t4-t3;
     }
     RBP_EVV(19,split_decode);RBP_EVV(20,split_bar1);RBP_EVV(21,split_add);RBP_EVV(22,split_bar2);
+#elif RBP_V3_UNROLL>1
+    // Change A: items g = base + u*threads (u < U). Phase 1 issues every item's
+    // loads (both encoded words - the index's padding word keeps word+1 in
+    // bounds - and the impact); phase 2 extracts positions and adds.
+    for (uint32_t base=thread;base<postings;base+=RBP_V3_UNROLL*threads) {
+        uint32_t lo[RBP_V3_UNROLL],hi[RBP_V3_UNROLL],impact[RBP_V3_UNROLL],shift[RBP_V3_UNROLL],width[RBP_V3_UNROLL],weight[RBP_V3_UNROLL];
+#pragma unroll
+        for (uint32_t u=0;u<RBP_V3_UNROLL;++u) {
+            const uint32_t g=base+u*threads;
+            if (g>=postings) continue;
+            uint32_t i=0,top=terms;
+            while (top-i>1) {
+                const uint32_t mid=i+(top-i)/2;
+                if (count_start[mid]<=g) i=mid; else top=mid;
+            }
+            const uint32_t j=g-count_start[i];
+            width[u]=term_width[i];weight[u]=term_weight[i];
+            const uint64_t bit=term_bit[i]+uint64_t(j)*width[u],word=bit>>5;
+            shift[u]=uint32_t(bit&31);
+            lo[u]=v.encoded[word];hi[u]=v.encoded[word+1];
+            impact[u]=v.impacts[term_value[i]+j];
+        }
+#pragma unroll
+        for (uint32_t u=0;u<RBP_V3_UNROLL;++u) {
+            if (base+u*threads>=postings) continue;
+            uint32_t position=lo[u]>>shift[u];
+            if (shift[u]+width[u]>32) position|=hi[u]<<(32-shift[u]);
+            if (width[u]<32) position&=(1u<<width[u])-1;
+            atomicAdd(&scores[position],weight[u]*impact[u]);
+        }
+    }
 #else
     for (uint32_t g=thread;g<postings;g+=threads) {
         // Last term whose work-list start is at or before g; it is never an
@@ -734,7 +774,7 @@ int main(int argc,char** argv) {
         string cpu_affinity="unknown",status_line;ifstream status("/proc/self/status");
         while (getline(status,status_line)) if (status_line.rfind("Cpus_allowed_list:",0)==0) { istringstream affinity(status_line.substr(18));affinity>>cpu_affinity; }
         research_gate("cuda-range-v2",N,count,k,gpu,argv[1],argv[2],
-            ",\"batch_size\":1,\"query_argument_bytes\":"+to_string(sizeof(QueryArgs))+",\"vocab\":"+to_string(index.vocab)+",\"nnz\":"+to_string(index.impacts.size())+",\"score_accumulator_bits\":"+to_string(sizeof(uint32_t)*8)+",\"returned_score_bits\":"+to_string(sizeof(GpuCandidate{}.score)*8)+",\"score_limit_exclusive\":"+to_string(uint64_t(UINT32_MAX))+",\"max_conservative_score_bound\":"+to_string(max_score_bound)+",\"max_slots_per_thread\":"+to_string(RBP_MAX_SLOTS)+",\"v3_theta\":"+to_string(RBP_V3_THETA)+",\"v3_radix\":"+to_string(RBP_V3_RADIX)+",\"radix_min_k\":"+to_string(radix_min_k)+",\"selection_path\":"+string(radix ? "\"radix\"" : "\"warp-lists\"")+",\"variant\":5,\"range_size\":"+to_string(W)+",\"postings_cap\":"+to_string(index.postings_cap)+",\"ranges\":"+to_string(R)+",\"blocks\":"+to_string(index.blocks())+",\"score_threads\":"+to_string(threads)+",\"merge_threads\":"+to_string(merge_threads)+",\"max_supported_k\":"+to_string(RBP_MAX_K)+",\"max_query_terms\":"+to_string(max_terms)+",\"max_supported_terms\":"+to_string(RBP_MAX_TERMS)+",\"max_term_document_multiplicity\":"+to_string(multiplicity)+",\"slots_per_thread\":"+to_string(slots)+",\"warp_list_capacity\":"+to_string(list_cap)+",\"shared_bytes\":"+to_string(shared_bytes)+",\"index_posting_bytes\":"+to_string(index.posting_bytes())+",\"tie_rank_bytes\":"+to_string((tie_rank.count+rank_slot.count)*2)+",\"verify_scores\":"+to_string(verify)+",\"warmup_rounds\":"+to_string(warmups)+",\"repeats\":"+to_string(rounds)+",\"cpu_affinity\":"+research_quote(cpu_affinity)+",\"index_sha256\":"+research_quote(sha_hex(index.file_sha))+",\"source_gsp_sha256\":"+research_quote(sha_hex(index.source_sha)),
+            ",\"batch_size\":1,\"query_argument_bytes\":"+to_string(sizeof(QueryArgs))+",\"vocab\":"+to_string(index.vocab)+",\"nnz\":"+to_string(index.impacts.size())+",\"score_accumulator_bits\":"+to_string(sizeof(uint32_t)*8)+",\"returned_score_bits\":"+to_string(sizeof(GpuCandidate{}.score)*8)+",\"score_limit_exclusive\":"+to_string(uint64_t(UINT32_MAX))+",\"max_conservative_score_bound\":"+to_string(max_score_bound)+",\"max_slots_per_thread\":"+to_string(RBP_MAX_SLOTS)+",\"v3_theta\":"+to_string(RBP_V3_THETA)+",\"v3_radix\":"+to_string(RBP_V3_RADIX)+",\"v3_unroll\":"+to_string(RBP_V3_UNROLL)+",\"radix_min_k\":"+to_string(radix_min_k)+",\"selection_path\":"+string(radix ? "\"radix\"" : "\"warp-lists\"")+",\"variant\":5,\"range_size\":"+to_string(W)+",\"postings_cap\":"+to_string(index.postings_cap)+",\"ranges\":"+to_string(R)+",\"blocks\":"+to_string(index.blocks())+",\"score_threads\":"+to_string(threads)+",\"merge_threads\":"+to_string(merge_threads)+",\"max_supported_k\":"+to_string(RBP_MAX_K)+",\"max_query_terms\":"+to_string(max_terms)+",\"max_supported_terms\":"+to_string(RBP_MAX_TERMS)+",\"max_term_document_multiplicity\":"+to_string(multiplicity)+",\"slots_per_thread\":"+to_string(slots)+",\"warp_list_capacity\":"+to_string(list_cap)+",\"shared_bytes\":"+to_string(shared_bytes)+",\"index_posting_bytes\":"+to_string(index.posting_bytes())+",\"tie_rank_bytes\":"+to_string((tie_rank.count+rank_slot.count)*2)+",\"verify_scores\":"+to_string(verify)+",\"warmup_rounds\":"+to_string(warmups)+",\"repeats\":"+to_string(rounds)+",\"cpu_affinity\":"+research_quote(cpu_affinity)+",\"index_sha256\":"+research_quote(sha_hex(index.file_sha))+",\"source_gsp_sha256\":"+research_quote(sha_hex(index.source_sha)),
             ",\"layout\":\"range-split-bitpacked-positions-term-major\",\"schedule\":\"exhaustive-all-ranges\",\"ranges\":\"boundaries-from-index;uniform-or-postings-capped\",\"decode\":\"combined-work-list;direct-positions;no-decode-barriers\",\"accumulator\":\"uint32-shared-gated-below-2^32-1-widened-to-uint64\",\"selection\":\"thread-sorted-slots;warp-shuffle-select;one-barrier-rank-scatter;merge-in-last-finishing-block-threadfence-atomic-ticket\",\"tie_keys\":\"per-range-original-id-rank-uint16\",\"query_transfer\":\"kernel-argument-by-value\",\"result_transfer\":\"topk-only\"",
             "uint32-guarded-exact-widened-uint64", "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1");
         require(!filesystem::exists(argv[3])&&!filesystem::exists(argv[4]),"Refusing to overwrite results");

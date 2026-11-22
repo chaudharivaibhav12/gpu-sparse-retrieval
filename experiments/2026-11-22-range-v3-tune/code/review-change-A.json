@@ -1,0 +1,36 @@
+{
+  "change": "A: unrolled decode (RBP_V3_UNROLL=U, U in {2, 4}; default 1 = v3-3 loop unchanged)",
+  "written": "before the code change",
+  "motivation": "laptop development profile (dry-03, CUDA 13.3, not a result): decode+add is about 78-85% of the pre-merge critical path at W=4096; the slowest block's decode is 5-6x the mean block's. Each lane in the v3-3 loop issues one encoded load (two when the value straddles a word), one impact load, then immediately uses them, so at most ~2 loads per lane are in flight.",
+  "design": [
+    "Loop over base = thread, thread + U*threads, ...; items g_u = base + u*threads for u < U.",
+    "Phase 1 (unrolled, #pragma unroll): for every valid g_u (g_u < postings) find the term i_u (same binary search over count_start in shared memory), j_u = g_u - count_start[i_u], bit_u = term_bit[i_u] + j_u*term_width[i_u], word_u = bit_u >> 5; load encoded[word_u], encoded[word_u+1] and impacts[term_value[i_u] + j_u]; read width and weight from the shared term table (term_width, term_weight).",
+    "Phase 2 (unrolled): position_u = (lo >> shift) | (shift + width > 32 ? hi << (32 - shift) : 0), masked to width bits (no mask when width == 32); atomicAdd(&scores[position_u], weight_u * impact_u).",
+    "The v3-3 loop stays as the #else path; with RBP_V3_UNROLL undefined or 1 the preprocessor emits exactly the v3-3 source for the kernel."
+  ],
+  "exactness": [
+    "Same items, same positions, same products: each posting contributes weight*impact once, to the same score slot. uint32 shared atomicAdd is associative and commutative, so the order change cannot change any score (overflow is excluded by the existing host gate: weight_sum*255*multiplicity < 2^32-1).",
+    "Bit extraction is rbp_extract's formula: shift = bit & 31; value = word >> shift; if shift + width > 32, value |= next << (32 - shift); mask (1 << width) - 1 unless width == 32. The hi word is always loaded but only used when the value straddles."
+  ],
+  "edge_cases_and_bugs_checked": [
+    "encoded[word+1] is always in bounds: the index stores one zero padding word after the packed bits (range_bitpack.h: words = ceil(total_bits/32) + 1, checked at load), and every value starts below total_bits, so word <= words-2.",
+    "hi << (32 - shift) with shift == 0 would be a 32-bit shift (undefined); it is only evaluated when shift + width > 32, which needs shift >= 1 because width <= 32.",
+    "width == 32: (1u << 32) is undefined; the mask is skipped as in rbp_extract. Positions are < W <= 32768, so width <= 15 in practice, but the code keeps the general form.",
+    "Invalid items (g_u >= postings) issue no loads and no atomics; their registers are not read. The tail iteration can have any mix of valid and invalid items within a warp.",
+    "postings == 0 (no query term in the range): the loop body never runs, as before.",
+    "Terms absent from the range have term_count 0 and never own an item g (count_start[i] == count_start[i+1]); the binary search picks the last term whose start is <= g, which is never such a term (same argument as v3-3).",
+    "RBP_SPLIT_DECODE_ADD (diagnostic) takes precedence: combining it with RBP_V3_UNROLL > 1 is a compile error, so no build mixes them silently.",
+    "U must be 1, 2 or 4 (static_assert); other values are rejected at compile time.",
+    "Registers: U items hold ~6 live 32-bit values each (lo, hi, impact, weight, shift, width) plus the bit position; U=4 may raise registers from 40. A rise above 40 at 256 threads drops the register limit below 6 blocks/SM (65,536 / (256 x 48) = 5); at W=4096 shared memory already limits blocks/SM to 4, so up to 64 registers costs no occupancy there; at W=1024 it may. Recorded per variant from ptxas and the compile-only table."
+  ],
+  "risks": [
+    "Benefit depends on the dense blocks being latency-bound on the encoded/impact loads; Measurement P (Nsight Compute long-scoreboard share, sectors per request) is still pending on cuda5. The change may help only the second wave or not at all.",
+    "More registers at W=1024 could cost a resident block per SM and offset the gain (see v3-1 in the v3 experiment).",
+    "The binary search for the term is repeated per item and is a dependent chain of shared loads; unrolling overlaps U chains but does not shorten one."
+  ],
+  "checks_planned": [
+    "CUDA 12.6 (cuda5, compile only): with RBP_V3_UNROLL unset the SASS must equal a644e9d5125d6e7e.",
+    "Laptop gates for v3-4-unroll2 and v3-4-unroll4: fixtures (v3 + v3-4 cases, default crossover and crossover 1), then 100K and 1M x 500 calibration queries x k=10, 100, 1000 at W=4096 (crossover 1) and W=1024 (default crossover), exact against the CPU oracle.",
+    "Registers, static/dynamic shared memory and blocks/SM per variant (ptxas, CUDA 12.6)."
+  ]
+}
