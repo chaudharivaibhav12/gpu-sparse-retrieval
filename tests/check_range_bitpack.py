@@ -329,11 +329,94 @@ def v3_cases():
     return cases
 
 
+# Version-3.4 cases (experiment 2026-11-22-range-v3-tune): zero-score skipping in the
+# radix passes (change B), the compaction + radix merge (change D) and the unrolled decode
+# (change A, through every run). Each case runs at W=1024 and W=4096 and at
+# k = 1, 10, 100, 128, 1000. Plain Python; shares no code with the kernel.
+V34_W = (1024, 4096)
+V34_K = (1, 10, 100, 128, 1000)
+
+
+def v34_cases():
+    rng = random.Random(20261122)
+    cases = []
+
+    def shuffled(n, base=7):
+        ids = list(range(base, base + 3 * n, 3)); rng.shuffle(ids); return ids   # gaps, interleaved across ranges
+
+    def runs(ks=V34_K, ws=V34_W):
+        return [(w, k, 256) for w in ws for k in ks]
+
+    def spread(d):
+        """A nonzero score with high digits that vary (impact x count, weight 32)."""
+        return [(0, rng.randrange(1, 256), rng.choice([1, 1, 2, 3, 9]))]
+
+    # One range (the first, at either W) where every document scores 0; the rest are mixed.
+    N = 3 * 4096 + 777
+    docs = [[] if d < 4096 else (spread(d) if rng.random() < 0.6 else [(1, 9, 1)]) for d in range(N)]
+    cases.append(dict(name="v34-zero-range", group="v3-4", ids=shuffled(N), docs=docs, vocab=2,
+                      queries={"q": [(0, 32)], "q2": [(0, 5), (1, 3)]}, runs=runs()))
+    # Nonzero count exactly k-1, k and k+1 in ranges 0, 1 and 2, everything else 0 except a
+    # sparse fourth range; one case per (W, k).
+    for w in V34_W:
+        for k in V34_K:
+            N = 4 * w + 100
+            docs = [[] for _ in range(N)]
+            for r, count in enumerate((k - 1, k, k + 1)):
+                for d in rng.sample(range(r * w, (r + 1) * w), count):
+                    docs[d] = spread(d)
+            for d in range(3 * w, N):
+                if rng.random() < 0.01: docs[d] = spread(d)
+            cases.append(dict(name="v34-nonzero-around-w%d-k%d" % (w, k), group="v3-4", ids=shuffled(N), docs=docs, vocab=2,
+                              queries={"q": [(0, 32)]}, runs=runs(ks=(k,), ws=(w,))))
+    # Ties at the k-th score across the zero/nonzero boundary. Ranges 0 and 2 hold k-3 nonzero
+    # documents (so the k-th place is a score-0 tie decided by ID); range 1 holds exactly k,
+    # the last five sharing the smallest score (impact 1, weight 1 in query "low").
+    for w in V34_W:
+        for k in (10, 100, 128, 1000):
+            N = 3 * w + 50
+            docs = [[] for _ in range(N)]
+            for r in range(3):
+                chosen = rng.sample(range(r * w, (r + 1) * w), k if r == 1 else k - 3)
+                for i, d in enumerate(chosen):
+                    docs[d] = [(0, 1, 1)] if i >= len(chosen) - 5 else spread(d)
+            cases.append(dict(name="v34-zero-boundary-ties-w%d-k%d" % (w, k), group="v3-4", ids=shuffled(N), docs=docs, vocab=2,
+                              queries={"q": [(0, 32)], "low": [(0, 1)]}, runs=runs(ks=(k,), ws=(w,))))
+    # Ties at the global k-th score spread across many ranges (change D): every range holds
+    # documents of one shared score s, more than k in total; a few documents score above s.
+    N = 6 * 4096 + 123
+    docs = [[(0, 50, 1)] if d % 7 == 0 else ([(0, 10, 1)] if d % 5 == 0 else []) for d in range(N)]
+    for d in rng.sample(range(N), 30): docs[d] = [(0, 200, 3)]
+    cases.append(dict(name="v34-global-ties", group="v3-4", ids=shuffled(N), docs=docs, vocab=2,
+                      queries={"q": [(0, 32)]}, runs=runs()))
+    # theta = 0 with every range full: every range has W >= k documents but only k // 2 nonzero
+    # ones, so every range's k-th score is 0 and every listed candidate survives (worst case for D).
+    for w in V34_W:
+        for k in (10, 100, 128, 1000):
+            N = (6 if w == 1024 else 3) * w
+            docs = [[] for _ in range(N)]
+            for r in range(N // w):
+                for d in rng.sample(range(r * w, (r + 1) * w), k // 2):
+                    docs[d] = spread(d)
+            cases.append(dict(name="v34-theta0-full-w%d-k%d" % (w, k), group="v3-4", ids=shuffled(N), docs=docs, vocab=2,
+                              queries={"q": [(0, 32)]}, runs=runs(ks=(k,), ws=(w,))))
+    # k larger than a range's documents (partial last range of 300) and than N.
+    N = 4096 + 300
+    docs = [spread(d) if d % 3 else [] for d in range(N)]
+    cases.append(dict(name="v34-k-above-range", group="v3-4", ids=shuffled(N), docs=docs, vocab=2,
+                      queries={"q": [(0, 32)]}, runs=runs()))
+    N = 700
+    docs = [spread(d) if d % 2 else [] for d in range(N)]
+    cases.append(dict(name="v34-k-above-n", group="v3-4", ids=shuffled(N), docs=docs, vocab=2,
+                      queries={"q": [(0, 32)]}, runs=runs()))
+    return cases
+
+
 def run_v3_suite(args, tool, scorer, root):
     out = root / "v3"; out.mkdir()
     extra_build = [args.encoding] if args.encoding != "gaps" else []
     results, case_info = [], {}
-    for case in v3_cases():
+    for case in v3_cases() + (v34_cases() if args.v34_cases else []):
         name = case["name"]; ids, docs, vocab = case["ids"], case["docs"], case["vocab"]
         gsp = out / ("%s.gsp" % name); v3_write_gsp(gsp, ids, docs, vocab)
         query_file = out / ("%s-queries.tsv" % name)
@@ -408,6 +491,7 @@ def main():
     parser.add_argument("--v3-cases", default="off", choices=["off", "report", "enforce"],
                         help="version-3 cases (%s): report = run and record outcomes; enforce = any non-pass fails" % PENDING)
     parser.add_argument("--only-v3", action="store_true", help="run only the version-3 cases")
+    parser.add_argument("--v34-cases", action="store_true", help="add the version-3.4 cases (zero skipping, radix merge) to the version-3 suite")
     parser.add_argument("--scorer-arg", action="append", default=[], help="extra trailing scorer argument for every scoring run (e.g. a selection crossover)")
     args = parser.parse_args()
     assert not args.only_v3 or args.v3_cases != "off", "--only-v3 needs --v3-cases report or enforce"
