@@ -15,7 +15,8 @@ OUT=$1; shift || true
 COMMIT=$(git rev-parse "${COMMIT:-HEAD}")
 ARCH=${ARCH:-sm_89}
 EXTRA_NVCC_FLAGS=${EXTRA_NVCC_FLAGS:-}
-# label|defines|switch that must exist in the source|commit (empty = COMMIT)
+# label|defines|switch that must exist in the source|commit (empty = COMMIT)|source file in src/ (empty = cuda_range_v2.cu)
+# prunetm: the team's pruned scorer with the theta-filtered merge, main 66d7e1e, unmodified (Measurement F reference).
 VARIANTS=(
   "ctrl|||74dd5d303f0cf5690a10f2060f6da536726705dc"
   "v3-3|-DRBP_V3_UNROLL=1 -DRBP_V3_MERGE_RADIX=0|"
@@ -28,14 +29,16 @@ VARIANTS=(
   "v3-4-u2m|-DRBP_V3_UNROLL=2 -DRBP_V3_MERGE_RADIX=1|RBP_V3_MERGE_RADIX"
   "v3-4-u4m|-DRBP_V3_UNROLL=4 -DRBP_V3_MERGE_RADIX=1|RBP_V3_MERGE_RADIX"
   "v3-4-default||RBP_V3_MERGE_RADIX"
+  "prunetm|||66d7e1e9dfd88954eb52505fa939d68519fc9918|cuda_range_prune_tm.cu"
 )
 want=("$@")
 for entry in "${VARIANTS[@]}"; do
-    IFS='|' read -r label defines switch commit <<< "$entry"
+    IFS='|' read -r label defines switch commit source <<< "$entry"
+    source=${source:-cuda_range_v2.cu}
     if [ ${#want[@]} -gt 0 ] && [[ ! " ${want[*]} " == *" $label "* ]]; then continue; fi
     commit=${commit:-$COMMIT}
     defines="$defines $EXTRA_NVCC_FLAGS"
-    src=$(git show "$commit:src/cuda_range_v2.cu")
+    src=$(git show "$commit:src/$source")
     if [ -n "$switch" ] && ! grep -q "$switch" <<< "$src"; then echo "SKIPPED $label: $switch not in $commit"; continue; fi
     dir=$OUT/$label
     test ! -e "$dir" || { echo "Refusing to reuse $dir"; exit 1; }
@@ -44,7 +47,8 @@ for entry in "${VARIANTS[@]}"; do
     echo "$commit" > "$dir/commit.txt"
     echo "nvcc -O3 -lineinfo -arch=$ARCH -std=c++17 $defines" | sed 's/ *$//' > "$dir/flags.txt"
     # shellcheck disable=SC2086
-    nvcc -O3 -lineinfo -arch="$ARCH" -std=c++17 $defines -Xptxas -v "$dir/src/cuda_range_v2.cu" -o "$dir/scorer" 2> "$dir/ptxas.log"
+    nvcc -O3 -lineinfo -arch="$ARCH" -std=c++17 $defines -Xptxas -v "$dir/src/$source" -o "$dir/scorer" 2> "$dir/ptxas.log"
+    echo "src/$source" > "$dir/source.txt"
     cuobjdump -sass "$dir/scorer" | grep -E '^\s+/\*[0-9a-f]{4}\*/' | sed -E 's#/\*[0-9a-f]{4}\*/##; s#;\s*/\*.*##' | sha256sum | cut -d' ' -f1 > "$dir/sass.sha256"
     [ "${COMPILE_ONLY:-0}" = 1 ] || g++ -O3 -Wall -Wextra -Wpedantic -std=c++17 "$dir/src/range_bitpack_tool.cpp" -o "$dir/range_bitpack_tool"
     echo "BUILT $label $(cut -c1-12 "$dir/commit.txt") sass=$(cut -c1-16 "$dir/sass.sha256") flags=[$defines]"

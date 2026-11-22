@@ -171,5 +171,50 @@
     "report": "stage tables before/after (setup, word-table prefix, decode+add, radix select+gather, bitonic sort, candidate write, threadfence, done ticket, merge select, merge scatter; D merge sub-stages), barrier waits, Nsight Compute stage shares, stall reasons, launch resources (registers, shared memory, blocks/SM, waves), decode-load coalescing and stalls, host vs GPU",
     "gpu_policy": "as measurement_E timing: idle check before every GPU process (no compute process, none of our GPU jobs, no other run_* script outside the session), retry every 300 s up to 6 h after launch, then stop and report; overlapped processes preserved and rerun (at most 3 per slot); overlap classification as amended",
     "script": "code/run_profile_p2.sh"
+  },
+  "measurement_F": {
+    "purpose": "the final variant u4m (default build) at W=4096 against the team references at the full collection (8,841,823 passages)",
+    "label": "calibration only and after the freeze: the 500 calibration queries were used to choose settings, and the held-out queries were used in PR #27; these results are not a held-out evaluation",
+    "inputs": {
+      "source": "pinned full-collection inputs of experiments/2026-11-15-full-collection-baselines/configs/protocol.json, matched by SHA-256 and copied to /scratch/ag11163/full-inputs (copies verified)",
+      "gsp": "full-8841823.gsp, SHA-256 e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac (pinned)",
+      "index_w1024": "full-8841823-w1024.rbp, SHA-256 c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab (pinned)",
+      "index_w4096": "full-8841823-w4096-pos.rbp, built once from the pinned GSP with range_bitpack_tool (build ... 4096 positions) at commit 37d1ffe, followed by the builder's round-trip check (verify); SHA-256, size and build time recorded in the run and the report",
+      "index_w256": "full-8841823-w256.rbp, the team's W=256 index used by PR #27's pruned scorer (scorer-reported index_sha256 pinned there: 90b86a651aa0be4cc45094e9f1891df184c2d93718dc71f081a74072248cd328); file SHA-256 0ad6531c7698c7541fd9f6d62fb4fa34619e4b765656cccfa3d13fdc64202892",
+      "queries": "data/derived/calibration-500.tsv, SHA-256 150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091 (pinned)",
+      "oracle": "cpu_pilot top-100 and top-1000 for the 500 calibration queries made from the pinned GSP and queries (cpu_pilot at main 63188b5; provenance files copied with them); top-10 = the per-query prefix of the top-1000, whose SHA-256 equals the pinned oracle 7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed"
+    },
+    "builds": {
+      "u4m": "label v3-4-default: src/cuda_range_v2.cu at the run's HEAD with no switches (SASS must be 8f8a5d49e0e0ad3f, the u4m timed in Measurement E); W=4096, crossover argument 1",
+      "ctrl": "label ctrl: main 74dd5d3 (V2-5), W=1024",
+      "prunetm": "label prunetm: src/cuda_range_prune_tm.cu at main 66d7e1e, unmodified; documented arguments of experiments/2026-11-19-prune-depth-adaptive: W=256, 64 seeds, 256 score and merge threads",
+      "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17, CUDA 12.6 on cuda5 (code/build_variants.sh)"
+    },
+    "gates": "code/gate_full.sh for u4m, ctrl and prunetm: all 500 calibration queries at k=10/100/1000 (1 warm-up + 1 measured round), exact against the oracle; prunetm first runs its own fixture suite (tests/check_range_prune.py, unmodified); peak GPU memory per process recorded (analysis/gpu_memory.py). prune-tm is timed only if it builds and passes its gate unmodified; otherwise it is left out and the reason reported. A u4m or ctrl gate failure stops the session",
+    "design": {
+      "session": "one cuda5 session: gates, then timing (code/run_timing_f.sh), then analysis",
+      "cells": "u4m W=4096; ctrl W=1024; prunetm W=256 S=64 if its gate passed",
+      "k": [
+        10,
+        100,
+        1000
+      ],
+      "order": "one set per k; 3 processes per cell; process p runs the cell list rotated by p*ceil(n/3)",
+      "rounds": "500 calibration queries x (3 warm-up + 20 measured rounds) per process; batch 1; 256 threads",
+      "correctness": "every timed top-k (all 23 rounds) compared with the oracle; a mismatch stops the run"
+    },
+    "statistic": {
+      "per_process": "median query_wall_ms of each query over the measured rounds",
+      "ratio": "geometric mean of the 3 x 500 paired (process, query) ratios to ctrl",
+      "interval": "crossed bootstrap (processes and queries), 10,000 draws, 95% percentile interval, seed 20261123 (new)",
+      "also": "u4m / prunetm when prunetm is timed",
+      "script": "analysis/analyze_timing_f.py"
+    },
+    "report": "per k: implementation | W | pooled median ms | ratio to ctrl [95%], next to the team's published full-collection numbers (v2 0.688 / 2.687 / 12.38 ms; pruned W=256 0.237 / 0.694 / 3.218 ms at k = 10/100/1000), which come from other sessions",
+    "estimate": {
+      "gpu_time": "about 30 min: timing ~20 min (27 processes at most: ~13 s index load each; ctrl 0.69/2.7/12.4 ms, prune-tm 0.24/0.69/3.2 ms, u4m ~0.5/0.6/1.0 ms per query x 11,500 queries per process) plus gates ~5-8 min; below the owner's 60 min limit",
+      "gpu_memory": "about 4.1 GB (u4m), 3.8 GB (ctrl), 5 GB (prune-tm) of the RTX 4070's 12 GB"
+    },
+    "gpu_policy": "idle check before every GPU process (no compute process, none of our GPU jobs, no other run_* script outside the session), retry every 300 s up to 6 h after launch, then stop and report; overlapped processes preserved and rerun (at most 3 per slot); gates and timing alike"
   }
 }
