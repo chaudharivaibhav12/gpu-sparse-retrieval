@@ -84,6 +84,11 @@
       "date": "2026-11-22",
       "decision_by": "owner",
       "text": "Measurement E gates run contended (CONTENDED=1 in code/session_lib.sh): they are correctness checks only, so they do not wait for other users' GPU processes and overlapped steps are not replaced; every overlap is still recorded per process (logs/overlap-checks.jsonl). Our own GPU jobs are still never run concurrently. The timing run is unchanged (idle check before every process, 300 s retries, overlapped processes preserved and rerun). Session 3 was stopped by hand at 18:10:52Z after gate ctrl-03 passed (under the full idle rule) and gate v3-3-01 had paused for an idle check; session 4 rebuilds at the amendment commit, gates the six v3 builds contended (v3-3 as -02), keeps ctrl-03 (ctrl is always built from 74dd5d3; SASS 53eb3cac16e4bc19), then times."
+    },
+    {
+      "date": "2026-11-22",
+      "decision_by": "owner",
+      "text": "E1 reading for Measurement E (decided after the run): E1 is applied per W, at W=4096. Reasons: W=4096 with 256 threads was chosen as the configuration before Measurement E (Step 1's prompt of this experiment, 'The chosen configuration is W=4096 with 256 threads', and the owner's 2026-11-21 decision), and E1 compares each variant against v3-3 at the same W. The registered clause 'it must pass at every W it was timed at' (written by Claude when registering) is replaced by this reading. Outcome: at W=4096 unroll2, unroll4, D, u2m and u4m all pass E1; E2 picks unroll4 (geometric mean 0.904 vs 0.942); E3 picks u4m (passes E1 and beats D: six-cell geometric mean 0.553 vs D 0.609; u4m/D at W=4096 0.823 [0.799, 0.842], 0.846 [0.842, 0.851], 0.903 [0.897, 0.909] at k=10/100/1000). Final variant: u4m (A with U=4 + D) at W=4096. Not adopted: v3-3 at W=1024 is the fastest k=10 cell (0.0907 ms vs u4m at W=4096 0.0987 ms), but using it would need a second index and a second code path; D loses at W=1024, k=10 (1.134 [1.126, 1.141] x v3-3). The run's analysis output (paired-statistics.json, tables.md) is left as produced under the registered clause; both readings are reported."
     }
   ],
   "measurement_E": {
@@ -147,7 +152,8 @@
       "E1": "a variant is adopted if its ratio to v3-3 (same W) has an upper 95% bound < 1 at some k and no k's lower bound is > 1.02; evaluated at each W the variant is timed at, and it must pass at every such W (unroll2/unroll4: W=4096 only)",
       "E2": "unroll: U=2 vs U=4, the lower geometric mean across k of the ratio-to-v3-3 point estimates (W=4096) among those passing E1; none if neither passes",
       "E3": "final variant = u2m or u4m if it passes E1 and its geometric mean of point estimates over the six (W, k) cells is lower than D's (the lower of the two if both qualify); otherwise D if D passes E1; otherwise v3-3 (nothing adopted)",
-      "E4": "for the final variant, per k: recommend W=1024 only if W=1024 / W=4096 (same session, paired) has an upper 95% bound < 1; otherwise W=4096; also report whether one W is best for all k. Label: calibration tuning, to be frozen before held-out evaluation"
+      "E4": "for the final variant, per k: recommend W=1024 only if W=1024 / W=4096 (same session, paired) has an upper 95% bound < 1; otherwise W=4096; also report whether one W is best for all k. Label: calibration tuning, to be frozen before held-out evaluation",
+      "E1_as_amended": "applied per W at W=4096 (the configuration chosen before Measurement E); see amendments"
     },
     "report": "per k: variant | W | pooled median ms | ratio to v3-3 [95%] | ratio to ctrl W=1024 [95%]; E1-E4 outcomes; final variant and W choice",
     "gpu_policy": {
