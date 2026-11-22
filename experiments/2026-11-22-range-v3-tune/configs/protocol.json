@@ -1,0 +1,63 @@
+{
+  "experiment_id": "2026-11-22-range-v3-tune",
+  "status": "registered before Measurement P; no kernel change written",
+  "registered_utc": "2026-11-21",
+  "owner": "Arnav",
+  "recording": "not recorded by the team runtime",
+  "source": {
+    "branch": "exp/arnav/2026-11-22-range-v3-tune",
+    "kernel": "src/cuda_range_v2.cu (v3-3: theta-filtered merge + radix-select local top-k), unchanged from exp/arnav/2026-11-18-range-v3-3 7362a8e and its merge with origin/main 66d7e1e (3077335)",
+    "sass_identity": "normal build SASS must equal the timed v3-3 binary (build/v3variants-fix1/v3-3, a644e9d5125d6e7e...); code/build_p.sh stops otherwise",
+    "measured_commit": "the run's HEAD, recorded in logs/environment.txt, commit.txt of each build and the manifest"
+  },
+  "builds": {
+    "host": "cuda5 (RTX 4070, sm_89), module cuda-12.6; only CUDA 12.6 builds on cuda5 count",
+    "script": "experiments/2026-11-22-range-v3-tune/code/build_p.sh OUT",
+    "normal": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17",
+    "clocks": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 -DRBP_STAGE_CLOCKS (clock64 per warp at stage boundaries and around the seven instrumented __syncthreads sites; globaltimer per block)",
+    "radix_cpu": "g++ -O2 -std=c++17 analysis/radix_cpu.cpp (CPU only)",
+    "ptxas": "-Xptxas -v output kept per build (registers, static shared memory, spills)"
+  },
+  "configuration": {
+    "documents": 1000000,
+    "index": "data/derived/hash-1000000-w4096-pos.rbp (W=4096, uniform ranges, 245 ranges)",
+    "threads": 256,
+    "radix_min_k": 1,
+    "radix_min_k_reason": "Measurement D adopted uniform radix at W=4096 (v3-3r); with crossover 1 every k runs range_scores<true>",
+    "k": [10, 100, 1000],
+    "queries": "data/derived/calibration-500.tsv, first 25 (calibration only; held-out queries are not used)",
+    "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1"
+  },
+  "measurement_P": {
+    "order": "for k in 10, 100, 1000: reference, clocks, nsys, ncu; then the CPU radix replay; then analysis",
+    "steps": {
+      "reference": "normal build, 3 warm-up + 20 measured rounds of the 25 queries; per-query wall (host steady_clock around argument packing, launch, result copy and event sync) and GPU event span",
+      "clocks": "clock build, 3 warm-up + 5 measured rounds; RBP_CLOCKS_OUT dumps; analysis/analyze_clocks.py --radix",
+      "nsys": "nsys profile --trace=cuda --sample=none --cpuctxsw=none, normal build, 3+20 rounds; SQLite export; analysis/analyze_nsys_v2.py",
+      "ncu": "ncu --kernel-name regex:range_scores --launch-count 25 --import-source yes, sections SpeedOfLight LaunchStats Occupancy WarpStateStats SchedulerStats SourceCounters MemoryWorkloadAnalysis MemoryWorkloadAnalysis_Tables InstructionStats ComputeWorkloadAnalysis; normal build, 0 warm-up + 1 round (25 launches); exports raw, details, source sass, source cuda+sass; analysis/analyze_ncu_p.py. Nsight Compute replays each launch at locked base clocks with flushed caches",
+      "radix_replay": "analysis/radix_cpu.cpp: exact CPU replay of the radix selection for the same 25 queries and k (RBP range boundaries and document order, cpu_pilot dot() scores); its merged top-k must equal the oracle"
+    },
+    "correctness": "every GPU step's top-k TSV and the replay's top-k equal data/derived/oracle/cpu-top{k}-1000000.tsv for the 25 queries (experiments/2026-11-13-range-bitpack/analysis/compare_topk.py); any mismatch stops the run",
+    "report": {
+      "stage_table": "from clocks: setup (lookup+zero), word-table prefix, decode+add, radix select+gather, bitonic sort, candidate write (theta atomicMax, cut read, write), threadfence, done ticket, merge select, merge scatter; mean per block (mean over warps, then blocks and slices) and critical path (median over slices of the slowest pre-merge block's slowest warp per stage); merge tail (globaltimer: merging block end - latest candidate-write end). Clock-build values; the radix, gather, bitonic and theta barriers have no clock sites, so their waits are inside those stage times",
+      "barrier_table": "clocks: the seven instrumented sites (S1-S7), mean wait per warp, critical-path wait, share of barrier time. ncu: every BAR instruction by source line (all sites, including radix passes, gather, bitonic and theta), barrier-stall samples and share",
+      "resources": "ncu launch statistics: registers per thread, static and dynamic shared memory per block, driver shared memory, occupancy limits and blocks per SM (minimum limit), waves per SM; ptxas -v as a cross-check",
+      "coalescing": "ncu source counters (-lineinfo): decode loop encoded-word loads (rbp_extract, range_bitpack.h) and impacts loads: requests (warp instructions), L2 theoretical sectors, sectors per request against ideal",
+      "radix_contention": "ncu: samples and stall reasons on the bucket atomicAdd line (mio throttle = shared-memory instruction queue throttle, short scoreboard, etc.); CPU replay: per range the share of documents with score 0, keys counted in each pass, the share of ranges whose first-pass largest bucket holds more than half the keys counted, and the modeled same-bucket depth per warp atomic instruction (32 consecutive slots per warp)",
+      "decode_stalls": "ncu: stall reasons on the encoded-load line and the impacts-load + score-atomicAdd line (all SASS of the line, so the consumers of the loads that carry long-scoreboard stalls are included), and on the load instructions themselves",
+      "host_vs_gpu": "nsys per query: launch API, launch to kernel start, kernel, D2H copy, kernel end to D2H start, kernel end to copy return (GPU end to result back on the host), copy return after D2H end; unprofiled wall and GPU share from the reference step"
+    },
+    "reading_rules_registered_before_data": {
+      "a_unrolled_decode": "supported if decode+add is at least 25% of the pre-merge critical path at some k AND long-scoreboard stalls are at least 50% of the samples on the encoded-load line AND DRAM throughput is below 50% of peak (latency-bound, not bandwidth-bound)",
+      "b_radix_contention": "supported if radix select+gather is at least 20% of the pre-merge critical path at some k AND the bucket atomicAdd line holds at least 5% of kernel samples AND the replay's mean same-bucket depth per warp atomic instruction is at least 8",
+      "c_result_buffer": "supported if the median kernel end to copy return is at least 5% of the median unprofiled wall per query at some k",
+      "note": "rules decide what the profile supports, not what is written; the owner decides which changes to implement"
+    },
+    "gpu_policy": {
+      "idle_check": "before every GPU process (code/session_lib.sh wait_idle): no compute process on the GPU (nvidia-smi), none of our GPU jobs (scorer, nsys, ncu), and no other 'run_*' script outside this session (pgrep -f '[r]un_'); otherwise wait in 30 s steps up to IDLE_WAIT_MAX = 14400 s, then the session stops",
+      "overlap": "0.5 s poll of compute processes and nvidia-smi pmon during the session; a process that overlaps another user's GPU process (1 s margin) is preserved as <tag>-overlap-<n> and its slot rerun, at most 3 replacements per slot, then the session stops",
+      "logging": "counts and owner class only; no other users' names, commands or paths"
+    },
+    "outputs": "results/2026-11-22-range-v3-tune/<run>/ with logs, raw, analysis and manifest (SHA-256 of every file); large originals (nsys/ncu reports, SQLite, clock dumps) go to ~/csciga3033-025/project/run-bulk/2026-11-22-range-v3-tune/<run>/ via scripts/package_run.py, hashes in the manifest"
+  }
+}
