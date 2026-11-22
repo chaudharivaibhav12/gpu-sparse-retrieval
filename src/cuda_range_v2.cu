@@ -72,6 +72,14 @@ static_assert(RBP_V3_UNROLL==1||RBP_V3_UNROLL==2||RBP_V3_UNROLL==4,"RBP_V3_UNROL
 #if RBP_V3_UNROLL>1 && defined(RBP_SPLIT_DECODE_ADD)
 #error "RBP_SPLIT_DECODE_ADD and RBP_V3_UNROLL are separate decode paths"
 #endif
+#ifndef RBP_V3_RADIX_AGG
+#define RBP_V3_RADIX_AGG 0   // change B: 1 = skip score-0 keys in the radix passes when the range
+                             // has >= want nonzero documents; 2 = also warp-aggregated bucket adds
+#endif
+static_assert(RBP_V3_RADIX_AGG>=0&&RBP_V3_RADIX_AGG<=2,"RBP_V3_RADIX_AGG must be 0, 1 or 2");
+#if RBP_V3_RADIX_AGG && !RBP_V3_RADIX
+#error "RBP_V3_RADIX_AGG changes the radix path (RBP_V3_RADIX=1)"
+#endif
 #if RBP_V3_RADIX
 #ifndef RBP_RADIX_BITS
 #define RBP_RADIX_BITS 8  // digit width of the radix selection (8 or 11)
@@ -399,12 +407,29 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
         const uint64_t rank_top=uint64_t(v.range_size-1);
         const uint32_t want=k<range_docs ? k : range_docs;
         uint64_t threshold=0;   // want == range_docs: every key wins
+#if RBP_V3_RADIX_AGG
+        // Change B2: with at least `want` nonzero-score documents the want largest keys
+        // all have nonzero scores, so score-0 keys can be left out of the passes and the gather.
+        __shared__ uint32_t radix_warp_nonzero[RBP_MAX_WARPS];
+        bool skip0=false;
+#endif
         if (want<range_docs) {
             uint64_t top_key=0;
+#if RBP_V3_RADIX_AGG
+            uint32_t nonzero=0;
+            for (uint32_t s=thread;s<range_docs;s+=threads) {
+                const uint64_t key=(uint64_t(scores[s])<<key_bits)|(rank_top-v.tie_rank[first+s]);
+                if (key>top_key) top_key=key;
+                nonzero+=scores[s]!=0;
+            }
+            nonzero=__reduce_add_sync(0xffffffffu,nonzero);
+            if (lane==0) radix_warp_nonzero[warp]=nonzero;
+#else
             for (uint32_t s=thread;s<range_docs;s+=threads) {
                 const uint64_t key=(uint64_t(scores[s])<<key_bits)|(rank_top-v.tie_rank[first+s]);
                 if (key>top_key) top_key=key;
             }
+#endif
             for (uint32_t offset=16;offset;offset>>=1) {
                 const uint64_t other=__shfl_xor_sync(0xffffffffu,top_key,offset);
                 if (other>top_key) top_key=other;
@@ -412,6 +437,13 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
             if (lane==0) radix_warp_max[warp]=top_key;
             __syncthreads();
             for (uint32_t w=0;w<warps;++w) if (radix_warp_max[w]>top_key) top_key=radix_warp_max[w];
+#if RBP_V3_RADIX_AGG
+            {
+                uint32_t total=0;
+                for (uint32_t w=0;w<warps;++w) total+=radix_warp_nonzero[w];
+                skip0=total>=want;
+            }
+#endif
             // Keys are unique and want < range_docs, so top_key > 0. Start at
             // the digit holding its top bit: higher digits are zero everywhere.
             int shift=(63-__clzll(top_key))/RBP_RADIX_BITS*RBP_RADIX_BITS;
@@ -420,10 +452,36 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
             for (;;shift-=RBP_RADIX_BITS) {
                 for (uint32_t b=thread;b<RBP_RADIX_BUCKETS;b+=threads) buckets[b]=0;
                 __syncthreads();
+#if RBP_V3_RADIX_AGG==2
+                // Change B1: the loop runs warp-uniformly (s0 is the warp's first slot), lanes
+                // with the same digit are grouped by __match_any_sync, and the lowest lane of
+                // each group adds the group's size. RBP_RADIX_BUCKETS marks "no key".
+                for (uint32_t s0=thread-lane;s0<range_docs;s0+=threads) {
+                    const uint32_t s=s0+lane;
+                    uint32_t bucket=RBP_RADIX_BUCKETS;
+                    if (s<range_docs) {
+                        const uint32_t score=scores[s];
+                        if (!(skip0 && score==0)) {
+                            const uint64_t key=(uint64_t(score)<<key_bits)|(rank_top-v.tie_rank[first+s]);
+                            if ((key&mask)==prefix) bucket=uint32_t(key>>shift)&(RBP_RADIX_BUCKETS-1);
+                        }
+                    }
+                    const uint32_t peers=__match_any_sync(0xffffffffu,bucket);
+                    if (bucket<RBP_RADIX_BUCKETS && lane==uint32_t(__ffs(peers)-1)) atomicAdd(&buckets[bucket],uint32_t(__popc(peers)));
+                }
+#elif RBP_V3_RADIX_AGG==1
+                for (uint32_t s=thread;s<range_docs;s+=threads) {
+                    const uint32_t score=scores[s];
+                    if (skip0 && score==0) continue;
+                    const uint64_t key=(uint64_t(score)<<key_bits)|(rank_top-v.tie_rank[first+s]);
+                    if ((key&mask)==prefix) atomicAdd(&buckets[(key>>shift)&(RBP_RADIX_BUCKETS-1)],1u);
+                }
+#else
                 for (uint32_t s=thread;s<range_docs;s+=threads) {
                     const uint64_t key=(uint64_t(scores[s])<<key_bits)|(rank_top-v.tie_rank[first+s]);
                     if ((key&mask)==prefix) atomicAdd(&buckets[(key>>shift)&(RBP_RADIX_BUCKETS-1)],1u);
                 }
+#endif
                 __syncthreads();
                 if (warp==0) {
                     // Lane L sums buckets top-down in a contiguous chunk; a warp
@@ -460,10 +518,19 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
         // Exactly `want` keys are >= threshold. Gather, pad to list_cap, sort descending.
         if (thread==0) radix_state[3]=0;
         __syncthreads();
+#if RBP_V3_RADIX_AGG
+        for (uint32_t s=thread;s<range_docs;s+=threads) {
+            const uint32_t score=scores[s];
+            if (skip0 && score==0) continue;   // below the threshold anyway; saves the tie_rank load
+            const uint64_t key=(uint64_t(score)<<key_bits)|(rank_top-v.tie_rank[first+s]);
+            if (key>=threshold) lists[atomicAdd(&radix_state[3],1u)]=key;
+        }
+#else
         for (uint32_t s=thread;s<range_docs;s+=threads) {
             const uint64_t key=(uint64_t(scores[s])<<key_bits)|(rank_top-v.tie_rank[first+s]);
             if (key>=threshold) lists[atomicAdd(&radix_state[3],1u)]=key;
         }
+#endif
         for (uint32_t i=want+thread;i<list_cap;i+=threads) lists[i]=0;
         __syncthreads();
 #ifdef RBP_STAGE_CLOCKS
@@ -774,7 +841,7 @@ int main(int argc,char** argv) {
         string cpu_affinity="unknown",status_line;ifstream status("/proc/self/status");
         while (getline(status,status_line)) if (status_line.rfind("Cpus_allowed_list:",0)==0) { istringstream affinity(status_line.substr(18));affinity>>cpu_affinity; }
         research_gate("cuda-range-v2",N,count,k,gpu,argv[1],argv[2],
-            ",\"batch_size\":1,\"query_argument_bytes\":"+to_string(sizeof(QueryArgs))+",\"vocab\":"+to_string(index.vocab)+",\"nnz\":"+to_string(index.impacts.size())+",\"score_accumulator_bits\":"+to_string(sizeof(uint32_t)*8)+",\"returned_score_bits\":"+to_string(sizeof(GpuCandidate{}.score)*8)+",\"score_limit_exclusive\":"+to_string(uint64_t(UINT32_MAX))+",\"max_conservative_score_bound\":"+to_string(max_score_bound)+",\"max_slots_per_thread\":"+to_string(RBP_MAX_SLOTS)+",\"v3_theta\":"+to_string(RBP_V3_THETA)+",\"v3_radix\":"+to_string(RBP_V3_RADIX)+",\"v3_unroll\":"+to_string(RBP_V3_UNROLL)+",\"radix_min_k\":"+to_string(radix_min_k)+",\"selection_path\":"+string(radix ? "\"radix\"" : "\"warp-lists\"")+",\"variant\":5,\"range_size\":"+to_string(W)+",\"postings_cap\":"+to_string(index.postings_cap)+",\"ranges\":"+to_string(R)+",\"blocks\":"+to_string(index.blocks())+",\"score_threads\":"+to_string(threads)+",\"merge_threads\":"+to_string(merge_threads)+",\"max_supported_k\":"+to_string(RBP_MAX_K)+",\"max_query_terms\":"+to_string(max_terms)+",\"max_supported_terms\":"+to_string(RBP_MAX_TERMS)+",\"max_term_document_multiplicity\":"+to_string(multiplicity)+",\"slots_per_thread\":"+to_string(slots)+",\"warp_list_capacity\":"+to_string(list_cap)+",\"shared_bytes\":"+to_string(shared_bytes)+",\"index_posting_bytes\":"+to_string(index.posting_bytes())+",\"tie_rank_bytes\":"+to_string((tie_rank.count+rank_slot.count)*2)+",\"verify_scores\":"+to_string(verify)+",\"warmup_rounds\":"+to_string(warmups)+",\"repeats\":"+to_string(rounds)+",\"cpu_affinity\":"+research_quote(cpu_affinity)+",\"index_sha256\":"+research_quote(sha_hex(index.file_sha))+",\"source_gsp_sha256\":"+research_quote(sha_hex(index.source_sha)),
+            ",\"batch_size\":1,\"query_argument_bytes\":"+to_string(sizeof(QueryArgs))+",\"vocab\":"+to_string(index.vocab)+",\"nnz\":"+to_string(index.impacts.size())+",\"score_accumulator_bits\":"+to_string(sizeof(uint32_t)*8)+",\"returned_score_bits\":"+to_string(sizeof(GpuCandidate{}.score)*8)+",\"score_limit_exclusive\":"+to_string(uint64_t(UINT32_MAX))+",\"max_conservative_score_bound\":"+to_string(max_score_bound)+",\"max_slots_per_thread\":"+to_string(RBP_MAX_SLOTS)+",\"v3_theta\":"+to_string(RBP_V3_THETA)+",\"v3_radix\":"+to_string(RBP_V3_RADIX)+",\"v3_unroll\":"+to_string(RBP_V3_UNROLL)+",\"v3_radix_agg\":"+to_string(RBP_V3_RADIX_AGG)+",\"radix_min_k\":"+to_string(radix_min_k)+",\"selection_path\":"+string(radix ? "\"radix\"" : "\"warp-lists\"")+",\"variant\":5,\"range_size\":"+to_string(W)+",\"postings_cap\":"+to_string(index.postings_cap)+",\"ranges\":"+to_string(R)+",\"blocks\":"+to_string(index.blocks())+",\"score_threads\":"+to_string(threads)+",\"merge_threads\":"+to_string(merge_threads)+",\"max_supported_k\":"+to_string(RBP_MAX_K)+",\"max_query_terms\":"+to_string(max_terms)+",\"max_supported_terms\":"+to_string(RBP_MAX_TERMS)+",\"max_term_document_multiplicity\":"+to_string(multiplicity)+",\"slots_per_thread\":"+to_string(slots)+",\"warp_list_capacity\":"+to_string(list_cap)+",\"shared_bytes\":"+to_string(shared_bytes)+",\"index_posting_bytes\":"+to_string(index.posting_bytes())+",\"tie_rank_bytes\":"+to_string((tie_rank.count+rank_slot.count)*2)+",\"verify_scores\":"+to_string(verify)+",\"warmup_rounds\":"+to_string(warmups)+",\"repeats\":"+to_string(rounds)+",\"cpu_affinity\":"+research_quote(cpu_affinity)+",\"index_sha256\":"+research_quote(sha_hex(index.file_sha))+",\"source_gsp_sha256\":"+research_quote(sha_hex(index.source_sha)),
             ",\"layout\":\"range-split-bitpacked-positions-term-major\",\"schedule\":\"exhaustive-all-ranges\",\"ranges\":\"boundaries-from-index;uniform-or-postings-capped\",\"decode\":\"combined-work-list;direct-positions;no-decode-barriers\",\"accumulator\":\"uint32-shared-gated-below-2^32-1-widened-to-uint64\",\"selection\":\"thread-sorted-slots;warp-shuffle-select;one-barrier-rank-scatter;merge-in-last-finishing-block-threadfence-atomic-ticket\",\"tie_keys\":\"per-range-original-id-rank-uint16\",\"query_transfer\":\"kernel-argument-by-value\",\"result_transfer\":\"topk-only\"",
             "uint32-guarded-exact-widened-uint64", "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1");
         require(!filesystem::exists(argv[3])&&!filesystem::exists(argv[4]),"Refusing to overwrite results");
