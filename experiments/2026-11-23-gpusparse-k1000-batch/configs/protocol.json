@@ -1,0 +1,30 @@
+{
+ "experiment_id": "2026-11-23-gpusparse-k1000-batch",
+ "status": "REGISTERED 2026-11-23 after the fixtures (72 brute-force cases), before any recorded run",
+ "host": "run A: cuda2 GPU 0 (RTX 2080 Ti). Run B: cuda5 (RTX 4070) if its GPU frees before the deadline. Separate tables; no number crosses machines",
+ "questions": [
+  "How does v3 compare with GPUSparse at k=1000, batch 1?",
+  "How does v3 (streams, 32 in flight) compare with GPUSparse at batch 500, k=1000, in queries per second?"
+ ],
+ "gpusparse": {
+  "batch1": "code/gsk: the team adapter copied with its k limit raised from 128 to 1000 (a labelled variant, not the released system); check_gs.py proves nothing else differs",
+  "batch500_canonical": "release 92bb87b's chunked scatter and compaction kernels unchanged; selection by packed int64 keys (exact, team ties)",
+  "batch500_native": "release 92bb87b's triton_chunked_score_fused called as is on the same uint8 index; arbitrary ties, so checked on scores",
+  "settings": "release defaults: doc_chunk 131072, BLOCK_PL 128, 8192 candidates. Not tuned for this GPU",
+  "why_chunked": "the monolithic accumulator needs 16.5 GiB at batch 500 on 8.8M passages and fits neither GPU; chunked is the release's own answer"
+ },
+ "timing": "3 processes, 3 warm-up + 20 measured rounds, rotating order. Batch 1: adapter timing unchanged. Batch 500: one batch of all 500 queries, query padding and upload through host scores and original IDs; output writing outside. v3 streams: as 2026-11-23-v3-streams-gpusparse",
+ "correctness": "every canonical configuration and every timing process equals the CPU oracle in all rows; native batch: every score equals the oracle, every ID above the k-th score equal, tied IDs rescored",
+ "eligibility": "unchanged: 4.0 machine-wide cores, 0.05 on the pinned core (and sibling on cuda2), no active foreign GPU process; ineligible processes are kept and replaced",
+ "descriptive": "no decision rule: both questions are descriptive comparisons",
+ "triton_cache": "batch-500 processes share one Triton cache per run, filled by the correctness stage, so kernels are not compiled during timing (the release compiles once and reuses too). Batch-1 GPUSparse keeps the adapter's per-process cache; its 3 warm-up rounds absorb the compile",
+ "dev": "dev-gsb-01 (smoke, cuda2): all stages passed; its timings were not read. It led to the shared cache",
+ "limits": [
+  "batch sizes differ between the systems (32 in flight vs 500 in one batch): each system uses its own batch mode; completion latency differs accordingly",
+  "GPUSparse runs in Python/PyTorch 2.6 + Triton 3.2 (the release used 2.9.1 + 3.5.1)",
+  "the paper's batch-500 figures are from an 80 GB H100 and are not compared",
+  "calibration queries only",
+  "uint8 storage is an adaptation on both paths: the release stores FP32"
+ ],
+ "external_wait": "cuda5 is occupied by another user on 2026-11-23 16:00 EST"
+}
