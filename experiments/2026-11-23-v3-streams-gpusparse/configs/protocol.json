@@ -1,0 +1,24 @@
+{
+  "experiment_id": "2026-11-23-v3-streams-gpusparse",
+  "status": "REGISTERED 2026-11-23 after the driver fixtures (1,152 runs on cuda2), before any recorded run; no timing of this experiment was read before registration",
+  "host": "cuda2 only, GPU 0 (RTX 2080 Ti), one session. No number is compared with a cuda5 (RTX 4070) number; this is a separate, labelled table",
+  "why_cuda2": "cuda5's GPU was held by another user's job for more than 6 hours on 2026-11-23, two days before the deadline",
+  "questions": [
+    "Do several queries in flight on streams raise range scorer v3's throughput at k=1000?",
+    "How does v3 compare with the compact guarded-FP32 GPUSparse adaptation at k=10 and k=100, batch 1?"
+  ],
+  "not_included": "GPUSparse at k=1000 (the adaptation accepts k <= 128) and batch-500 (no batch mode found in this repository's adaptation; the paper's number is another implementation, hardware and protocol)",
+  "inputs": "full collection, 500 calibration queries; hashes pinned in code/run.py; W=4096 index built here from the pinned GSP, required equal to 06368cee",
+  "configurations": "code/run.py CONFIGS; v3 W=4096, 256 threads, RADIX_MIN_K 1 (the timed u4m settings); GPUSparse adapter unchanged (block_pl 512, batch 1), pinned package versions",
+  "driver": "src/cuda_range_v3_batch.cu launches cuda_range_v3.cu's kernel unchanged; each query in flight owns every mutable buffer",
+  "correctness": "every configuration and every timing process equals the CPU oracle in all rows; VERIFY 2 (poisoned buffers, counter and theta re-armed) for the in-flight driver",
+  "timing": "3 processes, 3 warm-up + 20 measured rounds, rotating order; eligibility and replacement as in code/run.py (pinned-core rule of 2026-11-19-prune-batch amendment 1 plus the hyperthread sibling)",
+  "numa": "host thread on NUMA node 1 (the GPU's node), least-busy of CPUs 3..19 odd; sampler on CPU 1",
+  "analysis": "analysis/analyze.py",
+  "decision_rule": "streams is faster than one at a time at k=1000 if the b32 interval lies wholly above 1; otherwise no demonstrated gain. Everything else is descriptive",
+  "limits": [
+    "both batch-1 scorers time host query construction to host results, but GPUSparse runs in Python/PyTorch",
+    "calibration queries only; the 6,480 evaluation queries are not used",
+    "shared machine, one RTX 2080 Ti"
+  ]
+}
