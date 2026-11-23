@@ -1,0 +1,60 @@
+{
+  "experiment_id": "2026-11-23-range-v3-g",
+  "status": "registered before any GPU work (G1 is CPU-only and was computed first)",
+  "owner": "Arnav",
+  "recording": "not recorded by the team runtime",
+  "purpose": "repeat GPUSparse paper experiments (arXiv 2606.26441) for the report: quality (G1), collection scaling (G2, paper Table 2) and bandwidth/decomposition (G3, paper Tables 5-6)",
+  "label": "calibration queries only (500), after the freeze (the held-out queries were used in #27); the 6,480 evaluation queries are not touched",
+  "source": {
+    "branch": "exp/arnav/2026-11-23-range-v3-g from origin/main 27f581f (contains #33, bc4403a)",
+    "u4m": "src/cuda_range_v3.cu at the run's HEAD with its defaults; CUDA 12.6 SASS must be 8f8a5d49e0e0ad3f (checked by code/build_g.sh before any GPU work)",
+    "ctrl": "src/cuda_range_v2.cu at main 74dd5d3 (V2-5), SASS 53eb3cac16e4bc19",
+    "clock_build": "u4m with -DRBP_STAGE_CLOCKS",
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17, CUDA 12.6 on cuda5"
+  },
+  "G1": {
+    "what": "quality of the exact top-1000 (every exact scorer under the team contract returns it: uint8 impacts, cap-32 query weights)",
+    "inputs": {
+      "qrels": "configs/inputs-qrels.json (new external input: MS MARCO passage dev.small qrels, SHA-256 ddc607db...; in run-bulk, not Git)",
+      "run": "pinned-provenance CPU oracle top-1000 for the 500 calibration queries (SHA-256 302b63d4fc0c55cb..., Measurement F inputs)",
+      "queries": "data/derived/calibration-500.tsv (SHA-256 150917d7...)"
+    },
+    "metrics": "MRR@10 (MS MARCO official), nDCG@10 (trec_eval ndcg_cut_10), Recall@1000 (trec_eval recall_1000); means over the 500 calibration queries; canonical order and trec_eval tie order (analysis/g1_quality.py)",
+    "paper": "0.383 / 0.449 / 0.983 over 6,980 queries with FP32 scoring",
+    "cpu_only": true
+  },
+  "G2": {
+    "sizes": [
+      100000,
+      1000000,
+      8841823
+    ],
+    "cells": {
+      "u4m": "W=4096, crossover 1",
+      "ctrl": "V2-5, W=1024"
+    },
+    "k": [
+      10,
+      100,
+      1000
+    ],
+    "indexes": "100K and 1M: data/derived/hash-{N}-w4096-pos.rbp and -w1024-pos.rbp (existing; SHA-256 and sizes recorded in the run; the 100K W=4096 index already exists, so it is not rebuilt; its round-trip check is run on the CPU at the start of the session); full: /scratch/ag11163/full-inputs (W=4096 SHA-256 06368cee..., W=1024 c7669620..., Measurement F)",
+    "oracles": "data/derived/oracle/cpu-top{k}-{N}.tsv for 100K and 1M; full: the Measurement F oracles",
+    "per_size": "gates first (u4m and ctrl, 500 calibration queries, k=10/100/1000, 1 warm-up + 1 measured round, exact; a failure stops the session), then one timing set per k: 3 processes per cell, rotating order (r0 u4m,ctrl; r1 ctrl,u4m; r2 u4m,ctrl), 500 queries x (3 warm-up + 20 measured rounds), batch 1, 256 threads; every timed top-k checked against the oracle",
+    "statistics": "per (size, k, scorer): median, p95 and p99 over the 3 x 500 per-process query medians; u4m / ctrl at the same size: geometric mean of the paired (process, query) ratios, crossed bootstrap 10,000 draws, 95% interval, seed 20261124; growth = median at 8,841,823 / median at 100,000 (document ratio 88.42; paper: 85x latency over 88x documents at batch 500); index size (bytes) and peak GPU memory per process (analysis/gpu_memory.py)",
+    "script": "code/run_g.sh, analysis/analyze_g2.py"
+  },
+  "G3": {
+    "what": "full collection, u4m, k=1000, first 25 calibration queries",
+    "clock_build": "3 warm-up + 5 measured rounds; experiments/2026-11-22-range-v3-tune/analysis/analyze_clocks.py --radix; stages mapped onto the paper's categories: allocation/zeroing = setup (lookup + zero, word-table prefix), traversal = decode+add, top-k = local top-k (radix select + gather, bitonic sort) + candidate write + threadfence + done ticket + merge",
+    "ncu": "25 launches; sections SpeedOfLight, MemoryWorkloadAnalysis, Occupancy, LaunchStats; metrics dram__bytes_read.sum, dram__bytes_write.sum, gpu__dram_throughput.avg.pct_of_peak_sustained_elapsed, sm__warps_active.avg.pct_of_peak_sustained_active (achieved occupancy), lts__t_sector_hit_rate.pct (L2 hit rate), gpu__time_duration.sum; base clocks, caches flushed per pass",
+    "script": "code/run_g.sh, analysis/analyze_g3.py"
+  },
+  "correctness": "every GPU process's top-k equals the CPU oracle; a mismatch stops the session",
+  "estimate": {
+    "gpu_time": "about 37 min (full collection: 6 gate processes ~6 min, 18 timing processes ~22.5 min with ~40 s index load each; 1M ~4.5 min; 100K ~1.5 min; G3 ~2.5 min); below the owner's 45 min limit",
+    "gpu_memory": "at most ~3.9 GB per process (full collection: u4m ~3.4 GB, ctrl ~3.9 GB, Measurement F)"
+  },
+  "gpu_policy": "idle check before every GPU process (no compute process, none of our GPU jobs, no other run_* script outside the session); when busy, retry every 300 s up to 6 h after launch, then stop and report; a process that overlaps another user's GPU process is preserved and rerun (at most 3 per slot); experiments/2026-11-22-range-v3-tune/code/session_lib.sh and overlap.py (read only)",
+  "outputs": "results/2026-11-23-range-v3-g/<run>/; compressed top-k listings and Nsight reports to run-bulk with SHA-256"
+}
