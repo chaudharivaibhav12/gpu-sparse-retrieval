@@ -13,6 +13,14 @@
     "effects": "the holder cannot change our answers (every process is checked against the oracle) and issues no GPU work during the timed rounds; it holds ~150-250 MB; per-process peak memory excludes it; timing is validated against Measurement F's W=4096 cells (cross-session check)",
     "code": "code/session_lib_h.sh (redefines wait_idle and run_slot; the tune session_lib.sh monitors are reused read-only)"
   },
-  "inputs": "code/build_indexes_h.sh: W=256 (PR #27 pin 0ad6531c..., content 90b86a65..., header positions/256), W=1024 (c7669620...), W=4096 (06368cee...) verified by SHA-256; W=512/2048/8192/16384 built from the pinned GSP (e838dfbf...) with build time, size, SHA-256 and round-trip check; queries data/derived/calibration-500.tsv; oracle: pinned top-1000 (302b63d4...), top-10/100/316 as its prefixes (top-10/100 equal to the pinned files byte for byte)",
-  "pre_registration_session": "code/run_h_pre.sh: one-query probe per W at its largest k; gates for every (W, k) cell incl. k=316 (500 queries, 1 warm-up + 1 measured round, exact); feasibility table and GPU-time estimate (analysis/feasibility_h.py). Nothing timed."
+  "inputs": "code/build_indexes_h.sh: W=256 (PR #27 pin 0ad6531c..., content 90b86a65..., header positions/256), W=1024 (c7669620...), W=4096 (06368cee...) verified by SHA-256; W=512/2048 built from the pinned GSP (e838dfbf...) with build time, size, SHA-256 and round-trip check; queries data/derived/calibration-500.tsv; oracle: pinned top-1000 (302b63d4...), top-10/100/316 as its prefixes (top-10/100 equal to the pinned files byte for byte)",
+  "pre_registration_session": "code/run_h_pre.sh: one-query probe per W at its largest k; gates for every (W, k) cell incl. k=316 (500 queries, 1 warm-up + 1 measured round, exact); feasibility table and GPU-time estimate (analysis/feasibility_h.py). Nothing timed.",
+  "grid_change": {
+    "date": "2026-11-23",
+    "by": "owner, before registration and before any H GPU work",
+    "grid": "W in {256, 512, 1024, 2048, 4096} x k in {10, 100, 1000}: 15 cells minus infeasible ones (W=512 at every k since it is built); k=316 at every W only if the GPU estimate including it is <= 90 min",
+    "upper_edge": "W=4096 is the largest W tested; if it is best at some k, a larger W was not ruled out (stated in the report)",
+    "indexes": "W=8192 build stopped by exact PID (no partial output existed); W=16384 not built; W=512 and W=2048 kept (see the inputs STATUS)",
+    "rules": "H1-H4 unchanged; H2's regret table over the W values timed at every k"
+  }
 }

@@ -23,7 +23,9 @@ FULL=${FULL:-/scratch/ag11163/full-inputs}
 Q=data/derived/calibration-500.tsv
 COMPARE=experiments/2026-11-13-range-bitpack/analysis/compare_topk.py
 NQ=${QUERIES_LIMIT:-500}
-CELLS=(${CELLS:-256:10 256:100 256:316 256:1000 512:10 1024:10 1024:100 1024:316 1024:1000 2048:10 2048:100 2048:316 2048:1000 4096:10 4096:100 4096:316 4096:1000 8192:10 8192:100 8192:316 8192:1000 16384:10 16384:100 16384:316 16384:1000})
+# Grid (owner change before registration, 2026-11-23): W in {256, 512, 1024, 2048, 4096} x k in {10, 100, 1000},
+# plus k=316 at every W (gated so its cost is known; timed only if the estimate allows).
+CELLS=(${CELLS:-256:10 256:100 256:316 256:1000 512:10 512:100 512:316 512:1000 1024:10 1024:100 1024:316 1024:1000 2048:10 2048:100 2048:316 2048:1000 4096:10 4096:100 4096:316 4096:1000})
 ORACLE1000=${ORACLE1000:-$FULL/oracle/cpu-top1000-8841823.tsv}
 test ! -e "$RUN" || { echo "Refusing to reuse $RUN"; exit 1; }
 mkdir -p "$RUN/logs" "$RUN/raw" "$RUN/analysis" "$RUN/inputs"
