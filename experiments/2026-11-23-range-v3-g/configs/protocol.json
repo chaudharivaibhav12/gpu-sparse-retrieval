@@ -70,5 +70,17 @@
     "order": "G3 first (analysed as soon as it finishes, so its results stand on their own), then G2's 100K cells",
     "gpu_policy": "same idle rule, retry every 300 s, window 12 hours from launch; if the window closes after G3 but before G2 completes, G3's results are kept and reported and G2's 100K cells are recorded as not done",
     "estimate": "about 7 min of GPU time (G3: 2 full-collection processes ~3 min incl. the Nsight replay; 100K: 6 gate + 18 timing processes ~4 min)"
+  },
+  "amendment_2": {
+    "date": "2026-11-23",
+    "by": "owner (Arnav), registered before any further GPU work",
+    "reason": "attempt 20261123-cuda5-g-02 waited 14:01-18:00 UTC behind another user's training job. That user reports the job saves and pauses when another GPU user appears; coexistence probes (outside the protocol, not measurements) showed it stops computing ~100 s after one of our processes starts and its process exits ~130 s in, then restarts ~2 min after we leave. A third user's run_* scripts (not on the GPU) were also present, which the old idle rule counted as busy.",
+    "holder": "code/gpu_holder.cu: one CUDA context of ours for the whole session; 'work' mode (one 1-block kernel of ~1 ms every 100 ms) only while another user's process is on the GPU, so the yielding job pauses; 'idle' mode (no kernels, no copies) otherwise; mode changes logged in logs/holder.log; stopped at the end",
+    "idle_rule": "before every GPU process: no compute process other than the holder, none of our GPU jobs, and the holder in idle mode (switched to idle and re-checked after 5 s); the run_* script criterion is dropped. Retry every 300 s until the deadline. The per-process overlap check (pmon + 0.5 s poll; overlapped processes preserved and rerun, at most 3 per slot) is unchanged; it classifies the holder as ours",
+    "validation": "before G3: 1M u4m k=10, one process x 500 queries x (3 + 20 rounds), holder resident and idle, exact against the oracle; the median of per-query medians must be within 5% of Measurement E's idle 0.0987 ms, else the session stops",
+    "window": "12 hours from launch",
+    "effects": "the holder is a separate process and cannot change our answers (every process is still checked against the oracle); while idle it issues no GPU work, so it does not time-slice with our kernels; it holds ~250 MB of 12 GB; per-process peak memory excludes it; Nsight DRAM counters are device-wide, so another user's traffic would count, which the overlap check guards against. The 100K cells are timed with the idle holder resident, while Measurements E and F were not; the within-size u4m / ctrl ratio is unaffected and cross-size comparisons were already descriptive.",
+    "other_user": "the paused job's owner agreed that it yields to other GPU users (model training)",
+    "estimate": "about 15 min wall: up to ~5 min for the job to pause, ~1 min validation, ~3 min G3, ~4 min 100K cells"
   }
 }

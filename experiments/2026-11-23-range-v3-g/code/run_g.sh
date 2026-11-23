@@ -49,6 +49,8 @@ stage() { echo "$(date -u +%FT%TZ) STAGE $*" | tee -a "$RUN/logs/stages.txt"; }
 fail() { echo "$(date -u +%FT%TZ) FAILED $*" | tee -a "$RUN/logs/stages.txt"; exit 1; }
 # shellcheck source=../../2026-11-22-range-v3-tune/code/session_lib.sh
 source "$T/code/session_lib.sh"
+# Amendment 2: holder-based wait_idle (redefines wait_idle; run_slot and the monitors are unchanged)
+source "$X/code/session_lib_g.sh"
 X_SAVED=$X; X=$T   # session_lib's run_slot calls $X/code/overlap.py
 stage environment
 { git rev-parse HEAD; hostname -s; nvidia-smi --query-gpu=name,driver_version,clocks.max.sm,memory.total --format=csv,noheader; nvcc --version | tail -1; [ "$DRY" = 1 ] || ncu --version | tail -1; } > "$RUN/logs/environment.txt" 2>&1
@@ -65,6 +67,23 @@ check() {  # tag oracle k groups [keep]
     ${COMPRESS:-zstd -q -T4 --rm} "$RUN/raw/$1.tsv"
 }
 start_monitors
+holder_start
+trap 'holder_stop; stop_monitors' EXIT
+# Amendment 2 validation (before G3): 1M u4m k=10, one process x (3 + 20 rounds), holder resident;
+# its pooled median must be within 5% of Measurement E's idle 0.0987 ms, else the session stops.
+if [ "$DRY" != 1 ]; then
+    stage "holder validation 1M u4m k=10"
+    tag=validate-1000000-u4m-k10
+    run_slot "$tag" -- "$BUILD/u4m/scorer" "$(index 1000000 4096)" "$Q" "$RUN/raw/$tag.csv" "$RUN/raw/$tag.tsv" "$NQ" 10 0 0 "$ROUNDS" "$WARMUPS" 256 256 - 1
+    check "$tag" "$(oracle 1000000 10)" 10 $((ROUNDS+WARMUPS))
+    python3 - "$RUN/raw/$tag.csv" "$T/analysis" > "$RUN/logs/holder-validation.txt" <<'PY' || fail "holder validation: median not within 5% of Measurement E's 0.0987 ms (logs/holder-validation.txt)"
+import statistics, sys
+sys.path.insert(0, sys.argv[2]); import analyze_timing_e as E   # same statistic as Measurement E's 0.0987 ms
+_, wall, _ = E.medians(sys.argv[1], 500, 20, 3)
+m = statistics.median(wall); print("median of per-query medians %.4f ms; Measurement E idle reference (3 processes) 0.0987 ms; ratio %.3f" % (m, m / 0.0987))
+sys.exit(0 if abs(m / 0.0987 - 1) <= 0.05 else 1)
+PY
+fi
 stage "G3 clocks size=$GS k=1000"
 tag=g3-clocks-k1000
 run_slot "$tag" -- env RBP_CLOCKS_OUT="$RUN/raw/$tag" "$BUILD/u4m-clocks/scorer" "$(index "$GS" 4096)" "$Q" "$RUN/raw/$tag.csv" "$RUN/raw/$tag.tsv" "$G3Q" 1000 0 0 5 3 256 256 - 1
@@ -108,6 +127,7 @@ for s in "${SIZES[@]}"; do
     done
 done
 stage measurements-complete
+holder_stop
 stop_monitors
 X=$X_SAVED
 stage analysis

@@ -22,6 +22,7 @@ build u4m HEAD cuda_range_v3.cu ""
 build u4m-clocks HEAD cuda_range_v3.cu "-DRBP_STAGE_CLOCKS"
 build ctrl 74dd5d303f0cf5690a10f2060f6da536726705dc cuda_range_v2.cu ""
 g++ -O3 -Wall -Wextra -Wpedantic -std=c++17 src/range_bitpack_tool.cpp -o "$OUT/range_bitpack_tool"
+mkdir -p "$OUT/holder" && nvcc -O3 -arch=sm_89 -std=c++17 experiments/2026-11-23-range-v3-g/code/gpu_holder.cu -o "$OUT/holder/gpu_holder"   # amendment 2
 if [ "${DRY:-0}" != 1 ]; then
     case "$(cat "$OUT/u4m/sass.sha256")" in 8f8a5d49e0e0ad3f*) echo "U4M_SASS_OK";; *) echo "U4M_SASS_DIFFERS"; exit 1;; esac
     case "$(cat "$OUT/ctrl/sass.sha256")" in 53eb3cac16e4bc19*) echo "CTRL_SASS_OK";; *) echo "CTRL_SASS_DIFFERS"; exit 1;; esac
