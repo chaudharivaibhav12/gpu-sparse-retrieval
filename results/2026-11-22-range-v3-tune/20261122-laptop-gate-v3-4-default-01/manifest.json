@@ -1,0 +1,427 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-22-range-v3-tune",
+  "run_id": "20261122-laptop-gate-v3-4-default-01",
+  "status": "passed-laptop-gate",
+  "scope": "laptop gate (development, CUDA 13.3): v3-4-default; fixtures incl. v3 and v3-4 cases (default crossover and crossover 1); 100K and 1M x 500 calibration queries x k=10/100/1000 at W=4096 (crossover 1) and W=1024 (default crossover), 256 threads",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "37d1ffe0825dbf741e127d74e05636e93c513019",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17",
+    "source_sha256": {
+      "src/cuda_range_v2.cu": "0fa620c928e1857746a7ddc909d14ecf0a7736bd9e9b2553510a358628a10743",
+      "tests/check_range_bitpack.py": "f73f6be74ee3d3e6736df768d47de2526fc0ffc46585ce4733e53bc947add347",
+      "experiments/2026-11-22-range-v3-tune/code/gate_variant.sh": "d0c1932a4c3afe866ef59249085052f1619ff831a7ee7407eff1ed454a7e6849",
+      "experiments/2026-11-22-range-v3-tune/code/build_variants.sh": "a93e84efbbb0ddddd1d36b3f438ca4d05f661988232fd04be27414b466411d12"
+    },
+    "binary_sha256": {
+      "build/v34-laptop-37d1ffe/v3-4-default/scorer": "699cfb6944df1513548da5320ba9aea918cecda198ad9ec9ce1af3d959d6c958"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "data/derived/hash-100000-w4096-pos.rbp": {
+      "sha256": "b8c6701c55e7fde9ba3eb98ce5b4dad10494a3ddd6dc33d8038c307e827a2e16",
+      "bytes": 38386501
+    },
+    "data/derived/hash-1000000-w4096-pos.rbp": {
+      "sha256": "67e19c8c6eec751f709b644488c8f4bd13e72a821831a7ca9d65133fc02bed34",
+      "bytes": 370880289
+    },
+    "data/derived/hash-100000-w1024-pos.rbp": {
+      "sha256": "66457344c0e14e2ba729b5147be7060e9fd9898ae5848dab1cd6073aa5c8c9e3",
+      "bytes": 46639664
+    },
+    "data/derived/hash-1000000-w1024-pos.rbp": {
+      "sha256": "3c653e914699ac9a6558d2889d0000aa29d573a5d045f43ea26d15fc2f6c68f5",
+      "bytes": 437105290
+    }
+  },
+  "environment": {
+    "host": "arnavgupta829",
+    "kernel": "Linux 6.6.87.2-microsoft-standard-WSL2",
+    "gpu": "NVIDIA GeForce RTX 4070 Laptop GPU, 617.14, 8188 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_13.3.r13.3/compiler.38244171_0"
+    ],
+    "gxx": [
+      "g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0"
+    ],
+    "python": "Python 3.14.4"
+  },
+  "commands": [
+    "python3 tests/check_range_bitpack.py build/v34-laptop-37d1ffe/v3-4-default/range_bitpack_tool build/v34-laptop-37d1ffe/v3-4-default/scorer --gpu 0 --max-k 1000 --encoding positions --single-kernel --v3-cases enforce --v34-cases --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/fixtures",
+    "python3 tests/check_range_bitpack.py build/v34-laptop-37d1ffe/v3-4-default/range_bitpack_tool build/v34-laptop-37d1ffe/v3-4-default/scorer --gpu 0 --max-k 1000 --encoding positions --single-kernel --v3-cases enforce --v34-cases --only-v3 --scorer-arg 1 --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/fixtures-radix1",
+    "build/v34-laptop-37d1ffe/v3-4-default/scorer data/derived/hash-100000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w4096-k10.csv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w4096-k10.tsv 500 10 0 0 1 1 256 256 - 1",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-100000.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w4096-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/analysis/compare-100000-w4096-k10.json",
+    "build/v34-laptop-37d1ffe/v3-4-default/scorer data/derived/hash-100000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w4096-k100.csv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w4096-k100.tsv 500 100 0 0 1 1 256 256 - 1",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top100-100000.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w4096-k100.tsv --queries 500 --k 100 --groups-per-query 2 --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/analysis/compare-100000-w4096-k100.json",
+    "build/v34-laptop-37d1ffe/v3-4-default/scorer data/derived/hash-100000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w4096-k1000.csv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w4096-k1000.tsv 500 1000 0 0 1 1 256 256 - 1",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-100000.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w4096-k1000.tsv --queries 500 --k 1000 --groups-per-query 2 --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/analysis/compare-100000-w4096-k1000.json",
+    "build/v34-laptop-37d1ffe/v3-4-default/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w4096-k10.csv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w4096-k10.tsv 500 10 0 0 1 1 256 256 - 1",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-1000000.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w4096-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/analysis/compare-1000000-w4096-k10.json",
+    "build/v34-laptop-37d1ffe/v3-4-default/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w4096-k100.csv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w4096-k100.tsv 500 100 0 0 1 1 256 256 - 1",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top100-1000000.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w4096-k100.tsv --queries 500 --k 100 --groups-per-query 2 --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/analysis/compare-1000000-w4096-k100.json",
+    "build/v34-laptop-37d1ffe/v3-4-default/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w4096-k1000.csv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w4096-k1000.tsv 500 1000 0 0 1 1 256 256 - 1",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-1000000.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w4096-k1000.tsv --queries 500 --k 1000 --groups-per-query 2 --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/analysis/compare-1000000-w4096-k1000.json",
+    "build/v34-laptop-37d1ffe/v3-4-default/scorer data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w1024-k10.csv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w1024-k10.tsv 500 10 0 0 1 1 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-100000.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w1024-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/analysis/compare-100000-w1024-k10.json",
+    "build/v34-laptop-37d1ffe/v3-4-default/scorer data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w1024-k100.csv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w1024-k100.tsv 500 100 0 0 1 1 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top100-100000.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w1024-k100.tsv --queries 500 --k 100 --groups-per-query 2 --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/analysis/compare-100000-w1024-k100.json",
+    "build/v34-laptop-37d1ffe/v3-4-default/scorer data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w1024-k1000.csv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w1024-k1000.tsv 500 1000 0 0 1 1 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-100000.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-100000-w1024-k1000.tsv --queries 500 --k 1000 --groups-per-query 2 --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/analysis/compare-100000-w1024-k1000.json",
+    "build/v34-laptop-37d1ffe/v3-4-default/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w1024-k10.csv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w1024-k10.tsv 500 10 0 0 1 1 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top10-1000000.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w1024-k10.tsv --queries 500 --k 10 --groups-per-query 2 --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/analysis/compare-1000000-w1024-k10.json",
+    "build/v34-laptop-37d1ffe/v3-4-default/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w1024-k100.csv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w1024-k100.tsv 500 100 0 0 1 1 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top100-1000000.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w1024-k100.tsv --queries 500 --k 100 --groups-per-query 2 --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/analysis/compare-1000000-w1024-k100.json",
+    "build/v34-laptop-37d1ffe/v3-4-default/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w1024-k1000.csv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w1024-k1000.tsv 500 1000 0 0 1 1 256 256 -",
+    "python3 experiments/2026-11-13-range-bitpack/analysis/compare_topk.py data/derived/oracle/cpu-top1000-1000000.tsv results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/raw/real-1000000-w1024-k1000.tsv --queries 500 --k 1000 --groups-per-query 2 --output results/2026-11-22-range-v3-tune/20261122-laptop-gate-v3-4-default-01/analysis/compare-1000000-w1024-k1000.json"
+  ],
+  "artifacts": {
+    "analysis/compare-100000-w1024-k10.json": {
+      "sha256": "3b94642aec1a3b260edc71fb3808c47d66fc565a87ef86bea80639427603805c",
+      "bytes": 351
+    },
+    "analysis/compare-100000-w1024-k100.json": {
+      "sha256": "ae41bce4b39b9031ec6526d39c1ad67a6ef987c6e4aa1f841046528eff6074b7",
+      "bytes": 355
+    },
+    "analysis/compare-100000-w1024-k1000.json": {
+      "sha256": "99405dc7f379fa878659b112660935e8ed8c03864106d0623509523dd5d24dcc",
+      "bytes": 359
+    },
+    "analysis/compare-100000-w4096-k10.json": {
+      "sha256": "9ca2f030912b417ed8d6dd6b347b5c9396e8de04227d40fa48a978ac0aebb75c",
+      "bytes": 351
+    },
+    "analysis/compare-100000-w4096-k100.json": {
+      "sha256": "3cea2cae649715f050d002a7338e936c2d5ee47802ef4b8e5360a4d7d540f528",
+      "bytes": 355
+    },
+    "analysis/compare-100000-w4096-k1000.json": {
+      "sha256": "46ba1d29d029f8360e33fba1986f4a10e6fecffb0b06a970d8f86ff2e4b4ba50",
+      "bytes": 359
+    },
+    "analysis/compare-1000000-w1024-k10.json": {
+      "sha256": "5288a5925e72b0f7e24870d6c0b400c0a4e751522561572b1d56f804231fa9b0",
+      "bytes": 353
+    },
+    "analysis/compare-1000000-w1024-k100.json": {
+      "sha256": "b83c8431f685a2bbea0228f2ececddb5cd735983169072967d83dc035b72ea65",
+      "bytes": 357
+    },
+    "analysis/compare-1000000-w1024-k1000.json": {
+      "sha256": "ee023201fb91753d43b1e2d44709106095cc6169d2be9fef403795d5bb172a90",
+      "bytes": 361
+    },
+    "analysis/compare-1000000-w4096-k10.json": {
+      "sha256": "52d6de81c3546b12dd477196f1cefe78272991d721ad5b87c4f768cc7b496034",
+      "bytes": 353
+    },
+    "analysis/compare-1000000-w4096-k100.json": {
+      "sha256": "3b3f7e7556186606ecfb51879e69379edf5ca077ebaa40a1307db44ce743da15",
+      "bytes": 357
+    },
+    "analysis/compare-1000000-w4096-k1000.json": {
+      "sha256": "18910d4bf455514717dbd91214f7b493aa392cc8a3a06341080625b8f7e99c2c",
+      "bytes": 361
+    },
+    "analysis/dev-readings.txt": {
+      "sha256": "1626e5692e5599c4d911a2fcd9bf564c29207458bd7435e995e5e7d1c517f9d9",
+      "bytes": 567
+    },
+    "logs/binary-sha256.txt": {
+      "sha256": "cf96f9509113e5e4d3d769e652d7d575d162094421d2ffefc7fefb1a09ace3d5",
+      "bytes": 158
+    },
+    "logs/commands.txt": {
+      "sha256": "9e73f8bac166b423e62e3169c6b0886aaee2ce24d4ce2121105d7ea483dc270f",
+      "bytes": 9360
+    },
+    "logs/environment.txt": {
+      "sha256": "717e50aca7bb9df4351c424496414b7b7c436ba6fedee6920ff6d9eb78ebb021",
+      "bytes": 259
+    },
+    "logs/fixtures-radix1.log": {
+      "sha256": "6c7af3591604b82238f4ce2090aca2d10f1c1a08c3cae5087a2ad1ed8ea589c7",
+      "bytes": 132
+    },
+    "logs/fixtures.log": {
+      "sha256": "ae6d9f39dd20077aa1e6f11534727c228fda9521650e35c243e88f5e42b766c8",
+      "bytes": 33417
+    },
+    "logs/ptxas.log": {
+      "sha256": "7d0afe9841a86e994684137625db9e9ac0ad12099ab3891a8299b6ef78d556dc",
+      "bytes": 1368
+    },
+    "logs/sass-sha256.txt": {
+      "sha256": "bff36d27564e6d8b94f8fdc416d24f4a73dc6bc88ec28afa41b389d6638851b3",
+      "bytes": 65
+    },
+    "raw/fixtures/summary.json": {
+      "sha256": "b126f48fd5ebd6141e8b20ba8d6bc94a1e7fce779b1cf9ef1fe0060c806a976d",
+      "bytes": 48631
+    },
+    "raw/fixtures-radix1/summary.json": {
+      "sha256": "d715a0089622bab781dae448b2393a2253b95d88a42cd4a52896519c70401749",
+      "bytes": 46894
+    },
+    "raw/glance-w4096-k10.csv": {
+      "sha256": "5bab119d0c226ca1522d43840299fca1c52580ab650117822a963915e016a427",
+      "bytes": 38947
+    },
+    "raw/glance-w4096-k10.log": {
+      "sha256": "abc810c2dfee89af0874a598bb3b6740af393e02e4fc4a7d6f230769f083081d",
+      "bytes": 656
+    },
+    "raw/glance-w4096-k100.csv": {
+      "sha256": "e92e5cc52c73da1c0c7a0c67501ae94ed957ca34d6f56b7efa27b7fc695520df",
+      "bytes": 39617
+    },
+    "raw/glance-w4096-k100.log": {
+      "sha256": "adc8b38ccac94b674bbdaf8b838963f19dd30100ab76d53a047ff8025ed62661",
+      "bytes": 657
+    },
+    "raw/glance-w4096-k1000.csv": {
+      "sha256": "a9fcda32d09cb986cfe23cc298e57a8c8f431876fe55e1b537f8aadf3865faba",
+      "bytes": 40265
+    },
+    "raw/glance-w4096-k1000.log": {
+      "sha256": "8b9c2d15d3039441e5d295a2eee04a68e711cf224e4d9316a750a7480d7c3356",
+      "bytes": 658
+    },
+    "raw/real-100000-w1024-k10.csv": {
+      "sha256": "3f91e8e4bd93ac49856609ad16a68d34b109c59e46e3d8790b25eda78318321c",
+      "bytes": 115228
+    },
+    "raw/real-100000-w1024-k10.log": {
+      "sha256": "f628953a3680563c6362badb2eec1806a49d19b8ad18ed9129493475dab6f274",
+      "bytes": 370
+    },
+    "raw/real-100000-w1024-k10.tsv.sha256": {
+      "sha256": "ca8195c1cd46288724b07718a1b163df497657e273c2fea3d311fd80e0dde63a",
+      "bytes": 96
+    },
+    "raw/real-100000-w1024-k100.csv": {
+      "sha256": "fb0c54467ea6f9fb36524ddf922ae127a5fb036cb892a069154ff715f37fc91e",
+      "bytes": 117176
+    },
+    "raw/real-100000-w1024-k100.log": {
+      "sha256": "1e99974f358bc35acbcf2cf169fe018baadf393be3b30c294a18561801174350",
+      "bytes": 371
+    },
+    "raw/real-100000-w1024-k100.tsv.sha256": {
+      "sha256": "3f6e79dfd0c96807ca408aca34a008c8c1623a9745e9779cea6072b48d7037a2",
+      "bytes": 97
+    },
+    "raw/real-100000-w1024-k1000.csv": {
+      "sha256": "3e81db537f0a7a4a57d0b526fd3fa5ef908f8300e93a16b992f3debe1206a768",
+      "bytes": 119198
+    },
+    "raw/real-100000-w1024-k1000.log": {
+      "sha256": "2b7d9644401a126f3925579c8dc7d01e99c2d55e5fe73279b27b985c1edeed4c",
+      "bytes": 373
+    },
+    "raw/real-100000-w1024-k1000.tsv.sha256": {
+      "sha256": "f1f51c8e4f7f0010a5a2e321fe65f475631b3f2c8b49526fd2c0eea3631f5c46",
+      "bytes": 98
+    },
+    "raw/real-100000-w4096-k10.csv": {
+      "sha256": "c76154c45a6a039025a2bd68c9d1008c17ca273989079906407dcf832cb9f782",
+      "bytes": 115190
+    },
+    "raw/real-100000-w4096-k10.log": {
+      "sha256": "736ad0e47b63b30188ec08770ff76e4bb9bf04ee7c31f1fe72bdc41d833638c3",
+      "bytes": 371
+    },
+    "raw/real-100000-w4096-k10.tsv.sha256": {
+      "sha256": "3cbcd30c850e53d452121c02ae92d6bed3272dc3a26cf75f35e2f14ffba33624",
+      "bytes": 96
+    },
+    "raw/real-100000-w4096-k100.csv": {
+      "sha256": "1e3927461516e5ba5756efc88a815c81fa9225be26232b6f60159b15105cc4ea",
+      "bytes": 117174
+    },
+    "raw/real-100000-w4096-k100.log": {
+      "sha256": "c7f0fe373f948a311d32b9b41ed05d0a76661ac0c38062c9bb5f1436bf4dc85e",
+      "bytes": 372
+    },
+    "raw/real-100000-w4096-k100.tsv.sha256": {
+      "sha256": "d2d1ef39356572f38d07829ab8d5c6994db4a2d19b62d0d60e7476971aeb6763",
+      "bytes": 97
+    },
+    "raw/real-100000-w4096-k1000.csv": {
+      "sha256": "b6ad958c6ce1d7ae693a028a478e159f3c08778b1fbe951f15a7368d6dbe933d",
+      "bytes": 119185
+    },
+    "raw/real-100000-w4096-k1000.log": {
+      "sha256": "7f3a76e1bd86e31f0004ee27469222afe32097c084a742013f68080b7b928e63",
+      "bytes": 373
+    },
+    "raw/real-100000-w4096-k1000.tsv.sha256": {
+      "sha256": "a8aaeb9ac3e48a613a1f8d1609c398de37f7a74f3369b31734e2d3756454d41a",
+      "bytes": 98
+    },
+    "raw/real-1000000-w1024-k10.csv": {
+      "sha256": "ab40cf1c2f2297b419bf68cf84f8107eecb5db34d807975e23c909fd9146f93a",
+      "bytes": 119215
+    },
+    "raw/real-1000000-w1024-k10.log": {
+      "sha256": "575b25cbaf75d8b41e762cb5dd500abbb4eeff26bb04d1e2bf79f68a3bbbc264",
+      "bytes": 374
+    },
+    "raw/real-1000000-w1024-k10.tsv.sha256": {
+      "sha256": "6b3fa0ba3b2b2804e97ec2c7458e88f8a0205c1fa6745634bf90ae2699645d83",
+      "bytes": 97
+    },
+    "raw/real-1000000-w1024-k100.csv": {
+      "sha256": "dae5e669a0b039374934fbdffaab61866533e3d8c65b97b585933089fe80de6c",
+      "bytes": 121166
+    },
+    "raw/real-1000000-w1024-k100.log": {
+      "sha256": "7d020b422164f73acb6fe554da09c69ce318925e9c2fe0f514a5cd4c2dc7b12c",
+      "bytes": 375
+    },
+    "raw/real-1000000-w1024-k100.tsv.sha256": {
+      "sha256": "d71a995d30eaaab23812db1e61ef6d1d1d282535cd8c5720c8c4883a4379d3c7",
+      "bytes": 98
+    },
+    "raw/real-1000000-w1024-k1000.csv": {
+      "sha256": "1265c7d7983c433274169d0c02e4f08dd734f899461f1241e99f1211a64a0ff6",
+      "bytes": 122572
+    },
+    "raw/real-1000000-w1024-k1000.log": {
+      "sha256": "05e89bfab7d623c5a05127266b6b1213fdd592438d8899bda9e6c0c0829f76ee",
+      "bytes": 377
+    },
+    "raw/real-1000000-w1024-k1000.tsv.sha256": {
+      "sha256": "3c18b0e57ae170b6ea4de790a65cecd898376bd591f1688ccc68478cec0dc097",
+      "bytes": 99
+    },
+    "raw/real-1000000-w4096-k10.csv": {
+      "sha256": "222d2e0811e874f1a6fe6c76e16c41e8e443f38b9561ab315f4948589ba8914d",
+      "bytes": 119181
+    },
+    "raw/real-1000000-w4096-k10.log": {
+      "sha256": "72f407dc58d34a04de98c69dd2065e3009e6e9f44b4377a244b29b890665b047",
+      "bytes": 375
+    },
+    "raw/real-1000000-w4096-k10.tsv.sha256": {
+      "sha256": "87ffd8ba40b6751971ea773970aba0370d844281ceaf772f834b10df4c2c57e5",
+      "bytes": 97
+    },
+    "raw/real-1000000-w4096-k100.csv": {
+      "sha256": "317c2d5db5822a201a9c48a3a5f49f3c7128b893a0f6be0edd24b6036dad938d",
+      "bytes": 121235
+    },
+    "raw/real-1000000-w4096-k100.log": {
+      "sha256": "69f403e86c3835840b2c0760fa753a69aaf2f386e33b25a70ad478be1bb4f5bf",
+      "bytes": 376
+    },
+    "raw/real-1000000-w4096-k100.tsv.sha256": {
+      "sha256": "8e3890dcbe894e63ca66d244714a22b0e127565fc842abd2ca1f4064f370d0cf",
+      "bytes": 98
+    },
+    "raw/real-1000000-w4096-k1000.csv": {
+      "sha256": "f0767b3cb92e3c4cd1b5e6e9d5b5a4743d8b5457e34684c5ef51cd91fb9cd2fc",
+      "bytes": 123185
+    },
+    "raw/real-1000000-w4096-k1000.log": {
+      "sha256": "24e266bb8bd28742686ed30d82f6339226eceb3cae4b554b1eae3d9a5b5fa236",
+      "bytes": 377
+    },
+    "raw/real-1000000-w4096-k1000.tsv.sha256": {
+      "sha256": "6ffaaba06ae7e1861cc6c7a8e7d8196fd86503515b649d0cd9e0a577ad0b11f3",
+      "bytes": 99
+    }
+  },
+  "pr_slimming": {
+    "note": "Removed from the pull request that adds src/cuda_range_v3.cu to main (raw per-round timing/profile data only); every removed file is listed with the SHA-256 and size it had in Git.",
+    "full_raw_outputs": {
+      "branch": "exp/arnav/2026-11-22-range-v3-tune",
+      "commit": "baa3188a81dc3cbbec0c8422cb7948cd00158bc0",
+      "run_bulk": null
+    },
+    "removed": [
+      {
+        "path": "raw/glance-w4096-k10.csv",
+        "sha256": "5bab119d0c226ca1522d43840299fca1c52580ab650117822a963915e016a427",
+        "bytes": 38947
+      },
+      {
+        "path": "raw/glance-w4096-k100.csv",
+        "sha256": "e92e5cc52c73da1c0c7a0c67501ae94ed957ca34d6f56b7efa27b7fc695520df",
+        "bytes": 39617
+      },
+      {
+        "path": "raw/glance-w4096-k1000.csv",
+        "sha256": "a9fcda32d09cb986cfe23cc298e57a8c8f431876fe55e1b537f8aadf3865faba",
+        "bytes": 40265
+      },
+      {
+        "path": "raw/real-100000-w1024-k10.csv",
+        "sha256": "3f91e8e4bd93ac49856609ad16a68d34b109c59e46e3d8790b25eda78318321c",
+        "bytes": 115228
+      },
+      {
+        "path": "raw/real-100000-w1024-k100.csv",
+        "sha256": "fb0c54467ea6f9fb36524ddf922ae127a5fb036cb892a069154ff715f37fc91e",
+        "bytes": 117176
+      },
+      {
+        "path": "raw/real-100000-w1024-k1000.csv",
+        "sha256": "3e81db537f0a7a4a57d0b526fd3fa5ef908f8300e93a16b992f3debe1206a768",
+        "bytes": 119198
+      },
+      {
+        "path": "raw/real-100000-w4096-k10.csv",
+        "sha256": "c76154c45a6a039025a2bd68c9d1008c17ca273989079906407dcf832cb9f782",
+        "bytes": 115190
+      },
+      {
+        "path": "raw/real-100000-w4096-k100.csv",
+        "sha256": "1e3927461516e5ba5756efc88a815c81fa9225be26232b6f60159b15105cc4ea",
+        "bytes": 117174
+      },
+      {
+        "path": "raw/real-100000-w4096-k1000.csv",
+        "sha256": "b6ad958c6ce1d7ae693a028a478e159f3c08778b1fbe951f15a7368d6dbe933d",
+        "bytes": 119185
+      },
+      {
+        "path": "raw/real-1000000-w1024-k10.csv",
+        "sha256": "ab40cf1c2f2297b419bf68cf84f8107eecb5db34d807975e23c909fd9146f93a",
+        "bytes": 119215
+      },
+      {
+        "path": "raw/real-1000000-w1024-k100.csv",
+        "sha256": "dae5e669a0b039374934fbdffaab61866533e3d8c65b97b585933089fe80de6c",
+        "bytes": 121166
+      },
+      {
+        "path": "raw/real-1000000-w1024-k1000.csv",
+        "sha256": "1265c7d7983c433274169d0c02e4f08dd734f899461f1241e99f1211a64a0ff6",
+        "bytes": 122572
+      },
+      {
+        "path": "raw/real-1000000-w4096-k10.csv",
+        "sha256": "222d2e0811e874f1a6fe6c76e16c41e8e443f38b9561ab315f4948589ba8914d",
+        "bytes": 119181
+      },
+      {
+        "path": "raw/real-1000000-w4096-k100.csv",
+        "sha256": "317c2d5db5822a201a9c48a3a5f49f3c7128b893a0f6be0edd24b6036dad938d",
+        "bytes": 121235
+      },
+      {
+        "path": "raw/real-1000000-w4096-k1000.csv",
+        "sha256": "f0767b3cb92e3c4cd1b5e6e9d5b5a4743d8b5457e34684c5ef51cd91fb9cd2fc",
+        "bytes": 123185
+      }
+    ]
+  }
+}

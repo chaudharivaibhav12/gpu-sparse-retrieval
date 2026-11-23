@@ -1,0 +1,533 @@
+{
+  "bootstrap_seed": 20261117,
+  "bootstrap_draws": 10000,
+  "processes": 3,
+  "queries": 500,
+  "measured_rounds": 20,
+  "warmup_rounds": 3,
+  "qualification": "Conditional on this cuda5 session, the 500 calibration queries and three processes per implementation. Ratios below 1 favour the numerator.",
+  "sets": {
+    "k=10": {
+      "descriptive": {
+        "ctrl": {
+          "pooled_median_ms": 0.106576,
+          "pooled_median_gpu_span_ms": 0.093504,
+          "process_medians_ms": [
+            0.10655400000000001,
+            0.10643375,
+            0.10679575
+          ]
+        },
+        "v3-1": {
+          "pooled_median_ms": 0.12246225,
+          "pooled_median_gpu_span_ms": 0.10796,
+          "process_medians_ms": [
+            0.12253325000000001,
+            0.12236,
+            0.12248675
+          ]
+        },
+        "v3-2": {
+          "pooled_median_ms": 0.10568274999999999,
+          "pooled_median_gpu_span_ms": 0.09016,
+          "process_medians_ms": [
+            0.108351,
+            0.1054365,
+            0.10601275
+          ]
+        },
+        "v3-all": {
+          "pooled_median_ms": 0.12220275,
+          "pooled_median_gpu_span_ms": 0.106256,
+          "process_medians_ms": [
+            0.11936,
+            0.12220125000000001,
+            0.122353
+          ]
+        }
+      },
+      "contrasts": {
+        "v3-1/ctrl": {
+          "estimate": 1.1414736561558518,
+          "interval_95": [
+            1.1347574066689583,
+            1.148170544870465
+          ],
+          "process_estimates": [
+            1.1419623702785,
+            1.1418993477711954,
+            1.1405598003736293
+          ],
+          "pairs_below_1": 43,
+          "pairs": 1500,
+          "verdict": "slower"
+        },
+        "v3-2/ctrl": {
+          "estimate": 0.9734774340311708,
+          "interval_95": [
+            0.9651065321368056,
+            0.9851533781797772
+          ],
+          "process_estimates": [
+            0.985311758312685,
+            0.9658558315535861,
+            0.9693747301178344
+          ],
+          "pairs_below_1": 1197,
+          "pairs": 1500,
+          "verdict": "faster"
+        },
+        "v3-all/ctrl": {
+          "estimate": 1.126150604716749,
+          "interval_95": [
+            1.114377282441964,
+            1.1399864616129403
+          ],
+          "process_estimates": [
+            1.1396692533844834,
+            1.1201964784072294,
+            1.1187070842843885
+          ],
+          "pairs_below_1": 77,
+          "pairs": 1500,
+          "verdict": "slower"
+        },
+        "v3-all/v3-1": {
+          "estimate": 0.9865760796524152,
+          "interval_95": [
+            0.9791281407129396,
+            0.9977077261237074
+          ],
+          "process_estimates": [
+            0.9979919505636097,
+            0.9809940609859121,
+            0.9808403591972273
+          ],
+          "pairs_below_1": 850,
+          "pairs": 1500,
+          "verdict": "faster"
+        },
+        "v3-all/v3-2": {
+          "estimate": 1.1568327783966788,
+          "interval_95": [
+            1.149683161056628,
+            1.163868565449908
+          ],
+          "process_estimates": [
+            1.1566585334738426,
+            1.1597967748513618,
+            1.154050182583573
+          ],
+          "pairs_below_1": 2,
+          "pairs": 1500,
+          "verdict": "slower"
+        }
+      },
+      "previous_step": {
+        "v3-1": "v3-1/ctrl",
+        "v3-2": "v3-2/ctrl",
+        "v3-all": "v3-all/v3-2"
+      },
+      "interaction": {
+        "definition": "(v3-all/ctrl) / ((v3-1/ctrl) x (v3-2/ctrl)); 1 = effects multiply",
+        "product_of_single_ratios": 1.1111988458087776,
+        "observed_v3_all_over_ctrl": 1.126150604716749,
+        "interaction_ratio": {
+          "estimate": 1.0134555205527496,
+          "interval_95": [
+            1.0097955841670538,
+            1.017182493655071
+          ],
+          "process_estimates": [
+            1.0128692184417236,
+            1.015673384099132,
+            1.011827860499313
+          ],
+          "pairs_below_1": 343,
+          "pairs": 1500
+        }
+      }
+    },
+    "k=100": {
+      "descriptive": {
+        "ctrl": {
+          "pooled_median_ms": 0.35974375000000003,
+          "pooled_median_gpu_span_ms": 0.34398399999999996,
+          "process_medians_ms": [
+            0.35838,
+            0.36191475,
+            0.3569915
+          ]
+        },
+        "v3-1": {
+          "pooled_median_ms": 0.37942075,
+          "pooled_median_gpu_span_ms": 0.36372800000000005,
+          "process_medians_ms": [
+            0.37924175,
+            0.37946175,
+            0.37965975
+          ]
+        },
+        "v3-2": {
+          "pooled_median_ms": 0.33750399999999997,
+          "pooled_median_gpu_span_ms": 0.319984,
+          "process_medians_ms": [
+            0.3375225,
+            0.33721025,
+            0.3389275
+          ]
+        },
+        "v3-3": {
+          "pooled_median_ms": 0.19143125,
+          "pooled_median_gpu_span_ms": 0.176936,
+          "process_medians_ms": [
+            0.18953775,
+            0.19100325,
+            0.191715
+          ]
+        },
+        "v3-all": {
+          "pooled_median_ms": 0.19807249999999998,
+          "pooled_median_gpu_span_ms": 0.18192,
+          "process_medians_ms": [
+            0.19809425,
+            0.19842525,
+            0.1978625
+          ]
+        }
+      },
+      "contrasts": {
+        "v3-1/ctrl": {
+          "estimate": 1.0571514981744692,
+          "interval_95": [
+            1.0549987577897426,
+            1.0593501858079306
+          ],
+          "process_estimates": [
+            1.057206413767741,
+            1.0566978438781651,
+            1.0575504109150395
+          ],
+          "pairs_below_1": 2,
+          "pairs": 1500,
+          "verdict": "slower"
+        },
+        "v3-2/ctrl": {
+          "estimate": 0.9357425807843711,
+          "interval_95": [
+            0.929529473680203,
+            0.9421996476911748
+          ],
+          "process_estimates": [
+            0.9327767695740973,
+            0.9352133783556017,
+            0.9392490074052353
+          ],
+          "pairs_below_1": 1229,
+          "pairs": 1500,
+          "verdict": "faster"
+        },
+        "v3-3/ctrl": {
+          "estimate": 0.5352839535810903,
+          "interval_95": [
+            0.5278373951521204,
+            0.5425990435245694
+          ],
+          "process_estimates": [
+            0.5308808927507541,
+            0.5363588125667932,
+            0.5386419309968098
+          ],
+          "pairs_below_1": 1500,
+          "pairs": 1500,
+          "verdict": "faster"
+        },
+        "v3-all/ctrl": {
+          "estimate": 0.5483691974178556,
+          "interval_95": [
+            0.5425004235549737,
+            0.5543532277367657
+          ],
+          "process_estimates": [
+            0.5472217791902851,
+            0.5495798772995399,
+            0.5483084757380907
+          ],
+          "pairs_below_1": 1500,
+          "pairs": 1500,
+          "verdict": "faster"
+        },
+        "v3-3/v3-2": {
+          "estimate": 0.5720418890549973,
+          "interval_95": [
+            0.5675901042388061,
+            0.5763724089567008
+          ],
+          "process_estimates": [
+            0.5691403453295178,
+            0.5735149057746373,
+            0.573481501444286
+          ],
+          "pairs_below_1": 1500,
+          "pairs": 1500,
+          "verdict": "faster"
+        },
+        "v3-all/v3-3": {
+          "estimate": 1.024445425178963,
+          "interval_95": [
+            1.0170955170083384,
+            1.031777688550846
+          ],
+          "process_estimates": [
+            1.0307807017782487,
+            1.0246496644093095,
+            1.017946142297894
+          ],
+          "pairs_below_1": 468,
+          "pairs": 1500,
+          "verdict": "slower"
+        },
+        "v3-all/v3-1": {
+          "estimate": 0.5187233791606988,
+          "interval_95": [
+            0.5139666242996788,
+            0.5236249490246732
+          ],
+          "process_estimates": [
+            0.5176111041930408,
+            0.5200917939631051,
+            0.5184702970931381
+          ],
+          "pairs_below_1": 1500,
+          "pairs": 1500,
+          "verdict": "faster"
+        }
+      },
+      "previous_step": {
+        "v3-1": "v3-1/ctrl",
+        "v3-2": "v3-2/ctrl",
+        "v3-3": "v3-3/v3-2",
+        "v3-all": "v3-all/v3-3"
+      },
+      "interaction": {
+        "definition": "(v3-all/ctrl) / ((v3-1/ctrl) x (v3-3/ctrl)); 1 = effects multiply",
+        "product_of_single_ratios": 0.5658762334770026,
+        "observed_v3_all_over_ctrl": 0.5483691974178556,
+        "interaction_ratio": {
+          "estimate": 0.9690620757270983,
+          "interval_95": [
+            0.9621782778971704,
+            0.9758496422483275
+          ],
+          "process_estimates": [
+            0.9750042076501271,
+            0.9696713874694433,
+            0.9625509401647547
+          ],
+          "pairs_below_1": 1051,
+          "pairs": 1500
+        }
+      }
+    },
+    "k=1000": {
+      "descriptive": {
+        "ctrl": {
+          "pooled_median_ms": 1.7168025,
+          "pooled_median_gpu_span_ms": 1.6932,
+          "process_medians_ms": [
+            1.7173075,
+            1.7161024999999999,
+            1.716515
+          ]
+        },
+        "v3-3": {
+          "pooled_median_ms": 1.83872,
+          "pooled_median_gpu_span_ms": 1.8153375,
+          "process_medians_ms": [
+            1.8351625,
+            1.8398725,
+            1.8378575
+          ]
+        },
+        "v3-all": {
+          "pooled_median_ms": 1.8528875,
+          "pooled_median_gpu_span_ms": 1.82944,
+          "process_medians_ms": [
+            1.85622,
+            1.8500100000000002,
+            1.8546
+          ]
+        }
+      },
+      "contrasts": {
+        "v3-3/ctrl": {
+          "estimate": 1.0474106073804736,
+          "interval_95": [
+            1.039410629500469,
+            1.054706334329641
+          ],
+          "process_estimates": [
+            1.0448575938789137,
+            1.0502180875014824,
+            1.047163042388255
+          ],
+          "pairs_below_1": 148,
+          "pairs": 1500,
+          "verdict": "slower"
+        },
+        "v3-all/ctrl": {
+          "estimate": 1.056483979515555,
+          "interval_95": [
+            1.0486337991225103,
+            1.0634129073371317
+          ],
+          "process_estimates": [
+            1.0554241437150753,
+            1.0567769884753524,
+            1.057251657711581
+          ],
+          "pairs_below_1": 138,
+          "pairs": 1500,
+          "verdict": "slower"
+        },
+        "v3-all/v3-3": {
+          "estimate": 1.008662669702929,
+          "interval_95": [
+            1.006452240617766,
+            1.0104198053352313
+          ],
+          "process_estimates": [
+            1.010112909068244,
+            1.0062452751975297,
+            1.0096342354675896
+          ],
+          "pairs_below_1": 287,
+          "pairs": 1500,
+          "verdict": "slower"
+        }
+      },
+      "previous_step": {
+        "v3-3": "v3-3/ctrl",
+        "v3-all": "v3-all/v3-3"
+      }
+    },
+    "k=32": {
+      "descriptive": {
+        "v3-2": {
+          "pooled_median_ms": 0.15805525,
+          "pooled_median_gpu_span_ms": 0.142896,
+          "process_medians_ms": [
+            0.15920449999999997,
+            0.15623725,
+            0.1580745
+          ]
+        },
+        "v3-3": {
+          "pooled_median_ms": 0.10941275,
+          "pooled_median_gpu_span_ms": 0.09528,
+          "process_medians_ms": [
+            0.10726125,
+            0.111711,
+            0.10919825
+          ]
+        }
+      },
+      "contrasts": {
+        "v3-3/v3-2": {
+          "estimate": 0.6963639141793379,
+          "interval_95": [
+            0.6824712235550184,
+            0.7119696091215676
+          ],
+          "process_estimates": [
+            0.6821760457416546,
+            0.7126180157984418,
+            0.6946331579395216
+          ],
+          "pairs_below_1": 1500,
+          "pairs": 1500,
+          "verdict": "faster"
+        }
+      },
+      "previous_step": {
+        "v3-3": "v3-3/v3-2"
+      }
+    },
+    "k=64": {
+      "descriptive": {
+        "v3-2": {
+          "pooled_median_ms": 0.23785475,
+          "pooled_median_gpu_span_ms": 0.22148800000000002,
+          "process_medians_ms": [
+            0.24001775,
+            0.23760975,
+            0.23961975000000002
+          ]
+        },
+        "v3-3": {
+          "pooled_median_ms": 0.14275625,
+          "pooled_median_gpu_span_ms": 0.125936,
+          "process_medians_ms": [
+            0.14328924999999998,
+            0.13960275,
+            0.14385725
+          ]
+        }
+      },
+      "contrasts": {
+        "v3-3/v3-2": {
+          "estimate": 0.5962336117851601,
+          "interval_95": [
+            0.5908762711813149,
+            0.6008407048392752
+          ],
+          "process_estimates": [
+            0.5980253570927294,
+            0.5906157012954906,
+            0.6001015905969409
+          ],
+          "pairs_below_1": 1500,
+          "pairs": 1500,
+          "verdict": "faster"
+        }
+      },
+      "previous_step": {
+        "v3-3": "v3-3/v3-2"
+      }
+    }
+  },
+  "crossover": {
+    "rule": "recommended radix crossover = the smallest k in {32, 64, 100} at which v3-3/v3-2 has its upper 95% bound below 1; if none, keep 100 and report 'radix not shown faster at k <= 100'. k values below 32 are not tested, so 32 is the lowest possible recommendation. k=1000 has no v3-2 run; v3-3/ctrl there is reported but not part of the rule.",
+    "evidence": [
+      {
+        "k": 32,
+        "v3_3_over_v3_2": 0.6963639141793379,
+        "interval_95": [
+          0.6824712235550184,
+          0.7119696091215676
+        ],
+        "qualifies": true
+      },
+      {
+        "k": 64,
+        "v3_3_over_v3_2": 0.5962336117851601,
+        "interval_95": [
+          0.5908762711813149,
+          0.6008407048392752
+        ],
+        "qualifies": true
+      },
+      {
+        "k": 100,
+        "v3_3_over_v3_2": 0.5720418890549973,
+        "interval_95": [
+          0.5675901042388061,
+          0.5763724089567008
+        ],
+        "qualifies": true
+      }
+    ],
+    "recommended_crossover_k": 32,
+    "note": null
+  }
+}

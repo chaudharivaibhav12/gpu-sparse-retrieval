@@ -1,0 +1,1043 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-17-range-v3",
+  "run_id": "20261117-cuda5-measureD-01",
+  "status": "failed-overlap-limit",
+  "scope": "Measurement D session 1 (configs/protocol.json), stopped in the k=16 set by the overlap rule; k=10 complete; not analysed (see STATUS.md)",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "03c7b8f78e4031ce7a2e8d5d65535dc56bb6d681",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6), build_variants.sh; v3-3r = v3-3 with crossover argument 1",
+    "source_sha256": {
+      "experiments/2026-11-17-range-v3/configs/protocol.json": "b18bd1e8382fe5329ba01d6c6f5e0c0019d647c79ff1f8ba5c7f9e28a9e3d5e7",
+      "experiments/2026-11-17-range-v3/code/run_d.sh": "3cba9949a99d20b2997d4a8385fce614486b5cc5a87e972a7d363bdc83e47cfa",
+      "experiments/2026-11-17-range-v3/code/session_lib.sh": "acf656b09252e9d823e7666dcace69681da80d18f04305ebae7a5f9803e378fc",
+      "experiments/2026-11-17-range-v3/code/overlap.py": "b4dd604465720ebb5fb59c2a907f144f115b8b383a2fab840dd052125aae9925"
+    },
+    "binary_sha256": {
+      "build/v3variants-fix1/ctrl/scorer": "31e9ba0d069b958988a8a5ae60d185939a3cfbb13ea970454c3b10346493a7f2",
+      "build/v3variants-fix1/v3-2/scorer": "832801ea43c2ecde7eb752e9b601f66256df84e9b880471b6ff9952179a6e635",
+      "build/v3variants-fix1/v3-3/scorer": "dc765149d2c9cd4ad46bbc0679ab754ea30f187b6ee5b52965e6863df6714201"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "data/derived/hash-1000000-w1024-pos.rbp": {
+      "sha256": "3c653e914699ac9a6558d2889d0000aa29d573a5d045f43ea26d15fc2f6c68f5",
+      "bytes": 437105290
+    },
+    "data/derived/hash-1000000-w4096-pos.rbp": {
+      "sha256": "67e19c8c6eec751f709b644488c8f4bd13e72a821831a7ca9d65133fc02bed34",
+      "bytes": 370880289
+    },
+    "data/derived/oracle/cpu-top10-1000000.tsv": {
+      "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860",
+      "bytes": 116302
+    },
+    "data/derived/oracle/cpu-top100-1000000.tsv": {
+      "sha256": "f43fbb67855630b0463a750ab29bde9460c5ad3d0d36dff9c90e580b601d2637",
+      "bytes": 1190459
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_12.6.r12.6/compiler.35059454_0"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "[timing-k10-r0-ctrl-w1024] build/v3variants-fix1/ctrl/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-ctrl-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-ctrl-w1024.tsv 500 10 0 0 20 3 256 256 -",
+    "[timing-k10-r0-v3-2-w1024] build/v3variants-fix1/v3-2/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-2-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-2-w1024.tsv 500 10 0 0 20 3 256 256 -",
+    "[timing-k10-r0-v3-3r-w1024] build/v3variants-fix1/v3-3/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-3r-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-3r-w1024.tsv 500 10 0 0 20 3 256 256 - 1",
+    "[timing-k10-r0-ctrl-w4096] build/v3variants-fix1/ctrl/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-ctrl-w4096.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-ctrl-w4096.tsv 500 10 0 0 20 3 256 256 -",
+    "[timing-k10-r0-v3-2-w4096] build/v3variants-fix1/v3-2/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-2-w4096.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-2-w4096.tsv 500 10 0 0 20 3 256 256 -",
+    "[timing-k10-r0-v3-3r-w4096] build/v3variants-fix1/v3-3/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-3r-w4096.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-3r-w4096.tsv 500 10 0 0 20 3 256 256 - 1",
+    "[timing-k10-r1-v3-3r-w1024] build/v3variants-fix1/v3-3/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-3r-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-3r-w1024.tsv 500 10 0 0 20 3 256 256 - 1",
+    "[timing-k10-r1-ctrl-w4096] build/v3variants-fix1/ctrl/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-ctrl-w4096.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-ctrl-w4096.tsv 500 10 0 0 20 3 256 256 -",
+    "[timing-k10-r1-v3-2-w4096] build/v3variants-fix1/v3-2/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-2-w4096.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-2-w4096.tsv 500 10 0 0 20 3 256 256 -",
+    "[timing-k10-r1-v3-3r-w4096] build/v3variants-fix1/v3-3/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-3r-w4096.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-3r-w4096.tsv 500 10 0 0 20 3 256 256 - 1",
+    "[timing-k10-r1-ctrl-w1024] build/v3variants-fix1/ctrl/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-ctrl-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-ctrl-w1024.tsv 500 10 0 0 20 3 256 256 -",
+    "[timing-k10-r1-v3-2-w1024] build/v3variants-fix1/v3-2/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-2-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-2-w1024.tsv 500 10 0 0 20 3 256 256 -",
+    "[timing-k10-r2-v3-2-w4096] build/v3variants-fix1/v3-2/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-2-w4096.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-2-w4096.tsv 500 10 0 0 20 3 256 256 -",
+    "[timing-k10-r2-v3-3r-w4096] build/v3variants-fix1/v3-3/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-3r-w4096.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-3r-w4096.tsv 500 10 0 0 20 3 256 256 - 1",
+    "[timing-k10-r2-ctrl-w1024] build/v3variants-fix1/ctrl/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-ctrl-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-ctrl-w1024.tsv 500 10 0 0 20 3 256 256 -",
+    "[timing-k10-r2-v3-2-w1024] build/v3variants-fix1/v3-2/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-2-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-2-w1024.tsv 500 10 0 0 20 3 256 256 -",
+    "[timing-k10-r2-v3-3r-w1024] build/v3variants-fix1/v3-3/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-3r-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-3r-w1024.tsv 500 10 0 0 20 3 256 256 - 1",
+    "[timing-k10-r2-ctrl-w4096] build/v3variants-fix1/ctrl/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-ctrl-w4096.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-ctrl-w4096.tsv 500 10 0 0 20 3 256 256 -",
+    "[timing-k16-r0-ctrl-w1024] build/v3variants-fix1/ctrl/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-ctrl-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-ctrl-w1024.tsv 500 16 0 0 20 3 256 256 -",
+    "[timing-k16-r0-v3-2-w1024] build/v3variants-fix1/v3-2/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-v3-2-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-v3-2-w1024.tsv 500 16 0 0 20 3 256 256 -",
+    "[timing-k16-r0-v3-3r-w1024] build/v3variants-fix1/v3-3/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-v3-3r-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-v3-3r-w1024.tsv 500 16 0 0 20 3 256 256 - 1",
+    "[timing-k16-r0-v3-3r-w1024] build/v3variants-fix1/v3-3/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-v3-3r-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-v3-3r-w1024.tsv 500 16 0 0 20 3 256 256 - 1",
+    "[timing-k16-r0-v3-3r-w1024] build/v3variants-fix1/v3-3/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-v3-3r-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-v3-3r-w1024.tsv 500 16 0 0 20 3 256 256 - 1",
+    "[timing-k16-r0-v3-3r-w1024] build/v3variants-fix1/v3-3/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-v3-3r-w1024.csv results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-v3-3r-w1024.tsv 500 16 0 0 20 3 256 256 - 1"
+  ],
+  "artifacts": {
+    "STATUS.md": {
+      "sha256": "0c46d1baae3e9771c31db1a24116a1fb2101ce63df28b7065396b039f92a815d",
+      "bytes": 866
+    },
+    "analysis/compare-timing-k10-r0-ctrl-w1024.json": {
+      "sha256": "f702458e56c2da07c6ecae68d1eef252e9404a33babe5bc9361fc47230f9a22a",
+      "bytes": 342
+    },
+    "analysis/compare-timing-k10-r0-ctrl-w4096.json": {
+      "sha256": "55f2f6219525dc1b5274770c6d3cc7132739e9d16160672ea3cf0ebea4911ee4",
+      "bytes": 342
+    },
+    "analysis/compare-timing-k10-r0-v3-2-w1024.json": {
+      "sha256": "ce965b693a235eb6779d7ac57fcfd7fdacf7b862f0de4f419d5f042bb9b0ecaa",
+      "bytes": 342
+    },
+    "analysis/compare-timing-k10-r0-v3-2-w4096.json": {
+      "sha256": "485d88e59eeedbcee16cfbe7d1f0acd1f4ab7dff82d9e2cc1cfb9b1cb2c43d17",
+      "bytes": 342
+    },
+    "analysis/compare-timing-k10-r0-v3-3r-w1024.json": {
+      "sha256": "99e777da9c8c90159a3cbedc6b91c2b80d8dfaee04a99cabf2372a0c5539526c",
+      "bytes": 343
+    },
+    "analysis/compare-timing-k10-r0-v3-3r-w4096.json": {
+      "sha256": "490599635b82fcb1b49d2c65f5b299739fae3d25cbdd3bd621e394ed27ee3267",
+      "bytes": 343
+    },
+    "analysis/compare-timing-k10-r1-ctrl-w1024.json": {
+      "sha256": "d59310f6a99e2c4313aa23c1e74a5636837510ed82e198f85c99f3ac2dd6e3f2",
+      "bytes": 342
+    },
+    "analysis/compare-timing-k10-r1-ctrl-w4096.json": {
+      "sha256": "31b325c69e4adc125cfefaa8d08cf28e41c00d4d2a91242ceaba75e201f921c8",
+      "bytes": 342
+    },
+    "analysis/compare-timing-k10-r1-v3-2-w1024.json": {
+      "sha256": "15281ce9a519c2a0769bfa9cde179f007bc6524896c51bf0bd09736babe1aea7",
+      "bytes": 342
+    },
+    "analysis/compare-timing-k10-r1-v3-2-w4096.json": {
+      "sha256": "a7d049eef8ee4bc52d149380bdbebf9d6cb7b4d17d15ef6b60940db755e01174",
+      "bytes": 342
+    },
+    "analysis/compare-timing-k10-r1-v3-3r-w1024.json": {
+      "sha256": "15e5e7bcbf52acd9bcc74f2baed1900eeb33fca631c0fee07f0ffc446c4a0358",
+      "bytes": 343
+    },
+    "analysis/compare-timing-k10-r1-v3-3r-w4096.json": {
+      "sha256": "83b5b75c989c2ef285c4b74bea79c8191c6cc5ecc050e903813afd5e12568580",
+      "bytes": 343
+    },
+    "analysis/compare-timing-k10-r2-ctrl-w1024.json": {
+      "sha256": "2d7a05b5b0730196d36dcece3f0a02c3551a13cd6484965bf906819c39b29b1c",
+      "bytes": 342
+    },
+    "analysis/compare-timing-k10-r2-ctrl-w4096.json": {
+      "sha256": "121844c96e6439214b045095f9d345dc9cb2ef6c4056f543136a37b055d46c4b",
+      "bytes": 342
+    },
+    "analysis/compare-timing-k10-r2-v3-2-w1024.json": {
+      "sha256": "bd059ef7e4000ca4a130c02181f9a2d9e78917504712be3a362494a7b1d7a2b0",
+      "bytes": 342
+    },
+    "analysis/compare-timing-k10-r2-v3-2-w4096.json": {
+      "sha256": "9f024428d4cc3dfc35917c56a5da6731c6d13a2d3789a7ee245f4ba0eef39be3",
+      "bytes": 342
+    },
+    "analysis/compare-timing-k10-r2-v3-3r-w1024.json": {
+      "sha256": "c496dceca9b85ce26766bb1e78426e575e671e6ea82a9d7fe1d7dd17e795271c",
+      "bytes": 343
+    },
+    "analysis/compare-timing-k10-r2-v3-3r-w4096.json": {
+      "sha256": "5aa482fa05d7512442178d4c4fa472931351a9e2bb540e18f929561041d57ce9",
+      "bytes": 343
+    },
+    "analysis/compare-timing-k16-r0-ctrl-w1024.json": {
+      "sha256": "457dacb3f777a9116ce0aacf071471b54486560a8af41b61e2fcf889abb56d38",
+      "bytes": 384
+    },
+    "analysis/compare-timing-k16-r0-v3-2-w1024.json": {
+      "sha256": "ddc38b74cbd5c8f69e2e03373f8753a069c71794f9259c26b36405059af07832",
+      "bytes": 384
+    },
+    "logs/binaries.tsv": {
+      "sha256": "6fdb577aa098e6faab60810bccc15c388b00f2d039e46eda3386542d1668a114",
+      "bytes": 837
+    },
+    "logs/commands.txt": {
+      "sha256": "c2894d80f67a760785149d141bdf05d191684a1913a34d78ed8a6d6dbc387a6d",
+      "bytes": 8114
+    },
+    "logs/environment.txt": {
+      "sha256": "e6da949fc7787ddc2defd37f855015ee4339f045bd05c4571fd81563555a7542",
+      "bytes": 206
+    },
+    "logs/gpu-pmon.log": {
+      "sha256": "1a992cfa137f803005890488bf52e3fd9f0ded5a544d320ad2373685a6b9e0c9",
+      "bytes": 23152
+    },
+    "logs/gpu-poll.log": {
+      "sha256": "bc228d1e1ee28ae455aeabb60bfcac4cad27a0a90ce368d83a321ba64ce16dcc",
+      "bytes": 22301
+    },
+    "logs/host-utc-offset.txt": {
+      "sha256": "51ef6a6d539bbd38ac4fb4d8de42da0cf36eafb7fb7be71e3420d57982eebd9b",
+      "bytes": 6
+    },
+    "logs/idle-checks.txt": {
+      "sha256": "f5e93328fc2d15d7a5d4f5c331fa3bd356cb4b6e44d0b9f3c9a9caecc3e1b0c3",
+      "bytes": 3578
+    },
+    "logs/index-expected-sha256.txt": {
+      "sha256": "52e52f45dbe81896e4ba0b1c2cda9607c1fa2f4f49d7081d33d36f712ca3102f",
+      "bytes": 212
+    },
+    "logs/index-sha256-check.txt": {
+      "sha256": "92551fa8ed0b465f4c12e3296352ab446a2cd62136dab99a23dfa5ce3c9e3b94",
+      "bytes": 88
+    },
+    "logs/index-verify-w1024.log": {
+      "sha256": "01cde5b75553732c6aa34db1991870fcd6283a755b1ae353ffdc4bee1145c390",
+      "bytes": 893
+    },
+    "logs/index-verify-w4096.log": {
+      "sha256": "bd584d192b56a89fa4322b17a6d3d5e912910304fbe026a4ac0c6207a4e6570f",
+      "bytes": 901
+    },
+    "logs/input-sha256.txt": {
+      "sha256": "af53359d4aac9045b6f236d89bed7cf2a86438fd79504a8862e2bce6dc043a83",
+      "bytes": 822
+    },
+    "logs/order.tsv": {
+      "sha256": "b98dd8fb2fbd9a43c8fef44716c95e8cf977ad15c74a56e8be4d947466e034f3",
+      "bytes": 427
+    },
+    "logs/overlap-checks.jsonl": {
+      "sha256": "e59fbf32298afecacdfcbd303fd1a910828fbf63d264315ce9a89d3792e0e91d",
+      "bytes": 5018
+    },
+    "logs/processes.tsv": {
+      "sha256": "cc7ee93721fb2d9e677d11428f45f49ded198598e51e61b2feee05e0b722dea8",
+      "bytes": 1618
+    },
+    "logs/slot-attempts.tsv": {
+      "sha256": "dd118804b267d6d75d9c32b6af1465e6f777d89a0c97ffbd6a1eb02643ca4be0",
+      "bytes": 546
+    },
+    "logs/stages.txt": {
+      "sha256": "355c93613b75474c338829416e0ec3da94769c7a6250ab998b613a6d80bfce12",
+      "bytes": 845
+    },
+    "raw/oracle-top16-1000000.tsv": {
+      "sha256": "18f1be7df8720acc0f708de287f4b007b24433ef6d1b5351ec6d1d4026596ade",
+      "bytes": 188496
+    },
+    "raw/oracle-top32-1000000.tsv": {
+      "sha256": "9d7505a54469101998cca5b707025917fc7959831d58efbbb288ba27f14f2b59",
+      "bytes": 380459
+    },
+    "raw/timing-k10-r0-ctrl-w1024.csv": {
+      "sha256": "64cd8cb37e361d111e8f45e201636ab138bb36b6ab7791eae9738775bf7d0200",
+      "bytes": 1381663
+    },
+    "raw/timing-k10-r0-ctrl-w1024.log": {
+      "sha256": "c61da61e9474c3d987be12b7aba41164212538284723907f2a5b16353acf32c1",
+      "bytes": 915
+    },
+    "raw/timing-k10-r0-ctrl-w1024.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r0-ctrl-w4096.csv": {
+      "sha256": "0bde4be0d62b65c9064d771b928e39bf451a664f92529e1adf8adee41928e486",
+      "bytes": 1382015
+    },
+    "raw/timing-k10-r0-ctrl-w4096.log": {
+      "sha256": "f7f902285b1fb0b8b6fe36a73a07cb0c449316268b72750733103a05d58cae5e",
+      "bytes": 916
+    },
+    "raw/timing-k10-r0-ctrl-w4096.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r0-v3-2-w1024.csv": {
+      "sha256": "11eb9643a63402bed4467332dc9b1d806c140a28b1d677cf6aa0e544d64d15d5",
+      "bytes": 1381997
+    },
+    "raw/timing-k10-r0-v3-2-w1024.log": {
+      "sha256": "6ff7154d5fca796b2308e03282c18eee278d259d60d844e3d8184ff4ccf2f1b2",
+      "bytes": 915
+    },
+    "raw/timing-k10-r0-v3-2-w1024.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r0-v3-2-w4096.csv": {
+      "sha256": "82cb5422d72a9702e4a7ec3f0f4dfb3d192689690adb699cb1787e977ef6dd3e",
+      "bytes": 1381842
+    },
+    "raw/timing-k10-r0-v3-2-w4096.log": {
+      "sha256": "3b7d9e256991c67945841ddfb20e31ed5ac54928c0b455cb3cf755e62e3fc547",
+      "bytes": 916
+    },
+    "raw/timing-k10-r0-v3-2-w4096.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r0-v3-3r-w1024.csv": {
+      "sha256": "c5f6b0b288aeaff71d98c3d344835dfd76a7e35ea50295e385b985ed95570c6e",
+      "bytes": 1381676
+    },
+    "raw/timing-k10-r0-v3-3r-w1024.log": {
+      "sha256": "04f4db5fa6afa3703a4cb79515cb04be8db15bb1329cc3d41261e2a509a5e0be",
+      "bytes": 915
+    },
+    "raw/timing-k10-r0-v3-3r-w1024.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r0-v3-3r-w4096.csv": {
+      "sha256": "5f5a614f43018cb3d49cbf0bb9cc82fecca23e601588b8c74eb5a2d9ff48ff7e",
+      "bytes": 1381651
+    },
+    "raw/timing-k10-r0-v3-3r-w4096.log": {
+      "sha256": "96c05e0281495e31ef4a649efb2f52caa40e0a0f4876f28643afc32263c634f9",
+      "bytes": 916
+    },
+    "raw/timing-k10-r0-v3-3r-w4096.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r1-ctrl-w1024.csv": {
+      "sha256": "c8c448eff1551b384c10efbb0117e417dc101a9267ae6bff369d62483a8af165",
+      "bytes": 1381505
+    },
+    "raw/timing-k10-r1-ctrl-w1024.log": {
+      "sha256": "c61da61e9474c3d987be12b7aba41164212538284723907f2a5b16353acf32c1",
+      "bytes": 915
+    },
+    "raw/timing-k10-r1-ctrl-w1024.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r1-ctrl-w4096.csv": {
+      "sha256": "0c5002870024b703ff6054f35516318767aca73df5d9d69f500539b472d926fd",
+      "bytes": 1381491
+    },
+    "raw/timing-k10-r1-ctrl-w4096.log": {
+      "sha256": "f7f902285b1fb0b8b6fe36a73a07cb0c449316268b72750733103a05d58cae5e",
+      "bytes": 916
+    },
+    "raw/timing-k10-r1-ctrl-w4096.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r1-v3-2-w1024.csv": {
+      "sha256": "0711c8236d6b0c0daf80f50d1334bbc8a5ce3627d323cfd10f646b6a12489d1a",
+      "bytes": 1381952
+    },
+    "raw/timing-k10-r1-v3-2-w1024.log": {
+      "sha256": "6ff7154d5fca796b2308e03282c18eee278d259d60d844e3d8184ff4ccf2f1b2",
+      "bytes": 915
+    },
+    "raw/timing-k10-r1-v3-2-w1024.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r1-v3-2-w4096.csv": {
+      "sha256": "2b2e34fc4def6935ff358dc4815673dd4c27c8b08f4410f02197ca38300164e2",
+      "bytes": 1381724
+    },
+    "raw/timing-k10-r1-v3-2-w4096.log": {
+      "sha256": "3b7d9e256991c67945841ddfb20e31ed5ac54928c0b455cb3cf755e62e3fc547",
+      "bytes": 916
+    },
+    "raw/timing-k10-r1-v3-2-w4096.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r1-v3-3r-w1024.csv": {
+      "sha256": "74d9407d4667c458372e30f40723af88057dd974a5d60085499c8ccdacf1b0c7",
+      "bytes": 1381664
+    },
+    "raw/timing-k10-r1-v3-3r-w1024.log": {
+      "sha256": "04f4db5fa6afa3703a4cb79515cb04be8db15bb1329cc3d41261e2a509a5e0be",
+      "bytes": 915
+    },
+    "raw/timing-k10-r1-v3-3r-w1024.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r1-v3-3r-w4096.csv": {
+      "sha256": "6f19b76ea593cde3083139471d9f1ba668b345663f4ecce85321cc98900a1a8f",
+      "bytes": 1381591
+    },
+    "raw/timing-k10-r1-v3-3r-w4096.log": {
+      "sha256": "96c05e0281495e31ef4a649efb2f52caa40e0a0f4876f28643afc32263c634f9",
+      "bytes": 916
+    },
+    "raw/timing-k10-r1-v3-3r-w4096.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r2-ctrl-w1024.csv": {
+      "sha256": "5fbbf6b200d74ce74b859509f034916c48d9ececdea387473eeec060f7fd48ac",
+      "bytes": 1381586
+    },
+    "raw/timing-k10-r2-ctrl-w1024.log": {
+      "sha256": "c61da61e9474c3d987be12b7aba41164212538284723907f2a5b16353acf32c1",
+      "bytes": 915
+    },
+    "raw/timing-k10-r2-ctrl-w1024.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r2-ctrl-w4096.csv": {
+      "sha256": "a13383fcb73f919927eec5149047ecfc9ae775bc298118e092ebe38065cd64a8",
+      "bytes": 1381914
+    },
+    "raw/timing-k10-r2-ctrl-w4096.log": {
+      "sha256": "f7f902285b1fb0b8b6fe36a73a07cb0c449316268b72750733103a05d58cae5e",
+      "bytes": 916
+    },
+    "raw/timing-k10-r2-ctrl-w4096.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r2-v3-2-w1024.csv": {
+      "sha256": "47276be39dc156efc620ba806e5d4b634f443fb18c8fc275a9c07360dc34e2b2",
+      "bytes": 1381596
+    },
+    "raw/timing-k10-r2-v3-2-w1024.log": {
+      "sha256": "6ff7154d5fca796b2308e03282c18eee278d259d60d844e3d8184ff4ccf2f1b2",
+      "bytes": 915
+    },
+    "raw/timing-k10-r2-v3-2-w1024.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r2-v3-2-w4096.csv": {
+      "sha256": "1ef75111a2f39dcb8ba928c54822637c9d25a959b055ea815b5f1e853d77d025",
+      "bytes": 1381647
+    },
+    "raw/timing-k10-r2-v3-2-w4096.log": {
+      "sha256": "3b7d9e256991c67945841ddfb20e31ed5ac54928c0b455cb3cf755e62e3fc547",
+      "bytes": 916
+    },
+    "raw/timing-k10-r2-v3-2-w4096.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r2-v3-3r-w1024.csv": {
+      "sha256": "498ff088dade76dfafbd93f2d2ce706d30df701c0edb1756c9c9a7f731402ca5",
+      "bytes": 1381936
+    },
+    "raw/timing-k10-r2-v3-3r-w1024.log": {
+      "sha256": "04f4db5fa6afa3703a4cb79515cb04be8db15bb1329cc3d41261e2a509a5e0be",
+      "bytes": 915
+    },
+    "raw/timing-k10-r2-v3-3r-w1024.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k10-r2-v3-3r-w4096.csv": {
+      "sha256": "2abdf9571813368936f6399b7d3003b2b56132389483f943db68d189d5c6e3b9",
+      "bytes": 1381773
+    },
+    "raw/timing-k10-r2-v3-3r-w4096.log": {
+      "sha256": "96c05e0281495e31ef4a649efb2f52caa40e0a0f4876f28643afc32263c634f9",
+      "bytes": 916
+    },
+    "raw/timing-k10-r2-v3-3r-w4096.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    },
+    "raw/timing-k16-r0-ctrl-w1024.csv": {
+      "sha256": "fdffc4fc255b4e69a1669c2af3181f9cecf30c9ddac0f4714aa73dc3b94c1249",
+      "bytes": 1381589
+    },
+    "raw/timing-k16-r0-ctrl-w1024.log": {
+      "sha256": "43d51b4d4758b5cfbeee6091e22e0f03854d246df88a144e8948a1ef1e3cd4f9",
+      "bytes": 915
+    },
+    "raw/timing-k16-r0-ctrl-w1024.tsv.zst": {
+      "sha256": "4b13b4ae3c65c4a12dac6a01463f9459ff6d593d49b5460432616e772ff259d2",
+      "bytes": 282225
+    },
+    "raw/timing-k16-r0-v3-2-w1024.csv": {
+      "sha256": "a4623d805c27f5f2b8eef5dfe41b7cc1fbb9295ada5a531ffe81958070da703c",
+      "bytes": 1381584
+    },
+    "raw/timing-k16-r0-v3-2-w1024.log": {
+      "sha256": "6d8a8e6b8b8277db66c1dc422db8c0d4ae6dcaede3e43b21c7eca0533b9055c9",
+      "bytes": 915
+    },
+    "raw/timing-k16-r0-v3-2-w1024.tsv.zst": {
+      "sha256": "4b13b4ae3c65c4a12dac6a01463f9459ff6d593d49b5460432616e772ff259d2",
+      "bytes": 282225
+    },
+    "raw/timing-k16-r0-v3-3r-w1024-overlap-1.csv": {
+      "sha256": "c34c96876d61662110b6b037b025e7cbd1a01b103b3b3907344a5794828f44b2",
+      "bytes": 1381537
+    },
+    "raw/timing-k16-r0-v3-3r-w1024-overlap-1.log": {
+      "sha256": "f4eacd6af8d1e4059df1d30229c2d9b2d8fe9dc46c57fab381a45c21638bb593",
+      "bytes": 915
+    },
+    "raw/timing-k16-r0-v3-3r-w1024-overlap-1.tsv": {
+      "sha256": "9818c616e7def9cf1280722a24e6dc2d4aa700da1af3575552aceec478705e88",
+      "bytes": 6390716
+    },
+    "raw/timing-k16-r0-v3-3r-w1024-overlap-2.csv": {
+      "sha256": "970cc99ac678413ad9b1cb250587933328005f9569ed60cf0e9cd20a0207b802",
+      "bytes": 1381559
+    },
+    "raw/timing-k16-r0-v3-3r-w1024-overlap-2.log": {
+      "sha256": "f4eacd6af8d1e4059df1d30229c2d9b2d8fe9dc46c57fab381a45c21638bb593",
+      "bytes": 915
+    },
+    "raw/timing-k16-r0-v3-3r-w1024-overlap-2.tsv": {
+      "sha256": "9818c616e7def9cf1280722a24e6dc2d4aa700da1af3575552aceec478705e88",
+      "bytes": 6390716
+    },
+    "raw/timing-k16-r0-v3-3r-w1024-overlap-3.csv": {
+      "sha256": "31a69836926c10c1e3653409a730d5994a1e51a293efcacba52c335609a14ec8",
+      "bytes": 1381774
+    },
+    "raw/timing-k16-r0-v3-3r-w1024-overlap-3.log": {
+      "sha256": "f4eacd6af8d1e4059df1d30229c2d9b2d8fe9dc46c57fab381a45c21638bb593",
+      "bytes": 915
+    },
+    "raw/timing-k16-r0-v3-3r-w1024-overlap-3.tsv": {
+      "sha256": "9818c616e7def9cf1280722a24e6dc2d4aa700da1af3575552aceec478705e88",
+      "bytes": 6390716
+    },
+    "raw/timing-k16-r0-v3-3r-w1024-overlap-4.csv": {
+      "sha256": "a73c6824d02ad46c4a0f53cf4568d35ecb88a073a1237bcdcc528c52aa088836",
+      "bytes": 1381645
+    },
+    "raw/timing-k16-r0-v3-3r-w1024-overlap-4.log": {
+      "sha256": "f4eacd6af8d1e4059df1d30229c2d9b2d8fe9dc46c57fab381a45c21638bb593",
+      "bytes": 915
+    },
+    "raw/timing-k16-r0-v3-3r-w1024-overlap-4.tsv": {
+      "sha256": "9818c616e7def9cf1280722a24e6dc2d4aa700da1af3575552aceec478705e88",
+      "bytes": 6390716
+    },
+    "raw/topk-sha256.txt": {
+      "sha256": "d73f711fd447fb5c6bac5365afa20f598c112a5e4c37ea2e7dce564e4783190b",
+      "bytes": 1986
+    }
+  },
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [
+      {
+        "original": "raw/timing-k10-r0-ctrl-w1024.csv",
+        "sha256": "64cd8cb37e361d111e8f45e201636ab138bb36b6ab7791eae9738775bf7d0200",
+        "bytes": 1381663,
+        "public": "raw/timing-k10-r0-ctrl-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r0-ctrl-w4096.csv",
+        "sha256": "0bde4be0d62b65c9064d771b928e39bf451a664f92529e1adf8adee41928e486",
+        "bytes": 1382015,
+        "public": "raw/timing-k10-r0-ctrl-w4096.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r0-v3-2-w1024.csv",
+        "sha256": "11eb9643a63402bed4467332dc9b1d806c140a28b1d677cf6aa0e544d64d15d5",
+        "bytes": 1381997,
+        "public": "raw/timing-k10-r0-v3-2-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r0-v3-2-w4096.csv",
+        "sha256": "82cb5422d72a9702e4a7ec3f0f4dfb3d192689690adb699cb1787e977ef6dd3e",
+        "bytes": 1381842,
+        "public": "raw/timing-k10-r0-v3-2-w4096.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r0-v3-3r-w1024.csv",
+        "sha256": "c5f6b0b288aeaff71d98c3d344835dfd76a7e35ea50295e385b985ed95570c6e",
+        "bytes": 1381676,
+        "public": "raw/timing-k10-r0-v3-3r-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r0-v3-3r-w4096.csv",
+        "sha256": "5f5a614f43018cb3d49cbf0bb9cc82fecca23e601588b8c74eb5a2d9ff48ff7e",
+        "bytes": 1381651,
+        "public": "raw/timing-k10-r0-v3-3r-w4096.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r1-ctrl-w1024.csv",
+        "sha256": "c8c448eff1551b384c10efbb0117e417dc101a9267ae6bff369d62483a8af165",
+        "bytes": 1381505,
+        "public": "raw/timing-k10-r1-ctrl-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r1-ctrl-w4096.csv",
+        "sha256": "0c5002870024b703ff6054f35516318767aca73df5d9d69f500539b472d926fd",
+        "bytes": 1381491,
+        "public": "raw/timing-k10-r1-ctrl-w4096.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r1-v3-2-w1024.csv",
+        "sha256": "0711c8236d6b0c0daf80f50d1334bbc8a5ce3627d323cfd10f646b6a12489d1a",
+        "bytes": 1381952,
+        "public": "raw/timing-k10-r1-v3-2-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r1-v3-2-w4096.csv",
+        "sha256": "2b2e34fc4def6935ff358dc4815673dd4c27c8b08f4410f02197ca38300164e2",
+        "bytes": 1381724,
+        "public": "raw/timing-k10-r1-v3-2-w4096.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r1-v3-3r-w1024.csv",
+        "sha256": "74d9407d4667c458372e30f40723af88057dd974a5d60085499c8ccdacf1b0c7",
+        "bytes": 1381664,
+        "public": "raw/timing-k10-r1-v3-3r-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r1-v3-3r-w4096.csv",
+        "sha256": "6f19b76ea593cde3083139471d9f1ba668b345663f4ecce85321cc98900a1a8f",
+        "bytes": 1381591,
+        "public": "raw/timing-k10-r1-v3-3r-w4096.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r2-ctrl-w1024.csv",
+        "sha256": "5fbbf6b200d74ce74b859509f034916c48d9ececdea387473eeec060f7fd48ac",
+        "bytes": 1381586,
+        "public": "raw/timing-k10-r2-ctrl-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r2-ctrl-w4096.csv",
+        "sha256": "a13383fcb73f919927eec5149047ecfc9ae775bc298118e092ebe38065cd64a8",
+        "bytes": 1381914,
+        "public": "raw/timing-k10-r2-ctrl-w4096.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r2-v3-2-w1024.csv",
+        "sha256": "47276be39dc156efc620ba806e5d4b634f443fb18c8fc275a9c07360dc34e2b2",
+        "bytes": 1381596,
+        "public": "raw/timing-k10-r2-v3-2-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r2-v3-2-w4096.csv",
+        "sha256": "1ef75111a2f39dcb8ba928c54822637c9d25a959b055ea815b5f1e853d77d025",
+        "bytes": 1381647,
+        "public": "raw/timing-k10-r2-v3-2-w4096.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r2-v3-3r-w1024.csv",
+        "sha256": "498ff088dade76dfafbd93f2d2ce706d30df701c0edb1756c9c9a7f731402ca5",
+        "bytes": 1381936,
+        "public": "raw/timing-k10-r2-v3-3r-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r2-v3-3r-w4096.csv",
+        "sha256": "2abdf9571813368936f6399b7d3003b2b56132389483f943db68d189d5c6e3b9",
+        "bytes": 1381773,
+        "public": "raw/timing-k10-r2-v3-3r-w4096.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k16-r0-ctrl-w1024.csv",
+        "sha256": "fdffc4fc255b4e69a1669c2af3181f9cecf30c9ddac0f4714aa73dc3b94c1249",
+        "bytes": 1381589,
+        "public": "raw/timing-k16-r0-ctrl-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k16-r0-v3-2-w1024.csv",
+        "sha256": "a4623d805c27f5f2b8eef5dfe41b7cc1fbb9295ada5a531ffe81958070da703c",
+        "bytes": 1381584,
+        "public": "raw/timing-k16-r0-v3-2-w1024.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k16-r0-v3-3r-w1024-overlap-1.csv",
+        "sha256": "c34c96876d61662110b6b037b025e7cbd1a01b103b3b3907344a5794828f44b2",
+        "bytes": 1381537,
+        "public": "raw/timing-k16-r0-v3-3r-w1024-overlap-1.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k16-r0-v3-3r-w1024-overlap-1.tsv",
+        "sha256": "9818c616e7def9cf1280722a24e6dc2d4aa700da1af3575552aceec478705e88",
+        "bytes": 6390716,
+        "public": "raw/timing-k16-r0-v3-3r-w1024-overlap-1.tsv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k16-r0-v3-3r-w1024-overlap-2.csv",
+        "sha256": "970cc99ac678413ad9b1cb250587933328005f9569ed60cf0e9cd20a0207b802",
+        "bytes": 1381559,
+        "public": "raw/timing-k16-r0-v3-3r-w1024-overlap-2.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k16-r0-v3-3r-w1024-overlap-2.tsv",
+        "sha256": "9818c616e7def9cf1280722a24e6dc2d4aa700da1af3575552aceec478705e88",
+        "bytes": 6390716,
+        "public": "raw/timing-k16-r0-v3-3r-w1024-overlap-2.tsv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k16-r0-v3-3r-w1024-overlap-3.csv",
+        "sha256": "31a69836926c10c1e3653409a730d5994a1e51a293efcacba52c335609a14ec8",
+        "bytes": 1381774,
+        "public": "raw/timing-k16-r0-v3-3r-w1024-overlap-3.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k16-r0-v3-3r-w1024-overlap-3.tsv",
+        "sha256": "9818c616e7def9cf1280722a24e6dc2d4aa700da1af3575552aceec478705e88",
+        "bytes": 6390716,
+        "public": "raw/timing-k16-r0-v3-3r-w1024-overlap-3.tsv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k16-r0-v3-3r-w1024-overlap-4.csv",
+        "sha256": "a73c6824d02ad46c4a0f53cf4568d35ecb88a073a1237bcdcc528c52aa088836",
+        "bytes": 1381645,
+        "public": "raw/timing-k16-r0-v3-3r-w1024-overlap-4.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k16-r0-v3-3r-w1024-overlap-4.tsv",
+        "sha256": "9818c616e7def9cf1280722a24e6dc2d4aa700da1af3575552aceec478705e88",
+        "bytes": 6390716,
+        "public": "raw/timing-k16-r0-v3-3r-w1024-overlap-4.tsv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      }
+    ],
+    "excluded": [
+      {
+        "original": "raw/timing-k10-r0-ctrl-w1024.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-ctrl-w1024.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-ctrl-w1024.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r0-ctrl-w4096.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-ctrl-w4096.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-ctrl-w4096.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r0-v3-2-w1024.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-2-w1024.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-2-w1024.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r0-v3-2-w4096.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-2-w4096.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-2-w4096.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r0-v3-3r-w1024.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-3r-w1024.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-3r-w1024.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r0-v3-3r-w4096.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-3r-w4096.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r0-v3-3r-w4096.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r1-ctrl-w1024.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-ctrl-w1024.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-ctrl-w1024.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r1-ctrl-w4096.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-ctrl-w4096.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-ctrl-w4096.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r1-v3-2-w1024.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-2-w1024.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-2-w1024.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r1-v3-2-w4096.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-2-w4096.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-2-w4096.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r1-v3-3r-w1024.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-3r-w1024.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-3r-w1024.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r1-v3-3r-w4096.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-3r-w4096.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r1-v3-3r-w4096.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r2-ctrl-w1024.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-ctrl-w1024.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-ctrl-w1024.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r2-ctrl-w4096.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-ctrl-w4096.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-ctrl-w4096.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r2-v3-2-w1024.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-2-w1024.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-2-w1024.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r2-v3-2-w4096.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-2-w4096.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-2-w4096.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r2-v3-3r-w1024.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-3r-w1024.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-3r-w1024.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r2-v3-3r-w4096.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-3r-w4096.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k10-r2-v3-3r-w4096.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k16-r0-ctrl-w1024.tsv.zst",
+        "sha256": "4b13b4ae3c65c4a12dac6a01463f9459ff6d593d49b5460432616e772ff259d2",
+        "bytes": 282225,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-ctrl-w1024.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-ctrl-w1024.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k16-r0-v3-2-w1024.tsv.zst",
+        "sha256": "4b13b4ae3c65c4a12dac6a01463f9459ff6d593d49b5460432616e772ff259d2",
+        "bytes": 282225,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-v3-2-w1024.tsv.zst; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-measureD-01/raw/timing-k16-r0-v3-2-w1024.tsv.zst (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      }
+    ],
+    "recorded_artifacts_not_in_public_tree_or_lists": []
+  },
+  "pr_slimming": {
+    "note": "Removed from the pull request that adds src/cuda_range_v3.cu to main (raw per-round timing/profile data only); every removed file is listed with the SHA-256 and size it had in Git.",
+    "full_raw_outputs": {
+      "branch": "exp/arnav/2026-11-17-range-v3",
+      "commit": "5e6081714672b110c09734b500e78f364acf8550",
+      "run_bulk": "run-bulk/2026-11-17-range-v3/20261117-cuda5-measureD-01/"
+    },
+    "removed": [
+      {
+        "path": "raw/oracle-top16-1000000.tsv",
+        "sha256": "18f1be7df8720acc0f708de287f4b007b24433ef6d1b5351ec6d1d4026596ade",
+        "bytes": 188496
+      },
+      {
+        "path": "raw/oracle-top32-1000000.tsv",
+        "sha256": "9d7505a54469101998cca5b707025917fc7959831d58efbbb288ba27f14f2b59",
+        "bytes": 380459
+      },
+      {
+        "path": "raw/timing-k10-r0-ctrl-w1024.csv.gz",
+        "sha256": "7c6d9052610a159ba60b879a7157fbd2f34356b0d4b67464c3708c769f530ac6",
+        "bytes": 154154
+      },
+      {
+        "path": "raw/timing-k10-r0-ctrl-w4096.csv.gz",
+        "sha256": "4e9f161b48583b29351cac0824244dbe870f06b693005c678f3122dd3070e98e",
+        "bytes": 157651
+      },
+      {
+        "path": "raw/timing-k10-r0-v3-2-w1024.csv.gz",
+        "sha256": "c308b77f0e8d363a9aadc26cf8b6c64a801d4d8ff2e6410c25bd2d33e2747e02",
+        "bytes": 155287
+      },
+      {
+        "path": "raw/timing-k10-r0-v3-2-w4096.csv.gz",
+        "sha256": "38cfe434a409668f075448df26687641e3d911f193f29ce47e5cbd43e575b0ae",
+        "bytes": 157455
+      },
+      {
+        "path": "raw/timing-k10-r0-v3-3r-w1024.csv.gz",
+        "sha256": "b25a8c404b04eda6b082b5e6f9e3ac92711c057f6f212c8b75d0db6ea25b725c",
+        "bytes": 155678
+      },
+      {
+        "path": "raw/timing-k10-r0-v3-3r-w4096.csv.gz",
+        "sha256": "8e4ec7d0169b2a787e918171ad86da4338befc108667e4e8fd77e2fdc3c15216",
+        "bytes": 159194
+      },
+      {
+        "path": "raw/timing-k10-r1-ctrl-w1024.csv.gz",
+        "sha256": "9f7dc8f5c8039af311600f6054b46c0ecfc0f45e9ee6568c81299bde0ae61c8e",
+        "bytes": 154190
+      },
+      {
+        "path": "raw/timing-k10-r1-ctrl-w4096.csv.gz",
+        "sha256": "5e4482b8dd5f3929cf8ce79e6e5f1b77b08aa616c2427a35c8fb26fddf073b44",
+        "bytes": 157323
+      },
+      {
+        "path": "raw/timing-k10-r1-v3-2-w1024.csv.gz",
+        "sha256": "e1f76a8bc50e22b0c8bf0c750ec388441fccc15c07bec52ceab9791d25abeee2",
+        "bytes": 154971
+      },
+      {
+        "path": "raw/timing-k10-r1-v3-2-w4096.csv.gz",
+        "sha256": "59e273ce61c339c602c4451774129b22e536038fbaa3f6b5a807a5f659f291b2",
+        "bytes": 157350
+      },
+      {
+        "path": "raw/timing-k10-r1-v3-3r-w1024.csv.gz",
+        "sha256": "2387ea4705752bc833d2a99eaf2646a65a0dfbcd119808ef0078ea0f381d1dd4",
+        "bytes": 155045
+      },
+      {
+        "path": "raw/timing-k10-r1-v3-3r-w4096.csv.gz",
+        "sha256": "022b62e3c8023760b5ea7912e60cdff433a2506ab6abf1300c116194fa6830c8",
+        "bytes": 158747
+      },
+      {
+        "path": "raw/timing-k10-r2-ctrl-w1024.csv.gz",
+        "sha256": "7a60df40bbffb1471e955e1d5de69a8972236af2acd0a1f5e1a838194d6c407a",
+        "bytes": 154279
+      },
+      {
+        "path": "raw/timing-k10-r2-ctrl-w4096.csv.gz",
+        "sha256": "a236426f4baa45680b7db5873d60f365aa27c477de2643ee100f91c5a9765491",
+        "bytes": 157349
+      },
+      {
+        "path": "raw/timing-k10-r2-v3-2-w1024.csv.gz",
+        "sha256": "8dfb51306b3b512a0e07776f3f5a3f775d49c170be48775e7b4c7deee91dc24c",
+        "bytes": 155096
+      },
+      {
+        "path": "raw/timing-k10-r2-v3-2-w4096.csv.gz",
+        "sha256": "86c3b106b5827a57a78fd3a51eda9b584417b0447566122a0ae3ffa8324ce25f",
+        "bytes": 157257
+      },
+      {
+        "path": "raw/timing-k10-r2-v3-3r-w1024.csv.gz",
+        "sha256": "1dbd095e5ce1402d98099a62c494ada8ce7cf4ceb689527e10fe491efc167a76",
+        "bytes": 155656
+      },
+      {
+        "path": "raw/timing-k10-r2-v3-3r-w4096.csv.gz",
+        "sha256": "f96942395adad61aef6458bb42b54c438d8daf4fb7de11e6305b25de719f17e4",
+        "bytes": 158553
+      },
+      {
+        "path": "raw/timing-k16-r0-ctrl-w1024.csv.gz",
+        "sha256": "64a807bb30b7323add793fbfc9bfef688085e6985c4c3e78dc343fcd037cdece",
+        "bytes": 154317
+      },
+      {
+        "path": "raw/timing-k16-r0-v3-2-w1024.csv.gz",
+        "sha256": "e61b3c7828e17d363604dff4e7c63626d6cbb0f55570fe883a1d2d58587c2249",
+        "bytes": 155388
+      },
+      {
+        "path": "raw/timing-k16-r0-v3-3r-w1024-overlap-1.csv.gz",
+        "sha256": "03a2c25347e455f688fa77a75b485ccc077d3be97420e8be7213e26d936408e3",
+        "bytes": 155380
+      },
+      {
+        "path": "raw/timing-k16-r0-v3-3r-w1024-overlap-1.tsv.gz",
+        "sha256": "7d4d257a9f1fc42542e41bca49b752e4edae345b99a233ac012866a92ae48dbe",
+        "bytes": 1831003
+      },
+      {
+        "path": "raw/timing-k16-r0-v3-3r-w1024-overlap-2.csv.gz",
+        "sha256": "9808384757612fc39674b9284c8d716685c843ee1c575e68386ab5d1425090fc",
+        "bytes": 155732
+      },
+      {
+        "path": "raw/timing-k16-r0-v3-3r-w1024-overlap-2.tsv.gz",
+        "sha256": "7d4d257a9f1fc42542e41bca49b752e4edae345b99a233ac012866a92ae48dbe",
+        "bytes": 1831003
+      },
+      {
+        "path": "raw/timing-k16-r0-v3-3r-w1024-overlap-3.csv.gz",
+        "sha256": "8c3ff472d864897ed89bc27d25521024273a5e9231f98263f30a9854ecc133b6",
+        "bytes": 156126
+      },
+      {
+        "path": "raw/timing-k16-r0-v3-3r-w1024-overlap-3.tsv.gz",
+        "sha256": "7d4d257a9f1fc42542e41bca49b752e4edae345b99a233ac012866a92ae48dbe",
+        "bytes": 1831003
+      },
+      {
+        "path": "raw/timing-k16-r0-v3-3r-w1024-overlap-4.csv.gz",
+        "sha256": "0f0d3f4015e6bba76a2a9a3e4b89e81ba109535184bb0292730ada028feb43fa",
+        "bytes": 155779
+      },
+      {
+        "path": "raw/timing-k16-r0-v3-3r-w1024-overlap-4.tsv.gz",
+        "sha256": "7d4d257a9f1fc42542e41bca49b752e4edae345b99a233ac012866a92ae48dbe",
+        "bytes": 1831003
+      }
+    ]
+  }
+}

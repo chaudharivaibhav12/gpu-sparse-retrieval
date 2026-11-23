@@ -1,0 +1,220 @@
+{
+  "experiment_id": "2026-11-22-range-v3-tune",
+  "status": "Measurement P registered (queued on cuda5); Measurement E registered before timing",
+  "registered_utc": "2026-11-21",
+  "owner": "Arnav",
+  "recording": "not recorded by the team runtime",
+  "source": {
+    "branch": "exp/arnav/2026-11-22-range-v3-tune",
+    "kernel": "src/cuda_range_v2.cu (v3-3: theta-filtered merge + radix-select local top-k), unchanged from exp/arnav/2026-11-18-range-v3-3 7362a8e and its merge with origin/main 66d7e1e (3077335)",
+    "sass_identity": "normal build SASS must equal the timed v3-3 binary (build/v3variants-fix1/v3-3, a644e9d5125d6e7e...); code/build_p.sh stops otherwise",
+    "measured_commit": "the run's HEAD, recorded in logs/environment.txt, commit.txt of each build and the manifest"
+  },
+  "builds": {
+    "host": "cuda5 (RTX 4070, sm_89), module cuda-12.6; only CUDA 12.6 builds on cuda5 count",
+    "script": "experiments/2026-11-22-range-v3-tune/code/build_p.sh OUT",
+    "normal": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17",
+    "clocks": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 -DRBP_STAGE_CLOCKS (clock64 per warp at stage boundaries and around the seven instrumented __syncthreads sites; globaltimer per block)",
+    "radix_cpu": "g++ -O2 -std=c++17 analysis/radix_cpu.cpp (CPU only)",
+    "ptxas": "-Xptxas -v output kept per build (registers, static shared memory, spills)"
+  },
+  "configuration": {
+    "documents": 1000000,
+    "index": "data/derived/hash-1000000-w4096-pos.rbp (W=4096, uniform ranges, 245 ranges)",
+    "threads": 256,
+    "radix_min_k": 1,
+    "radix_min_k_reason": "Measurement D adopted uniform radix at W=4096 (v3-3r); with crossover 1 every k runs range_scores<true>",
+    "k": [
+      10,
+      100,
+      1000
+    ],
+    "queries": "data/derived/calibration-500.tsv, first 25 (calibration only; held-out queries are not used)",
+    "contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1"
+  },
+  "measurement_P": {
+    "order": "for k in 10, 100, 1000: reference, clocks, nsys, ncu; then the CPU radix replay; then analysis",
+    "steps": {
+      "reference": "normal build, 3 warm-up + 20 measured rounds of the 25 queries; per-query wall (host steady_clock around argument packing, launch, result copy and event sync) and GPU event span",
+      "clocks": "clock build, 3 warm-up + 5 measured rounds; RBP_CLOCKS_OUT dumps; analysis/analyze_clocks.py --radix",
+      "nsys": "nsys profile --trace=cuda --sample=none --cpuctxsw=none, normal build, 3+20 rounds; SQLite export; analysis/analyze_nsys_v2.py",
+      "ncu": "ncu --kernel-name regex:range_scores --launch-count 25 --import-source yes, sections SpeedOfLight LaunchStats Occupancy WarpStateStats SchedulerStats SourceCounters MemoryWorkloadAnalysis MemoryWorkloadAnalysis_Tables InstructionStats ComputeWorkloadAnalysis; normal build, 0 warm-up + 1 round (25 launches); exports raw, details, source sass, source cuda+sass; analysis/analyze_ncu_p.py. Nsight Compute replays each launch at locked base clocks with flushed caches",
+      "radix_replay": "analysis/radix_cpu.cpp: exact CPU replay of the radix selection for the same 25 queries and k (RBP range boundaries and document order, cpu_pilot dot() scores); its merged top-k must equal the oracle"
+    },
+    "correctness": "every GPU step's top-k TSV and the replay's top-k equal data/derived/oracle/cpu-top{k}-1000000.tsv for the 25 queries (experiments/2026-11-13-range-bitpack/analysis/compare_topk.py); any mismatch stops the run",
+    "report": {
+      "stage_table": "from clocks: setup (lookup+zero), word-table prefix, decode+add, radix select+gather, bitonic sort, candidate write (theta atomicMax, cut read, write), threadfence, done ticket, merge select, merge scatter; mean per block (mean over warps, then blocks and slices) and critical path (median over slices of the slowest pre-merge block's slowest warp per stage); merge tail (globaltimer: merging block end - latest candidate-write end). Clock-build values; the radix, gather, bitonic and theta barriers have no clock sites, so their waits are inside those stage times",
+      "barrier_table": "clocks: the seven instrumented sites (S1-S7), mean wait per warp, critical-path wait, share of barrier time. ncu: every BAR instruction by source line (all sites, including radix passes, gather, bitonic and theta), barrier-stall samples and share",
+      "resources": "ncu launch statistics: registers per thread, static and dynamic shared memory per block, driver shared memory, occupancy limits and blocks per SM (minimum limit), waves per SM; ptxas -v as a cross-check",
+      "coalescing": "ncu source counters (-lineinfo): decode loop encoded-word loads (rbp_extract, range_bitpack.h) and impacts loads: requests (warp instructions), L2 theoretical sectors, sectors per request against ideal",
+      "radix_contention": "ncu: samples and stall reasons on the bucket atomicAdd line (mio throttle = shared-memory instruction queue throttle, short scoreboard, etc.); CPU replay: per range the share of documents with score 0, keys counted in each pass, the share of ranges whose first-pass largest bucket holds more than half the keys counted, and the modeled same-bucket depth per warp atomic instruction (32 consecutive slots per warp)",
+      "decode_stalls": "ncu: stall reasons on the encoded-load line and the impacts-load + score-atomicAdd line (all SASS of the line, so the consumers of the loads that carry long-scoreboard stalls are included), and on the load instructions themselves",
+      "host_vs_gpu": "nsys per query: launch API, launch to kernel start, kernel, D2H copy, kernel end to D2H start, kernel end to copy return (GPU end to result back on the host), copy return after D2H end; unprofiled wall and GPU share from the reference step"
+    },
+    "reading_rules_registered_before_data": {
+      "a_unrolled_decode": "supported if decode+add is at least 25% of the pre-merge critical path at some k AND long-scoreboard stalls are at least 50% of the samples on the encoded-load line AND DRAM throughput is below 50% of peak (latency-bound, not bandwidth-bound)",
+      "b_radix_contention": "supported if radix select+gather is at least 20% of the pre-merge critical path at some k AND the bucket atomicAdd line holds at least 5% of kernel samples AND the replay's mean same-bucket depth per warp atomic instruction is at least 8",
+      "c_result_buffer": "supported if the median kernel end to copy return is at least 5% of the median unprofiled wall per query at some k",
+      "note": "rules decide what the profile supports, not what is written; the owner decides which changes to implement"
+    },
+    "gpu_policy": {
+      "idle_check": "before every GPU process (code/session_lib.sh wait_idle): no compute process on the GPU (nvidia-smi), none of our GPU jobs (scorer, nsys, ncu), and no other 'run_*' script outside this session (pgrep -f '[r]un_'); otherwise wait in 30 s steps up to IDLE_WAIT_MAX = 14400 s, then the session stops",
+      "overlap": "0.5 s poll of compute processes and nvidia-smi pmon during the session; a process that overlaps another user's GPU process (1 s margin) is preserved as <tag>-overlap-<n> and its slot rerun, at most 3 replacements per slot, then the session stops",
+      "logging": "counts and owner class only; no other users' names, commands or paths"
+    },
+    "outputs": "results/2026-11-22-range-v3-tune/<run>/ with logs, raw, analysis and manifest (SHA-256 of every file); large originals (nsys/ncu reports, SQLite, clock dumps) go to ~/csciga3033-025/project/run-bulk/2026-11-22-range-v3-tune/<run>/ via scripts/package_run.py, hashes in the manifest"
+  },
+  "amendments": [
+    {
+      "date": "2026-11-22",
+      "decision_by": "owner",
+      "text": "Measurement P (20261122-cuda5-profileP-01) stays queued; if it times out (4 h idle wait per process) it is not re-queued. A later step profiles v3-3 and the final variant together."
+    },
+    {
+      "date": "2026-11-22",
+      "decision_by": "owner",
+      "text": "Change B (RBP_V3_RADIX_AGG) is dropped from timing: its code stays behind the switch, off. Recorded as a negative result from laptop development readings (CUDA 13.3, 1M, W=4096, 25 queries, not results): GPU span ratio to v3-3 skip0 1.02/0.99/1.06 and aggskip 1.08/1.02/1.05 at k=10/100/1000. Change C (result copy) was dropped earlier on the laptop profile."
+    },
+    {
+      "date": "2026-11-22",
+      "decision_by": "Claude (fix of a monitoring bug; the owner asked for the relaunch, reported afterwards)",
+      "text": "Overlap classification fix before Measurement E session 3. In session 2 the fixtures step (one Python process that runs ~216 short scorer subprocesses) was flagged as overlapping in every attempt: most of its own subprocesses exit before the 0.5 s poll can read their owner, so they were logged as 'gone' and, in pmon, as unknown PIDs, both counted as other users' processes (attempt 1: 32 flagged PIDs, 31 pmon-only with 0 MiB, 1 with 154 MiB; attempt 0 also had one genuine other process, 920 MiB at 99% SM). Fix (code/session_lib.sh, code/overlap.py): a process whose owner cannot be read is classified as ours ('oursname') only if nvidia-smi's process path is one of our build directories' scorer binaries ((^|/)build/<dir>/<label>/scorer); a pmon row is ours if its process name is exactly 'scorer' (the command column is logged as 'ours' or '-', never the name). Everything else is unchanged: another user's process still counts as an overlap. Session 2 (gate ctrl-02, fixtures overlap-1..3 preserved) was stopped by hand at 17:50:16Z and is recorded as failed; session 3 relaunches the same plan from the fixed commit (rebuilt; SASS must equal the recorded hashes)."
+    },
+    {
+      "date": "2026-11-22",
+      "decision_by": "owner",
+      "text": "Measurement E gates run contended (CONTENDED=1 in code/session_lib.sh): they are correctness checks only, so they do not wait for other users' GPU processes and overlapped steps are not replaced; every overlap is still recorded per process (logs/overlap-checks.jsonl). Our own GPU jobs are still never run concurrently. The timing run is unchanged (idle check before every process, 300 s retries, overlapped processes preserved and rerun). Session 3 was stopped by hand at 18:10:52Z after gate ctrl-03 passed (under the full idle rule) and gate v3-3-01 had paused for an idle check; session 4 rebuilds at the amendment commit, gates the six v3 builds contended (v3-3 as -02), keeps ctrl-03 (ctrl is always built from 74dd5d3; SASS 53eb3cac16e4bc19), then times."
+    },
+    {
+      "date": "2026-11-22",
+      "decision_by": "owner",
+      "text": "E1 reading for Measurement E (decided after the run): E1 is applied per W, at W=4096. Reasons: W=4096 with 256 threads was chosen as the configuration before Measurement E (Step 1's prompt of this experiment, 'The chosen configuration is W=4096 with 256 threads', and the owner's 2026-11-21 decision), and E1 compares each variant against v3-3 at the same W. The registered clause 'it must pass at every W it was timed at' (written by Claude when registering) is replaced by this reading. Outcome: at W=4096 unroll2, unroll4, D, u2m and u4m all pass E1; E2 picks unroll4 (geometric mean 0.904 vs 0.942); E3 picks u4m (passes E1 and beats D: six-cell geometric mean 0.553 vs D 0.609; u4m/D at W=4096 0.823 [0.799, 0.842], 0.846 [0.842, 0.851], 0.903 [0.897, 0.909] at k=10/100/1000). Final variant: u4m (A with U=4 + D) at W=4096. Not adopted: v3-3 at W=1024 is the fastest k=10 cell (0.0907 ms vs u4m at W=4096 0.0987 ms), but using it would need a second index and a second code path; D loses at W=1024, k=10 (1.134 [1.126, 1.141] x v3-3). The run's analysis output (paired-statistics.json, tables.md) is left as produced under the registered clause; both readings are reported."
+    }
+  ],
+  "measurement_E": {
+    "purpose": "paired timing of the version-3.4 variants against v3-3 at W=4096 and W=1024, and of every cell against the team reference ctrl (V2-5) at W=1024",
+    "host": "cuda5 (RTX 4070); CUDA 12.6 builds only (module cuda-12.6), nvcc -O3 -lineinfo -arch=sm_89 -std=c++17",
+    "builds": {
+      "script": "code/build_variants.sh (flag combinations, no new code); commit = the run's HEAD, except ctrl = main 74dd5d3 (V2-5)",
+      "variants": {
+        "ctrl": "74dd5d3, no flags",
+        "v3-3": "no flags (SASS a644e9d5125d6e7e)",
+        "v3-4-unroll2": "-DRBP_V3_UNROLL=2",
+        "v3-4-unroll4": "-DRBP_V3_UNROLL=4",
+        "v3-4-mergeradix": "-DRBP_V3_MERGE_RADIX=1",
+        "v3-4-u2m": "-DRBP_V3_UNROLL=2 -DRBP_V3_MERGE_RADIX=1",
+        "v3-4-u4m": "-DRBP_V3_UNROLL=4 -DRBP_V3_MERGE_RADIX=1"
+      },
+      "records": "SASS hash, registers and static shared memory (ptxas) per build; dynamic shared memory and estimated blocks/SM from analysis/resources_v34.py"
+    },
+    "gates": "before timing, every build passes code/gate_cuda5.sh on the cuda5 GPU: fixtures incl. --v3-cases enforce --v34-cases (default crossover, and crossover 1 except ctrl), then 100K and 1M x 500 calibration queries x k=10/100/1000 at W=4096 (crossover 1; ctrl none) and W=1024 (default crossover), exact against the CPU oracle; a failed gate stops the session before timing",
+    "design": {
+      "session": "one cuda5 session: gates, then timing, then analysis (code/run_timing_e.sh)",
+      "documents": 1000000,
+      "threads": 256,
+      "batch": 1,
+      "radix_min_k": "1 (uniform radix) for every v3 cell; ctrl takes no crossover argument",
+      "queries": "data/derived/calibration-500.tsv, all 500; held-out untouched",
+      "rounds": "3 warm-up + 20 measured per process",
+      "cells_per_k": {
+        "W=4096": [
+          "v3-3",
+          "v3-4-unroll2",
+          "v3-4-unroll4",
+          "v3-4-mergeradix",
+          "v3-4-u2m",
+          "v3-4-u4m"
+        ],
+        "W=1024": [
+          "v3-3",
+          "v3-4-mergeradix",
+          "v3-4-u2m",
+          "v3-4-u4m",
+          "ctrl"
+        ]
+      },
+      "k": [
+        10,
+        100,
+        1000
+      ],
+      "order": "one set per k with all 11 cells; 3 processes per cell; process p runs the cell list rotated by p*ceil(11/3) (offsets 0, 4, 8); sets in order k=10, 100, 1000",
+      "correctness": "every timed top-k (all 23 rounds) compared with data/derived/oracle/cpu-top{k}-1000000.tsv; any mismatch stops the run"
+    },
+    "statistic": {
+      "per_process": "median query_wall_ms of each query over the 20 measured rounds",
+      "ratio": "geometric mean over 3 x 500 (process, query) pairs of median_X / median_Y, processes paired by index within a k set",
+      "interval": "crossed bootstrap (processes and queries resampled independently), 10,000 draws, 95% percentile interval, seed 20261122 (new); shared draws across the contrasts of one k",
+      "contrasts": "each cell / v3-3 at the same W; each cell / ctrl at W=1024; W=1024 / W=4096 for v3-3, D, u2m, u4m; u2m / D and u4m / D at each W",
+      "script": "analysis/analyze_timing_e.py"
+    },
+    "decision_rules": {
+      "E1": "a variant is adopted if its ratio to v3-3 (same W) has an upper 95% bound < 1 at some k and no k's lower bound is > 1.02; evaluated at each W the variant is timed at, and it must pass at every such W (unroll2/unroll4: W=4096 only)",
+      "E2": "unroll: U=2 vs U=4, the lower geometric mean across k of the ratio-to-v3-3 point estimates (W=4096) among those passing E1; none if neither passes",
+      "E3": "final variant = u2m or u4m if it passes E1 and its geometric mean of point estimates over the six (W, k) cells is lower than D's (the lower of the two if both qualify); otherwise D if D passes E1; otherwise v3-3 (nothing adopted)",
+      "E4": "for the final variant, per k: recommend W=1024 only if W=1024 / W=4096 (same session, paired) has an upper 95% bound < 1; otherwise W=4096; also report whether one W is best for all k. Label: calibration tuning, to be frozen before held-out evaluation",
+      "E1_as_amended": "applied per W at W=4096 (the configuration chosen before Measurement E); see amendments"
+    },
+    "report": "per k: variant | W | pooled median ms | ratio to v3-3 [95%] | ratio to ctrl W=1024 [95%]; E1-E4 outcomes; final variant and W choice",
+    "gpu_policy": {
+      "idle_check": "before every GPU process: no compute process, none of our GPU jobs, no other run_* script outside the session; when busy, retry every 300 s (IDLE_POLL=300) until a deadline 6 h after the session launch (IDLE_DEADLINE), then the session stops and the owner is told",
+      "overlap": "a process that overlaps another user's GPU process is preserved as <tag>-overlap-<n> and rerun (at most 3 replacements per slot, then the session stops)",
+      "estimate": "timing about 20 min of GPU time (99 processes: k=10 ~7 s, k=100 ~9.5 s, k=1000 ~30 s without D and ~10 s with D, from Measurement A and contendedD-02 process durations); gates about 6 min each x 7 (correctness, before timing)"
+    },
+    "outputs": "results/2026-11-22-range-v3-tune/<run>/ (logs, analysis, manifest); timing CSVs committed; compressed top-k TSVs and other large originals to ~/csciga3033-025/project/run-bulk/2026-11-22-range-v3-tune/<run>/ with SHA-256 in the manifest"
+  },
+  "measurement_P2": {
+    "purpose": "before/after profile of v3-3 and the final variant u4m (A U=4 + D) at W=4096 (owner, 2026-11-22; replaces the Measurement P that never ran)",
+    "design": "as measurement_P (reference 3+20, clocks 3+5, nsys 3+20, ncu 0+1 = 25 launches with the same sections; CPU radix replay), for both variants: 1M documents, W=4096, 256 threads, radix crossover 1, first 25 calibration queries, k = 10, 100, 1000; within each step v3-3 then u4m",
+    "builds": "code/build_variants.sh at the run's HEAD: normal builds v3-3 (SASS must be a644e9d5125d6e7e) and v3-4-u4m (SASS must be 8f8a5d49e0e0ad3f, the build timed in Measurement E); clock builds with EXTRA_NVCC_FLAGS=-DRBP_STAGE_CLOCKS. The D merge has clock events of its own (instrumentation only, under RBP_STAGE_CLOCKS): merge_count_scan_end, merge_compact_end, merge_select_end (= end of the radix select), merge_end; analysis/analyze_clocks.py reports them as merge sub-stages",
+    "correctness": "every GPU step's top-k compared with the CPU oracle; any mismatch stops the run",
+    "report": "stage tables before/after (setup, word-table prefix, decode+add, radix select+gather, bitonic sort, candidate write, threadfence, done ticket, merge select, merge scatter; D merge sub-stages), barrier waits, Nsight Compute stage shares, stall reasons, launch resources (registers, shared memory, blocks/SM, waves), decode-load coalescing and stalls, host vs GPU",
+    "gpu_policy": "as measurement_E timing: idle check before every GPU process (no compute process, none of our GPU jobs, no other run_* script outside the session), retry every 300 s up to 6 h after launch, then stop and report; overlapped processes preserved and rerun (at most 3 per slot); overlap classification as amended",
+    "script": "code/run_profile_p2.sh"
+  },
+  "measurement_F": {
+    "purpose": "the final variant u4m (default build) at W=4096 against the team references at the full collection (8,841,823 passages)",
+    "label": "calibration only and after the freeze: the 500 calibration queries were used to choose settings, and the held-out queries were used in PR #27; these results are not a held-out evaluation",
+    "inputs": {
+      "source": "pinned full-collection inputs of experiments/2026-11-15-full-collection-baselines/configs/protocol.json, matched by SHA-256 and copied to /scratch/ag11163/full-inputs (copies verified)",
+      "gsp": "full-8841823.gsp, SHA-256 e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac (pinned)",
+      "index_w1024": "full-8841823-w1024.rbp, SHA-256 c766962016b9f0be9799db42eabc2217889f1a00e6b70396702603787000f6ab (pinned)",
+      "index_w4096": "full-8841823-w4096-pos.rbp, built once from the pinned GSP with range_bitpack_tool (build ... 4096 positions) at commit 37d1ffe, followed by the builder's round-trip check (verify); SHA-256, size and build time recorded in the run and the report",
+      "index_w256": "full-8841823-w256.rbp, the team's W=256 index used by PR #27's pruned scorer (scorer-reported index_sha256 pinned there: 90b86a651aa0be4cc45094e9f1891df184c2d93718dc71f081a74072248cd328); file SHA-256 0ad6531c7698c7541fd9f6d62fb4fa34619e4b765656cccfa3d13fdc64202892",
+      "queries": "data/derived/calibration-500.tsv, SHA-256 150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091 (pinned)",
+      "oracle": "cpu_pilot top-100 and top-1000 for the 500 calibration queries made from the pinned GSP and queries (cpu_pilot at main 63188b5; provenance files copied with them); top-10 = the per-query prefix of the top-1000, whose SHA-256 equals the pinned oracle 7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed"
+    },
+    "builds": {
+      "u4m": "label v3-4-default: src/cuda_range_v2.cu at the run's HEAD with no switches (SASS must be 8f8a5d49e0e0ad3f, the u4m timed in Measurement E); W=4096, crossover argument 1",
+      "ctrl": "label ctrl: main 74dd5d3 (V2-5), W=1024",
+      "prunetm": "label prunetm: src/cuda_range_prune_tm.cu at main 66d7e1e, unmodified; documented arguments of experiments/2026-11-19-prune-depth-adaptive: W=256, 64 seeds, 256 score and merge threads",
+      "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17, CUDA 12.6 on cuda5 (code/build_variants.sh)"
+    },
+    "gates": "code/gate_full.sh for u4m, ctrl and prunetm: all 500 calibration queries at k=10/100/1000 (1 warm-up + 1 measured round), exact against the oracle; prunetm first runs its own fixture suite (tests/check_range_prune.py, unmodified); peak GPU memory per process recorded (analysis/gpu_memory.py). prune-tm is timed only if it builds and passes its gate unmodified; otherwise it is left out and the reason reported. A u4m or ctrl gate failure stops the session",
+    "design": {
+      "session": "one cuda5 session: gates, then timing (code/run_timing_f.sh), then analysis",
+      "cells": "u4m W=4096; ctrl W=1024; prunetm W=256 S=64 if its gate passed",
+      "k": [
+        10,
+        100,
+        1000
+      ],
+      "order": "one set per k; 3 processes per cell; process p runs the cell list rotated by p*ceil(n/3)",
+      "rounds": "500 calibration queries x (3 warm-up + 20 measured rounds) per process; batch 1; 256 threads",
+      "correctness": "every timed top-k (all 23 rounds) compared with the oracle; a mismatch stops the run"
+    },
+    "statistic": {
+      "per_process": "median query_wall_ms of each query over the measured rounds",
+      "ratio": "geometric mean of the 3 x 500 paired (process, query) ratios to ctrl",
+      "interval": "crossed bootstrap (processes and queries), 10,000 draws, 95% percentile interval, seed 20261123 (new)",
+      "also": "u4m / prunetm when prunetm is timed",
+      "script": "analysis/analyze_timing_f.py"
+    },
+    "report": "per k: implementation | W | pooled median ms | ratio to ctrl [95%], next to the team's published full-collection numbers (v2 0.688 / 2.687 / 12.38 ms; pruned W=256 0.237 / 0.694 / 3.218 ms at k = 10/100/1000), which come from other sessions",
+    "estimate": {
+      "gpu_time": "about 30 min: timing ~20 min (27 processes at most: ~13 s index load each; ctrl 0.69/2.7/12.4 ms, prune-tm 0.24/0.69/3.2 ms, u4m ~0.5/0.6/1.0 ms per query x 11,500 queries per process) plus gates ~5-8 min; below the owner's 60 min limit",
+      "gpu_memory": "about 4.1 GB (u4m), 3.8 GB (ctrl), 5 GB (prune-tm) of the RTX 4070's 12 GB"
+    },
+    "gpu_policy": "idle check before every GPU process (no compute process, none of our GPU jobs, no other run_* script outside the session), retry every 300 s up to 6 h after launch, then stop and report; overlapped processes preserved and rerun (at most 3 per slot); gates and timing alike"
+  }
+}

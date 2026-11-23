@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-17-range-v3",
+  "title": "Range scorer v3: warp-cooperative lookup, θ-filtered merge, radix-select local top-k",
+  "owner": "Arnav",
+  "branch": "exp/arnav/2026-11-17-range-v3",
+  "status": "setup; no kernel change written",
+  "parent_experiment": "main 74dd5d3 (V2-5 via PR #12; settings from PR #13; baselines PR #16)",
+  "parent_source_commit": "74dd5d3",
+  "question": "Do (1) a warp-cooperative block lookup, (2) a θ-filtered merge and (3) radix-select local top-k for large k reduce latency, separately and combined?",
+  "hypothesis": "Pending registration.",
+  "motivation": "V2-5 profile: S1 barrier after per-thread lookup, serial merge tail, warp-shuffle select cost at large k. Change 3 overlaps the research plan's 'reduced local selection capacity' idea.",
+  "code_paths": [
+    "src/cuda_range_v2.cu",
+    "tests/check_range_bitpack.py",
+    "experiments/2026-11-17-range-v3/code/build_variants.sh"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-17-range-v3/configs/protocol.json (draft, uncommitted)"
+  ],
+  "declared_changes": {},
+  "scoring_contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "input_manifest": "FILL_ME",
+  "query_split": "500 calibration queries only; 6,480 held-out untouched",
+  "timing_boundary": "FILL_ME",
+  "correctness_rule": "FILL_ME",
+  "measurement_and_analysis_plan": "FILL_ME",
+  "success_rule": "FILL_ME",
+  "failure_rule": "FILL_ME",
+  "next_if_negative": "FILL_ME",
+  "recording_ids": [
+    "not recorded by the team runtime"
+  ],
+  "runs": []
+}

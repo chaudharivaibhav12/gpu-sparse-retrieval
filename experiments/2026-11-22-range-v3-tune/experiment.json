@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-22-range-v3-tune",
+  "title": "Range scorer v3-3 at W=4096: profile, then unrolled decode, radix contention, result buffer",
+  "owner": "Arnav",
+  "branch": "exp/arnav/2026-11-22-range-v3-tune",
+  "status": "setup; Measurement P (profile) planned; no kernel change written",
+  "parent_experiment": "2026-11-17-range-v3 (v3-3 carried forward; Measurement D exploratory-contended)",
+  "parent_source_commit": "3077335 (exp/arnav/2026-11-18-range-v3-3 merged with origin/main 66d7e1e; SASS a644e9d5125d6e7e = timed v3-3)",
+  "question": "Where does v3-3 spend its time at W=4096 with 256 threads, and do (a) an unrolled decode with more loads in flight, (b) less atomic contention in radix bucket counting, (c) a pinned or zero-copy result buffer help?",
+  "hypothesis": "Pending Measurement P.",
+  "motivation": "Measurement D timed v3-3 at W=4096 (adopted, uniform radix) but never profiled it.",
+  "code_paths": [
+    "src/cuda_range_v2.cu"
+  ],
+  "configuration_files": [
+    "experiments/2026-11-22-range-v3-tune/configs/protocol.json"
+  ],
+  "declared_changes": {},
+  "scoring_contract": "GSP-CAP32-U32GUARDED-NUMERIC-TIES-v1",
+  "input_manifest": "FILL_ME",
+  "query_split": "500 calibration queries only (Measurement P: first 25); held-out untouched",
+  "timing_boundary": "FILL_ME",
+  "correctness_rule": "FILL_ME",
+  "measurement_and_analysis_plan": "FILL_ME",
+  "success_rule": "FILL_ME",
+  "failure_rule": "FILL_ME",
+  "next_if_negative": "FILL_ME",
+  "recording_ids": [
+    "not recorded by the team runtime"
+  ],
+  "runs": []
+}
