@@ -6,6 +6,7 @@ Experiment `2026-11-22-range-v3-tune`, branch `exp/arnav/2026-11-22-range-v3-tun
 
 - **Final variant: u4m** = change A (unrolled decode, U=4) + change D (last-block merge by compaction + radix select), at **W=4096**, 256 threads, radix crossover 1. It is now the default build of `src/cuda_range_v2.cu` on this branch.
 - Measurement E (cuda5, 500 calibration queries, paired, crossed bootstrap): u4m at W=4096 / v3-3 at W=4096 = **0.836 [0.831, 0.840]** at k=10, **0.617 [0.611, 0.622]** at k=100, **0.245 [0.241, 0.248]** at k=1000; against the team reference ctrl (V2-5 at W=1024): **0.911, 0.308, 0.128**.
+- Full collection (Measurement F, section 10): u4m is 0.577 / 0.172 / 0.069 x ctrl (V2-5) at k = 10 / 100 / 1000, and 1.55 / 0.66 / 0.22 x the team's pruned scorer prune-tm (calibration only, after the freeze).
 - Change B (zero-score skipping / aggregated bucket adds) was negative on laptop development readings and dropped before timing; change C (result buffer) was dropped on the laptop profile.
 - Decision rule E1 was applied per W at W=4096 by the owner after the run (protocol amendment); under the clause registered first, the final variant would have been v3-3 (section 3).
 
@@ -238,3 +239,43 @@ Since commit `37d1ffe` the defaults of `src/cuda_range_v2.cu` are `RBP_V3_UNROLL
 - **Radix contention (change B) is real but small.** The replay shows nearly fully serialized bucket atomics in pass 1, yet the radix select+gather is about 7-10 µs on the critical path; B's extra work cost about as much as it saved (section 6). The radix stages' sample share rises in u4m (27.9% -> 31.4% at k=10) only because decode shrank.
 - **Host side.** Per query outside the kernel: launch API about 13 µs, launch to kernel start about 12 µs, D2H copy 1-2.4 µs, kernel end to copy return 12-22 µs; unprofiled wall minus GPU busy is 21-34 µs. At k=10 this host share (about 20% of the 106 µs u4m wall) is now comparable to the time the decode change saved; change C (pinned/zero-copy results) would address only the copy part (a few µs).
 - **Resources.** u4m uses 48 registers (v3-3 40) and 1.3 KB more static shared memory; achieved occupancy is unchanged or higher (51 -> 53% at k=10, 39 -> 44% at k=1000) because shared memory, not registers, limits residency at W=4096.
+
+## 10. Measurement F: u4m against the team references at the full collection
+
+Run `20261122-cuda5-timingF-01` (cuda5, commit 299aa28; protocol `measurement_F`). Full collection, 8,841,823 passages; 500 calibration queries; per cell 3 processes in rotating order x (3 warm-up + 20 measured rounds), batch 1, 256 threads; ratios = geometric mean of paired query/process ratios to ctrl, crossed bootstrap (10,000 draws, seed 20261123). Every timed top-k (all 23 rounds) matched the CPU oracle; 4 processes overlapped another user's job (k=1000, rotation 1: ctrl three times, prune-tm once) and were preserved and rerun. **Calibration queries only, after the freeze**: these queries chose the settings, and the held-out queries were used in PR #27, so this is not a held-out evaluation. The team's published numbers in the last column come from other sessions (experiments 2026-11-15-full-collection-baselines and 2026-11-19-prune-depth-adaptive) and are shown for orientation only; the ratios use this session's ctrl.
+
+### k = 10
+
+| implementation | W | pooled median ms (this session) | ratio to ctrl [95%] | team's published median ms (other sessions) |
+|---|---|---|---|---|
+| u4m (range v3-4, default build) | 4096 | 0.4031 | 0.577 [0.573, 0.580] | — |
+| ctrl (range V2-5, main 74dd5d3) | 1024 | 0.6867 | 1 | v2: 0.688 |
+| prune-tm (pruned, theta-filtered merge, 64 seeds, main 66d7e1e) | 256 | **0.2386** | 0.371 [0.355, 0.388] | pruned W=256: 0.237 |
+
+u4m / prune-tm = 1.553 [1.489, 1.620].
+
+### k = 100
+
+| implementation | W | pooled median ms (this session) | ratio to ctrl [95%] | team's published median ms (other sessions) |
+|---|---|---|---|---|
+| **u4m** (range v3-4, default build) | 4096 | **0.4548** | 0.172 [0.170, 0.174] | — |
+| ctrl (range V2-5, main 74dd5d3) | 1024 | 2.6800 | 1 | v2: 2.687 |
+| prune-tm (pruned, theta-filtered merge, 64 seeds, main 66d7e1e) | 256 | 0.6919 | 0.261 [0.249, 0.273] | pruned W=256: 0.694 |
+
+u4m / prune-tm = 0.659 [0.634, 0.685].
+
+### k = 1000
+
+| implementation | W | pooled median ms (this session) | ratio to ctrl [95%] | team's published median ms (other sessions) |
+|---|---|---|---|---|
+| **u4m** (range v3-4, default build) | 4096 | **0.8329** | 0.069 [0.068, 0.070] | — |
+| ctrl (range V2-5, main 74dd5d3) | 1024 | 12.3908 | 1 | v2: 12.38 |
+| prune-tm (pruned, theta-filtered merge, 64 seeds, main 66d7e1e) | 256 | 3.2260 | 0.309 [0.292, 0.327] | pruned W=256: 3.218 |
+
+u4m / prune-tm = 0.223 [0.213, 0.233].
+
+**Inputs** ([STATUS](../../results/2026-11-22-range-v3-tune/20261122-cuda5-fullinputs-01/STATUS.md)): the pinned full GSP (`e838dfbf…`), W=1024 index (`c7669620…`) and queries (`150917d7…`); the W=256 index PR #27 pinned (scorer-reported `90b86a65…`); oracle top-100/1000 made by the team from the pinned GSP and queries, and top-10 as their prefix, whose SHA-256 equals the pinned oracle (`7a63bb52…`). The W=4096 positions index was built once from the pinned GSP: 3,195,699,506 bytes (12% smaller than the W=1024 index's 3,638,491,070), SHA-256 `06368cee…`, 8 min 20 s, 17.7 GB peak host memory; the builder's round-trip check passed (7 min 3 s).
+
+**Gates** (500 calibration queries x k=10/100/1000, exact) passed for all three; prune-tm also passed its own fixture suite, unmodified. **GPU memory** (peak nvidia-smi, our process, k=10 / 100 / 1000): u4m 3,316 / 3,322 / 3,384 MiB; ctrl 3,668 / 3,686 / 3,864 MiB; prune-tm 4,828 / 4,900 / 5,612 MiB.
+
+**Reading.** The session reproduces the team's published references (ctrl 0.687 / 2.680 / 12.39 ms vs v2 0.688 / 2.687 / 12.38; prune-tm 0.239 / 0.692 / 3.226 vs 0.237 / 0.694 / 3.218). u4m is 1.7x, 5.8x and 14.5x faster than the exhaustive V2-5 control at k = 10, 100, 1000. Against the pruned scorer it loses at k=10 (u4m is 1.55x prune-tm's latency) and wins at k=100 (0.66x) and k=1000 (0.22x): u4m still scores every posting of every query term, which dominates at k=10 on the full collection (0.39 ms GPU span), while prune-tm skips most ranges; as k grows, pruning keeps more ranges and its merge grows, whereas u4m's cost rises only from 0.40 to 0.83 ms thanks to the radix merge. On the 1M subset u4m at k=10 took 0.099 ms; on 8.8x the documents it takes 0.40 ms (about 4x), consistent with decode dominating while the fixed per-query costs stay the same. A combination (pruning's range skipping with u4m's decode and merge) is the obvious next question; it was not tested here.
