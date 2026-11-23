@@ -82,5 +82,10 @@
     "effects": "the holder is a separate process and cannot change our answers (every process is still checked against the oracle); while idle it issues no GPU work, so it does not time-slice with our kernels; it holds ~250 MB of 12 GB; per-process peak memory excludes it; Nsight DRAM counters are device-wide, so another user's traffic would count, which the overlap check guards against. The 100K cells are timed with the idle holder resident, while Measurements E and F were not; the within-size u4m / ctrl ratio is unaffected and cross-size comparisons were already descriptive.",
     "other_user": "the paused job's owner agreed that it yields to other GPU users (model training)",
     "estimate": "about 15 min wall: up to ~5 min for the job to pause, ~1 min validation, ~3 min G3, ~4 min 100K cells"
+  },
+  "continuation_1": {
+    "date": "2026-11-23",
+    "run": "20261123-cuda5-g-03 completed the amendment-2 validation (0.1001 ms vs 0.0987, ratio 1.014) and both G3 processes (exact, no overlap), then stopped in analyze_g3.py (a '%' in a format string; the Nsight path is skipped by the laptop dry run). G3's data are complete and analysed from that run with the fixed script; the G3 decomposition reports range-block time shares (all range blocks) and the last-block merge on the wall-clock axis, instead of the single slowest block's critical path, which covers only one of 2,159 blocks.",
+    "next": "20261123-cuda5-g-04: same script and rules (amendment 2, holder, validation) with RUN_G3=0: validation, then G2's 100K cells"
   }
 }

@@ -27,6 +27,7 @@ COMPARE=experiments/2026-11-13-range-bitpack/analysis/compare_topk.py
 NQ=${QUERIES_LIMIT:-500}; ROUNDS=${ROUNDS:-20}; WARMUPS=${WARMUPS:-3}; G3Q=${G3_QUERIES:-25}
 SIZES=(${SIZES:-100000})
 GS=${G3_SIZE:-8841823}
+RUN_G3=${RUN_G3:-1}   # 0: continuation run without G3 (G3 already complete in an earlier run)
 if [ "$DRY" != 1 ]; then
     [ "$NQ" = 500 ] && [ "$ROUNDS" = 20 ] && [ "$WARMUPS" = 3 ] && [ "$G3Q" = 25 ] || { echo "Registered settings only"; exit 1; }
     test -z "$(git status --porcelain --untracked-files=no)" || { echo "Commit first"; exit 1; }
@@ -84,6 +85,7 @@ m = statistics.median(wall); print("median of per-query medians %.4f ms; Measure
 sys.exit(0 if abs(m / 0.0987 - 1) <= 0.05 else 1)
 PY
 fi
+if [ "$RUN_G3" = 1 ]; then
 stage "G3 clocks size=$GS k=1000"
 tag=g3-clocks-k1000
 run_slot "$tag" -- env RBP_CLOCKS_OUT="$RUN/raw/$tag" "$BUILD/u4m-clocks/scorer" "$(index "$GS" 4096)" "$Q" "$RUN/raw/$tag.csv" "$RUN/raw/$tag.tsv" "$G3Q" 1000 0 0 5 3 256 256 - 1
@@ -102,6 +104,7 @@ python3 "$T/analysis/analyze_clocks.py" "$RUN/raw/g3-clocks-k1000" --label g3-cl
     --output "$RUN/analysis/g3-clocks.json" --sites-csv "$RUN/analysis/g3-clocks-sites.csv" --stages-csv "$RUN/analysis/g3-clocks-stages.csv" > /dev/null || fail "analyze clocks"
 python3 "$X_SAVED/analysis/analyze_g3.py" --clocks "$RUN/analysis/g3-clocks.json" "${G3RAW[@]}" --output "$RUN/analysis/g3.json" --tables "$RUN/analysis/g3-tables.md" > /dev/null || fail "analyze g3"
 stage g3-complete
+fi
 for s in "${SIZES[@]}"; do
     for c in u4m ctrl; do
         for k in 10 100 1000; do
