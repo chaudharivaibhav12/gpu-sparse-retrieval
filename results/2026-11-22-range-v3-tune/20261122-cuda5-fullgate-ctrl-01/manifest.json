@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-22-range-v3-tune",
+  "run_id": "20261122-cuda5-fullgate-ctrl-01",
+  "status": "passed-full-gate",
+  "scope": "Measurement F correctness gate at the full collection (8,841,823 passages): ctrl; 500 calibration queries x k=10/100/1000, exact against the pinned-provenance CPU oracle",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "299aa28b71ee6cea456734410f665ed275e12744",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6)",
+    "source_sha256": {
+      "experiments/2026-11-22-range-v3-tune/code/gate_full.sh": "11ec80c2d9e9ed237e71b7ab5500f71824f04a7b13586ea20c87958dd5829501",
+      "experiments/2026-11-22-range-v3-tune/code/session_lib.sh": "f5e6aecfaa91d70872a25f70dee4173ff72e61ce2767b1d5bfc8b0e14b6daf69",
+      "experiments/2026-11-22-range-v3-tune/code/build_variants.sh": "ee1d2730fcf658062479bef3720678b7894bb26618df14eb035e688debeb1c0c",
+      "experiments/2026-11-22-range-v3-tune/analysis/gpu_memory.py": "d616c48d6e89e32733cf349e5dec64784d21d7a672fd3fd08a20fe55a1c4b943"
+    },
+    "binary_sha256": {
+      "build/f-299aa28b/ctrl/scorer": "18402979db81ebff924efc64d6f39c44797039da4d981b452b0381c93d89b08d"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_12.6.r12.6/compiler.35059454_0"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "[full-k10] build/f-299aa28b/ctrl/scorer /scratch/ag11163/full-inputs/full-8841823-w1024.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-fullgate-ctrl-01/raw/full-k10.csv results/2026-11-22-range-v3-tune/20261122-cuda5-fullgate-ctrl-01/raw/full-k10.tsv 500 10 0 0 1 1 256 256 -",
+    "[full-k100] build/f-299aa28b/ctrl/scorer /scratch/ag11163/full-inputs/full-8841823-w1024.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-fullgate-ctrl-01/raw/full-k100.csv results/2026-11-22-range-v3-tune/20261122-cuda5-fullgate-ctrl-01/raw/full-k100.tsv 500 100 0 0 1 1 256 256 -",
+    "[full-k1000] build/f-299aa28b/ctrl/scorer /scratch/ag11163/full-inputs/full-8841823-w1024.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-fullgate-ctrl-01/raw/full-k1000.csv results/2026-11-22-range-v3-tune/20261122-cuda5-fullgate-ctrl-01/raw/full-k1000.tsv 500 1000 0 0 1 1 256 256 -"
+  ],
+  "artifacts": {
+    "analysis/compare-full-k10.json": {
+      "sha256": "ce6e1c01923183d1eefdaa5ba6163c30ce90afbda85925c87a75e0c4c6f6f1f9",
+      "bytes": 350
+    },
+    "analysis/compare-full-k100.json": {
+      "sha256": "aca3fae79731baba86dc984d045bc40eff15bc9c0c92c62739207f37bbf1a8d3",
+      "bytes": 354
+    },
+    "analysis/compare-full-k1000.json": {
+      "sha256": "0d2222f5162dd9765847a03cb3935958c52e3896efacf983715fe1653df05b1e",
+      "bytes": 358
+    },
+    "analysis/gpu-memory.json": {
+      "sha256": "a690e801c5d377f42cee7da58dd2113b3e8c0b824401d64124616e927ea05096",
+      "bytes": 347
+    },
+    "analysis/gpu-memory.txt": {
+      "sha256": "5d0deddaf4f8f538f993f904a561c04e4bab98b08fd92887c4b6c9a0bb0f1770",
+      "bytes": 144
+    },
+    "logs/binary-sha256.txt": {
+      "sha256": "bc956640438e2a619c22ffb89ac27f97df8f465680533157b8121e649156803b",
+      "bytes": 73
+    },
+    "logs/commands.txt": {
+      "sha256": "493b7d31e8ff56d457926df8c1811bd0ae09ce1640c487a84192564d0f4fc0df",
+      "bytes": 954
+    },
+    "logs/environment.txt": {
+      "sha256": "4297ca2f554247490efdf40e0ad7d1790eb5a1b58ff66f354a8df5307edd2134",
+      "bytes": 290
+    },
+    "logs/gpu-pmon.log": {
+      "sha256": "bbb26a11a92923f66c86d15c9e1533a1d2239d3bac41d63c520e0bed0f505702",
+      "bytes": 7480
+    },
+    "logs/gpu-poll.log": {
+      "sha256": "ad9ebda0674330bfa0e9898087232de374fce95bf3d9a65ed1dbbed8c0951b02",
+      "bytes": 5757
+    },
+    "logs/host-utc-offset.txt": {
+      "sha256": "51ef6a6d539bbd38ac4fb4d8de42da0cf36eafb7fb7be71e3420d57982eebd9b",
+      "bytes": 6
+    },
+    "logs/idle-checks.txt": {
+      "sha256": "14fe09b274d6662665cd0708053cd44a42b2b1c9b9fe3a641490d3041b1d77de",
+      "bytes": 357
+    },
+    "logs/input-sha256.txt": {
+      "sha256": "2c3008b36fc6229c523815db79999c3cf139e96b04186016a627f870d7d6af93",
+      "bytes": 496
+    },
+    "logs/overlap-checks.jsonl": {
+      "sha256": "be5bebf621ecbb2c55cabb058d549910371f3278a4ca142df3d74ca2537f3ebd",
+      "bytes": 547
+    },
+    "logs/processes.tsv": {
+      "sha256": "b8632399ee64051f3966e24e3bacbd9088b3d458f984ac5665dc3b0488948abd",
+      "bytes": 156
+    },
+    "logs/ptxas.log": {
+      "sha256": "3cd9a77b178af7803393f3f40c63f1c67793d8bd92728e5143c8a196d7a78929",
+      "bytes": 792
+    },
+    "logs/sass-sha256.txt": {
+      "sha256": "1e9c8dace26388dbe5681ecd594db4c16d81c147a29eedd8e2fc32659b5359ab",
+      "bytes": 65
+    },
+    "logs/stages.txt": {
+      "sha256": "463bb8ba2f8795ff0e3a4154bbc582707ab5adeec067c843b5abfb611610da2b",
+      "bytes": 147
+    },
+    "raw/full-k10.csv": {
+      "sha256": "a7a5c8872fa8190394f88a077c99b79a0e9d07766cf6ad3ecacab05eddb495fc",
+      "bytes": 122107
+    },
+    "raw/full-k10.log": {
+      "sha256": "23fb692e5609c83272a01444f1f25ebc295f442917dce612ccef5273c981380b",
+      "bytes": 365
+    },
+    "raw/full-k10.tsv.sha256": {
+      "sha256": "a2dd8918c25eb4de125ab70fc23cc5893a42b24a52f8a232af4dee04735f68b0",
+      "bytes": 83
+    },
+    "raw/full-k100.csv": {
+      "sha256": "5f8bce0acf63bf3196dfe30a3ceb5c79142952cc7df285be5ddf729107fc56da",
+      "bytes": 122308
+    },
+    "raw/full-k100.log": {
+      "sha256": "7ea3c0c04483e738f3b138bb53904da8f9f1078275df5a524497ff909c2e5611",
+      "bytes": 367
+    },
+    "raw/full-k100.tsv.sha256": {
+      "sha256": "0048d53b95c7b422e4ec86117f6bfb6af524de63956af8c86620a58d4d863b1a",
+      "bytes": 84
+    },
+    "raw/full-k1000.csv": {
+      "sha256": "24b763fc70eca030c9553dc837fcf100e127634e80d0193e7df1ba36c5e64c4f",
+      "bytes": 124347
+    },
+    "raw/full-k1000.log": {
+      "sha256": "510dcae10bece2346129b65d72b27ee1984c1152e58d457e3c76f5d8baaf9543",
+      "bytes": 368
+    },
+    "raw/full-k1000.tsv.sha256": {
+      "sha256": "f17f867c426886f9c00776ba7dcf190b14bd41b08c75f0de704aed25cb4f7a0c",
+      "bytes": 85
+    }
+  },
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [],
+    "excluded": [],
+    "recorded_artifacts_not_in_public_tree_or_lists": []
+  }
+}

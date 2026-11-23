@@ -1,0 +1,671 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-17-range-v3",
+  "run_id": "20261117-cuda5-profile-01",
+  "status": "completed-measurement-B",
+  "scope": "Measurement B (configs/protocol.json): cuda5; ctrl and v3-all; 1M documents, W=1024, 256 threads; first 25 calibration queries; k=10 and k=100; reference, clocks, nsys, theta counts; not recorded by the team runtime",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "62e41dbfc4ceac5818adcc10fbc13c857cd9aacd",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6), build_variants.sh; clock builds -DRBP_STAGE_CLOCKS; stats build -DRBP_V3_STATS=1",
+    "source_sha256": {
+      "experiments/2026-11-17-range-v3/configs/protocol.json": "54d234d38987a0c2b226824280e29008148bb1972db4474e4208cc02878da89b",
+      "experiments/2026-11-17-range-v3/code/run_profile.sh": "367eaf05f0ceae889ef60f59b90343f687facb41701395c12ebae777ed519698",
+      "experiments/2026-11-17-range-v3/code/session_lib.sh": "acf656b09252e9d823e7666dcace69681da80d18f04305ebae7a5f9803e378fc",
+      "experiments/2026-11-17-range-v3/code/overlap.py": "b4dd604465720ebb5fb59c2a907f144f115b8b383a2fab840dd052125aae9925",
+      "experiments/2026-11-17-range-v3/analysis/analyze_clocks.py": "c7b0bbeeb4296629fd65ebc7379e6ef5f02941f9c6d5fd721ecad56ef2bbdde6",
+      "experiments/2026-11-17-range-v3/analysis/analyze_nsys_v2.py": "6fe75cf862cf4aeee60b6b2c99124319de12e9aca4e7481fdc58cd66d7ef129b",
+      "experiments/2026-11-17-range-v3/analysis/theta_counts.py": "790915088a75a26071133e3fc2a94cf8fd8979125d26f498c6aa47e556f7f2d2",
+      "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py": "ca43fb45ed74e0fc8d24c14898ac8ae3d32c7ebd3f805b55f6d59db87378d18e"
+    },
+    "binary_sha256": {
+      "build/v3variants-fix1/v3-all/scorer": "f1416ce098556a47e05c9cdfb268de0b01f490d97ce0f9b37caa73e06c1b02fa",
+      "build/v3variants-fix1/ctrl/scorer": "31e9ba0d069b958988a8a5ae60d185939a3cfbb13ea970454c3b10346493a7f2",
+      "build/v3variants-clocks-fix1/v3-all/scorer": "a433d19b1cbf9311b069bc9b96f42b1b039d8ac3ea30e2c86325b073ffeb0355",
+      "build/v3variants-clocks-fix1/ctrl-instrumented/scorer": "48040b15c3005607860bb8e13193d66cb027299fcd166b94934c0c22bd654808",
+      "build/v3variants-stats-fix1/v3-all/scorer": "414e1d09aeb7bacb5309762a9bf08a1c5e6976ac897f890922786f75b6957783"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "data/derived/hash-1000000-w1024-pos.rbp": {
+      "sha256": "3c653e914699ac9a6558d2889d0000aa29d573a5d045f43ea26d15fc2f6c68f5",
+      "bytes": 437105290
+    },
+    "data/derived/oracle/cpu-top10-1000000.tsv": {
+      "sha256": "5e20aa57db8f4a3b7a060d3559149817b2c9e56ad87eaab6701b96b3ca183860",
+      "bytes": 116302
+    },
+    "data/derived/oracle/cpu-top100-1000000.tsv": {
+      "sha256": "f43fbb67855630b0463a750ab29bde9460c5ad3d0d36dff9c90e580b601d2637",
+      "bytes": 1190459
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_12.6.r12.6/compiler.35059454_0"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "[reference-k10-ctrl] build/v3variants-fix1/ctrl/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/reference-k10-ctrl.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/reference-k10-ctrl.tsv 25 10 0 0 20 3 256 256 -",
+    "[reference-k10-v3-all] build/v3variants-fix1/v3-all/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/reference-k10-v3-all.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/reference-k10-v3-all.tsv 25 10 0 0 20 3 256 256 -",
+    "[clocks-k10-ctrl] env RBP_CLOCKS_OUT=results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-ctrl build/v3variants-clocks-fix1/ctrl-instrumented/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-ctrl.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-ctrl.tsv 25 10 0 0 5 3 256 256 -",
+    "[clocks-k10-v3-all] env RBP_CLOCKS_OUT=results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-v3-all build/v3variants-clocks-fix1/v3-all/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-v3-all.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-v3-all.tsv 25 10 0 0 5 3 256 256 -",
+    "[nsys-k10-ctrl] nsys profile -o results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-ctrl --trace=cuda --sample=none --cpuctxsw=none build/v3variants-fix1/ctrl/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-ctrl.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-ctrl.tsv 25 10 0 0 20 3 256 256 -",
+    "[nsys-k10-v3-all] nsys profile -o results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-v3-all --trace=cuda --sample=none --cpuctxsw=none build/v3variants-fix1/v3-all/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-v3-all.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-v3-all.tsv 25 10 0 0 20 3 256 256 -",
+    "[theta-k10-v3-all] env RBP_V3_STATS_OUT=results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/theta-k10-v3-all.stats.tsv build/v3variants-stats-fix1/v3-all/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/theta-k10-v3-all.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/theta-k10-v3-all.tsv 25 10 0 0 5 1 256 256 -",
+    "[reference-k100-ctrl] build/v3variants-fix1/ctrl/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/reference-k100-ctrl.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/reference-k100-ctrl.tsv 25 100 0 0 20 3 256 256 -",
+    "[reference-k100-v3-all] build/v3variants-fix1/v3-all/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/reference-k100-v3-all.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/reference-k100-v3-all.tsv 25 100 0 0 20 3 256 256 -",
+    "[clocks-k100-ctrl] env RBP_CLOCKS_OUT=results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-ctrl build/v3variants-clocks-fix1/ctrl-instrumented/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-ctrl.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-ctrl.tsv 25 100 0 0 5 3 256 256 -",
+    "[clocks-k100-v3-all] env RBP_CLOCKS_OUT=results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-v3-all build/v3variants-clocks-fix1/v3-all/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-v3-all.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-v3-all.tsv 25 100 0 0 5 3 256 256 -",
+    "[nsys-k100-ctrl] nsys profile -o results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-ctrl --trace=cuda --sample=none --cpuctxsw=none build/v3variants-fix1/ctrl/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-ctrl.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-ctrl.tsv 25 100 0 0 20 3 256 256 -",
+    "[nsys-k100-v3-all] nsys profile -o results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-v3-all --trace=cuda --sample=none --cpuctxsw=none build/v3variants-fix1/v3-all/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-v3-all.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-v3-all.tsv 25 100 0 0 20 3 256 256 -",
+    "[theta-k100-v3-all] env RBP_V3_STATS_OUT=results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/theta-k100-v3-all.stats.tsv build/v3variants-stats-fix1/v3-all/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/theta-k100-v3-all.csv results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/theta-k100-v3-all.tsv 25 100 0 0 5 1 256 256 -"
+  ],
+  "artifacts": {
+    "analysis/clocks-k10-ctrl-sites.csv": {
+      "sha256": "49668d8cb94750302ccb20a574da97c5740498025fa5a793fbe4e013d6bf80df",
+      "bytes": 1502
+    },
+    "analysis/clocks-k10-ctrl-stages.csv": {
+      "sha256": "d343ea9ce3e240d32f0179c2a6714ec8816e5772eab14afa397baeb70fea8878",
+      "bytes": 1012
+    },
+    "analysis/clocks-k10-ctrl.json": {
+      "sha256": "e6b85e729852ebb220338e88f0571b7b2d2e2471d0fe0387edff49cb4d177ff0",
+      "bytes": 8639
+    },
+    "analysis/clocks-k10-v3-all-sites.csv": {
+      "sha256": "b20b5f269c0a6bbb9ab196c3b3c185f6a08e7638d0ce45eae307cbd1f177bcab",
+      "bytes": 1493
+    },
+    "analysis/clocks-k10-v3-all-stages.csv": {
+      "sha256": "27e88f64dc5f52cf6224e7e74f3ad32e2b2428ebd7ba199bb3a718cffc2a07a9",
+      "bytes": 1009
+    },
+    "analysis/clocks-k10-v3-all.json": {
+      "sha256": "7f9028da899e67504168acf6d4e74043ead4a4d357d25de68e966a6c6df43178",
+      "bytes": 8628
+    },
+    "analysis/clocks-k100-ctrl-sites.csv": {
+      "sha256": "f8839dcc1e779b68a3b1bc5e1dff40d3a62463170f655d3001d91d44aedd78f1",
+      "bytes": 1481
+    },
+    "analysis/clocks-k100-ctrl-stages.csv": {
+      "sha256": "03d7801db0d4b68c3fa386f3ca52a70edb9710effda4c68ef5d2bc29b0de42f7",
+      "bytes": 979
+    },
+    "analysis/clocks-k100-ctrl.json": {
+      "sha256": "79014e097755639ef661e961c6878cf1495cfca534a04bd1cf0577c3238c5b12",
+      "bytes": 8553
+    },
+    "analysis/clocks-k100-v3-all-sites.csv": {
+      "sha256": "9947bdc2fa060cc53ff11854639d2a7d9e8e5076a184ab29ef1c310b670be73d",
+      "bytes": 1503
+    },
+    "analysis/clocks-k100-v3-all-stages.csv": {
+      "sha256": "6f6bced264a9fea15359abac36df4ffe2ad75e29c3c60d88e095852dc7888f8a",
+      "bytes": 1017
+    },
+    "analysis/clocks-k100-v3-all.json": {
+      "sha256": "33cc5db365b623dda41fd45983ddabdee4f00ee6fc8ffa4ab594cdd1a3aedf41",
+      "bytes": 8652
+    },
+    "analysis/compare-clocks-k10-ctrl.json": {
+      "sha256": "ae7cc1c6ea8c9d35b6022ff598db7c0910858dc93c6940ce7bbe1daa65cc6491",
+      "bytes": 327
+    },
+    "analysis/compare-clocks-k10-v3-all.json": {
+      "sha256": "eb760bbe25ce4df4912acbb08f65491ff6021c1e0234bb00ee2cc33d78191364",
+      "bytes": 329
+    },
+    "analysis/compare-clocks-k100-ctrl.json": {
+      "sha256": "e7d81c002273c4e3a0bff65ee83f5d3d14732ddc073434041486d10a757c0d63",
+      "bytes": 331
+    },
+    "analysis/compare-clocks-k100-v3-all.json": {
+      "sha256": "4422f8e6b58b187a1c3ec5721a5cf90777779308bb89fdfc1bf8520bf9154a11",
+      "bytes": 333
+    },
+    "analysis/compare-nsys-k10-ctrl.json": {
+      "sha256": "aeb5f908a4ace822323d7b5695e69957f54f0bddf759cae66eb0b564a1428b75",
+      "bytes": 325
+    },
+    "analysis/compare-nsys-k10-v3-all.json": {
+      "sha256": "38564ce730eb6fd68fec94b0b4663708bf508eb4764f905cc08786074a44521b",
+      "bytes": 327
+    },
+    "analysis/compare-nsys-k100-ctrl.json": {
+      "sha256": "33074a9c30097f75c6854c1d7a283f0dca05ac2bab22d9b28fa835759b7e1148",
+      "bytes": 329
+    },
+    "analysis/compare-nsys-k100-v3-all.json": {
+      "sha256": "473440f45c95833122687c03a1e04bbc0eda22506ef3731966a517fef2dc2f39",
+      "bytes": 331
+    },
+    "analysis/compare-reference-k10-ctrl.json": {
+      "sha256": "c883db74f5ee5f7ed3576cea69408153afdee6ffa0486f02b59c604aed22c38d",
+      "bytes": 330
+    },
+    "analysis/compare-reference-k10-v3-all.json": {
+      "sha256": "aaaa98d86a1f987412aeaa8cead90b5d820e54e4542be6e268b4f01d5f66049e",
+      "bytes": 332
+    },
+    "analysis/compare-reference-k100-ctrl.json": {
+      "sha256": "8ff397fa010e75aa29b512c81718957118b4e0fd721559a4736697282b18aeb3",
+      "bytes": 334
+    },
+    "analysis/compare-reference-k100-v3-all.json": {
+      "sha256": "6093f15f897a4395a8879b4803101eb6c955ec7972ca323d42ea23ed89542ca9",
+      "bytes": 336
+    },
+    "analysis/compare-theta-k10-v3-all.json": {
+      "sha256": "b2e4faf3bf2f814438e6730856061a581ccb1ffc28193e9af7340984e3b955d5",
+      "bytes": 328
+    },
+    "analysis/compare-theta-k100-v3-all.json": {
+      "sha256": "b11118762c001554dddcee4adbc45bbf3491e4ec8be33796f940131f82cd2f08",
+      "bytes": 332
+    },
+    "analysis/nsys-k10-ctrl-per-query.csv": {
+      "sha256": "ca4439db08263d6cca317c5a7b8483f50586ee7e15d07d06d391d940db004bf4",
+      "bytes": 3077
+    },
+    "analysis/nsys-k10-ctrl.json": {
+      "sha256": "d8f8a47679b3317fe13c0e29071cabde3224508a7e2389943b252fb55de39a09",
+      "bytes": 1331
+    },
+    "analysis/nsys-k10-v3-all-per-query.csv": {
+      "sha256": "91573cc2def1f26f764a1cb95267f24f2f31bef3467e572254e06ed34839258c",
+      "bytes": 3277
+    },
+    "analysis/nsys-k10-v3-all.json": {
+      "sha256": "c0f4cdd40515280284d323f79bc365a29778686460116a22e8a55cb5a195d7bd",
+      "bytes": 1349
+    },
+    "analysis/nsys-k100-ctrl-per-query.csv": {
+      "sha256": "737775de7a45dc7460dcfda991461871ab7791a968303a9810dd7565f0ae804d",
+      "bytes": 3266
+    },
+    "analysis/nsys-k100-ctrl.json": {
+      "sha256": "e27b7e664bf7105948f25ebaa058e3a7d38611bdce131c04cac09231176aa7ba",
+      "bytes": 1348
+    },
+    "analysis/nsys-k100-v3-all-per-query.csv": {
+      "sha256": "2915772ebde0e54e99d6c8ca342e792a0295614fdf4cd519d039c56f6b6b9363",
+      "bytes": 3171
+    },
+    "analysis/nsys-k100-v3-all.json": {
+      "sha256": "2d13b2863fd351453b0b212de9350d249d25e3a193f1b454498b5558b0254f95",
+      "bytes": 1340
+    },
+    "analysis/theta-k10.json": {
+      "sha256": "7d173a823216aee3e98875407889394b173ed5597249e4aa391870a784f97068",
+      "bytes": 500
+    },
+    "analysis/theta-k100.json": {
+      "sha256": "c6846b6f52b6702d439d0b9ccc4fdacb7211f8ad9e97318a2dd0fa3210ff71d3",
+      "bytes": 514
+    },
+    "logs/binaries.tsv": {
+      "sha256": "9d5c55cedc5f7aaed731465a46bb83142b4c30f4a237418de55b11669e161899",
+      "bytes": 1296
+    },
+    "logs/commands.txt": {
+      "sha256": "b45c4f570c4d43bc651dc9d883c69d88a75e534cee17c2761f122f17d8b3bde4",
+      "bytes": 5563
+    },
+    "logs/environment.txt": {
+      "sha256": "2f603713fac766c6baeecffd48aa808e4e512ab6af8caec4fe2cf0d372275754",
+      "bytes": 193
+    },
+    "logs/gpu-pmon.log": {
+      "sha256": "8cb14935aa531e04abfc0bb445d38c415a27da17a0bb58c311541c251e337856",
+      "bytes": 5814
+    },
+    "logs/gpu-poll.log": {
+      "sha256": "f9357b77bd5cb2e9d5387f62f7bd5639751b22b15cf6af96ccc1866cd507da30",
+      "bytes": 4546
+    },
+    "logs/host-utc-offset.txt": {
+      "sha256": "51ef6a6d539bbd38ac4fb4d8de42da0cf36eafb7fb7be71e3420d57982eebd9b",
+      "bytes": 6
+    },
+    "logs/idle-checks.txt": {
+      "sha256": "56aa8092105cfd38e8f560d7a5cd92ba8b2de5eb7e91b5ee76a431904cf104f8",
+      "bytes": 1495
+    },
+    "logs/overlap-checks.jsonl": {
+      "sha256": "5bf51528574937e1f3f9c42b1fea348b8350555ca688af9bf487704e2cb37673",
+      "bytes": 2645
+    },
+    "logs/processes.tsv": {
+      "sha256": "fefef7e5a296db75b20b6dc37e5616fbcd7a6faea471d82db3d035bc8999f00b",
+      "bytes": 837
+    },
+    "logs/stages.txt": {
+      "sha256": "0d3d4782d42fad8022e816cf70dbe338ba12127c5518b0f58d3d09ea8dbe4a0b",
+      "bytes": 798
+    },
+    "raw/clocks-k10-ctrl.blocks.bin": {
+      "sha256": "ba74c363e606b0d320ae451df18ee6ea21d068c146325cdd5078037e1068811d",
+      "bytes": 7816000
+    },
+    "raw/clocks-k10-ctrl.csv": {
+      "sha256": "8fff29af46d8f524e659da27b382a13a5f8bd49285990e37285fba9df6cf6e54",
+      "bytes": 24021
+    },
+    "raw/clocks-k10-ctrl.events.bin": {
+      "sha256": "57bf56f2844345f407066e59c668c15403be0fb1bc73686f92cf9d07b940efc5",
+      "bytes": 187584000
+    },
+    "raw/clocks-k10-ctrl.json": {
+      "sha256": "0b7fd3a7926f75ab15284c6d95b47b77ac8b753609ae711e6a0313b9bdcef51b",
+      "bytes": 998
+    },
+    "raw/clocks-k10-ctrl.log": {
+      "sha256": "bd67a300e10e9767ecfaae8a52ff2d5d21a4116b7963a5fd4647f243c70e5ca6",
+      "bytes": 514
+    },
+    "raw/clocks-k10-ctrl.tsv": {
+      "sha256": "557f881a73b5a978b6f74702524f6794f9ebb1691fabc8d7efd7f7d67e9440e0",
+      "bytes": 66280
+    },
+    "raw/clocks-k10-v3-all.blocks.bin": {
+      "sha256": "cc0bd5a44ac4b60739312eaeeecc63bde9efc267defd82a9759f7d13eaf52b48",
+      "bytes": 7816000
+    },
+    "raw/clocks-k10-v3-all.csv": {
+      "sha256": "193b31c9db39dc14f77e6162cdbea5cc05a6db2b8e2a4758e5f085846f035132",
+      "bytes": 24021
+    },
+    "raw/clocks-k10-v3-all.events.bin": {
+      "sha256": "0a7195b33f8d8084435e4fce7e966bfdd22afa8d603eef8eebd9c7af9e374acd",
+      "bytes": 187584000
+    },
+    "raw/clocks-k10-v3-all.json": {
+      "sha256": "0b7fd3a7926f75ab15284c6d95b47b77ac8b753609ae711e6a0313b9bdcef51b",
+      "bytes": 998
+    },
+    "raw/clocks-k10-v3-all.log": {
+      "sha256": "5048feb98f5e19fbb2937c960c7b1c5058e637ca6c625163fe90cba32e841254",
+      "bytes": 514
+    },
+    "raw/clocks-k10-v3-all.tsv": {
+      "sha256": "557f881a73b5a978b6f74702524f6794f9ebb1691fabc8d7efd7f7d67e9440e0",
+      "bytes": 66280
+    },
+    "raw/clocks-k100-ctrl.blocks.bin": {
+      "sha256": "7c092dc038d021f303668ee95071b95ffe11d1beff3ad4f6489bd0ffbff72972",
+      "bytes": 7816000
+    },
+    "raw/clocks-k100-ctrl.csv": {
+      "sha256": "9999d1b456ebdf00d8462c0c032abf36d681eb16178714f68fa30538baa060d5",
+      "bytes": 24430
+    },
+    "raw/clocks-k100-ctrl.events.bin": {
+      "sha256": "5906e08aa8e85aba2add847993f816f5734ce8131ad70ca15d75650e4fd1a0d6",
+      "bytes": 187584000
+    },
+    "raw/clocks-k100-ctrl.json": {
+      "sha256": "a79936fba6581eb8d1294a278010b3620ec866a674156b144c9363041e2480e1",
+      "bytes": 999
+    },
+    "raw/clocks-k100-ctrl.log": {
+      "sha256": "8a97fdf0884ffb19f3ffb0d05c6212f099f19fb3677c176c6ea3ca2e4f44df6a",
+      "bytes": 516
+    },
+    "raw/clocks-k100-ctrl.tsv": {
+      "sha256": "22bb000b3dcec55a9777e72b3cbbea476b1466ff0f789986b4a472b828d22442",
+      "bytes": 672932
+    },
+    "raw/clocks-k100-v3-all.blocks.bin": {
+      "sha256": "8f8393c5966996ae60a7f8f6668a9414f8d9ca9a4c96847e9ba21a1185984b5a",
+      "bytes": 7816000
+    },
+    "raw/clocks-k100-v3-all.csv": {
+      "sha256": "280917e6fa4e816ead174d5c45c1d8b8094f33098103fe7bf58c98d38e025b88",
+      "bytes": 24425
+    },
+    "raw/clocks-k100-v3-all.events.bin": {
+      "sha256": "f6e3d5433e2d1c02db61a8658089db0abb6e2d5ca0e31263a9300c9b0fe2d780",
+      "bytes": 187584000
+    },
+    "raw/clocks-k100-v3-all.json": {
+      "sha256": "a79936fba6581eb8d1294a278010b3620ec866a674156b144c9363041e2480e1",
+      "bytes": 999
+    },
+    "raw/clocks-k100-v3-all.log": {
+      "sha256": "01b7995d56ccf9676c2b9e134b430f19e34966aeacc6925c2b7d5f36b310d8f7",
+      "bytes": 515
+    },
+    "raw/clocks-k100-v3-all.tsv": {
+      "sha256": "22bb000b3dcec55a9777e72b3cbbea476b1466ff0f789986b4a472b828d22442",
+      "bytes": 672932
+    },
+    "raw/nsys-k10-ctrl.csv": {
+      "sha256": "807305a7b5b9a14b63ff264b331a06c7c0cba5e5cec3d0ca659eb4205f5b072d",
+      "bytes": 69176
+    },
+    "raw/nsys-k10-ctrl.log": {
+      "sha256": "21fc4d7f9330186592a6c01088443157c14330068d7c1d4b6a0aefd327cfa45c",
+      "bytes": 1636
+    },
+    "raw/nsys-k10-ctrl.nsys-rep": {
+      "sha256": "8ff3eab7a2d5f8d6efb52a3a12c231d130e9b1483cb0d59bb797e8138bb9815f",
+      "bytes": 186401
+    },
+    "raw/nsys-k10-ctrl.sqlite": {
+      "sha256": "5ad5c2a37874a8e481506efe5819470d9e5ce031d0d426881ec7d3a4745f1a52",
+      "bytes": 774144
+    },
+    "raw/nsys-k10-ctrl.tsv": {
+      "sha256": "280765a471950bfb26d28f24d5241ac45ec42f04f46dfcd654de43caf8388323",
+      "bytes": 195785
+    },
+    "raw/nsys-k10-v3-all.csv": {
+      "sha256": "fffb33a26c6270f7cca81f2d518df6c5451678f106a1d5982358f49505f053bc",
+      "bytes": 69198
+    },
+    "raw/nsys-k10-v3-all.log": {
+      "sha256": "8e6b58bbbc02d7e5cbbe6331ab3baf1cb29779a56c810e0a511c88469a47dac2",
+      "bytes": 1718
+    },
+    "raw/nsys-k10-v3-all.nsys-rep": {
+      "sha256": "0eccf70c021a6e3d6d98234193e4c94b05d7a8db66b8ea4b3d3d76eb412152db",
+      "bytes": 186351
+    },
+    "raw/nsys-k10-v3-all.sqlite": {
+      "sha256": "91396ee91d97455b4e2e5b90a3e45ecf0513e2cdd2a4816208ef322af198c067",
+      "bytes": 774144
+    },
+    "raw/nsys-k10-v3-all.tsv": {
+      "sha256": "280765a471950bfb26d28f24d5241ac45ec42f04f46dfcd654de43caf8388323",
+      "bytes": 195785
+    },
+    "raw/nsys-k100-ctrl.csv": {
+      "sha256": "0c5bcc87b3b64a0f5a1776f54e830923bea14373932e65f666c776288747add3",
+      "bytes": 70284
+    },
+    "raw/nsys-k100-ctrl.log": {
+      "sha256": "c8be2f40e5f8680346a4ecf750ce8e5f1f893a1e543e77975db97a634c876dbf",
+      "bytes": 1770
+    },
+    "raw/nsys-k100-ctrl.nsys-rep": {
+      "sha256": "3f7af4ec94c6cc4d09670637ed7e576d3bc67a6a091359ca895b98d815c15fe6",
+      "bytes": 186207
+    },
+    "raw/nsys-k100-ctrl.sqlite": {
+      "sha256": "467b41138b175825e9f04416ae140427b74f822e8a0af5f832adc8f0b83afefc",
+      "bytes": 774144
+    },
+    "raw/nsys-k100-ctrl.tsv": {
+      "sha256": "1591b4312b430580f9e7c4e152d41e6d0d07c2c8fdc37110dc14f9e2608f8f67",
+      "bytes": 1987722
+    },
+    "raw/nsys-k100-v3-all.csv": {
+      "sha256": "5e6599666be3e30685ff56e342c91801b5627b896df1be990812c8e2ead0afaf",
+      "bytes": 70263
+    },
+    "raw/nsys-k100-v3-all.log": {
+      "sha256": "f2e78499b6fa66b9817174c4e4f4567c755e86f29b3e810e0eb9b9eecb741941",
+      "bytes": 1793
+    },
+    "raw/nsys-k100-v3-all.nsys-rep": {
+      "sha256": "fce9f808c3f73abadcc25232a2e39bd2388cab2c40237da00145ca3b28111255",
+      "bytes": 186957
+    },
+    "raw/nsys-k100-v3-all.sqlite": {
+      "sha256": "e4941c228c2e9133514b08cc673c786769259e35a713daf5a000566feb2a2142",
+      "bytes": 778240
+    },
+    "raw/nsys-k100-v3-all.tsv": {
+      "sha256": "1591b4312b430580f9e7c4e152d41e6d0d07c2c8fdc37110dc14f9e2608f8f67",
+      "bytes": 1987722
+    },
+    "raw/reference-k10-ctrl.csv": {
+      "sha256": "e3331925bda553a589aa9e92e97628f28c4c1823dc9288ffe1e258105fb8d2cb",
+      "bytes": 69119
+    },
+    "raw/reference-k10-ctrl.log": {
+      "sha256": "f045b5a6b065609e51c69506179d62bc873025eaa1f1d2df501574fcf3ef37dd",
+      "bytes": 914
+    },
+    "raw/reference-k10-ctrl.tsv": {
+      "sha256": "280765a471950bfb26d28f24d5241ac45ec42f04f46dfcd654de43caf8388323",
+      "bytes": 195785
+    },
+    "raw/reference-k10-v3-all.csv": {
+      "sha256": "ff6d8890f8bb00c6a07e44420a514bf51142380d9e1fe4680320dda8c3a61aff",
+      "bytes": 69109
+    },
+    "raw/reference-k10-v3-all.log": {
+      "sha256": "7a980b90cc1e3410694db6d88d5427ce10c16224c923ddba903aab2f8341ec49",
+      "bytes": 914
+    },
+    "raw/reference-k10-v3-all.tsv": {
+      "sha256": "280765a471950bfb26d28f24d5241ac45ec42f04f46dfcd654de43caf8388323",
+      "bytes": 195785
+    },
+    "raw/reference-k100-ctrl.csv": {
+      "sha256": "4049376a07ac97f2fb06500a9020363e7ca01537655cf41da4840b4b6fd261b3",
+      "bytes": 70267
+    },
+    "raw/reference-k100-ctrl.log": {
+      "sha256": "b110d7dfdf0971aa0eda6692e4f8c504a94acd67f25f8472ccf9131621962e84",
+      "bytes": 916
+    },
+    "raw/reference-k100-ctrl.tsv": {
+      "sha256": "1591b4312b430580f9e7c4e152d41e6d0d07c2c8fdc37110dc14f9e2608f8f67",
+      "bytes": 1987722
+    },
+    "raw/reference-k100-v3-all.csv": {
+      "sha256": "967fd57b0dad2664d3f69685599d0ae6976d68a6a11b6fcad7e1cfca6c7eecc1",
+      "bytes": 70267
+    },
+    "raw/reference-k100-v3-all.log": {
+      "sha256": "5018ce13bd5dec672f57d02dc6914ce4d6f93a2ee9a6726f2f253f742a9d16d4",
+      "bytes": 915
+    },
+    "raw/reference-k100-v3-all.tsv": {
+      "sha256": "1591b4312b430580f9e7c4e152d41e6d0d07c2c8fdc37110dc14f9e2608f8f67",
+      "bytes": 1987722
+    },
+    "raw/theta-k10-v3-all.csv": {
+      "sha256": "b79abe98cad3dc046ee9c649aeed2261dd695310a2e3a0dc58c18e9bf56e1e61",
+      "bytes": 18130
+    },
+    "raw/theta-k10-v3-all.log": {
+      "sha256": "d58272246601e58902d55c0ff8c29d0fcd227d726b58c2d58700e3661376c19b",
+      "bytes": 466
+    },
+    "raw/theta-k10-v3-all.stats.tsv": {
+      "sha256": "968edab1398e6b543e9d1f8c47c19c9ccd7ed0ec490d47afaf8122354e543ae9",
+      "bytes": 4862
+    },
+    "raw/theta-k10-v3-all.tsv": {
+      "sha256": "68eb58dd76256eb79700a0170bc46ec1a9afd39eede42a08002f7d529ec57683",
+      "bytes": 50346
+    },
+    "raw/theta-k100-v3-all.csv": {
+      "sha256": "ff3407b3fe1c909c6a7658103abd88cb70d8cad8fad7a5aa62bc7a9fbfd5f63d",
+      "bytes": 18432
+    },
+    "raw/theta-k100-v3-all.log": {
+      "sha256": "33ea628043ecfc375b1a5fc09a0207c1dc1474405bebd1eb10cfa4145e9501e0",
+      "bytes": 467
+    },
+    "raw/theta-k100-v3-all.stats.tsv": {
+      "sha256": "db5f285be32037ca6c71a905ae5af9d5e40e676ad5890a350a3a574f3e183278",
+      "bytes": 5404
+    },
+    "raw/theta-k100-v3-all.tsv": {
+      "sha256": "5b5ce1f2879dc0555e303501fe59e68935345e23d79503f3a6ff8bc2813f2bf8",
+      "bytes": 510960
+    },
+    "raw/topk-sha256.txt": {
+      "sha256": "b6fd0a19ac7b433dcec1ccf9f4e5b6cfecf50ef18739db23421cf40dd42f6c96",
+      "bytes": 1285
+    }
+  },
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [
+      {
+        "original": "raw/nsys-k100-ctrl.tsv",
+        "sha256": "1591b4312b430580f9e7c4e152d41e6d0d07c2c8fdc37110dc14f9e2608f8f67",
+        "bytes": 1987722,
+        "public": "raw/nsys-k100-ctrl.tsv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/nsys-k100-v3-all.tsv",
+        "sha256": "1591b4312b430580f9e7c4e152d41e6d0d07c2c8fdc37110dc14f9e2608f8f67",
+        "bytes": 1987722,
+        "public": "raw/nsys-k100-v3-all.tsv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/reference-k100-ctrl.tsv",
+        "sha256": "1591b4312b430580f9e7c4e152d41e6d0d07c2c8fdc37110dc14f9e2608f8f67",
+        "bytes": 1987722,
+        "public": "raw/reference-k100-ctrl.tsv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/reference-k100-v3-all.tsv",
+        "sha256": "1591b4312b430580f9e7c4e152d41e6d0d07c2c8fdc37110dc14f9e2608f8f67",
+        "bytes": 1987722,
+        "public": "raw/reference-k100-v3-all.tsv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      }
+    ],
+    "excluded": [
+      {
+        "original": "raw/clocks-k10-ctrl.blocks.bin",
+        "sha256": "ba74c363e606b0d320ae451df18ee6ea21d068c146325cdd5078037e1068811d",
+        "bytes": 7816000,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-ctrl.blocks.bin; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-ctrl.blocks.bin (host-local scratch, not backed up).",
+        "reason": "raw binary dump too large for Git"
+      },
+      {
+        "original": "raw/clocks-k10-ctrl.events.bin",
+        "sha256": "57bf56f2844345f407066e59c668c15403be0fb1bc73686f92cf9d07b940efc5",
+        "bytes": 187584000,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-ctrl.events.bin; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-ctrl.events.bin (host-local scratch, not backed up).",
+        "reason": "raw binary dump too large for Git"
+      },
+      {
+        "original": "raw/clocks-k10-v3-all.blocks.bin",
+        "sha256": "cc0bd5a44ac4b60739312eaeeecc63bde9efc267defd82a9759f7d13eaf52b48",
+        "bytes": 7816000,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-v3-all.blocks.bin; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-v3-all.blocks.bin (host-local scratch, not backed up).",
+        "reason": "raw binary dump too large for Git"
+      },
+      {
+        "original": "raw/clocks-k10-v3-all.events.bin",
+        "sha256": "0a7195b33f8d8084435e4fce7e966bfdd22afa8d603eef8eebd9c7af9e374acd",
+        "bytes": 187584000,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-v3-all.events.bin; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k10-v3-all.events.bin (host-local scratch, not backed up).",
+        "reason": "raw binary dump too large for Git"
+      },
+      {
+        "original": "raw/clocks-k100-ctrl.blocks.bin",
+        "sha256": "7c092dc038d021f303668ee95071b95ffe11d1beff3ad4f6489bd0ffbff72972",
+        "bytes": 7816000,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-ctrl.blocks.bin; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-ctrl.blocks.bin (host-local scratch, not backed up).",
+        "reason": "raw binary dump too large for Git"
+      },
+      {
+        "original": "raw/clocks-k100-ctrl.events.bin",
+        "sha256": "5906e08aa8e85aba2add847993f816f5734ce8131ad70ca15d75650e4fd1a0d6",
+        "bytes": 187584000,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-ctrl.events.bin; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-ctrl.events.bin (host-local scratch, not backed up).",
+        "reason": "raw binary dump too large for Git"
+      },
+      {
+        "original": "raw/clocks-k100-v3-all.blocks.bin",
+        "sha256": "8f8393c5966996ae60a7f8f6668a9414f8d9ca9a4c96847e9ba21a1185984b5a",
+        "bytes": 7816000,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-v3-all.blocks.bin; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-v3-all.blocks.bin (host-local scratch, not backed up).",
+        "reason": "raw binary dump too large for Git"
+      },
+      {
+        "original": "raw/clocks-k100-v3-all.events.bin",
+        "sha256": "f6e3d5433e2d1c02db61a8658089db0abb6e2d5ca0e31263a9300c9b0fe2d780",
+        "bytes": 187584000,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-v3-all.events.bin; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/clocks-k100-v3-all.events.bin (host-local scratch, not backed up).",
+        "reason": "raw binary dump too large for Git"
+      },
+      {
+        "original": "raw/nsys-k10-ctrl.nsys-rep",
+        "sha256": "8ff3eab7a2d5f8d6efb52a3a12c231d130e9b1483cb0d59bb797e8138bb9815f",
+        "bytes": 186401,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-ctrl.nsys-rep; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-ctrl.nsys-rep (host-local scratch, not backed up).",
+        "reason": "full profiler report"
+      },
+      {
+        "original": "raw/nsys-k10-v3-all.nsys-rep",
+        "sha256": "0eccf70c021a6e3d6d98234193e4c94b05d7a8db66b8ea4b3d3d76eb412152db",
+        "bytes": 186351,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-v3-all.nsys-rep; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-v3-all.nsys-rep (host-local scratch, not backed up).",
+        "reason": "full profiler report"
+      },
+      {
+        "original": "raw/nsys-k100-ctrl.nsys-rep",
+        "sha256": "3f7af4ec94c6cc4d09670637ed7e576d3bc67a6a091359ca895b98d815c15fe6",
+        "bytes": 186207,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-ctrl.nsys-rep; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-ctrl.nsys-rep (host-local scratch, not backed up).",
+        "reason": "full profiler report"
+      },
+      {
+        "original": "raw/nsys-k100-v3-all.nsys-rep",
+        "sha256": "fce9f808c3f73abadcc25232a2e39bd2388cab2c40237da00145ca3b28111255",
+        "bytes": 186957,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-v3-all.nsys-rep; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-v3-all.nsys-rep (host-local scratch, not backed up).",
+        "reason": "full profiler report"
+      },
+      {
+        "original": "raw/nsys-k10-ctrl.sqlite",
+        "sha256": "5ad5c2a37874a8e481506efe5819470d9e5ce031d0d426881ec7d3a4745f1a52",
+        "bytes": 774144,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-ctrl.sqlite; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-ctrl.sqlite (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/nsys-k10-v3-all.sqlite",
+        "sha256": "91396ee91d97455b4e2e5b90a3e45ecf0513e2cdd2a4816208ef322af198c067",
+        "bytes": 774144,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-v3-all.sqlite; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k10-v3-all.sqlite (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/nsys-k100-ctrl.sqlite",
+        "sha256": "467b41138b175825e9f04416ae140427b74f822e8a0af5f832adc8f0b83afefc",
+        "bytes": 774144,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-ctrl.sqlite; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-ctrl.sqlite (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/nsys-k100-v3-all.sqlite",
+        "sha256": "e4941c228c2e9133514b08cc673c786769259e35a713daf5a000566feb2a2142",
+        "bytes": 778240,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-v3-all.sqlite; CIMS cuda5 /scratch/ag11163/gsr-v3/results/2026-11-17-range-v3/20261117-cuda5-profile-01/raw/nsys-k100-v3-all.sqlite (host-local scratch, not backed up).",
+        "reason": "kept outside Git"
+      }
+    ],
+    "recorded_artifacts_not_in_public_tree_or_lists": []
+  }
+}

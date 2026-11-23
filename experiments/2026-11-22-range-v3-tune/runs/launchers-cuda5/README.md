@@ -1,0 +1,11 @@
+# cuda5 session launchers and logs
+
+- `session_p.sh` / `session_p.log`: Measurement P (run `20261122-cuda5-profileP-01`), launched 2026-11-22T04:18:46Z from `/scratch/ag11163/gsr-tune` (commit 4efdea0); ended `P_FAILED` at 08:22:57Z (GPU not idle for 4 h before the first step).
+- `session_e.sh` / `session_e.log`: Measurement E (gates, then timing), launched 07:17:53Z from `/scratch/ag11163/gsr-tune-build` (commit edffe2c) with a 6 h deadline and 300 s idle checks; waited for P, built the seven variants (08:27-08:30Z), started gate ctrl (`20261122-cuda5-gate-ctrl-01`), and ended `E_FAILED` at 13:20:33Z at the deadline (GPU never idle). The `KeyError: 'radix'` lines are the resource-table step, which did not handle ctrl's untemplated kernel (non-fatal; fixed in `analysis/resources_v34.py` and rerun on the CPU: `analysis/compile-cuda12.6-edffe2c/`).
+- `session_e2.sh` / `.log`: Measurement E session 2 (14:00Z, commit edffe2c): gate ctrl-02 stopped by hand at 17:50Z (false overlaps).
+- `session_e3.sh` / `.log`: session 3 (17:51Z, commit 7968051, overlap fix): gate ctrl-03 passed; stopped by hand at 18:10Z when the gate rule became contended.
+- `session_e4.sh` / `.log`: session 4 (18:11Z, commit f1e2811): six contended gates passed (18:20-18:51Z), timing 18:51-20:46Z, analysis, manifest; `E4_DONE` 20:48Z. `gate4-v3-4-u4m.log` and `timing-e.log` are the last gate's and the timing driver's console logs.
+- `session_p2.sh` / `.log`, `profile-p2.log`: Measurement P2 (21:16Z, commit 105fcea): builds (normal + clock) of v3-3 and u4m, profile, analysis; `P2_DONE` 22:42Z, no overlaps.
+- `session_final.sh` / `.log`, `gate-final.log`: after P2, checkout of the default commit 37d1ffe, CUDA 12.6 SASS identity (default = u4m 8f8a5d49e0e0ad3f; v3-3 a644e9d5125d6e7e), contended cuda5 gate of the default build; `FINAL_DONE` 22:49Z. `session_final-failedlaunch.log` is a first launch that failed before doing anything (the script had not been copied because the bundle step failed).
+- `full_prep.sh` / `.log`: Measurement F input preparation (23:23-23:42Z); see `20261122-cuda5-fullinputs-01`.
+- `session_f.sh` / `.log`, `fgate-*.log`, `timing-f.log`: Measurement F session (23:31Z start, commit 299aa28): builds, three full-collection gates (passed), timing with prune-tm included, analysis; `F_DONE` 01:50:58Z. Paths under other users' directories are redacted.

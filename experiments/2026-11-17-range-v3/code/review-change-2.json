@@ -1,0 +1,37 @@
+{
+  "change": 2,
+  "title": "Theta-filtered merge candidates (all k)",
+  "written": "before implementation",
+  "switch": "RBP_V3_THETA (default 1 in this commit; RBP_V3_LOOKUP default set to 0 here so the commit's default build is v3-2 = change 2 alone). RBP_V3_STATS (default 0) adds per-query candidate counts.",
+  "design": [
+    "New per-launch device words: theta (uint32, 0 before every launch) and counts[range] (uint32 per range). The last block resets theta together with the done counter.",
+    "Rank pass (existing 4c rank computation): the key whose rank is k-1 (it exists exactly when the range has at least k documents) does atomicMax(theta, its score). Barrier; thread 0 reads theta into shared; barrier.",
+    "Write pass: keys with score >= theta recompute their rank and are written at that rank (the survivors are a prefix of the range's canonical order, so ranks 0..count-1 are filled). A shared counter gives count; thread 0 stores counts[range] and fences before taking the done ticket.",
+    "Merge (last block): thread 0 reads the final theta into shared; owned_best treats a list as ending at counts[l] and skips a head whose score is below theta (lists are descending, so nothing after it survives). Ordering unchanged: score descending, then original numeric ID ascending.",
+    "The empty-slot marking for ranges with fewer than k documents is replaced by counts."
+  ],
+  "safety_argument": "A range whose k-th score is s has k documents with score >= s, so the global k-th score is >= s. Hence theta (a maximum of such s) never exceeds the global k-th score, at any time. Every global top-k document has score >= global k-th >= theta, is in its range's top-k list (canonical disjoint-partition argument), and is therefore written and survives the final filter. Equal scores are kept (>=), so ties at the cutoff are decided by original ID in the merge as before.",
+  "bugs_and_edge_cases_checked_in_design": [
+    "Stale theta reads (other blocks raising it concurrently) only weaken the filter; any value read is <= the global k-th score.",
+    "Ranges with fewer than k documents never raise theta and write all their documents with score >= theta.",
+    "All scores zero: k-th scores are 0, theta stays 0, every candidate is kept; ties resolved by ID.",
+    "Fewer than k nonzero documents overall: zeros remain eligible because theta is 0 whenever some range's k-th score is 0.",
+    "k = 1: the range's best key raises theta to the global maximum observed so far.",
+    "Visibility: counts[range] and the candidate writes are fenced before the done ticket (all threads fence before S5; thread 0 fences again after writing the count), so the merging block reads complete lists; theta's atomicMax precedes the issuing block's fence and ticket.",
+    "The write pass recomputes ranks only for surviving keys, so the worst case (theta 0) costs one extra rank computation per key compared with V2-5; it never writes more than k candidates.",
+    "Barrier uniformity: the two new barriers are outside data-dependent branches."
+  ],
+  "semantics": "Same canonical top-k; only the number of candidates written and merged changes.",
+  "risks": [
+    "Two extra block barriers per range and a second rank computation for survivors may cost more than the merge saves at small k; measured by the gate's development readings and later on cuda5.",
+    "Early-finishing ranges see theta = 0 and write k candidates, so the saving depends on block scheduling order.",
+    "Parva's batched copy of range_scores and tests/check_batched_kernel_sync.py are not edited and will need a refresh."
+  ],
+  "tests": "v3 theta cases (all-zero, few nonzero, ties at the k-th score across ranges, k above a range's size, k = 0, 1, 10, 128, 1000), the existing suite, and 100K/1M x 500 queries x k = 10/100/1000; RBP_V3_STATS build to confirm candidates written and survivors.",
+  "after_implementation": {
+    "switch_off_identity": "-DRBP_V3_THETA=0 (with RBP_V3_LOOKUP=0, this commit's default) compiles to SASS identical to ctrl (CUDA 13.3 34c94253cf61c499).",
+    "resources": "40 registers (unchanged), no spills, static shared 3,744 B (+16 B), ~6 blocks/SM estimate at k=10/100/1000.",
+    "statistics_build": "RBP_V3_STATS=1, 1M, W=1024, first 25 calibration queries (laptop): candidates written per query median 477 / 4,435 / 334,272 at k=10/100/1000 against 9,770 / 97,700 / 977,000 for V2-5; survivors after the final filter median 44 / 684 / 74,029.",
+    "findings": []
+  }
+}

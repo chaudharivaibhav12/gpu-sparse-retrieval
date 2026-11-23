@@ -1,0 +1,47 @@
+{
+  "change": 3,
+  "title": "Radix-select local top-k for large k",
+  "written": "before implementation",
+  "switch": "RBP_V3_RADIX (default 1 in this commit, with RBP_V3_THETA=1 and RBP_V3_LOOKUP=0, so the commit builds v3-3 = changes 2 + 3). Radix requires theta (compile-time error otherwise). RBP_RADIX_BITS selects the digit width (8 or 11).",
+  "design": [
+    "range_scores becomes a template on the selection path. The host launches the small-k instantiation (V2-5 local selection, unchanged) when k < radix_min_k and the radix instantiation otherwise. radix_min_k is an optional 15th command-line argument, default 100.",
+    "Key per document slot: (score << b) | (W-1 - r), where W is the index's widest range, b = bits(W-1) and r is the document's in-range original-ID rank (existing tie_rank array). Keys are unique within a range; larger key = higher score, then smaller original ID.",
+    "want = min(k, range documents). If want equals the range's document count, every key is a winner (threshold 0).",
+    "Otherwise: one block reduction for the maximum key; start at the digit containing its top bit (skipping leading all-zero digits). Each pass: zero 2^D shared buckets; every thread counts the digit of each of its keys that matches the prefix so far (shared atomics); warp 0 finds the boundary bucket from the top (lanes sum 2^D/32 contiguous buckets, warp scan, ballot, then the boundary lane walks its chunk); keys in higher buckets are accepted implicitly; the prefix is extended by the boundary digit and the search continues only inside it. Stop when the boundary bucket's count equals the number still needed (always true at the last digit because keys are unique).",
+    "Threshold T = final prefix with lower bits zero; exactly `want` keys are >= T. Gather them into shared memory with an atomic counter, pad to the next power of two P >= k with zeros, bitonic-sort descending.",
+    "Theta (change 2): if want == k, thread 0 raises theta to the score of sorted entry k-1; after a barrier the block reads theta and writes sorted entries with score >= theta at their index (a prefix), plus the count.",
+    "Dynamic shared memory for the radix path: P x 8 (winners) + 2^D x 4 (buckets) + W x 4 (scores); the small-k path's per-thread slot array (1 KB stack) is not instantiated in the radix kernel.",
+    "Event markers RBP_EV(7..10) and the S4 barrier are kept in the same order so the profile analyses apply to both paths."
+  ],
+  "bugs_and_edge_cases_checked_in_design": [
+    "Uniqueness: two documents of a range never share a rank, so keys differ; the boundary bucket at the last digit holds exactly one key.",
+    "Key 0 is possible (score 0 and the largest rank); padding is also 0 and sorts after real keys only when equal, which is harmless because exactly `want` real keys exist and only indices < want are read.",
+    "Maximal guarded scores (< 2^32 - 1) with b <= 15 fit in 47 bits of the uint64 key.",
+    "k larger than the range (want = range documents): no selection passes; all keys are sorted.",
+    "Partial last range: keys are formed only for slots < range documents.",
+    "Long runs of equal scores: separated by the rank bits; the boundary search handles buckets with many equal-score keys.",
+    "Loop uniformity: pass count and early exit depend only on shared values written by warp 0 before a barrier.",
+    "Bucket search with fewer than 32 x (2^D/32) threads: warp 0 always exists (threads >= 32).",
+    "k up to 1000: P <= 1024, winners 8 KB."
+  ],
+  "semantics": "Same canonical top-k per range as the small-k selection, hence the same global result.",
+  "risks": [
+    "Many barriers (one per radix pass step plus about log2(P)^2/2 bitonic stages: 28 at k=100, 55 at k=1000) may outweigh the saving at moderate k; the crossover is a host parameter for that reason.",
+    "Repeated global loads of tie_rank while forming keys in every pass (cached).",
+    "Parva's batched copy of range_scores and tests/check_batched_kernel_sync.py are not edited and will need a refresh."
+  ],
+  "tests": "v3 radix cases (equal runs, maximal guarded scores, scores to about 2^31, k = 32/64/100/1000, partial last range) run with the default crossover and with crossover 1 (radix for every k) and 1001 (never); the existing suite; 100K/1M x 500 queries x k = 10/100/1000.",
+  "after_implementation": {
+    "switch_off_identity": "With RBP_V3_RADIX=0 the small-k instantiation is SASS-identical to v3-2 (CUDA 13.3 68d58ba8ce08f27c); with RBP_V3_RADIX=0 RBP_V3_THETA=0 identical to ctrl (34c94253cf61c499).",
+    "resources": "small-k instantiation: 40 registers, 1,024 B stack, 3,744 B static shared; radix instantiation: 40 registers, no stack, 4,016 B static shared plus P x 8 + 2^D x 4 + W x 4 dynamic (k=100: 1,024 + 1,024 + 4,096 = 6,144 B; k=1000: 8,192 + 1,024 + 4,096 = 13,312 B, with D=8).",
+    "fixtures": "Existing suite plus version-3 cases (enforced) pass with the crossover at 1 (radix for every k), 100 (default) and 1001 (never); added --scorer-arg to tests/check_range_bitpack.py to pass the crossover.",
+    "digit_width": "Laptop development readings (1M, W=1024, 25 queries, GPU span, two repeats; NOT results): k=32 8-bit 0.161 ms, 11-bit 0.357, small-k path 0.261; k=100 8-bit 0.278-0.295, 11-bit 0.466-0.487, small-k 0.508-0.510; k=1000 8-bit 2.10, 11-bit 1.91, small-k 2.34-2.36. Kept 8-bit as the default: faster at k=32 and 100; 11-bit is about 9% faster only at k=1000 (one pass fewer, but each pass clears and scans 2,048 buckets). -DRBP_RADIX_BITS=11 remains available.",
+    "findings": [
+      {
+        "id": 1,
+        "issue": "On the laptop the radix path is already faster than the small-k path at k=32, so the default crossover of 100 may be conservative.",
+        "handling": "Left at 100 as specified; the protocol's crossover rule on cuda5 decides."
+      }
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "fix": 1,
+  "title": "Lookup chunk 8 and a host-side thread-limit check",
+  "written": "before implementation",
+  "trigger": "cuda5 gate 20261117-cuda5-gate-v3-all-01 failed in the fixture pass with the radix path forced for every k: 'too many resources requested for launch' at 1,024 threads (fixture random-1-w1-k10-t1024-m32).",
+  "cause": "CUDA 12.6 compiles v3-all's radix instantiation of range_scores (commit 313e255) to 68 registers per thread; CUDA 13.3 on the laptop gave 55. A 1,024-thread block then needs 68 x 1,024 = 69,632 registers, more than the 65,536 per SM, so the launch fails. The laptop gate of v3-all ran the fixtures with the default crossover only, where no 1,024-thread fixture takes the radix path, so it did not show. The register growth comes from change 1's lookup holding one pending load per word for a chunk of 16 words in registers. The stats build of v3-all (70/75 registers) has the same limit; at the 256 threads used for timing every build launches.",
+  "fix_design": [
+    "RBP_LOOKUP_CHUNK_WORDS default 16 -> 8 (owner decision 2026-11-17). New v3-1 and v3-all commits; ctrl, v3-2 and v3-3 commits are not touched.",
+    "Host check: after choosing the instantiation, cudaFuncGetAttributes(kernel).maxThreadsPerBlock; if SCORE_THREADS exceeds it, refuse with 'SCORE_THREADS <n> exceeds this kernel's limit of <m> threads per block (registers or launch bounds); use fewer threads' before any query is scored, instead of failing at launch.",
+    "Test hook: -DRBP_TEST_LAUNCH_BOUND=<n> adds __launch_bounds__(<n>) to range_scores; without it the macro is empty, so normal builds are unchanged. The fixture builds the scorer source with -DRBP_TEST_LAUNCH_BOUND=256 and expects the rejection at 1,024 threads (tests/check_range_bitpack.py --limit-scorer, run by gate_build.sh from the build's src/)."
+  ],
+  "compile_probe": "cuda5, CUDA 12.6, compile only: v3-all source with chunk 8 gives 42 (small-k) / 43 (radix) registers, no spills.",
+  "bugs_and_edge_cases_checked_in_design": [
+    "Chunk 8 at 256 threads: a warp has up to 16 words (128 words / 8 warps), so warps with more than 8 words take a second set of search rounds; at most two chunks. 56 of the 500 calibration queries have more than 64 words. Lookup results are unchanged (same per-word interval search); the v3 lookup fixtures with 128 words at 256 and 32 threads cover multiple chunks.",
+    "The check reads attributes of the instantiation actually launched (radix or small-k), after the crossover decision.",
+    "Merge threads equal score threads (single kernel), so one check covers both.",
+    "cudaFuncGetAttributes failure is reported as an error, not ignored."
+  ],
+  "risks": [
+    "Registers 42/43 round up to 48 per thread at allocation granularity: about 5 resident blocks per SM at 256 threads against 6 for ctrl (38 registers). To be reported to the owner before timing; not changed here.",
+    "The second chunk costs one more set of dependent load rounds for long queries.",
+    "The thread-limit check is host code only and does not change device SASS; the test hook changes SASS only when defined.",
+    "Parva's batched copy of range_scores and tests/check_batched_kernel_sync.py are not edited and will need a refresh."
+  ],
+  "tests": "cuda5 re-gates of v3-1, v3-all, v3-all-clocks and v3-all-stats: fixtures with the v3 cases enforced, forced radix for every k including 1,024 threads (radix builds) and the thread-limit rejection fixture; 100K/1M x 500 calibration queries x k=10/100/1000 exact. The stats build skips the fixtures (each process needs a new statistics file, as registered) and runs the 100K/1M checks."
+}
