@@ -1,0 +1,655 @@
+{
+  "label": "ncu-k100-v3-4-u4m",
+  "kernel": "range_scores<",
+  "launches_in_source_export": 25,
+  "duplicate_blocks_skipped": 25,
+  "launch": {
+    "range_scores<1>": {
+      "launches": 25,
+      "ncu_duration_ms_mean": 0.12918016,
+      "ncu_duration_ms_median": 0.121536,
+      "launch": {
+        "grid_size": 245.0,
+        "block_size": 256.0,
+        "sm_count": 46.0,
+        "registers_per_thread": 48.0,
+        "registers_per_thread_allocated": 12288.0,
+        "shared_mem_per_block_static": 5.312,
+        "shared_mem_per_block_dynamic": 18.432,
+        "shared_mem_per_block_driver": 1.024,
+        "shared_mem_per_block_allocated": 24.832,
+        "shared_mem_config_size": 102.4,
+        "occupancy_limit_blocks": 24.0,
+        "occupancy_limit_registers": 5.0,
+        "occupancy_limit_shared_mem": 4.0,
+        "occupancy_limit_warps": 6.0,
+        "waves_per_multiprocessor": 1.33
+      },
+      "blocks_per_sm": 4.0,
+      "metrics": {
+        "achieved_occupancy_pct": 52.82400364901608,
+        "theoretical_occupancy_pct": 66.666667,
+        "threads_per_warp_instruction": 31.149527555934288,
+        "sm_throughput_pct": 23.618504085660216,
+        "memory_throughput_pct": 23.364617304403403,
+        "dram_throughput_pct": 10.53379839446305
+      },
+      "stall_cycles_per_issued_instruction": {
+        "long_scoreboard": 3.9406181105606315,
+        "barrier": 2.9495194345435087,
+        "wait": 2.7610670243554427,
+        "short_scoreboard": 1.173524570034284,
+        "branch_resolving": 1.0359121931590733,
+        "selected": 1.000006247825053,
+        "not_selected": 0.7364615183210798,
+        "math_pipe_throttle": 0.488432820960742,
+        "no_instruction": 0.2775840744535384,
+        "imc_miss": 0.2041730090366818,
+        "mio_throttle": 0.1153362811874517,
+        "membar": 0.08626187878757853,
+        "dispatch_stall": 0.03327483217732507,
+        "misc": 0.023997373248647473,
+        "lg_throttle": 0.0026652406214700466,
+        "drain": 0.0003804472860228692,
+        "tex_throttle": 1.1657785220269118e-05,
+        "sleeping": 0.0
+      }
+    }
+  },
+  "kernel_samples": 149683.0,
+  "stages": {
+    "radix select": {
+      "share_of_kernel_samples": 0.3105963937120448,
+      "samples": 46491.0,
+      "active_threads_per_warp_instruction": 31.63033536957118
+    },
+    "decode": {
+      "share_of_kernel_samples": 0.30469057942451716,
+      "samples": 45607.0,
+      "active_threads_per_warp_instruction": 31.858499574791196
+    },
+    "radix gather": {
+      "share_of_kernel_samples": 0.07019501212562548,
+      "samples": 10507.0,
+      "active_threads_per_warp_instruction": 25.844078500679352
+    },
+    "bitonic sort": {
+      "share_of_kernel_samples": 0.044955004910377266,
+      "samples": 6729.0,
+      "active_threads_per_warp_instruction": 31.989559543230015
+    },
+    "setup: term lookup": {
+      "share_of_kernel_samples": 0.017283191812029423,
+      "samples": 2587.0,
+      "active_threads_per_warp_instruction": 23.65035875905034
+    },
+    "setup: prologue": {
+      "share_of_kernel_samples": 0.014590835298597704,
+      "samples": 2184.0,
+      "active_threads_per_warp_instruction": 31.65796194978367
+    },
+    "candidate write": {
+      "share_of_kernel_samples": 0.008578128444779969,
+      "samples": 1284.0,
+      "active_threads_per_warp_instruction": 26.198156076837357
+    },
+    "candidate write: threadfence": {
+      "share_of_kernel_samples": 0.00825745074590969,
+      "samples": 1236.0,
+      "active_threads_per_warp_instruction": 29.53846153846154
+    },
+    "setup: zero scores": {
+      "share_of_kernel_samples": 0.00785660362232184,
+      "samples": 1176.0,
+      "active_threads_per_warp_instruction": 32.0
+    },
+    "merge": {
+      "share_of_kernel_samples": 0.005064035327993159,
+      "samples": 758.0,
+      "active_threads_per_warp_instruction": 28.925728658942987
+    },
+    "done ticket": {
+      "share_of_kernel_samples": 0.002899460860618774,
+      "samples": 434.0,
+      "active_threads_per_warp_instruction": 14.75925925925926
+    },
+    "setup: word-table prefix": {
+      "share_of_kernel_samples": 0.0023917211707408324,
+      "samples": 358.0,
+      "active_threads_per_warp_instruction": 18.53248431155408
+    },
+    "add": {
+      "share_of_kernel_samples": 0.0020910858280499454,
+      "samples": 313.0,
+      "active_threads_per_warp_instruction": 31.92605168558145
+    },
+    "local top-k: warp lists": {
+      "share_of_kernel_samples": 2.004235617939245e-05,
+      "samples": 3.0,
+      "active_threads_per_warp_instruction": 32.0
+    },
+    "barrier waits (all sites)": {
+      "share_of_kernel_samples": 0.20053045436021458,
+      "samples": 30016.0
+    }
+  },
+  "barrier_sites": [
+    {
+      "line": 271,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 200.0,
+      "barrier_stall_samples": 9.0,
+      "share_of_barrier_stall_samples": 0.0002998400852878465,
+      "share_of_kernel_samples": 6.0127068538177347e-05
+    },
+    {
+      "line": 283,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 200.0,
+      "barrier_stall_samples": 2.0,
+      "share_of_barrier_stall_samples": 6.663113006396588e-05,
+      "share_of_kernel_samples": 1.3361570786261632e-05
+    },
+    {
+      "line": 289,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 200.0,
+      "barrier_stall_samples": 9.0,
+      "share_of_barrier_stall_samples": 0.0002998400852878465,
+      "share_of_kernel_samples": 6.0127068538177347e-05
+    },
+    {
+      "line": 292,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 200.0,
+      "barrier_stall_samples": 4.0,
+      "share_of_barrier_stall_samples": 0.00013326226012793177,
+      "share_of_kernel_samples": 2.6723141572523264e-05
+    },
+    {
+      "line": 310,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 200.0,
+      "barrier_stall_samples": 79.0,
+      "share_of_barrier_stall_samples": 0.0026319296375266524,
+      "share_of_kernel_samples": 0.0005277820460573345
+    },
+    {
+      "line": 324,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 200.0,
+      "barrier_stall_samples": 1.0,
+      "share_of_barrier_stall_samples": 3.331556503198294e-05,
+      "share_of_kernel_samples": 6.680785393130816e-06
+    },
+    {
+      "line": 331,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 368.0,
+      "barrier_stall_samples": 0,
+      "share_of_barrier_stall_samples": 0.0,
+      "share_of_kernel_samples": 0.0
+    },
+    {
+      "line": 336,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 368.0,
+      "barrier_stall_samples": 3.0,
+      "share_of_barrier_stall_samples": 9.994669509594883e-05,
+      "share_of_kernel_samples": 2.004235617939245e-05
+    },
+    {
+      "line": 357,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 368.0,
+      "barrier_stall_samples": 29.0,
+      "share_of_barrier_stall_samples": 0.0009661513859275053,
+      "share_of_kernel_samples": 0.00019374277640079368
+    },
+    {
+      "line": 362,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 368.0,
+      "barrier_stall_samples": 0,
+      "share_of_barrier_stall_samples": 0.0,
+      "share_of_kernel_samples": 0.0
+    },
+    {
+      "line": 372,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 200.0,
+      "barrier_stall_samples": 1.0,
+      "share_of_barrier_stall_samples": 3.331556503198294e-05,
+      "share_of_kernel_samples": 6.680785393130816e-06
+    },
+    {
+      "line": 378,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 200.0,
+      "barrier_stall_samples": 4.0,
+      "share_of_barrier_stall_samples": 0.00013326226012793177,
+      "share_of_kernel_samples": 2.6723141572523264e-05
+    },
+    {
+      "line": 386,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 5600.0,
+      "barrier_stall_samples": 56.0,
+      "share_of_barrier_stall_samples": 0.0018656716417910447,
+      "share_of_kernel_samples": 0.00037412398201532574
+    },
+    {
+      "line": 466,
+      "stage": "setup: zero scores",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 8844.0,
+      "share_of_barrier_stall_samples": 0.29464285714285715,
+      "share_of_kernel_samples": 0.05908486601684894
+    },
+    {
+      "line": 479,
+      "stage": "setup: word-table prefix",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 919.0,
+      "share_of_barrier_stall_samples": 0.030617004264392324,
+      "share_of_kernel_samples": 0.006139641776287221
+    },
+    {
+      "line": 568,
+      "stage": "decode",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 1072.0,
+      "share_of_barrier_stall_samples": 0.03571428571428571,
+      "share_of_kernel_samples": 0.007161801941436235
+    },
+    {
+      "line": 614,
+      "stage": "radix select",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 426.0,
+      "share_of_barrier_stall_samples": 0.014192430703624734,
+      "share_of_kernel_samples": 0.0028460145774737277
+    },
+    {
+      "line": 630,
+      "stage": "radix select",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 121120.0,
+      "barrier_stall_samples": 215.0,
+      "share_of_barrier_stall_samples": 0.007162846481876333,
+      "share_of_kernel_samples": 0.0014363688595231256
+    },
+    {
+      "line": 661,
+      "stage": "radix select",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 121120.0,
+      "barrier_stall_samples": 1436.0,
+      "share_of_barrier_stall_samples": 0.047841151385927504,
+      "share_of_kernel_samples": 0.009593607824535852
+    },
+    {
+      "line": 684,
+      "stage": "radix select",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 121120.0,
+      "barrier_stall_samples": 3367.0,
+      "share_of_barrier_stall_samples": 0.11217350746268656,
+      "share_of_kernel_samples": 0.02249420441867146
+    },
+    {
+      "line": 689,
+      "stage": "radix select",
+      "source": "__syncthreads();   // radix_state and buckets are reused by the next pass",
+      "bar_instructions": 1,
+      "bar_warp_executions": 121120.0,
+      "barrier_stall_samples": 65.0,
+      "share_of_barrier_stall_samples": 0.002165511727078891,
+      "share_of_kernel_samples": 0.0004342510505535031
+    },
+    {
+      "line": 696,
+      "stage": "radix gather",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 70.0,
+      "share_of_barrier_stall_samples": 0.0023320895522388058,
+      "share_of_kernel_samples": 0.00046765497751915716
+    },
+    {
+      "line": 711,
+      "stage": "radix gather",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 1006.0,
+      "share_of_barrier_stall_samples": 0.03351545842217484,
+      "share_of_kernel_samples": 0.006720870105489602
+    },
+    {
+      "line": 722,
+      "stage": "bitonic sort",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 1372000.0,
+      "barrier_stall_samples": 6849.0,
+      "share_of_barrier_stall_samples": 0.22817830490405117,
+      "share_of_kernel_samples": 0.04575669915755296
+    },
+    {
+      "line": 765,
+      "stage": "local top-k: warp lists",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 69.0,
+      "share_of_barrier_stall_samples": 0.002298773987206823,
+      "share_of_kernel_samples": 0.00046097419212602636
+    },
+    {
+      "line": 781,
+      "stage": "candidate write",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 277.0,
+      "share_of_barrier_stall_samples": 0.009228411513859275,
+      "share_of_kernel_samples": 0.0018505775538972362
+    },
+    {
+      "line": 783,
+      "stage": "candidate write",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 629.0,
+      "share_of_barrier_stall_samples": 0.02095549040511727,
+      "share_of_kernel_samples": 0.004202214012279284
+    },
+    {
+      "line": 857,
+      "stage": "candidate write: threadfence",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 2654.0,
+      "share_of_barrier_stall_samples": 0.08841950959488273,
+      "share_of_kernel_samples": 0.017730804433369187
+    },
+    {
+      "line": 875,
+      "stage": "done ticket",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 49000.0,
+      "barrier_stall_samples": 1917.0,
+      "share_of_barrier_stall_samples": 0.0638659381663113,
+      "share_of_kernel_samples": 0.012807065598631776
+    },
+    {
+      "line": 887,
+      "stage": "merge",
+      "source": "__syncthreads();",
+      "bar_instructions": 1,
+      "bar_warp_executions": 200.0,
+      "barrier_stall_samples": 4.0,
+      "share_of_barrier_stall_samples": 0.00013326226012793177,
+      "share_of_kernel_samples": 2.6723141572523264e-05
+    }
+  ],
+  "barrier_stall_samples_total": 30016.0,
+  "barrier_stall_samples_before_first_bar": 0,
+  "decode": {
+    "encoded": {
+      "instructions": [
+        "LDG.E R21, [R4.64] @0x7f578327f8e0",
+        "LDG.E R26, [R4.64+0x4] @0x7f578327f8f0",
+        "LDG.E R23, [R4.64] @0x7f578327fb80",
+        "LDG.E R28, [R4.64+0x4] @0x7f578327fb90",
+        "LDG.E R17, [R4.64] @0x7f578327fe20",
+        "LDG.E R30, [R4.64+0x4] @0x7f578327fe30",
+        "LDG.E R19, [R4.64] @0x7f57832800c0",
+        "LDG.E R24, [R4.64+0x4] @0x7f57832800d0"
+      ],
+      "requests": 2579288.0,
+      "sectors": 6722528.0,
+      "sectors_per_request": 2.606350279612048,
+      "ideal_sectors_per_request": 2.57722906476516,
+      "samples_on_load_instructions": 557.0,
+      "stall_reasons_on_load_instructions": {
+        "dispatch": 0.003590664272890485,
+        "lg": 0.005385996409335727,
+        "mio": 0.18491921005385997,
+        "not_selected": 0.10233393177737882,
+        "selected": 0.1561938958707361,
+        "wait": 0.547576301615799
+      }
+    },
+    "impacts": {
+      "instructions": [
+        "LDG.E.U8 R20, [R8.64] @0x7f578327f8d0",
+        "LDG.E.U8 R22, [R8.64] @0x7f578327fb70",
+        "LDG.E.U8 R16, [R8.64] @0x7f578327fe10",
+        "LDG.E.U8 R18, [R8.64] @0x7f57832800b0"
+      ],
+      "requests": 1289644.0,
+      "sectors": 2741985.0,
+      "sectors_per_request": 2.1261565207142437,
+      "ideal_sectors_per_request": 1.0,
+      "samples_on_load_instructions": 205.0,
+      "stall_reasons_on_load_instructions": {
+        "dispatch": 0.004878048780487805,
+        "lg": 0.004878048780487805,
+        "mio": 0.3951219512195122,
+        "not_selected": 0.06341463414634146,
+        "selected": 0.2634146341463415,
+        "wait": 0.2682926829268293
+      }
+    },
+    "encoded_line": {
+      "line": 539,
+      "source": "lo[u]=v.encoded[word];hi[u]=v.encoded[word+1];",
+      "stages": [
+        "decode"
+      ],
+      "samples": 1357.0,
+      "share_of_kernel_samples": 0.009065825778478517,
+      "opcodes": [
+        "IADD3",
+        "IADD3.X",
+        "LDG.E",
+        "SHF.R.U32.HI",
+        "SHF.R.U64"
+      ],
+      "stall_reasons_share_of_line": {
+        "wait": 0.35666912306558585,
+        "selected": 0.20117907148120856,
+        "not_selected": 0.18570375829034635,
+        "math": 0.1348563006632277,
+        "mio": 0.0759027266028003,
+        "dispatch": 0.043478260869565216,
+        "lg": 0.002210759027266028
+      }
+    },
+    "impacts_and_add_line": null,
+    "impacts_line": {
+      "line": 540,
+      "source": "impact[u]=v.impacts[term_value[i]+j];",
+      "stages": [
+        "decode"
+      ],
+      "samples": 1285.0,
+      "share_of_kernel_samples": 0.0085848092301731,
+      "opcodes": [
+        "BSYNC",
+        "IADD3",
+        "IMAD.IADD",
+        "IMAD.X",
+        "LDG.E.U8",
+        "LDS"
+      ],
+      "stall_reasons_share_of_line": {
+        "wait": 0.38054474708171204,
+        "selected": 0.22412451361867705,
+        "mio": 0.12373540856031129,
+        "short_sb": 0.10894941634241245,
+        "not_selected": 0.09571984435797666,
+        "dispatch": 0.02801556420233463,
+        "no_inst": 0.017120622568093387,
+        "math": 0.01556420233463035,
+        "branch_resolving": 0.005447470817120622,
+        "lg": 0.0007782101167315176
+      }
+    },
+    "score_add_line": {
+      "line": 548,
+      "source": "atomicAdd(&scores[position],weight[u]*impact[u]);",
+      "stages": [
+        "add",
+        "decode"
+      ],
+      "samples": 1111.0,
+      "share_of_kernel_samples": 0.007422352571768337,
+      "opcodes": [
+        "ATOMS.ADD",
+        "BSSY",
+        "BSYNC",
+        "IMAD"
+      ],
+      "stall_reasons_share_of_line": {
+        "wait": 0.37623762376237624,
+        "branch_resolving": 0.35553555355535554,
+        "selected": 0.17551755175517553,
+        "not_selected": 0.05130513051305131,
+        "mio": 0.023402340234023402,
+        "dispatch": 0.009000900090009001,
+        "no_inst": 0.009000900090009001
+      }
+    }
+  },
+  "merge_radix": {
+    "bucket_atomic_line": {
+      "line": 334,
+      "source": "if ((key&mask)==prefix) atomicAdd(&merge_buckets[(key>>shift)&(RBP_RADIX_BUCKETS-1)],1u);",
+      "stages": [
+        "merge"
+      ],
+      "samples": 4.0,
+      "share_of_kernel_samples": 2.6723141572523264e-05,
+      "opcodes": [
+        "@P6",
+        "ATOMS.POPC.INC.32",
+        "BSYNC",
+        "IMAD.SHL.U32",
+        "ISETP.NE.AND.EX",
+        "ISETP.NE.U32.AND",
+        "LOP3.LUT",
+        "SHF.R.U64"
+      ],
+      "stall_reasons_share_of_line": {
+        "branch_resolving": 0.5,
+        "wait": 0.5
+      }
+    },
+    "compaction_line": {
+      "line": 307,
+      "source": "keys[off+e]=(c.score<<32)|uint64_t(0xffffffffu-v.global_rank[c.doc]);",
+      "stages": [
+        "merge"
+      ],
+      "samples": 165.0,
+      "share_of_kernel_samples": 0.0011023295898665848,
+      "opcodes": [
+        "IMAD.IADD",
+        "IMAD.MOV.U32",
+        "IMAD.WIDE.U32",
+        "LDG.E",
+        "LOP3.LUT",
+        "ST.E.64"
+      ],
+      "stall_reasons_share_of_line": {
+        "long_sb": 0.9939393939393939,
+        "wait": 0.006060606060606061
+      }
+    }
+  },
+  "radix": {
+    "bucket_atomic_line": null,
+    "key_build_line": null,
+    "gather_atomic_line": null
+  },
+  "attribution": {
+    "unmapped_instruction_rows": 0,
+    "header_or_unmapped_inherited_rows": 132,
+    "missing_anchors": [],
+    "header_call_lines": {
+      "decode+add|range_bitpack.h": 561,
+      "decode+add|device_atomic_functions.hpp": 562,
+      "radix select|device_atomic_functions.hpp": null,
+      "radix gather|device_atomic_functions.hpp": null
+    },
+    "role_lines": {
+      "encoded load": [
+        561,
+        539
+      ],
+      "impacts load + score atomicAdd": [
+        562
+      ],
+      "impacts load": [
+        540
+      ],
+      "score atomicAdd": [
+        548
+      ],
+      "radix bucket atomicAdd": [],
+      "radix key build (pass loop)": [],
+      "radix gather atomicAdd": [],
+      "merge radix bucket atomicAdd": [
+        334
+      ],
+      "merge compaction": [
+        307
+      ]
+    }
+  },
+  "qualification": "Every SASS instruction gets a source line of the scorer: the\nline it correlates to in cuda_range_v2.cu; an instruction that correlates\nonly to a header inherits the stage of the preceding mapped instruction in\naddress order (inlined code is contiguous) and is assigned to the call line\nof that header in that stage: range_bitpack.h in decode -> the rbp_extract\n(encoded load) line; device_atomic_functions.hpp in decode -> the score\natomicAdd line, in radix select -> the bucket atomicAdd line, in radix gather\n-> the gather atomicAdd line; otherwise the preceding instruction's line.\nStages run from one anchor line (text match) to the next. Inside decode+add,\nshared atomics (ATOMS*, RED.*SHARED) count as \"add\", everything else as\n\"decode\". Nsight attributes a warp waiting at a barrier to the instruction\nafter the BAR, so every stall_barrier sample goes to the most recent\npreceding BAR instruction in address order and through it to that BAR's\nsource line (one barrier site per line). Identical repeated source blocks of\none launch are counted once. Nsight Compute replays each kernel at locked\nbase clocks with flushed caches: values are sampling shares and counts, not\nnormal-clock times.\n\nCoalescing (SourceCounters): for a global load, requests = warp-level\ninstructions executed, sectors = L2 Theoretical Sectors Global; sectors per\nrequest against the ideal (L2 Theoretical Sectors Global Ideal)."
+}

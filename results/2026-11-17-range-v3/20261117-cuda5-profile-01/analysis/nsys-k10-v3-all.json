@@ -1,0 +1,22 @@
+{
+  "label": "nsys-k10-v3-all",
+  "queries": 25,
+  "measured_rounds": 20,
+  "medians_us": {
+    "gpu_busy_us": 102.577,
+    "kernel_us": 101.681,
+    "copies_us": 0.896,
+    "gpu_span_us": 109.762,
+    "gpu_idle_in_span_us": 6.768,
+    "launch_api_us": 33.043,
+    "launch_to_kernel_start_us": 28.7055,
+    "copy_api_us": 100.921,
+    "copy_return_after_gpu_end_us": 8.7775,
+    "other_api_us": 10.0435,
+    "host_wall_profiled_us": 174.126,
+    "unprofiled_wall_us": 126.59899999999999,
+    "non_gpu_unprofiled_us": 23.971499999999992
+  },
+  "gpu_share_of_unprofiled_wall": 0.8186819416855995,
+  "definitions": "- gpu_busy: kernel + copy durations (CUPTI timestamps, normal clocks)\n- gpu_span: first GPU start to last GPU end; gpu_idle_in_span = span - busy\n- launch_api: host time inside cudaLaunchKernel for the query's kernel\n- launch_to_kernel_start: kernel GPU start - launch call start\n- copy_api: host time inside the cudaMemcpy of the results (it waits for the kernel)\n- copy_return_after_gpu_end: copy call end - D2H GPU end (sync return latency)\n- other_api: host time in other CUDA calls between the query's launch call and its copy call (event records etc.)\n- host_wall_profiled: the driver's own wall time for the query under tracing\n- non_gpu_unprofiled: median unprofiled wall (--unprofiled CSVs, same queries) - gpu_busy"
+}

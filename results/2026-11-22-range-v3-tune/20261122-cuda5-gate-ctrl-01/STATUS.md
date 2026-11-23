@@ -1,0 +1,5 @@
+# 20261122-cuda5-gate-ctrl-01 — stopped before any GPU process (failed-gpu-busy)
+
+First gate of the Measurement E session (configs/protocol.json measurement_E; launcher `experiments/2026-11-22-range-v3-tune/runs/launchers-cuda5/session_e.sh`, commit edffe2c, builds `build/v34-edffe2c`). The session started 2026-11-22T07:17:53Z with a 6 h deadline (13:17:53Z), waited for Measurement P to end (08:22:57Z), built all seven variants on the CPU (SASS in `analysis/compile-cuda12.6-edffe2c/`), and started this gate at 08:30:22Z. Its first step (fixtures) waited for an idle GPU, checking every 300 s; another user's GPU processes were present at every check (`logs/idle-checks.txt`), so at 13:20:33Z the gate stopped at the session deadline and the session ended (`E_FAILED gate ctrl`). No GPU process ran; no other gate or any timing started. Per the owner's instruction (stop after 6 h and report), it was not relaunched.
+
+Monitor logs: `logs/gpu-poll.log.gz`, `logs/gpu-pmon.log.gz` (lossless gzip; originals in `~/csciga3033-025/project/run-bulk/2026-11-22-range-v3-tune/20261122-cuda5-gate-ctrl-01/logs/`, SHA-256 in manifest.json `bulk_originals`).

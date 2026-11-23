@@ -1,0 +1,408 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-22-range-v3-tune",
+  "run_id": "20261122-cuda5-gate-v3-4-unroll2-01",
+  "status": "passed-cuda5-gate",
+  "scope": "official correctness gate on the cuda5 GPU: v3-4-unroll2; fixtures incl. v3 and v3-4 cases (default crossover and crossover 1); 100K and 1M x 500 calibration queries x k=10/100/1000 at W=4096 and W=1024, 256 threads",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "f1e281144c5f4f7b8b5f5f03a223f7a5fdfe02d3",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 -DRBP_V3_UNROLL=2 (CUDA 12.6)",
+    "source_sha256": {
+      "src/cuda_range_v2.cu": "7e00bf54c2eda5d15c2acfcfb491009484bf660734f0b3d3454d518d8e29a3bd",
+      "tests/check_range_bitpack.py": "f73f6be74ee3d3e6736df768d47de2526fc0ffc46585ce4733e53bc947add347",
+      "experiments/2026-11-22-range-v3-tune/code/gate_cuda5.sh": "c3910ffe2452e6228ef51da386273fe74448cf8ca369f97cbcdd58909da39b00",
+      "experiments/2026-11-22-range-v3-tune/code/session_lib.sh": "f5e6aecfaa91d70872a25f70dee4173ff72e61ce2767b1d5bfc8b0e14b6daf69",
+      "experiments/2026-11-22-range-v3-tune/code/build_variants.sh": "f7bd3432ffd1c59495ee85e121a2d3fd20caae8033f06c9292e69c25b740c7be"
+    },
+    "binary_sha256": {
+      "build/v34-f1e2811/v3-4-unroll2/scorer": "01a6f38b26239319b9b32fc207c196cfdd36701c44e14c98242670ed35e7055e"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    },
+    "data/derived/hash-100000-w4096-pos.rbp": {
+      "sha256": "b8c6701c55e7fde9ba3eb98ce5b4dad10494a3ddd6dc33d8038c307e827a2e16",
+      "bytes": 38386501
+    },
+    "data/derived/hash-1000000-w4096-pos.rbp": {
+      "sha256": "67e19c8c6eec751f709b644488c8f4bd13e72a821831a7ca9d65133fc02bed34",
+      "bytes": 370880289
+    },
+    "data/derived/hash-100000-w1024-pos.rbp": {
+      "sha256": "66457344c0e14e2ba729b5147be7060e9fd9898ae5848dab1cd6073aa5c8c9e3",
+      "bytes": 46639664
+    },
+    "data/derived/hash-1000000-w1024-pos.rbp": {
+      "sha256": "3c653e914699ac9a6558d2889d0000aa29d573a5d045f43ea26d15fc2f6c68f5",
+      "bytes": 437105290
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_12.6.r12.6/compiler.35059454_0"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "[fixtures] python3 tests/check_range_bitpack.py build/v34-f1e2811/v3-4-unroll2/range_bitpack_tool build/v34-f1e2811/v3-4-unroll2/scorer --gpu 0 --max-k 1000 --encoding positions --single-kernel --v3-cases enforce --v34-cases --output results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/fixtures.d",
+    "[fixtures-radix1] python3 tests/check_range_bitpack.py build/v34-f1e2811/v3-4-unroll2/range_bitpack_tool build/v34-f1e2811/v3-4-unroll2/scorer --gpu 0 --max-k 1000 --encoding positions --single-kernel --v3-cases enforce --v34-cases --only-v3 --scorer-arg 1 --output results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/fixtures-radix1.d",
+    "[real-100000-w4096-k10] build/v34-f1e2811/v3-4-unroll2/scorer data/derived/hash-100000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-100000-w4096-k10.csv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-100000-w4096-k10.tsv 500 10 0 0 1 1 256 256 - 1",
+    "[real-100000-w4096-k100] build/v34-f1e2811/v3-4-unroll2/scorer data/derived/hash-100000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-100000-w4096-k100.csv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-100000-w4096-k100.tsv 500 100 0 0 1 1 256 256 - 1",
+    "[real-100000-w4096-k1000] build/v34-f1e2811/v3-4-unroll2/scorer data/derived/hash-100000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-100000-w4096-k1000.csv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-100000-w4096-k1000.tsv 500 1000 0 0 1 1 256 256 - 1",
+    "[real-1000000-w4096-k10] build/v34-f1e2811/v3-4-unroll2/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-1000000-w4096-k10.csv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-1000000-w4096-k10.tsv 500 10 0 0 1 1 256 256 - 1",
+    "[real-1000000-w4096-k100] build/v34-f1e2811/v3-4-unroll2/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-1000000-w4096-k100.csv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-1000000-w4096-k100.tsv 500 100 0 0 1 1 256 256 - 1",
+    "[real-1000000-w4096-k1000] build/v34-f1e2811/v3-4-unroll2/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-1000000-w4096-k1000.csv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-1000000-w4096-k1000.tsv 500 1000 0 0 1 1 256 256 - 1",
+    "[real-100000-w1024-k10] build/v34-f1e2811/v3-4-unroll2/scorer data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-100000-w1024-k10.csv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-100000-w1024-k10.tsv 500 10 0 0 1 1 256 256 -",
+    "[real-100000-w1024-k100] build/v34-f1e2811/v3-4-unroll2/scorer data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-100000-w1024-k100.csv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-100000-w1024-k100.tsv 500 100 0 0 1 1 256 256 -",
+    "[real-100000-w1024-k1000] build/v34-f1e2811/v3-4-unroll2/scorer data/derived/hash-100000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-100000-w1024-k1000.csv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-100000-w1024-k1000.tsv 500 1000 0 0 1 1 256 256 -",
+    "[real-1000000-w1024-k10] build/v34-f1e2811/v3-4-unroll2/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-1000000-w1024-k10.csv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-1000000-w1024-k10.tsv 500 10 0 0 1 1 256 256 -",
+    "[real-1000000-w1024-k100] build/v34-f1e2811/v3-4-unroll2/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-1000000-w1024-k100.csv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-1000000-w1024-k100.tsv 500 100 0 0 1 1 256 256 -",
+    "[real-1000000-w1024-k1000] build/v34-f1e2811/v3-4-unroll2/scorer data/derived/hash-1000000-w1024-pos.rbp data/derived/calibration-500.tsv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-1000000-w1024-k1000.csv results/2026-11-22-range-v3-tune/20261122-cuda5-gate-v3-4-unroll2-01/raw/real-1000000-w1024-k1000.tsv 500 1000 0 0 1 1 256 256 -"
+  ],
+  "artifacts": {
+    "analysis/compare-100000-w1024-k10.json": {
+      "sha256": "9a629f5b4b8a32561da5ddb7d00fc34cbf5842a4d453b723babc74bed60116d0",
+      "bytes": 350
+    },
+    "analysis/compare-100000-w1024-k100.json": {
+      "sha256": "dcb616693b55eaafd7dcb55e07d491c92b8e86fbd9ebf4055e8e687ec11bbe92",
+      "bytes": 354
+    },
+    "analysis/compare-100000-w1024-k1000.json": {
+      "sha256": "fd61be02171dade8fb9131ac2805d3cab5902596963ebdf62fe2870a5a1dfc5d",
+      "bytes": 358
+    },
+    "analysis/compare-100000-w4096-k10.json": {
+      "sha256": "6e7b5181b14aa45b4502983d2461a04b73eb3438019decec7d451e927733ea17",
+      "bytes": 350
+    },
+    "analysis/compare-100000-w4096-k100.json": {
+      "sha256": "7e58c2634b387200052d700117b5d2a8a668bd5a90db0f166c0ff2ba432e850a",
+      "bytes": 354
+    },
+    "analysis/compare-100000-w4096-k1000.json": {
+      "sha256": "54fd802622706762f4d89f6727907165b56779c772977b7ba6f65958ee095981",
+      "bytes": 358
+    },
+    "analysis/compare-1000000-w1024-k10.json": {
+      "sha256": "79b39f1bdf4c2b827b85b98101ed6c8f12bea77699fb26bc976d5f21edcbf465",
+      "bytes": 352
+    },
+    "analysis/compare-1000000-w1024-k100.json": {
+      "sha256": "d801e737064812f593b77f49a8d026bd0d81deea3ffcb3e55aad1466e608c8c9",
+      "bytes": 356
+    },
+    "analysis/compare-1000000-w1024-k1000.json": {
+      "sha256": "67235203010159a743ed4f84c2251958ad394b993a9e150b5707c82982ef1da3",
+      "bytes": 360
+    },
+    "analysis/compare-1000000-w4096-k10.json": {
+      "sha256": "3f4259d1981a982c3b531d2aafc7d2fdd557d790888968a6df95d893a17cd111",
+      "bytes": 352
+    },
+    "analysis/compare-1000000-w4096-k100.json": {
+      "sha256": "bbf882b81a1b928e081b790e3d183a8fc9431142a5ccb9594dcb358925c5e602",
+      "bytes": 356
+    },
+    "analysis/compare-1000000-w4096-k1000.json": {
+      "sha256": "a4961e093441e01fe6e3f70734f75d5605c72d5dbfd78c5496dd991da672e0f3",
+      "bytes": 360
+    },
+    "logs/binary-sha256.txt": {
+      "sha256": "53614b8a23d76c0b599a728491ccae17ae9443f18ef7b1a395dd0fc01740f9ec",
+      "bytes": 158
+    },
+    "logs/commands.txt": {
+      "sha256": "39e967f57b261cd57bc9792400188a98b047c0bae53f314dc9bd1f97a0430ea7",
+      "bytes": 5043
+    },
+    "logs/environment.txt": {
+      "sha256": "c4602c176bb272f8f89f576d302a7fe375394c1f548cbcdcbdb8088ea927b929",
+      "bytes": 276
+    },
+    "logs/gpu-pmon.log": {
+      "sha256": "75ae35eb0045c904350f5528761cce394e164548aa541c80dda0e145e5cad0a7",
+      "bytes": 16053
+    },
+    "logs/gpu-poll.log": {
+      "sha256": "d7b8002c328848bebb0e0df540e053292243dbc072c57de494b4ab1720ee83a0",
+      "bytes": 15274
+    },
+    "logs/host-utc-offset.txt": {
+      "sha256": "51ef6a6d539bbd38ac4fb4d8de42da0cf36eafb7fb7be71e3420d57982eebd9b",
+      "bytes": 6
+    },
+    "logs/idle-checks.txt": {
+      "sha256": "f110dd78478e84e784c6388099116cf8831e6167ee992f699aaba6e5a582e8e3",
+      "bytes": 1834
+    },
+    "logs/overlap-checks.jsonl": {
+      "sha256": "a5ecaecba297d12bd0c2b74f29bc1b2b8bd19b2687f4f61f6a2cf31c9ac92d8f",
+      "bytes": 2697
+    },
+    "logs/processes.tsv": {
+      "sha256": "dc49c6cd591eb09692b38ee2b528591d889427336e7c71afd3e8412db42a9575",
+      "bytes": 895
+    },
+    "logs/ptxas.log": {
+      "sha256": "b649e63570dce06f8bd3fbfae2832590e02bbb9eb1d165adf8e76c247340831b",
+      "bytes": 1235
+    },
+    "logs/sass-sha256.txt": {
+      "sha256": "4374122bebdea6a3d24fcbb7bf14bf4341d29401157f2f27810ecb71350d6b53",
+      "bytes": 65
+    },
+    "logs/stages.txt": {
+      "sha256": "44c1aa4b49ac973c5e8822bfb802de595aee29274db341b05be893f6a891d8d5",
+      "bytes": 721
+    },
+    "raw/fixtures-radix1.d/summary.json": {
+      "sha256": "d715a0089622bab781dae448b2393a2253b95d88a42cd4a52896519c70401749",
+      "bytes": 46894
+    },
+    "raw/fixtures-radix1.log": {
+      "sha256": "6c7af3591604b82238f4ce2090aca2d10f1c1a08c3cae5087a2ad1ed8ea589c7",
+      "bytes": 132
+    },
+    "raw/fixtures.d/summary.json": {
+      "sha256": "b126f48fd5ebd6141e8b20ba8d6bc94a1e7fce779b1cf9ef1fe0060c806a976d",
+      "bytes": 48631
+    },
+    "raw/fixtures.log": {
+      "sha256": "ae6d9f39dd20077aa1e6f11534727c228fda9521650e35c243e88f5e42b766c8",
+      "bytes": 33417
+    },
+    "raw/real-100000-w1024-k10.csv": {
+      "sha256": "5b362fefbf7df7376e69056f40443983982391311bdf0340c2548d90d57b480b",
+      "bytes": 115199
+    },
+    "raw/real-100000-w1024-k10.log": {
+      "sha256": "fcc7a27b8a5e4bdef67c8faacd586d6984626b7f7c12371ec893649716efe7cc",
+      "bytes": 359
+    },
+    "raw/real-100000-w1024-k10.tsv.sha256": {
+      "sha256": "ca8195c1cd46288724b07718a1b163df497657e273c2fea3d311fd80e0dde63a",
+      "bytes": 96
+    },
+    "raw/real-100000-w1024-k100.csv": {
+      "sha256": "a275f214df22f2493f58a65af1a2ea56124bb17c8eefd03bcc229a3a614a7506",
+      "bytes": 117159
+    },
+    "raw/real-100000-w1024-k100.log": {
+      "sha256": "d38a6159268aa4e10c0dbe19c6f4fdc6f26e38cd9f954eec54f4c32debf3f618",
+      "bytes": 360
+    },
+    "raw/real-100000-w1024-k100.tsv.sha256": {
+      "sha256": "3f6e79dfd0c96807ca408aca34a008c8c1623a9745e9779cea6072b48d7037a2",
+      "bytes": 97
+    },
+    "raw/real-100000-w1024-k1000.csv": {
+      "sha256": "3b9113943f530a3462b1e4498c7f1dd3c3326e62fed6fd78576593f47b144983",
+      "bytes": 119207
+    },
+    "raw/real-100000-w1024-k1000.log": {
+      "sha256": "1b8c588ead0d57ad5eebe1306d1aff2c6c62eccd47d7dd1af5a129d5e504111c",
+      "bytes": 362
+    },
+    "raw/real-100000-w1024-k1000.tsv.sha256": {
+      "sha256": "f1f51c8e4f7f0010a5a2e321fe65f475631b3f2c8b49526fd2c0eea3631f5c46",
+      "bytes": 98
+    },
+    "raw/real-100000-w4096-k10.csv": {
+      "sha256": "e75e68240730a72e14196b8964a2180e8e7344e781fb195d68eb252df1b84b70",
+      "bytes": 115200
+    },
+    "raw/real-100000-w4096-k10.log": {
+      "sha256": "830162a1c572b5f78458d89bae24d28aaebbdf5cd911a649b8cd8e59a14ce44f",
+      "bytes": 360
+    },
+    "raw/real-100000-w4096-k10.tsv.sha256": {
+      "sha256": "3cbcd30c850e53d452121c02ae92d6bed3272dc3a26cf75f35e2f14ffba33624",
+      "bytes": 96
+    },
+    "raw/real-100000-w4096-k100.csv": {
+      "sha256": "6ff6553d6cb36da8776267a580e2b86251fc9f83df10f2278ad0bb29450716f6",
+      "bytes": 117166
+    },
+    "raw/real-100000-w4096-k100.log": {
+      "sha256": "06bb465ca2cd29cc6aafcc1f6c5e14b63a098b437b2582ad7ad6dac3f9dfe687",
+      "bytes": 361
+    },
+    "raw/real-100000-w4096-k100.tsv.sha256": {
+      "sha256": "d2d1ef39356572f38d07829ab8d5c6994db4a2d19b62d0d60e7476971aeb6763",
+      "bytes": 97
+    },
+    "raw/real-100000-w4096-k1000.csv": {
+      "sha256": "16e8dcddd9888744035c484286eaaba53f71564ac21a4e6137680b4c382e54ca",
+      "bytes": 119139
+    },
+    "raw/real-100000-w4096-k1000.log": {
+      "sha256": "d8dea3ce6939c7cdaa6c573787c0e62f0aaa9093eb607a3392991637cd0bb466",
+      "bytes": 362
+    },
+    "raw/real-100000-w4096-k1000.tsv.sha256": {
+      "sha256": "a8aaeb9ac3e48a613a1f8d1609c398de37f7a74f3369b31734e2d3756454d41a",
+      "bytes": 98
+    },
+    "raw/real-1000000-w1024-k10.csv": {
+      "sha256": "b6a703c9f8eeab8c19f8fb2b2da7b2779d46b67afcbc566f108810072ffdfe62",
+      "bytes": 119190
+    },
+    "raw/real-1000000-w1024-k10.log": {
+      "sha256": "7f0f56faf75f54853f9f498cc6026b396ad65badfade6dcccda5bffd25972c55",
+      "bytes": 363
+    },
+    "raw/real-1000000-w1024-k10.tsv.sha256": {
+      "sha256": "6b3fa0ba3b2b2804e97ec2c7458e88f8a0205c1fa6745634bf90ae2699645d83",
+      "bytes": 97
+    },
+    "raw/real-1000000-w1024-k100.csv": {
+      "sha256": "5ec00056131d429235e68d92c08a8633171577874e1b21e21b8abf3467c7eb19",
+      "bytes": 121164
+    },
+    "raw/real-1000000-w1024-k100.log": {
+      "sha256": "8da3d23b0482546754c7c4d6f11dfe0ce9b08d4f6f450096d652a9d4eaaf1fe8",
+      "bytes": 364
+    },
+    "raw/real-1000000-w1024-k100.tsv.sha256": {
+      "sha256": "d71a995d30eaaab23812db1e61ef6d1d1d282535cd8c5720c8c4883a4379d3c7",
+      "bytes": 98
+    },
+    "raw/real-1000000-w1024-k1000.csv": {
+      "sha256": "7fdc5ab57ed27aabcbe3394659031becb1565d3a02778c4d07ca052e85056986",
+      "bytes": 121303
+    },
+    "raw/real-1000000-w1024-k1000.log": {
+      "sha256": "87aa4ede051ca5c9107dd85a0e3806e0e85c105ee0d3ab439d29fbb925cd588d",
+      "bytes": 366
+    },
+    "raw/real-1000000-w1024-k1000.tsv.sha256": {
+      "sha256": "3c18b0e57ae170b6ea4de790a65cecd898376bd591f1688ccc68478cec0dc097",
+      "bytes": 99
+    },
+    "raw/real-1000000-w4096-k10.csv": {
+      "sha256": "e5da8484d048b330dbcd86ebb73ccb87d0b08b64c321b116e2bace06b4850fd6",
+      "bytes": 119175
+    },
+    "raw/real-1000000-w4096-k10.log": {
+      "sha256": "c43b90d2d6af59c6afe2adbdf1591e580bad683dd342ddeacc6ea581444487e6",
+      "bytes": 364
+    },
+    "raw/real-1000000-w4096-k10.tsv.sha256": {
+      "sha256": "87ffd8ba40b6751971ea773970aba0370d844281ceaf772f834b10df4c2c57e5",
+      "bytes": 97
+    },
+    "raw/real-1000000-w4096-k100.csv": {
+      "sha256": "39fa3e60ac35ea0d7e6636b61c95c68225e71970a8b0351290ceff045970c149",
+      "bytes": 121292
+    },
+    "raw/real-1000000-w4096-k100.log": {
+      "sha256": "bdfbcd653f12ab10b9d5d56db8409ce3e2de2bcd0228cfe25ec2509e463f0759",
+      "bytes": 365
+    },
+    "raw/real-1000000-w4096-k100.tsv.sha256": {
+      "sha256": "8e3890dcbe894e63ca66d244714a22b0e127565fc842abd2ca1f4064f370d0cf",
+      "bytes": 98
+    },
+    "raw/real-1000000-w4096-k1000.csv": {
+      "sha256": "4e2ecd2b9113b9f6d9df1d263dc303e67d7c35d2dc38205a14222b7f39a0bcfc",
+      "bytes": 123087
+    },
+    "raw/real-1000000-w4096-k1000.log": {
+      "sha256": "4eb99a436a13c2ed69fb8e0ef1b785c37c95c61db35df81476eec5935c9ca7a8",
+      "bytes": 366
+    },
+    "raw/real-1000000-w4096-k1000.tsv.sha256": {
+      "sha256": "6ffaaba06ae7e1861cc6c7a8e7d8196fd86503515b649d0cd9e0a577ad0b11f3",
+      "bytes": 99
+    }
+  },
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [],
+    "excluded": [],
+    "recorded_artifacts_not_in_public_tree_or_lists": []
+  },
+  "pr_slimming": {
+    "note": "Removed from the pull request that adds src/cuda_range_v3.cu to main (raw per-round timing/profile data only); every removed file is listed with the SHA-256 and size it had in Git.",
+    "full_raw_outputs": {
+      "branch": "exp/arnav/2026-11-22-range-v3-tune",
+      "commit": "baa3188a81dc3cbbec0c8422cb7948cd00158bc0",
+      "run_bulk": null
+    },
+    "removed": [
+      {
+        "path": "raw/real-100000-w1024-k10.csv",
+        "sha256": "5b362fefbf7df7376e69056f40443983982391311bdf0340c2548d90d57b480b",
+        "bytes": 115199
+      },
+      {
+        "path": "raw/real-100000-w1024-k100.csv",
+        "sha256": "a275f214df22f2493f58a65af1a2ea56124bb17c8eefd03bcc229a3a614a7506",
+        "bytes": 117159
+      },
+      {
+        "path": "raw/real-100000-w1024-k1000.csv",
+        "sha256": "3b9113943f530a3462b1e4498c7f1dd3c3326e62fed6fd78576593f47b144983",
+        "bytes": 119207
+      },
+      {
+        "path": "raw/real-100000-w4096-k10.csv",
+        "sha256": "e75e68240730a72e14196b8964a2180e8e7344e781fb195d68eb252df1b84b70",
+        "bytes": 115200
+      },
+      {
+        "path": "raw/real-100000-w4096-k100.csv",
+        "sha256": "6ff6553d6cb36da8776267a580e2b86251fc9f83df10f2278ad0bb29450716f6",
+        "bytes": 117166
+      },
+      {
+        "path": "raw/real-100000-w4096-k1000.csv",
+        "sha256": "16e8dcddd9888744035c484286eaaba53f71564ac21a4e6137680b4c382e54ca",
+        "bytes": 119139
+      },
+      {
+        "path": "raw/real-1000000-w1024-k10.csv",
+        "sha256": "b6a703c9f8eeab8c19f8fb2b2da7b2779d46b67afcbc566f108810072ffdfe62",
+        "bytes": 119190
+      },
+      {
+        "path": "raw/real-1000000-w1024-k100.csv",
+        "sha256": "5ec00056131d429235e68d92c08a8633171577874e1b21e21b8abf3467c7eb19",
+        "bytes": 121164
+      },
+      {
+        "path": "raw/real-1000000-w1024-k1000.csv",
+        "sha256": "7fdc5ab57ed27aabcbe3394659031becb1565d3a02778c4d07ca052e85056986",
+        "bytes": 121303
+      },
+      {
+        "path": "raw/real-1000000-w4096-k10.csv",
+        "sha256": "e5da8484d048b330dbcd86ebb73ccb87d0b08b64c321b116e2bace06b4850fd6",
+        "bytes": 119175
+      },
+      {
+        "path": "raw/real-1000000-w4096-k100.csv",
+        "sha256": "39fa3e60ac35ea0d7e6636b61c95c68225e71970a8b0351290ceff045970c149",
+        "bytes": 121292
+      },
+      {
+        "path": "raw/real-1000000-w4096-k1000.csv",
+        "sha256": "4e2ecd2b9113b9f6d9df1d263dc303e67d7c35d2dc38205a14222b7f39a0bcfc",
+        "bytes": 123087
+      }
+    ]
+  }
+}

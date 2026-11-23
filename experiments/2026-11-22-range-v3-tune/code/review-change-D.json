@@ -1,0 +1,50 @@
+{
+  "change": "D: RBP_V3_MERGE_RADIX (default 0 = v3-3's merge_lists). The last block merges by compaction + radix select + bitonic sort instead of the warp-shuffle merge.",
+  "written": "before the code change",
+  "motivation": "laptop development profile (dry-03, CUDA 13.3, not a result): the last block's merge is about 84% of the kernel at k=1000 (merge select ~0.80 ms of ~1.02 ms) and about half at k=100; v3-3's merge_lists picks one candidate per round per warp (k rounds of shuffles), so it scales with k in a single block.",
+  "design": [
+    "After the merging block reads the final theta (final_cut), with the v3-3 fence/ticket protocol unchanged:",
+    "1. Survivor count per range l (one thread per range): list l holds lengths[l] candidates in canonical (descending) order, so the survivors (score >= final_cut, ties kept) are a prefix; a binary search gives its length c_l. c_l overwrites lengths[l] (the array is rewritten by every range before its ticket in the next launch).",
+    "2. Exclusive block prefix sum over c_0..c_{R-1} (each thread scans a contiguous chunk serially, warp shuffle scan of chunk sums, one serial pass over the warp totals), written back into lengths[] as offsets; S = total survivors.",
+    "3. Compaction: warp w copies lists l = w, w + warps, ... (lane-strided) into keys[offset_l + e] = merge key of candidate e.",
+    "4. Radix select (8-bit digits, same procedure as the range blocks: block max key, start at its top digit, per pass zero the 256 buckets, count keys whose higher digits match the prefix, warp 0 finds the boundary bucket, stop when it holds exactly the remaining count or the digit is the last) for the want-th largest key, want = min(k, S); if want == S every key wins (threshold 0).",
+    "5. Gather the keys >= threshold into dynamic shared memory [0, want), pad to P = next power of two >= want with 0, bitonic sort descending (same network as the range blocks), map each key back to its document and write output[0..want).",
+    "Keys: in dynamic shared memory after the P winner slots when S fits (capacity = %dynamic_smem_size / 8 - P), otherwise in a global scratch buffer of R x k keys (allocated only with the switch on).",
+    "Merge-only shared state (256 buckets, 32 warp maxima, 4 state words) is static shared memory inside the switch; dynamic shared memory is raised to at least P x 8 bytes on the host when the switch is on (the radix instantiation already reserves exactly P x 8 at the start).",
+    "The host builds two N-entry uint32 tables: global_rank[doc] = rank of the document's original ID among all N IDs (0 = smallest), and rank_doc = its inverse; both are passed in RbpView only with the switch on."
+  ],
+  "key_layout": {
+    "bits": "key = (score << 32) | (0xFFFFFFFF - global_rank[doc]); bits 63..32 = score, bits 31..0 = inverted global ID rank",
+    "order": "larger key = higher score; equal scores -> smaller global rank -> smaller original numeric ID; exactly the contract's order (candidate_better: score descending, then original ID ascending). The tie part is global (all N documents), not the per-range tie rank, so ties across ranges are ordered correctly.",
+    "no_overflow": "score: the host's overflow gate requires weight_sum * 255 * multiplicity < 2^32 - 1 for every query, so every score is <= 2^32 - 2 and fits bits 63..32 without truncation. rank: N <= 2^32 - 1 documents (uint32 document indexes), so global_rank <= 2^32 - 2 and 0xFFFFFFFF - rank is in [1, 2^32 - 1]: it fits 32 bits, cannot borrow into the score bits, and every real key is >= 1, so the 0 padding sorts after every real key.",
+    "uniqueness": "original IDs are unique (the host requires it), so global ranks and keys are unique; the radix procedure relies on that to terminate with exactly want keys >= threshold."
+  },
+  "exactness": [
+    "Survivor set = v3-3's: merge_lists treats a head below final_cut as the end of its list; here the same prefix (score >= final_cut) of each list is compacted.",
+    "The survivors contain the global top min(k, N): theta never exceeds the global k-th score (v3-3 argument, review-change-2 of the v3 experiment), every global top-k document is in its own range's local top-k list, and the range wrote every entry at or above its cut_now <= final_cut. So S >= wanted and the top want keys of the survivors are the global top-k in contract order.",
+    "Radix select over unique keys returns the exact want-th largest; the gather therefore collects exactly want keys; bitonic sort gives descending key order = canonical order."
+  ],
+  "edge_cases_and_bugs_checked": [
+    "theta = 0 with every range full (S = R x k, the worst case): fixture v34-theta0-full-* (k = 10..1000, W = 1024 and 4096); with k = 1000 and W = 1024, S = 6,000 exceeds the shared capacity, so the global path runs.",
+    "Ties at the global k-th score spread across many ranges with shuffled IDs: fixture v34-global-ties and the v3 theta-ties-at-kth case.",
+    "Ranges with fewer than k documents (lists shorter than k) and k > N: fixtures v34-k-above-range, v34-k-above-n, v3 theta-k-above-range (W=3).",
+    "Every score 0 (theta 0, ties all at 0, decided by original ID): v3 theta-all-zero, v34-zero-range.",
+    "W = 1 and W = 3 indexes (thousands of ranges, more ranges than threads): the v3 lookup cases; the prefix sum handles R > threads with per-thread chunks.",
+    "Warp-list instantiation (k < crossover): its dynamic shared memory may be smaller than P x 8 (e.g. 32 threads, W = 1); the host raises it to P x 8 when the switch is on.",
+    "S == want: no radix pass, threshold 0.",
+    "lengths[] is overwritten with offsets only in the merging block, after every other block has taken its ticket; the next launch rewrites every entry before any ticket.",
+    "Global scratch writes are read back by other threads of the same block only after __syncthreads, which orders global memory within a block.",
+    "The RBP_V3_STATS survivor count runs before the merge and reads lengths[] unchanged."
+  ],
+  "risks": [
+    "Extra device memory with the switch on: 8 x N bytes (two rank tables; 8 MB at 1M documents) and 8 x R x k bytes of scratch (2 MB at W=4096, k=1000; 7.8 MB at W=1024).",
+    "Static shared memory +~1.3 KB per block with the switch on; may cost a resident block at some (W, k); recorded in the resource table.",
+    "Raising dynamic shared memory to P x 8 for the warp-list instantiation can reduce blocks per SM at small W with k near the crossover.",
+    "If S is small (high theta at small k), the fixed costs (prefix sum over R ranges, barriers) may make D slower than merge_lists at k = 10; the flag can be combined with a k threshold later.",
+    "The compaction reads candidates with lane-strided 24-byte loads (two sectors per candidate)."
+  ],
+  "checks_planned": [
+    "CUDA 12.6 compile-only: flags off -> SASS a644e9d5125d6e7e.",
+    "Laptop gates for v3-4-mergeradix and v3-4-all (fixtures at both crossovers; 100K/1M x 500 queries x k=10/100/1000 at W=4096 crossover 1 and W=1024 default crossover)."
+  ]
+}

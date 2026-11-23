@@ -1,0 +1,48 @@
+{
+  "threads": 256,
+  "kernels": [
+    {
+      "mangled": "_Z12range_scores7RbpView9QueryArgsjjP12GpuCandidatePjPtS2_S2_S3_S3_",
+      "arch": "sm_89",
+      "registers": 40,
+      "barriers": 1,
+      "stack_bytes": 1024,
+      "static_shared_bytes": 3744,
+      "spill_store_bytes": 0,
+      "spill_load_bytes": 0,
+      "per_setting": {
+        "k10": {
+          "dynamic_shared_bytes": 4736,
+          "total_shared_bytes": 8480,
+          "blocks_per_sm_estimate": 6,
+          "limits": {
+            "registers": 6,
+            "threads": 6,
+            "shared": 10
+          }
+        },
+        "k100": {
+          "dynamic_shared_bytes": 10496,
+          "total_shared_bytes": 14240,
+          "blocks_per_sm_estimate": 6,
+          "limits": {
+            "registers": 6,
+            "threads": 6,
+            "shared": 6
+          }
+        },
+        "k1000": {
+          "dynamic_shared_bytes": 12288,
+          "total_shared_bytes": 16032,
+          "blocks_per_sm_estimate": 6,
+          "limits": {
+            "registers": 6,
+            "threads": 6,
+            "shared": 6
+          }
+        }
+      }
+    }
+  ],
+  "note": "For each range_scores instantiation: registers and\nstatic shared memory as reported by ptxas; dynamic shared memory from the\nhost formula (passed in by the gate as --dynamic K=BYTES); and an ESTIMATE of\nresident blocks per SM on sm_89 (65,536 registers with per-thread registers\nrounded up to a multiple of 8, 1,536 threads, 100 KB shared plus 1 KB per\nblock for the driver). Nsight Compute on the timing host is the authority."
+}

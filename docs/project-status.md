@@ -1,5 +1,19 @@
 # Current project status
 
+## November 23: range scorer v3 (`cuda_range_v3`, "u4m")
+
+`src/cuda_range_v3.cu` is a new exact scorer: the range scorer v2 (V2-5) plus four changes, each tested separately: a theta-filtered merge (candidates below a shared k-th-score bound are not written), radix-select local top-k, an unrolled decode (four postings' loads in flight per lane) and a last-block merge by compaction + radix select. Answers are the canonical top-k (score, then original ID). Configuration: range size 4096, 256 threads, radix at every k. `src/cuda_range_v2.cu` is unchanged and remains the exhaustive control. Evidence: [2026-11-17-range-v3](../experiments/2026-11-17-range-v3/report.md), [2026-11-22-range-v3-tune](../experiments/2026-11-22-range-v3-tune/report.md) (Measurements E, P2, F) and [2026-11-23-range-v3-pr](../experiments/2026-11-23-range-v3-pr/README.md) (the new file's SASS equals the timed build; gates).
+
+Full collection (8,841,823 passages), 500 calibration queries, one cuda5 session (run `20261122-cuda5-timingF-01`), 3 processes per scorer x 23 rounds, every answer equal to the CPU reference. Median latency in ms; ratios are paired geometric means with crossed-bootstrap 95% intervals:
+
+| k | v3 (u4m), W=4096 | v2, W=1024 | pruned `prune_tm`, W=256, 64 seeds | v3 / v2 | v3 / pruned |
+|---|---:|---:|---:|---|---|
+| 10 | 0.403 | 0.687 | 0.239 | 0.577 [0.573, 0.580] | 1.553 [1.489, 1.620] |
+| 100 | 0.455 | 2.680 | 0.692 | 0.172 [0.170, 0.174] | 0.659 [0.634, 0.685] |
+| 1000 | 0.833 | 12.391 | 3.226 | 0.069 [0.068, 0.070] | 0.223 [0.213, 0.233] |
+
+v3 is faster than the exhaustive v2 at every depth and faster than the pruned scorer at k=100 and k=1000; at k=10 the pruned scorer is faster (v3 still scores every posting). **These are calibration-only results, measured after the freeze** (the calibration queries chose v3's settings, and the held-out queries were used in #27); they are not a held-out evaluation. **The frozen evaluation (#27) is unchanged**: v3 was not part of it, and its scorers, settings and results stand as recorded.
+
 November 18 compact-control update: Compact document-weight storage reduces paired query time by 1.93% and sampled GPU memory by 36.1% versus the guarded FP32-storage GPUSparse adaptation. The unchanged exhaustive range scorer remains 8.27× faster (conditional 95% interval 8.14–8.39) on all 8,841,823 passages, 500 calibration queries, RTX 4070, k=10 and batch size 1. All 6,480 held-out queries remain unused. [Report](../experiments/2026-11-17-gpusparse-u8-storage/report.md). Newer team pruning, CPU and profile results retain their own protocols and qualifications.
 
 

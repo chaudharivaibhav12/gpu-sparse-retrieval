@@ -1,0 +1,42 @@
+{
+  "change": "B: RBP_V3_RADIX_AGG (radix path only). 1 = B2, skip score-0 keys in the radix passes and the gather when the range has at least want nonzero documents; 2 = B1 + B2, plus warp-aggregated bucket adds with __match_any_sync. Default 0 = v3-3.",
+  "written": "before the code change",
+  "motivation": "CPU replay of the laptop dry run (25 calibration queries, W=4096, development): about 48% of a range's documents score 0; in about 97% of ranges the first pass's largest bucket (digit 0, scores < 4096) holds more than half the keys; the modeled same-bucket depth of a warp's bucket atomicAdd is about 30 of 32 lanes in pass 1. Expected gain is small: radix select+gather is about 8% of the pre-merge critical path (laptop development reading).",
+  "design": {
+    "B2": [
+      "In the existing max-key loop (only when want < range_docs, i.e. when passes run) every thread also counts its nonzero-score slots; a warp sum (__reduce_add_sync) per warp is stored next to the warp max and summed after the existing barrier, so no extra barrier is added.",
+      "skip0 = nonzero >= want. If skip0, the passes count only keys with score != 0 (zero-score slots are skipped before their tie_rank load) and the gather skips them too. If not, the passes and gather are exactly v3-3's.",
+      "The max-key loop itself is unchanged (it still visits every slot)."
+    ],
+    "B1": [
+      "Only with RBP_V3_RADIX_AGG=2, in the passes (not the gather): the slot loop runs warp-uniformly (s0 = warp base, s = s0 + lane, condition on s0), each lane computes its bucket b or 'none' (256), peers = __match_any_sync(full mask, b), and the lowest lane of each group with b != none adds __popc(peers) to buckets[b].",
+      "Implemented only after B2 passes its fixtures."
+    ],
+    "not_done": "no per-warp private buckets (as specified)"
+  },
+  "exactness": [
+    "Keys are unique and a nonzero score always beats a zero score in the key's high bits, so when the range has >= want nonzero documents the want largest keys are all nonzero-score keys: the want-th largest key over the nonzero keys equals the want-th largest over all keys, and the gather (key >= threshold) selects exactly the same keys. Zero-score keys are below that threshold, so skipping them in the gather changes nothing; it only avoids their tie_rank loads.",
+    "When nonzero < want the zero-score keys are part of the answer (ties at score 0 decided by tie rank) and skip0 is false: v3-3 behaviour exactly.",
+    "Pass termination is unchanged: keys are unique, so the boundary bucket eventually holds exactly the remaining count, or the last digit is reached.",
+    "B1 adds the same count to the same bucket (popc of the lanes sharing it), so every bucket total, and hence every boundary, is unchanged."
+  ],
+  "edge_cases_and_bugs_checked": [
+    "want == range_docs (k >= range docs): no passes, threshold 0, all keys gathered, zeros included: B never applies (the counting is inside the want < range_docs branch).",
+    "nonzero exactly want-1 / want / want+1: fixture v34-nonzero-around-* (k-1, k, k+1 per range, every k, both W). want-1 keeps v3-3 behaviour; want and want+1 skip zeros.",
+    "A range where every document scores 0: nonzero = 0 < want, v3-3 path (fixture v34-zero-range).",
+    "Ties at the k-th score across the zero/nonzero boundary: fixture v34-zero-boundary-ties-* (k-3 nonzero: k-th is a zero tie, v3-3 path; exactly k nonzero with the smallest scores tied: skip path).",
+    "B1: the loop condition must be warp-uniform for __match_any_sync with a full mask; s0 = thread - lane + i*threads is the same for all lanes of a warp, and threads is a multiple of 32 (host check). Out-of-range lanes (s >= range_docs, only in the last iteration) take part with b = none and load nothing.",
+    "B1: 'none' = RBP_RADIX_BUCKETS (256) is outside the bucket range, so it never collides with a real digit.",
+    "__reduce_add_sync needs sm_80+; builds are sm_89 only.",
+    "Static shared memory grows by 128 bytes (per-warp nonzero counts) only when the switch is on; recorded in the resource table."
+  ],
+  "risks": [
+    "The extra nonzero count in the max loop costs one compare/add per slot; B2 pays off only if enough zero keys are skipped in the passes (pass 1 counts every slot; the replay says ~48% are zero).",
+    "B1: __match_any_sync is not free (it is a multi-cycle instruction); with mostly-distinct buckets in later passes it can cost more than the atomics it saves. The replay says pass 1 is ~30-deep, pass 2 ~14-16, later passes ~1-2.",
+    "Skipping zeros helps the range blocks, not the merge, which dominates at k >= 100 (change D)."
+  ],
+  "checks_planned": [
+    "CUDA 12.6 compile-only: flags off -> SASS a644e9d5125d6e7e.",
+    "Laptop gates for v3-4-skip0 and v3-4-aggskip (fixtures at both crossovers; 100K/1M x 500 queries x k=10/100/1000 at W=4096 crossover 1 and W=1024 default crossover)."
+  ]
+}
