@@ -1,0 +1,124 @@
+{
+ "schema_version": 1,
+ "experiment_id": "2026-11-23-gpusparse-k1000-batch",
+ "title": "GPUSparse at k=1000 (batch 1) and at batch 500, against range scorer v3",
+ "owner": "parva",
+ "branch": "exp/parva/2026-11-23-gpusparse-k1000-batch",
+ "status": "run A (cuda2) completed 2026-11-23; run B (cuda5) not run, GPU occupied",
+ "parent_experiment": "2026-11-23-v3-streams-gpusparse",
+ "code_paths": [
+  "experiments/2026-11-23-gpusparse-k1000-batch/analysis/analyze.py",
+  "experiments/2026-11-23-gpusparse-k1000-batch/code/check_gs.py",
+  "experiments/2026-11-23-gpusparse-k1000-batch/code/gate.py",
+  "experiments/2026-11-23-gpusparse-k1000-batch/code/gs_batch.py",
+  "experiments/2026-11-23-gpusparse-k1000-batch/code/gsk/canonical_baseline.py",
+  "experiments/2026-11-23-gpusparse-k1000-batch/code/gsk/expected_config.py",
+  "experiments/2026-11-23-gpusparse-k1000-batch/code/gsk/fp32_monolithic.py",
+  "experiments/2026-11-23-gpusparse-k1000-batch/code/gsk/gsp_input.py",
+  "experiments/2026-11-23-gpusparse-k1000-batch/code/gsk/runtime_gate.py",
+  "experiments/2026-11-23-gpusparse-k1000-batch/code/gsk/storage_domain.py",
+  "experiments/2026-11-23-gpusparse-k1000-batch/code/gsk/u64_monolithic.py",
+  "experiments/2026-11-23-gpusparse-k1000-batch/code/guarded_domain.py",
+  "experiments/2026-11-23-gpusparse-k1000-batch/code/run.py"
+ ],
+ "configuration_files": [
+  "experiments/2026-11-23-gpusparse-k1000-batch/configs/protocol.json"
+ ],
+ "declared_changes": {
+  "shared_files": "none modified",
+  "adapter": "code/gsk: copy of the team's GPUSparse adapter with k limit 128 -> 1000"
+ },
+ "query_split": "calibration-500 only",
+ "runs": [
+  {
+   "run_id": "20261123-cuda2-gsb-01",
+   "kind": "recorded",
+   "host": "cuda2",
+   "status": "completed",
+   "ineligible_processes": 1,
+   "results": "results/2026-11-23-gpusparse-k1000-batch/20261123-cuda2-gsb-01",
+   "readme": "experiments/2026-11-23-gpusparse-k1000-batch/runs/20261123-cuda2-gsb-01/README.md",
+   "statistics": {
+    "configurations": {
+     "v3-k1000": {
+      "median_ms": 1.67645,
+      "p95_ms": 2.3262572499999994,
+      "p99_ms": 2.6638409500000004,
+      "one_at_a_time_qps": 572.7998870896862,
+      "per_process_median_ms": [
+       1.6759625,
+       1.6773449999999999,
+       1.67426
+      ]
+     },
+     "gs-k1000": {
+      "median_ms": 8.94220075,
+      "p95_ms": 12.535727300000001,
+      "p99_ms": 13.052570215,
+      "one_at_a_time_qps": 110.41230643837358,
+      "per_process_median_ms": [
+       8.953866,
+       8.952593,
+       8.927635
+      ]
+     },
+     "v3-k1000-streams-b32": {
+      "throughput_qps": 746.6442076089018,
+      "per_process_median_qps": [
+       746.6238603425944,
+       746.6589810828672,
+       746.6651136319074
+      ],
+      "round_ms": 669.663
+     },
+     "gs-canonical-k1000-b500": {
+      "throughput_qps": 404.7043856163608,
+      "per_process_median_qps": [
+       404.57168627414035,
+       404.72712896822316,
+       404.727813787008
+      ],
+      "round_ms": 1235.4696854557305
+     },
+     "gs-native-k1000-b500": {
+      "throughput_qps": 453.04798312613195,
+      "per_process_median_qps": [
+       453.0185251334632,
+       452.97186305155094,
+       453.1377830525388
+      ],
+      "round_ms": 1103.6358589434362
+     }
+    },
+    "contrasts": {
+     "GPUSparse time / v3 time, batch 1, k1000": {
+      "ratio": 5.181620012747102,
+      "interval_95": [
+       5.091247230549447,
+       5.275439276055699
+      ]
+     },
+     "v3 streams b32 / gs-canonical-k1000-b500 throughput": {
+      "ratio": 1.845108464936648,
+      "interval_95": [
+       1.8448489448555367,
+       1.845400517651477
+      ]
+     },
+     "v3 streams b32 / gs-native-k1000-b500 throughput": {
+      "ratio": 1.6480183408006834,
+      "interval_95": [
+       1.6477166552819626,
+       1.6483159854356617
+      ]
+     }
+    }
+   }
+  },
+  {
+   "run_id": "dev-gsb-01",
+   "kind": "development",
+   "status": "smoke test; timings not read"
+  }
+ ]
+}

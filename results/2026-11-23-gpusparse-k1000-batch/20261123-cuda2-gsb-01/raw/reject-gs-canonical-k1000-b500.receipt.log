@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/scratch/psp8502/runsrc/20261123-cuda2-gsb-01/experiments/2026-11-23-gpusparse-k1000-batch/code/gs_batch.py", line 122, in <module>
+    with torch.inference_mode(): raise SystemExit(main())
+                                                  ^^^^^^
+  File "/scratch/psp8502/runsrc/20261123-cuda2-gsb-01/experiments/2026-11-23-gpusparse-k1000-batch/code/gs_batch.py", line 85, in main
+    runtime_report(cfg, dict(contract="GSP-CAP32-F32GUARDED-NUMERIC-TIES-v1" if a.mode == "canonical" else "score-exact-arbitrary-ties", timing="padding-and-upload-through-host-scores-and-original-ids"))
+  File "/scratch/psp8502/runsrc/20261123-cuda2-gsb-01/experiments/2026-11-23-gpusparse-k1000-batch/code/gsk/runtime_gate.py", line 17, in runtime_report
+    if (directory/'reject').exists():raise RuntimeError('Research runtime gate rejected')
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Research runtime gate rejected
