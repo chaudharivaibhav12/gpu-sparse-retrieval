@@ -16,7 +16,7 @@ ARCH, CORES, SIBLING, SAMPLER, BASE, ORA = {"cuda2": ("sm_75", range(3, 20, 2), 
     "cuda5": ("sm_89", range(2, 16, 2), None, 1, Path("/scratch/psp8502/v3s"), None)}[HOST]
 F = Path("/scratch/psp8502/full"); ENV = Path("/scratch/psp8502/gpusparse-env"); HOME = BASE
 GSP, RBP = F / "full-8841823.gsp", Path(W4096)
-Q = F / "calibration-500.tsv" if HOST == "cuda2" else EXP.parents[1] / "data/derived/calibration-500.tsv"
+Q = F / "calibration-500.tsv" if HOST == "cuda2" else Path("/scratch/psp8502/gpu-sparse-retrieval/data/derived/calibration-500.tsv")
 ORACLE = {k: Path(ORA % k) if ORA else F / "oracle-cuda5" / ("cpu-top%d-8841823.tsv" % k) for k in (10, 100, 1000)}
 PINS = {GSP: "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac", RBP: "06368cee88e0b1104760ecb1672be511e2685990b35178021dacdcd8eee98ba6",
         Q: "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091", ORACLE[10]: "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed"}
