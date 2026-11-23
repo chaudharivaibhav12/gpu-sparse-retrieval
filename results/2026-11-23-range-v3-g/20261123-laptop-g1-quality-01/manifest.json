@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-23-range-v3-g",
+  "run_id": "20261123-laptop-g1-quality-01",
+  "status": "completed-measurement-G1",
+  "scope": "Measurement G1 (CPU only): MRR@10, nDCG@10, Recall@1000 of the exact top-1000 for the 500 calibration queries against MS MARCO dev.small qrels (new external input, configs/inputs-qrels.json); calibration only, after the freeze",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "e17b509756f29e35bb2566e414ff5ecd918aba68",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "python3 (standard library)",
+    "source_sha256": {
+      "experiments/2026-11-23-range-v3-g/analysis/g1_quality.py": "145417f9c78525e408ea883ea3506421aed2128415732b1ad767e0e47b7302d7",
+      "experiments/2026-11-23-range-v3-g/configs/inputs-qrels.json": "952d9df32640dc69952d2bd2f62599c710ea7de792c28cee4671d96629c46398"
+    },
+    "binary_sha256": {}
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    }
+  },
+  "environment": {
+    "host": "arnavgupta829",
+    "kernel": "Linux 6.6.87.2-microsoft-standard-WSL2",
+    "gpu": "NVIDIA GeForce RTX 4070 Laptop GPU, 617.14, 8188 MiB, 8.9",
+    "nvcc": [
+      "Build cuda_13.3.r13.3/compiler.38244171_0"
+    ],
+    "gxx": [
+      "g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0"
+    ],
+    "python": "Python 3.14.4"
+  },
+  "commands": [
+    "python3 experiments/2026-11-23-range-v3-g/analysis/g1_quality.py --qrels run-bulk/2026-11-23-range-v3-g/inputs/qrels.dev.small.tsv --run run-bulk/2026-11-22-range-v3-tune/20261122-cuda5-fullinputs-01/oracle/cpu-top1000-8841823.tsv --queries data/derived/calibration-500.tsv --output analysis/g1-quality.json"
+  ],
+  "artifacts": {
+    "analysis/g1-quality.json": {
+      "sha256": "1b188bbcca71e37bb0488371d71c3bf834554bf0cd6aba52e20fdbb6ae37c33c",
+      "bytes": 2259
+    },
+    "logs/commands.txt": {
+      "sha256": "c640da03c5e67192236fe3b66467b9fe4d1a969f65dec2aa50f7755a08948e07",
+      "bytes": 308
+    }
+  }
+}

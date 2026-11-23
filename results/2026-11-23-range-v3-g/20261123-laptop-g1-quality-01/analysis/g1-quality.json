@@ -1,0 +1,41 @@
+{
+  "inputs": {
+    "qrels": "/home/arnav/csciga3033-025/project/run-bulk/2026-11-23-range-v3-g/inputs/qrels.dev.small.tsv",
+    "qrels_sha256": "ddc607dbe7b748d7168e8675a242f0811d47febaa2e69d3af09d7ab249c68d7e",
+    "run": "/home/arnav/csciga3033-025/project/run-bulk/2026-11-22-range-v3-tune/20261122-cuda5-fullinputs-01/oracle/cpu-top1000-8841823.tsv",
+    "run_sha256": "302b63d4fc0c55cb41eeb9f63ad9b108706ead26edb36304e7c57fbd9c9dc086",
+    "queries": "data/derived/calibration-500.tsv",
+    "queries_sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"
+  },
+  "queries": 500,
+  "orders": {
+    "canonical": {
+      "mean": {
+        "mrr_at_10": 0.36838333333333334,
+        "ndcg_at_10": 0.44394146353214947,
+        "recall_at_1000": 0.9843333333333334
+      },
+      "queries_with_relevant_in_top10": 349,
+      "queries_with_all_relevant_in_top1000": 491
+    },
+    "trec_eval": {
+      "mean": {
+        "mrr_at_10": 0.3684476190476191,
+        "ndcg_at_10": 0.443993374120732,
+        "recall_at_1000": 0.9843333333333334
+      },
+      "queries_with_relevant_in_top10": 349,
+      "queries_with_all_relevant_in_top1000": 491
+    }
+  },
+  "definitions": "(trec_eval-compatible; relevance = grade > 0, gains = grades, all grades here are 1):\n- MRR@10 (MS MARCO official): mean over queries of 1 / rank of the first relevant passage among\n  the first 10, or 0 if none;\n- nDCG@10 (trec_eval ndcg_cut_10): DCG@10 = sum_{i=1..10} gain_i / log2(i + 1); IDCG@10 from the\n  query's judged grades sorted descending; nDCG = DCG / IDCG (0 if IDCG = 0);\n- Recall@1000 (trec_eval recall_1000): |relevant in the first 1000| / |relevant|.\nMeans are over the 500 calibration queries (each has at least one relevant passage). Two orders:\n\"canonical\" = the run's ranks (score descending, then smaller original ID: the team contract);\n\"trec_eval\" = trec_eval's own re-sort (score descending, then document ID descending as strings);\nthey differ only inside score ties.",
+  "queries_whose_top10_order_differs_under_trec_eval_ties": 28,
+  "paper_reference": {
+    "source": "GPUSparse, arXiv 2606.26441",
+    "queries": 6980,
+    "scoring": "FP32",
+    "mrr_at_10": 0.383,
+    "ndcg_at_10": 0.449,
+    "recall_at_1000": 0.983
+  }
+}
