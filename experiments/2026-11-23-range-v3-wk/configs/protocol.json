@@ -1,6 +1,6 @@
 {
   "experiment_id": "2026-11-23-range-v3-wk",
-  "status": "part 1 (GPU rule, inputs, feasibility and gates) written before any GPU work; the timing design and decision rules H1-H4 are registered in part 2 after the gates and before timing",
+  "status": "part 1 (GPU rule, inputs, feasibility and gates) and part 2 (timing design, decision rules H1-H4) registered before any timing; part 2 was registered while the pre-registration gates were running, with the grid and k=316 decided by the fixed rules below from that run's results",
   "owner": "Arnav",
   "label": "calibration queries only (500), after the freeze",
   "gpu_policy": {
@@ -22,5 +22,22 @@
     "upper_edge": "W=4096 is the largest W tested; if it is best at some k, a larger W was not ruled out (stated in the report)",
     "indexes": "W=8192 build stopped by exact PID (no partial output existed); W=16384 not built; W=512 and W=2048 kept (see the inputs STATUS)",
     "rules": "H1-H4 unchanged; H2's regret table over the W values timed at every k"
+  },
+  "part_2": {
+    "registered": "2026-11-23, before any H timing (owner instruction; the launch is automated on cuda5 so it does not depend on the laptop)",
+    "grid": "W in {256, 512, 1024, 2048, 4096} x k in {10, 100, 1000} (15 cells). Cells whose gate fails are infeasible; if any cell fails, the timing session is not started and the owner is asked.",
+    "k316": "k=316 is added at every W only if the pre-registration estimate including it (analysis/feasibility.json estimate_minutes.grid_with_k316) is <= 90 minutes",
+    "gpu_time_rule": "if the 15-cell estimate (estimate_minutes.grid) is > 90 minutes, the timing session is not started and the owner is asked",
+    "design": "one cuda5 session (code/run_h.sh); 3 processes per cell, each 500 calibration queries x (3 warm-up + 20 measured rounds), batch 1, 256 threads, radix at every k (crossover 1); W rotated within each k: process round p runs the W list (256, 512, 1024, 2048, 4096) cyclically shifted by p; every timed output checked against the oracle prefix (exact, else the session stops)",
+    "statistic": "per cell: pooled median, p95, p99 over the 3 x 500 per-process query medians of query_wall_ms; W / 4096 at the same k: geometric mean of paired (process round p, query) ratios, crossed bootstrap over processes and queries, 10,000 draws, seed 20261125 (analysis/analyze_h.py)",
+    "H1": "best W per k: the W with the lowest geometric-mean ratio; it differs from 4096 only if its upper 95% bound is < 1",
+    "H2": "best single W: regret(W, k) = ratio(W, k) / best ratio at k; choose the W with the smallest maximum regret across the timed k values, over the W timed at every k; ties (equal to 3 decimals) broken by the geometric mean of its ratios across k; the regret table is reported",
+    "H3": "if H2's W is not 4096, report its gain per k and recommend it only if no k has an upper bound > 1.02",
+    "H4": "at k=10, W=256 / W for every other W (paired, same session, 95% intervals); 'W=256 is best at k=10' only if every upper bound is < 1",
+    "upper_edge": "W=4096 is the largest W tested; if it is best at some k, a larger W was not ruled out",
+    "diagnostic_profile": "after timing, not timed: clock build (-DRBP_STAGE_CLOCKS), first 25 calibration queries, k=10 at W=256, 1024 and 4096, 3 + 5 rounds; setup, decode+add, local top-k, candidate write (mean per block, critical path), merge tail, kernel span; waves from the feasibility table",
+    "cross_session_check": "W=4096 pooled medians against Measurement F's 0.403 / 0.455 / 0.833 ms at k = 10 / 100 / 1000 (descriptive)",
+    "gpu_policy": "as part 1 (holder, 5-sample clear window, retry every 300 s for up to 12 hours from the timing launch, then stop and report)",
+    "label": "calibration queries only (500), after the freeze"
   }
 }
