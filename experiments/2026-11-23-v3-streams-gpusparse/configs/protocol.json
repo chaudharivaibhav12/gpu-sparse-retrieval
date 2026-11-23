@@ -38,6 +38,14 @@
       "change": "the whole run uses cuda2 GPU 1 instead of GPU 0 (same model, RTX 2080 Ti); device selection in code/run.py only",
       "reason": "another user repeatedly starts short GPU jobs on GPU 0; run 20261123-cuda2-v3s-02 waited for a quiet GPU and no timing process had started",
       "consequence": "-02 is stopped before any correctness or timing process and is not analysed; -03 starts from the beginning. All systems still run on one GPU in one session"
+    },
+    {
+      "number": 3,
+      "date": "2026-11-23",
+      "registered": "before run 20261123-cuda2-v3s-04",
+      "change": "amendment 2 is withdrawn: the run uses GPU 0 as first registered; all limits unchanged",
+      "reason": "run 20261123-cuda2-v3s-03 failed its GPUSparse rejection check because the pinned adapter asserts CUDA_VISIBLE_DEVICES == 0, which was not checked before amendment 2. The adapter is kept unmodified. The other user's GPU 0 jobs had ended",
+      "consequence": "-03 ended before any correctness or timing process and is not analysed; -04 starts from the beginning"
     }
   ]
 }

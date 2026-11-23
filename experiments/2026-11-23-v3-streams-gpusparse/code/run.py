@@ -88,7 +88,7 @@ def run_cfg(out, name, rounds, warmups, verify, core, drift=False):
                                        {"triton_kernel.py": PIN_KERNEL}, "92bb87b36f10e78ab39c81e9db2412dbb7a3b650")
         want = dict(config=cfg, behavior=expected_config.marks(verify))
         if drift: want["config"]["requested_k"] = k + 1
-        cmd = ["env", "CUDA_DEVICE_ORDER=PCI_BUS_ID", "CUDA_VISIBLE_DEVICES=1", "TRITON_CACHE_DIR=" + str(out) + ".triton", "numactl", "--physcpubind=%d" % core, "--localalloc",
+        cmd = ["env", "CUDA_DEVICE_ORDER=PCI_BUS_ID", "CUDA_VISIBLE_DEVICES=0", "TRITON_CACHE_DIR=" + str(out) + ".triton", "numactl", "--physcpubind=%d" % core, "--localalloc",
                ENV / "venv/bin/python", GS / "canonical_baseline.py", "--variant", "monolithic", "--index", GSP, "--queries", Q, "--reference", ORACLE[k], "--native-repo", ENV / "source",
                "--csv", csv, "--top", top, "--validation", str(out) + ".validation.json", "--jit-manifest", str(out) + ".jit.json", "--limit", 500, "--k", k, "--gpu", 0,
                "--block-pl", 512, "--repeats", rounds, "--warmups", warmups, "--verify", verify]
@@ -146,7 +146,7 @@ if not a.smoke: assert not subprocess.run(["git", "status", "--porcelain", "--un
 RUN = HOME / "runs" / EXP.name / a.run_id; BUILD = HOME / "build" / a.run_id; DEADLINE = time.time() + 10 * 3600
 for d in ("logs", "raw/ineligible", "raw/interrupted", "analysis"): (RUN / d).mkdir(parents=True, exist_ok=True)
 BUILD.mkdir(parents=True, exist_ok=True)
-UUID = smi("-i", "1", "--query-gpu=uuid", "--format=csv,noheader"); PIN_KERNEL = "ef298aba741b6fe86a31021369b808549fa465c7011444cb98770808bcf79fd0"
+UUID = smi("-i", "0", "--query-gpu=uuid", "--format=csv,noheader"); PIN_KERNEL = "ef298aba741b6fe86a31021369b808549fa465c7011444cb98770808bcf79fd0"
 commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
 if (RUN / "commit.txt").exists(): assert (RUN / "commit.txt").read_text() == commit, "resume needs the same commit"
 (RUN / "commit.txt").write_text(commit)
