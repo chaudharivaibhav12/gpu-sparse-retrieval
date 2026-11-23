@@ -39,4 +39,40 @@ The first attempt, `20261123-cuda5-g-01`, did not run: the GPU was busy for its 
 
 ## G3 — Bandwidth and decomposition (paper Tables 5-6)
 
-*Pending (relaunched with a 12-hour window; runs first).*
+Run [`20261123-cuda5-g-03`](../../results/2026-11-23-range-v3-g/20261123-cuda5-g-03/): full collection (8,841,823 passages, W=4096, 2,159 range blocks), u4m, k=1000, the first 25 calibration queries. Both processes were exact against the oracle, and neither overlapped another GPU process. The session ran under amendment 2: an idle holder process of ours was resident, and the validation step before G3 gave 0.1001 ms against Measurement E's idle 0.0987 ms (ratio 1.014, within the 5% gate). The session then stopped in the G3 analysis script (a formatting bug). The data were complete and are analysed with the fixed script ([analysis/analyze_g3.py](analysis/analyze_g3.py)).
+
+**Nsight Compute** (25 launches; Nsight locks base clocks and flushes caches before each replayed pass, so the durations are longer than in timing runs):
+
+| counter | mean per launch | min - max |
+|---|---|---|
+| DRAM bytes read | 61.3 MB | 37.1 - 113.8 MB |
+| DRAM bytes written | 3.72 MB | 1.57 - 6.64 MB |
+| DRAM throughput, % of peak | 12.0% | 8.1 - 15.1% |
+| achieved occupancy | 49.0% | 48.3 - 49.2% |
+| L2 hit rate | 58.2% | 53.0 - 61.8% |
+| kernel duration | 1.089 ms | 0.826 - 1.650 ms |
+
+(Read + written bytes) / duration averages 59 GB/s, against the RTX 4070's 504 GB/s peak. The kernel is far from bandwidth-bound: it reads about 61 MB per query, and its time goes to work inside the blocks.
+
+**Stage decomposition** (clock build, `-DRBP_STAGE_CLOCKS`, same source; 25 queries × 5 rounds; stage times exclude barrier waits, which are 9.6% of warp time). Every range block runs setup, traversal and its local top-k. The merge runs once per query, in the last block.
+
+| paper category | our stages | mean per range block | share of range-block time |
+|---|---|---:|---:|
+| allocation/zeroing | lookup + zero, word-table prefix | 1.3 µs | 3.4% |
+| traversal | decode+add | 10.2 µs | 26.2% |
+| top-k (local) | radix select + gather, bitonic sort, candidate write, fence, ticket | 27.4 µs | 70.3% |
+
+| wall clock (median per query) | µs | share of kernel span |
+|---|---:|---:|
+| range phase (all 2,159 range blocks, in waves) | 677.9 | 80.7% |
+| top-k merge tail (last block) | 161.8 | 19.3% |
+| kernel span | 839.7 | 100% |
+
+The merge stages measure 193.6 µs in the last block: count/scan 19.6, compaction 110.7, radix select 40.2, scatter 23.1. This is a different measure from the merge tail, which starts at the latest range's rank write.
+
+At k=1000, top-k dominates: 70% of the range blocks' own time goes to the local top-k, and the serial merge adds 19% of the kernel span on top. Traversal (decode+add) is about a quarter of block time, and allocation/zeroing is negligible.
+
+**Caveats.**
+- The stage clocks come from an instrumented build, whose kernel span is 840 µs on these 25 queries. For comparison, u4m's uninstrumented median GPU span at k=1000 is 807 µs over all 500 queries (Measurement F), so the instrumentation overhead looks small, but the query sets differ.
+- Shares are of time on the SMs, not of DRAM traffic.
+- The mapping onto the paper's categories is ours. The paper's phases come from a different kernel design, so only the categories, not the numbers, are comparable.
