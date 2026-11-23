@@ -1,0 +1,18 @@
+{
+  "experiment_id": "2026-11-23-range-v3-wk",
+  "status": "part 1 (GPU rule, inputs, feasibility and gates) written before any GPU work; the timing design and decision rules H1-H4 are registered in part 2 after the gates and before timing",
+  "owner": "Arnav",
+  "label": "calibration queries only (500), after the freeze",
+  "gpu_policy": {
+    "decided": "owner, 2026-11-23, before any H GPU work",
+    "reason": "cuda5's GPU is shared with another user's training job (yields to other GPU users after ~100 s, restarts ~2 min after they leave) and a batch script of ~1 min GPU jobs (does not yield). In Measurement G, one clear sample followed by our ~35 s CPU start-up let the job return (overlap at 18:09).",
+    "holder": "code/gpu_holder.cu, one CUDA context of ours for the whole session; 'work' mode (one 1-block ~1 ms kernel every 100 ms) except while one of our GPU processes runs",
+    "idle_check": "5 consecutive samples 2 s apart with no compute process other than the holder and none of our GPU jobs; otherwise retry every 300 s for up to 12 hours, then stop and report. The holder stays in 'work' through the check.",
+    "per_process": "the holder stays in 'work' through the process's CPU start-up (index load) and switches to 'idle' (no GPU work) as soon as a GPU context of ours other than the holder appears, before the warm-up rounds; back to 'work' when the process ends; times in logs/holder-switch.tsv. A process whose context is never seen stops the session.",
+    "overlap": "unchanged: 0.5 s poll + pmon during each process; a process that overlaps another user's GPU process is preserved as <tag>-overlap-<n> and rerun, at most 3 replacements per slot (experiments/2026-11-22-range-v3-tune/code/overlap.py; it classifies the holder as ours)",
+    "effects": "the holder cannot change our answers (every process is checked against the oracle) and issues no GPU work during the timed rounds; it holds ~150-250 MB; per-process peak memory excludes it; timing is validated against Measurement F's W=4096 cells (cross-session check)",
+    "code": "code/session_lib_h.sh (redefines wait_idle and run_slot; the tune session_lib.sh monitors are reused read-only)"
+  },
+  "inputs": "code/build_indexes_h.sh: W=256 (PR #27 pin 0ad6531c..., content 90b86a65..., header positions/256), W=1024 (c7669620...), W=4096 (06368cee...) verified by SHA-256; W=512/2048/8192/16384 built from the pinned GSP (e838dfbf...) with build time, size, SHA-256 and round-trip check; queries data/derived/calibration-500.tsv; oracle: pinned top-1000 (302b63d4...), top-10/100/316 as its prefixes (top-10/100 equal to the pinned files byte for byte)",
+  "pre_registration_session": "code/run_h_pre.sh: one-query probe per W at its largest k; gates for every (W, k) cell incl. k=316 (500 queries, 1 warm-up + 1 measured round, exact); feasibility table and GPU-time estimate (analysis/feasibility_h.py). Nothing timed."
+}
