@@ -56,5 +56,19 @@
     "gpu_memory": "at most ~3.9 GB per process (full collection: u4m ~3.4 GB, ctrl ~3.9 GB, Measurement F)"
   },
   "gpu_policy": "idle check before every GPU process (no compute process, none of our GPU jobs, no other run_* script outside the session); when busy, retry every 300 s up to 6 h after launch, then stop and report; a process that overlaps another user's GPU process is preserved and rerun (at most 3 per slot); experiments/2026-11-22-range-v3-tune/code/session_lib.sh and overlap.py (read only)",
-  "outputs": "results/2026-11-23-range-v3-g/<run>/; compressed top-k listings and Nsight reports to run-bulk with SHA-256"
+  "outputs": "results/2026-11-23-range-v3-g/<run>/; compressed top-k listings and Nsight reports to run-bulk with SHA-256",
+  "amendment_1": {
+    "date": "2026-11-23",
+    "by": "owner (Arnav), after attempt 20261123-cuda5-g-01 found the GPU busy for its whole 6-hour window (no GPU process ran); registered before any further GPU work",
+    "G2_reuse": {
+      "1000000": "Measurement E, run results/2026-11-22-range-v3-tune/20261122-cuda5-timingE-01: cells v3-4-u4m-w4096 (u4m, W=4096, crossover 1, SASS 8f8a5d49e0e0ad3f) and ctrl-w1024 (V2-5, SASS 53eb3cac16e4bc19); 3 rotating processes x (3 + 20 rounds) inside an 11-cell rotation",
+      "8841823": "Measurement F, run results/2026-11-22-range-v3-tune/20261122-cuda5-timingF-01: cells v3-4-default (u4m, same SASS) and ctrl; 3 rotating processes x (3 + 20 rounds) with prunetm",
+      "raw_data": "E's and F's raw timing CSVs from branch exp/arnav/2026-11-22-range-v3-tune at baa3188 (gzip); peak GPU memory recomputed with gpu_memory.py from their logs"
+    },
+    "G2_new": "only the 100K cells: u4m W=4096 and ctrl W=1024, k=10/100/1000, gates first, then 3 processes x (3 + 20 rounds), rotating order (code/run_g.sh with SIZES=100000)",
+    "statistics": "per size and k: median, p95, p99, u4m / ctrl within that size's session (crossed bootstrap, seed 20261124), index size, peak GPU memory (analysis/analyze_g2_combined.py); each size is labelled with its run ID; cross-size comparisons (growth 100K -> 8.8M) are descriptive, because the sizes come from different sessions",
+    "order": "G3 first (analysed as soon as it finishes, so its results stand on their own), then G2's 100K cells",
+    "gpu_policy": "same idle rule, retry every 300 s, window 12 hours from launch; if the window closes after G3 but before G2 completes, G3's results are kept and reported and G2's 100K cells are recorded as not done",
+    "estimate": "about 7 min of GPU time (G3: 2 full-collection processes ~3 min incl. the Nsight replay; 100K: 6 gate + 18 timing processes ~4 min)"
+  }
 }
