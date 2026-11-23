@@ -103,7 +103,7 @@ def run_cfg(out, name, rounds, warmups, verify, core, drift=False):
                    cpu_affinity=str(core), torch_num_threads=1, **{x: env[x] for x in ("gpu_name", "torch_version", "triton_version", "numpy_version", "scipy_version", "torch_cuda_version")})
         want = dict(config=cfg, behavior=dict(contract="GSP-CAP32-F32GUARDED-NUMERIC-TIES-v1" if mode == "canonical" else "score-exact-arbitrary-ties", timing="padding-and-upload-through-host-scores-and-original-ids"))
         if drift: want["config"]["batch_size"] = batch + 1
-        cmd = ["env", "CUDA_DEVICE_ORDER=PCI_BUS_ID", "CUDA_VISIBLE_DEVICES=0", "TRITON_CACHE_DIR=" + str(out) + ".triton", "PYTHONDONTWRITEBYTECODE=1", "numactl", "--physcpubind=%d" % core, "--localalloc",
+        cmd = ["env", "CUDA_DEVICE_ORDER=PCI_BUS_ID", "CUDA_VISIBLE_DEVICES=0", "TRITON_CACHE_DIR=" + str(RUN / "raw/gsb.triton"), "PYTHONDONTWRITEBYTECODE=1", "numactl", "--physcpubind=%d" % core, "--localalloc",
                ENV / "venv/bin/python", EXP / "code/gs_batch.py", "--mode", mode, "--index", GSP, "--queries", Q, "--reference", ORACLE[k], "--native-repo", ENV / "source", "--csv", csv, "--top", top,
                "--validation", str(out) + ".validation.json", "--k", k, "--batch", batch, "--repeats", rounds, "--warmups", warmups]
     else:

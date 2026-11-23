@@ -17,6 +17,8 @@
  "correctness": "every canonical configuration and every timing process equals the CPU oracle in all rows; native batch: every score equals the oracle, every ID above the k-th score equal, tied IDs rescored",
  "eligibility": "unchanged: 4.0 machine-wide cores, 0.05 on the pinned core (and sibling on cuda2), no active foreign GPU process; ineligible processes are kept and replaced",
  "descriptive": "no decision rule: both questions are descriptive comparisons",
+ "triton_cache": "batch-500 processes share one Triton cache per run, filled by the correctness stage, so kernels are not compiled during timing (the release compiles once and reuses too). Batch-1 GPUSparse keeps the adapter's per-process cache; its 3 warm-up rounds absorb the compile",
+ "dev": "dev-gsb-01 (smoke, cuda2): all stages passed; its timings were not read. It led to the shared cache",
  "limits": [
   "batch sizes differ between the systems (32 in flight vs 500 in one batch): each system uses its own batch mode; completion latency differs accordingly",
   "GPUSparse runs in Python/PyTorch 2.6 + Triton 3.2 (the release used 2.9.1 + 3.5.1)",
