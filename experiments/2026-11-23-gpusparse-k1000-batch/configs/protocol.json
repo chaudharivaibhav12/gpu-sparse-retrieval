@@ -26,5 +26,6 @@
   "calibration queries only",
   "uint8 storage is an adaptation on both paths: the release stores FP32"
  ],
- "external_wait": "cuda5 is occupied by another user on 2026-11-23 16:00 EST"
+ "external_wait": "cuda5 is occupied by another user on 2026-11-23 16:00 EST",
+ "amendments": [{"number": 1, "date": "2026-11-23", "registered": "before run B (20261123-cuda5-gsb-01); run A is not affected", "change": "cuda5 only: if another compute process is seen on the GPU while waiting, the harness starts its next process only after 18 consecutive quiet checks (about 10 minutes)", "reason": "another user restarts jobs that need almost all GPU memory; using a short gap could make their next job fail", "consequence": "no limit, statistic or configuration changes"}]
 }
