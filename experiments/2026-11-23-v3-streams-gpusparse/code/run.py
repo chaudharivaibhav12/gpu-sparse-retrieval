@@ -14,6 +14,7 @@ import argparse, datetime, gzip, hashlib, importlib.util, json, os, shutil, subp
 from pathlib import Path
 
 EXP = Path(__file__).resolve().parents[1]; ROOT = EXP.parents[1]
+HOME = Path.home() / "v3s"  # amendment 1: /scratch on cuda2 is full; it is only read, results and build go to the home folder
 F = Path("/scratch/psp8502/full"); ENV = Path("/scratch/psp8502/gpusparse-env")
 GSP, RBP, Q = F / "full-8841823.gsp", F / "full-8841823-w4096-pos.rbp", F / "calibration-500.tsv"
 ORACLE = {k: F / ("cpu-top%d-8841823.tsv" % k) for k in (10, 100, 1000)}
@@ -142,7 +143,7 @@ def hold(out, where):
 ap = argparse.ArgumentParser(); ap.add_argument("run_id"); ap.add_argument("--smoke", action="store_true"); a = ap.parse_args()
 PASSES, WARM, ROUNDS = (1, 1, 1) if a.smoke else (3, 3, 20)
 if not a.smoke: assert not subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=ROOT, capture_output=True, text=True, check=True).stdout, "commit first"
-RUN = Path("/scratch/psp8502/runs") / EXP.name / a.run_id; BUILD = ROOT / "build" / a.run_id; DEADLINE = time.time() + 10 * 3600
+RUN = HOME / "runs" / EXP.name / a.run_id; BUILD = HOME / "build" / a.run_id; DEADLINE = time.time() + 10 * 3600
 for d in ("logs", "raw/ineligible", "raw/interrupted", "analysis"): (RUN / d).mkdir(parents=True, exist_ok=True)
 BUILD.mkdir(parents=True, exist_ok=True)
 UUID = smi("-i", "0", "--query-gpu=uuid", "--format=csv,noheader"); PIN_KERNEL = "ef298aba741b6fe86a31021369b808549fa465c7011444cb98770808bcf79fd0"

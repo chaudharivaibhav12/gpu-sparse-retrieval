@@ -20,5 +20,16 @@
     "both batch-1 scorers time host query construction to host results, but GPUSparse runs in Python/PyTorch",
     "calibration queries only; the 6,480 evaluation queries are not used",
     "shared machine, one RTX 2080 Ti"
+  ],
+  "amendments": [
+    {
+      "number": 1,
+      "date": "2026-11-23",
+      "registered": "before run 20261123-cuda2-v3s-02",
+      "change": "build and results are written to the home folder (network storage) instead of /scratch; inputs and the Python environment are still read from /scratch; paths in code/run.py only",
+      "reason": "cuda2's shared /scratch filled up during run 20261123-cuda2-v3s-01 (another user's output; our run folder was 15 MB). A disk guard stopped our run after 1 of 21 timing processes",
+      "consequence": "run -02 starts from the beginning: build, rejections, correctness and all 21 timing processes. -01 stays on record and is not analysed; none of its timings were read. Indexes load before the gate releases a process. Result files are flushed between queries or batches, outside the per-query and per-batch timers, but on network storage this can lengthen the gaps between them",
+      "observation": "GPUSparse's Triton compile runs in child processes on the pinned core during its first ~2 s; the gate counts it as others' use. The limit is unchanged"
+    }
   ]
 }
