@@ -33,9 +33,42 @@ Means are over the 500 queries. "Canonical" order is the team contract's (score 
 
 Amendment 1: the 1M cells reuse Measurement E (run `20261122-cuda5-timingE-01`) and the full-collection cells reuse Measurement F (run `20261122-cuda5-timingF-01`); only the 100K cells are new. Each size comes from its own session, so cross-size comparisons are descriptive.
 
-The first attempt, `20261123-cuda5-g-01`, did not run: the GPU was busy for its whole 6-hour window ([STATUS](../../results/2026-11-23-range-v3-g/20261123-cuda5-g-01/STATUS)).
+Attempts that did not run, both kept:
+- `20261123-cuda5-g-01`: the GPU was busy for its whole 6-hour window ([STATUS](../../results/2026-11-23-range-v3-g/20261123-cuda5-g-01/STATUS)).
+- `20261123-cuda5-g-02`: stopped while waiting, when the owner chose amendment 2 ([STATUS](../../results/2026-11-23-range-v3-g/20261123-cuda5-g-02/STATUS)).
 
-*100K cells: pending (relaunched with a 12-hour window, after G3).*
+The 100K cells come from run [`20261123-cuda5-g-04`](../../results/2026-11-23-range-v3-g/20261123-cuda5-g-04/) (amendment 2, continuation 1). Its first validation attempt overlapped the other user's restarted job; it was preserved and rerun. The rerun gave 0.1000 ms against E's 0.0987 ms (ratio 1.013). All 6 gates and all 18 timed processes were exact, with no overlap. Analysis: [analysis/analyze_g2_combined.py](analysis/analyze_g2_combined.py) (crossed bootstrap, seed 20261124); table [g2-combined.md](../../results/2026-11-23-range-v3-g/20261123-cuda5-g-04/analysis/g2-combined.md).
+
+Per-query wall latency, batch 1. Each cell gives median / p95 / p99 in ms over the 3 × 500 per-process query medians. The p95 and p99 describe query-to-query spread, not a serving tail. The u4m / ctrl ratio is paired within that size's session.
+
+| passages | run | k | u4m (W=4096) median / p95 / p99 | ctrl (V2-5, W=1024) median / p95 / p99 | u4m / ctrl [95%] | peak GPU MiB u4m / ctrl |
+|---:|---|---:|---|---|---|---|
+| 100,000 | g-04 | 10 | 0.057 / 0.076 / 0.084 | 0.050 / 0.058 / 0.059 | 1.208 [1.193, 1.223] | 196 / 204 |
+| 100,000 | g-04 | 100 | 0.067 / 0.084 / 0.092 | 0.118 / 0.126 / 0.127 | 0.562 [0.556, 0.569] | 196 / 204 |
+| 100,000 | g-04 | 1000 | 0.117 / 0.143 / 0.151 | 0.706 / 0.726 / 0.734 | 0.163 [0.161, 0.165] | 196 / 208 |
+| 1,000,000 | E (`20261122-cuda5-timingE-01`) | 10 | 0.099 / 0.139 / 0.156 | 0.106 / 0.139 / 0.148 | 0.911 [0.902, 0.920] | 528 / 586 |
+| 1,000,000 | E | 100 | 0.111 / 0.152 / 0.168 | 0.361 / 0.386 / 0.398 | 0.308 [0.304, 0.312] | 528 / 590 |
+| 1,000,000 | E | 1000 | 0.215 / 0.306 / 0.382 | 1.699 / 1.759 / 1.780 | 0.128 [0.125, 0.131] | 536 / 610 |
+| 8,841,823 | F (`20261122-cuda5-timingF-01`) | 10 | 0.403 / 0.585 / 0.648 | 0.687 / 0.962 / 1.085 | 0.577 [0.573, 0.580] | 3316 / 3668 |
+| 8,841,823 | F | 100 | 0.455 / 0.667 / 0.718 | 2.680 / 2.867 / 2.948 | 0.172 [0.170, 0.174] | 3322 / 3686 |
+| 8,841,823 | F | 1000 | 0.833 / 1.226 / 1.414 | 12.391 / 12.617 / 12.738 | 0.069 [0.068, 0.070] | 3384 / 3864 |
+
+Index sizes (bytes), u4m W=4096 / ctrl W=1024:
+- 100,000: 38,386,501 / 46,639,664
+- 1,000,000: 370,880,289 / 437,105,290
+- 8,841,823: 3,195,699,506 / 3,638,491,070
+
+Peak GPU memory is nvidia-smi's per-process figure, CUDA context included.
+
+**Growth, 100K → 8,841,823 passages (×88.4).** This comparison is descriptive: the three sizes come from different sessions, and the 100K session had the idle holder resident.
+
+| median latency growth | k=10 | k=100 | k=1000 |
+|---|---:|---:|---:|
+| u4m | ×7.0 | ×6.8 | ×7.1 |
+| ctrl | ×13.7 | ×22.7 | ×17.6 |
+| GPUSparse paper (batch 500) | ×85 at its batch size | | |
+
+At batch 1, neither scorer's latency grows in proportion to the collection. At 100K, u4m has only 25 ranges of 4,096 passages, against 98 ranges of 1,024 for ctrl. With so few ranges the GPU is far from full, and per-query fixed costs dominate. This fits u4m being 21% slower than ctrl at 100K, k=10, while being faster at every larger size and k. The paper's near-linear growth (85× over 88×) is at batch 500, where the GPU is saturated; our batch-1 numbers aren't directly comparable.
 
 ## G3 — Bandwidth and decomposition (paper Tables 5-6)
 

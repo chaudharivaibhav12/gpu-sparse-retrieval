@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-23-range-v3-g",
+  "run_id": "20261123-cuda5-g-03",
+  "status": "completed-measurement-G3-stopped-in-analysis",
+  "scope": "Measurement G amendment 2 run g-03 on cuda5: holder validation (1M u4m k=10, 0.1001 ms vs Measurement E 0.0987 ms) and G3 (full collection, u4m k=1000, first 25 calibration queries: clock build 3 + 5 rounds, Nsight Compute 25 launches); all exact, no overlap; the session stopped in analyze_g3.py (format bug) before the 100K cells, which ran in g-04; calibration only, after the freeze",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "42b3aa04b0d215da8af466f0c2992d6a08a8fc0c",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6), code/build_g.sh",
+    "source_sha256": {
+      "experiments/2026-11-23-range-v3-g/configs/protocol.json": "e4df5a92c0e10033a86c696671cc2986d546ad10f8725f06abc828f02d913668",
+      "experiments/2026-11-23-range-v3-g/code/run_g.sh": "746601ba46bfc0d6796946646fc8ba6e9c22ae8efe71070cbbc038ce360b0043",
+      "experiments/2026-11-23-range-v3-g/code/session_lib_g.sh": "48c8d86fc4c3997d5b1c9a2fd48cb3d320c923473f7776c63b4856730ac34d60",
+      "experiments/2026-11-23-range-v3-g/code/gpu_holder.cu": "fad4065fcce61c6dbce1987277d37c5c5eb151f4dde3ed4c72f20c7c2fa741a6",
+      "experiments/2026-11-22-range-v3-tune/code/session_lib.sh": "f5e6aecfaa91d70872a25f70dee4173ff72e61ce2767b1d5bfc8b0e14b6daf69",
+      "experiments/2026-11-22-range-v3-tune/code/overlap.py": "0ce4280e3e0785260a8a48724b4ab771e85277c2d98484cf32f887ca5be45afc",
+      "experiments/2026-11-22-range-v3-tune/analysis/analyze_clocks.py": "9d5a611f14e5b5df279a96d43ee473cfeffc3660b9dd77412cd9b73d3b11e3fc"
+    },
+    "binary_sha256": {
+      "build/g3-618b32fc/u4m/scorer": "add46d82cc00048d194e2487d4179fbd9d84d017fd359b865645b13d801bc7b0",
+      "build/g3-618b32fc/u4m-clocks/scorer": "0c3974a0f9739c311ce4f24c44eb14a3026df9f8e1366dc650979dac024a7b54",
+      "build/g3-618b32fc/holder/gpu_holder": "4f3542d68a02a9db89e82284ae72f22dc7b626cc9125312ef833429f89dc27f5"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "unavailable"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "[validate-1000000-u4m-k10] build/g3-618b32fc/u4m/scorer data/derived/hash-1000000-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/validate-1000000-u4m-k10.csv results/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/validate-1000000-u4m-k10.tsv 500 10 0 0 20 3 256 256 - 1",
+    "[g3-clocks-k1000] env RBP_CLOCKS_OUT=results/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/g3-clocks-k1000 build/g3-618b32fc/u4m-clocks/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/g3-clocks-k1000.csv results/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/g3-clocks-k1000.tsv 25 1000 0 0 5 3 256 256 - 1",
+    "[g3-ncu-k1000] ncu -o results/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/g3-ncu-k1000 --kernel-name regex:range_scores --launch-count 25 --section SpeedOfLight --section MemoryWorkloadAnalysis --section Occupancy --section LaunchStats --metrics dram__bytes_read.sum,dram__bytes_write.sum,lts__t_sector_hit_rate.pct,gpu__dram_throughput.avg.pct_of_peak_sustained_elapsed,sm__warps_active.avg.pct_of_peak_sustained_active,gpu__time_duration.sum build/g3-618b32fc/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/g3-ncu-k1000.csv results/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/g3-ncu-k1000.tsv 25 1000 0 0 1 0 256 256 - 1"
+  ],
+  "artifacts": {
+    "analysis/compare-g3-clocks-k1000.json": {
+      "sha256": "ed6c813d95a4475302de4f0dcba12dfa9af406a794a56286bebc0f411548a744",
+      "bytes": 345
+    },
+    "analysis/compare-g3-ncu-k1000.json": {
+      "sha256": "f6e30f7116dd934c20280e3d7e68cc90586c842e2fe79606db6a308cd31568f4",
+      "bytes": 340
+    },
+    "analysis/compare-validate-1000000-u4m-k10.json": {
+      "sha256": "203a1ce98cdef712f58ce0d4dc7b5b2c262c2b072115b3e4bf50e2386f712a36",
+      "bytes": 337
+    },
+    "analysis/g3-clocks-sites.csv": {
+      "sha256": "514ae1aeea11bc5bcccb03b71bba5d679953e17f6e9ba478df5bf3b1edc31415",
+      "bytes": 1516
+    },
+    "analysis/g3-clocks-stages.csv": {
+      "sha256": "b14f34c090473198ce897f3570e3d079d96cd3213ad3e899ccaaf74738111907",
+      "bytes": 1252
+    },
+    "analysis/g3-clocks.json": {
+      "sha256": "9a58ad0ef405ff7a4621357a983c19e3bd34d894f53252c2485f26467442fa24",
+      "bytes": 9429
+    },
+    "logs/binaries.tsv": {
+      "sha256": "476855159feaa4089c739d2b107a9537ebf77e5cf3c046c8b3df0fa25b5d66d6",
+      "bytes": 741
+    },
+    "logs/commands.txt": {
+      "sha256": "17fd20b2b1906250fb199f01816e199a029eb636f1eefe6c7c5c9c4e66f86327",
+      "bytes": 1465
+    },
+    "logs/environment.txt": {
+      "sha256": "283701c2348f7c3c35fe2dd7039643a542e8a558802ff08d2991db54e4084baf",
+      "bytes": 199
+    },
+    "logs/gpu-pmon.log": {
+      "sha256": "a4a6ba68e8b9fa21118a759079c7badfe6b12cb6e41a411a614d1d42628f2ffc",
+      "bytes": 10227
+    },
+    "logs/gpu-poll.log": {
+      "sha256": "5fc80c470a39a4d487909d479fce8c986da82f0c093e17abfd959aa2610bafd2",
+      "bytes": 9998
+    },
+    "logs/holder-validation.txt": {
+      "sha256": "65092b4b82fbd1d79d9709ec8b1832f3f11005a3d137cb6f7535fb800d50812d",
+      "bytes": 105
+    },
+    "logs/holder.ctl": {
+      "sha256": "a11c3d917a2149a4b548217038bc8f2dd2130a1966e0c7af5c4225d81f25a8c3",
+      "bytes": 5
+    },
+    "logs/holder.log": {
+      "sha256": "4213feebf08bccdea4bb569584a46f3511e4d7b3678344a183e9e3f4efc9cbfc",
+      "bytes": 40
+    },
+    "logs/holder.out": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/host-utc-offset.txt": {
+      "sha256": "51ef6a6d539bbd38ac4fb4d8de42da0cf36eafb7fb7be71e3420d57982eebd9b",
+      "bytes": 6
+    },
+    "logs/idle-checks.txt": {
+      "sha256": "b360d9f65060d67e250cfa2f7744e06c8aceb364d46aa45001833d881e462b3b",
+      "bytes": 383
+    },
+    "logs/index-sizes-sha256.tsv": {
+      "sha256": "36682955b16b90ce80d5cec8d9c0d8e16da77d0b1c5a5993debbc074c3aee00d",
+      "bytes": 350
+    },
+    "logs/input-sha256.txt": {
+      "sha256": "cd2251931322dd443617e70f470df6e6e12fa631bc62a635206afa20b0bfd590",
+      "bytes": 525
+    },
+    "logs/overlap-checks.jsonl": {
+      "sha256": "2af943560acf15b8db6ddd189ca69950ff1b0f31546dee85f79fc0bfe87224d6",
+      "bytes": 571
+    },
+    "logs/processes.tsv": {
+      "sha256": "a06bc77e9e7cd9b2735b954d913f78bfb7e62eddaee1ce3d5c41bcfdd33de42f",
+      "bytes": 180
+    },
+    "logs/ptxas-ctrl.log": {
+      "sha256": "3cd9a77b178af7803393f3f40c63f1c67793d8bd92728e5143c8a196d7a78929",
+      "bytes": 792
+    },
+    "logs/ptxas-u4m-clocks.log": {
+      "sha256": "7fea07efc746cd47268e70608435d28ab5d7466730032624bfb470fcbc25372a",
+      "bytes": 1262
+    },
+    "logs/ptxas-u4m.log": {
+      "sha256": "e8d228124a62ab1c663c6e4aba5789f41d4515a96d41edf4623454a4de9fac6a",
+      "bytes": 1243
+    },
+    "logs/stages.txt": {
+      "sha256": "0da4d71269b537f517e1aecff61f29b03687b25e4b458c8feca2b7090d15c03a",
+      "bytes": 361
+    },
+    "logs/verify-100000-w4096.log": {
+      "sha256": "f61c181e6130e28c8c4e443a66df59491fd43c9a093f61e834705a5f80195000",
+      "bytes": 875
+    },
+    "raw/g3-clocks-k1000.blocks.bin": {
+      "sha256": "322ca47799285baf43b349586287ffa34e9720a251d6c18edb0e3a6d9fe58dbd",
+      "bytes": 17272000
+    },
+    "raw/g3-clocks-k1000.csv": {
+      "sha256": "ba30f0204a6f3ec5bf3d94acf563d95806ecec413e4e09e66b72f1c17d1c9f53",
+      "bytes": 25352
+    },
+    "raw/g3-clocks-k1000.events.bin": {
+      "sha256": "cda0dc3e24774092c39f8dea40799ebe593e794b89b80ae58c0c537adbfa1ab1",
+      "bytes": 414528000
+    },
+    "raw/g3-clocks-k1000.json": {
+      "sha256": "979264b87096b5b478b8129bf525bdb91d202a56018227bd9d0a6bf423a7d3fc",
+      "bytes": 987
+    },
+    "raw/g3-clocks-k1000.log": {
+      "sha256": "c8167e200b48d62fa820aca3aef0305ef8f73b5d987934613b1ccbbd0cc1dfbb",
+      "bytes": 513
+    },
+    "raw/g3-clocks-k1000.tsv.zst": {
+      "sha256": "f3f716d771beb717bfd0b1a1174405ba025fd1bd3b803eca035e3300a14b0b05",
+      "bytes": 572688
+    },
+    "raw/g3-ncu-k1000-raw.csv": {
+      "sha256": "1d423d00193d47e7ac590d2f43ef9b1a500eb86c12d25d0e2548f6f23ea9d85a",
+      "bytes": 142476
+    },
+    "raw/g3-ncu-k1000.csv": {
+      "sha256": "bc08c6b47c8b31b45b0c55de8fc488b9c7d946da13ad4cde9222c826ff211e32",
+      "bytes": 3363
+    },
+    "raw/g3-ncu-k1000.log": {
+      "sha256": "a2dd85f090a528c448896e336e86f177d1f269b7c518fbfac213356e9459db4d",
+      "bytes": 2187
+    },
+    "raw/g3-ncu-k1000.ncu-rep": {
+      "sha256": "6b4ac48e4b12fe6bbc29005d8d440da3b6e55945d2c63fd9da9be6cccf4e18d3",
+      "bytes": 1126130
+    },
+    "raw/g3-ncu-k1000.tsv.zst": {
+      "sha256": "1449d26bea2373568fe1574520c6818479e12bdf1ee8c11c2d75fc857944b8a8",
+      "bytes": 241926
+    },
+    "raw/topk-sha256.txt": {
+      "sha256": "9a01e4fb8d6092ac6718d2685df9ef7f54482860c37ffeb738d212188e582fa0",
+      "bytes": 276
+    },
+    "raw/validate-1000000-u4m-k10.csv": {
+      "sha256": "8832be46ac5aa20470e3cecc808dee06d84e2877f9bc51df2a8821b006c86392",
+      "bytes": 1381514
+    },
+    "raw/validate-1000000-u4m-k10.log": {
+      "sha256": "6389dd007f8ce1d8d2770b8c8888f7ad59749d5f0a3ea801456bcce0441265db",
+      "bytes": 910
+    },
+    "raw/validate-1000000-u4m-k10.tsv.zst": {
+      "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+      "bytes": 168211
+    }
+  },
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [
+      {
+        "original": "raw/validate-1000000-u4m-k10.csv",
+        "sha256": "8832be46ac5aa20470e3cecc808dee06d84e2877f9bc51df2a8821b006c86392",
+        "bytes": 1381514,
+        "public": "raw/validate-1000000-u4m-k10.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      }
+    ],
+    "excluded": [
+      {
+        "original": "raw/g3-clocks-k1000.blocks.bin",
+        "sha256": "322ca47799285baf43b349586287ffa34e9720a251d6c18edb0e3a6d9fe58dbd",
+        "bytes": 17272000,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/g3-clocks-k1000.blocks.bin.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/g3-clocks-k1000.events.bin",
+        "sha256": "cda0dc3e24774092c39f8dea40799ebe593e794b89b80ae58c0c537adbfa1ab1",
+        "bytes": 414528000,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/g3-clocks-k1000.events.bin.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/g3-clocks-k1000.tsv.zst",
+        "sha256": "f3f716d771beb717bfd0b1a1174405ba025fd1bd3b803eca035e3300a14b0b05",
+        "bytes": 572688,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/g3-clocks-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/g3-ncu-k1000.ncu-rep",
+        "sha256": "6b4ac48e4b12fe6bbc29005d8d440da3b6e55945d2c63fd9da9be6cccf4e18d3",
+        "bytes": 1126130,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/g3-ncu-k1000.ncu-rep.",
+        "reason": "full profiler report"
+      },
+      {
+        "original": "raw/g3-ncu-k1000.tsv.zst",
+        "sha256": "1449d26bea2373568fe1574520c6818479e12bdf1ee8c11c2d75fc857944b8a8",
+        "bytes": 241926,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/g3-ncu-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/validate-1000000-u4m-k10.tsv.zst",
+        "sha256": "fca7b3994f92b4648d40402872accd0adafba77dae3a15f86a2b7f597ee21751",
+        "bytes": 168211,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-g/20261123-cuda5-g-03/raw/validate-1000000-u4m-k10.tsv.zst.",
+        "reason": "kept outside Git"
+      }
+    ],
+    "recorded_artifacts_not_in_public_tree_or_lists": []
+  }
+}

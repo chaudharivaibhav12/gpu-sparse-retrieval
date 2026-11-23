@@ -1,0 +1,89 @@
+{
+  "range_block_categories": {
+    "allocation/zeroing (setup)": {
+      "mean_per_range_block_us": 1.3404186356224608,
+      "slowest_range_critical_path_us": 4.216887122715803,
+      "stages": [
+        "lookup_and_zero",
+        "word_table_prefix"
+      ],
+      "share_of_range_block_time": 0.034411872055358485
+    },
+    "traversal (decode+add)": {
+      "mean_per_range_block_us": 10.209946858543022,
+      "slowest_range_critical_path_us": 70.22035514526202,
+      "stages": [
+        "decode_add"
+      ],
+      "share_of_range_block_time": 0.2621146675009003
+    },
+    "local top-k (radix select + gather, bitonic sort, candidate write, fence, ticket)": {
+      "mean_per_range_block_us": 27.40184941196125,
+      "slowest_range_critical_path_us": 28.634900729992953,
+      "stages": [
+        "radix_select_gather",
+        "bitonic_sort",
+        "candidate_write",
+        "threadfence",
+        "done_ticket"
+      ],
+      "share_of_range_block_time": 0.7034734604437411
+    }
+  },
+  "merge": {
+    "last_block_merge_stage_us": 193.55715334789392,
+    "merge_tail_us_median": 161.792,
+    "share_of_kernel_span": 0.1926829268292683,
+    "stages": [
+      "merge_select",
+      "merge_scatter"
+    ],
+    "substages": {
+      "merge_count_scan": 19.626225223088923,
+      "merge_compaction": 110.67986151638064,
+      "merge_radix_select": 40.152596767550705
+    }
+  },
+  "kernel_span_us_median": 839.68,
+  "range_phase_us": 677.8879999999999,
+  "sm_clock_ghz": 2.50390625,
+  "blocks_starting_after_first_block_ends_median": 2020,
+  "barrier_warp_time_share": 0.09626018305813472,
+  "note": "Stage times exclude barrier waits (analyze_clocks.py). Range-block shares are of the summed mean per-block stage time, i.e. of the GPU work spread over all range blocks; the merge runs once per query in the last block and is reported on the wall-clock axis (merge tail).",
+  "ncu": {
+    "launches": 25,
+    "per_launch": {
+      "read": {
+        "mean": 61287966.72,
+        "min": 37052032.0,
+        "max": 113770368.0
+      },
+      "write": {
+        "mean": 3720104.96,
+        "min": 1571072.0,
+        "max": 6638720.0
+      },
+      "dram_pct": {
+        "mean": 11.99667936,
+        "min": 8.100249,
+        "max": 15.103861
+      },
+      "occupancy_pct": {
+        "mean": 48.95501108,
+        "min": 48.293125,
+        "max": 49.230835
+      },
+      "l2_hit_pct": {
+        "mean": 58.23445568,
+        "min": 53.040211,
+        "max": 61.830578
+      },
+      "seconds": {
+        "mean": 0.00108861824,
+        "min": 0.0008261119999999999,
+        "max": 0.0016496
+      }
+    },
+    "achieved_dram_bandwidth_gb_s": 58.973306409175436
+  }
+}

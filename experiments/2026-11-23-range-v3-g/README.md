@@ -10,4 +10,4 @@ Branch `exp/arnav/2026-11-23-range-v3-g` from `origin/main` `27f581f`. Scorer: `
 
 ## Runs
 
-See [runs/](runs/). Findings: [report.md](report.md) (G1 done; G2 100K and G3 pending).
+See [runs/](runs/). Findings: [report.md](report.md) (G1, G2 and G3 complete).

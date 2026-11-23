@@ -1,0 +1,12 @@
+NOT RUN: stopped by the owner while waiting; replaced by amendment 2 (holder-based idle check).
+
+Session launched 2026-11-23T14:00:34Z on cuda5 (commit b6dedc2, amendment 1; 12-hour window).
+- Builds passed (u4m SASS 8f8a5d49e0e0ad3f, ctrl 53eb3cac16e4bc19) and the CPU round-trip check of
+  the 100K W=4096 index passed.
+- The first GPU slot (g3-clocks-k1000) waited from 14:01:53Z; every idle check (logs/idle-checks.txt,
+  every 300 s) found another user's GPU process and/or other users' run_* scripts.
+- Two coexistence probes outside the protocol ran at 17:41 and 17:45 UTC while this session waited
+  (not measurements; files on cuda5 in /scratch/ag11163/tmp/probe-coexist-0{1,2}); the second made
+  the yielding training job pause (~100 s after our start).
+- 18:00:38Z: the owner chose amendment 2; this session was terminated (process group) while waiting.
+No GPU process of this session ran. Monitor logs are in run-bulk (logs/run-bulk-sha256.txt).
