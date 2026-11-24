@@ -43,5 +43,12 @@
     "reason": "gate run 20261124-cuda5-i-pre-01 (6 of 13 gates exact, both k=10 byte comparisons identical) met many short GPU processes of other users during each ~90-105 s gate (8-14 per attempt), then stopped on a session-script bug: the adapter's <tag>-validation.json and <tag>-jit.json were not moved with an overlapped attempt, so the rerun's adapter refused to overwrite them (fixed in 9392dd1: outputs named <tag>.validation.json / <tag>.jit.json)",
     "rule": "gates (correctness only) run with CONTENDED=1 (code/session_lib_i.sh): they wait for none of our own GPU jobs but not for other users' processes; an overlap is detected and recorded per process (logs/overlap-checks.jsonl) and the attempt is kept, not rerun. Exactness, the byte comparisons and the FP32 rule are unchanged. The timing session never runs contended (run_i.sh refuses) and keeps the Measurement H rule.",
     "effect_on_estimate": "gate process durations under contention can be longer, so the gate-based GPU-time estimate (the 60-minute start rule) is conservative; peak GPU memory per gate is the gate process's own nvidia-smi figure and is unaffected by other processes"
+  },
+  "timing_amendment_1": {
+    "date": "2026-11-24",
+    "by": "owner (option 1), after the gate run 20261124-cuda5-i-pre-02 and before any timing",
+    "decision": "the 60-minute start rule is waived for this session: the owner approved the gate-based estimate of 80 min for the full registered design",
+    "gates": "all 13 gates exact (pre-02); the k-limit copies' top.tsv equal the original adapters' byte for byte at k = 10 and 100 for U64 and FP32; FP32 exact at k = 10, 100 and 1000",
+    "cells": "unchanged: GPUSparse U64, GPUSparse FP32 and u4m at k = 10, 100, 1000 (FP32_KS = 10 100 1000); design, statistic, correctness checks and the Measurement H GPU rule unchanged; timing never runs contended"
   }
 }
