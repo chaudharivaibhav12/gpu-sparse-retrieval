@@ -1,0 +1,21 @@
+{
+ "experiment_id": "2026-11-24-two-half-depth",
+ "host": "cuda5 (RTX 4070)",
+ "parent": "main 8fc44cd0; scorer sources unchanged",
+ "questions": [
+  "At k=100 and k=1000, is the two-half filter faster than its control (cuda_range_prune_tm)?",
+  "At k=10, 100 and 1000, is it faster than v3, in one session?"
+ ],
+ "prior_guess": "faster than v3 at k=10 only; registered before the run",
+ "configurations": 8,
+ "timing": "3 processes, 3 warm-up + 20 measured rounds, rotating order, batch 1, 256 threads, 64 seeds",
+ "queries": "the 500 calibration queries only; the 6,480 are not used",
+ "correctness": "two-half at each k: VERIFY=1 (IDs, scores and the pruning schedule against a CPU model) plus the CPU reference; control and v3 reuse da-02 and gsb-02. Every timing round of every configuration is compared with the CPU reference",
+ "eligibility": "as 2026-11-23-gpusparse-k1000-batch amendments 1 and 2: 4.0 machine cores, 0.05 pinned core, no active foreign GPU process; ineligible processes kept and replaced; 10 quiet minutes after another user's job",
+ "decision_rule": "descriptive only. Recommended configuration per k: the faster of two-half and v3 if the paired 95% interval excludes 1. No per-query selection is fitted",
+ "deadline": "no process starts after 2026-11-24 23:00 EST; an incomplete run is recorded and not analysed",
+ "limits": [
+  "calibration queries only, which chose the settings",
+  "one GPU, one session"
+ ]
+}
