@@ -11,7 +11,7 @@ from pathlib import Path
 
 EXP = Path(__file__).resolve().parents[1]; ROOT = EXP.parents[1]
 HOST = os.uname().nodename.split(".")[0]
-W4096 = {"cuda2": "/scratch/psp8502/full/full-8841823-w4096-pos.rbp", "cuda5": "/scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp"}[HOST]
+W4096 = {"cuda2": "/scratch/psp8502/full/full-8841823-w4096-pos.rbp", "cuda5": os.environ.get("W4096_RBP", "")}[HOST]  # cuda5: a teammate's read-only copy, checked by hash; set W4096_RBP
 ARCH, CORES, SIBLING, SAMPLER, BASE, ORA = {"cuda2": ("sm_75", range(3, 20, 2), 20, 1, Path.home() / "v3s", "/scratch/psp8502/full/cpu-top%d-8841823.tsv"),
     "cuda5": ("sm_89", range(2, 16, 2), None, 1, Path("/scratch/psp8502/v3s"), None)}[HOST]
 F = Path("/scratch/psp8502/full"); ENV = Path("/scratch/psp8502/gpusparse-env"); HOME = BASE
