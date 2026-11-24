@@ -24,6 +24,7 @@ F32=experiments/2026-11-16-guarded-fp32-baseline/code/fp32/canonical_baseline.py
 U64K=$X/code/klimit/u64/canonical_baseline.py; F32K=$X/code/klimit/fp32/canonical_baseline.py
 test -z "$(git status --porcelain --untracked-files=no)" || { echo "Commit first"; exit 1; }
 case "$(cat "$BUILD/u4m/sass.sha256")" in 8f8a5d49e0e0ad3f*) ;; *) echo "u4m SASS is not the timed u4m"; exit 1;; esac
+[ "$MODE" = pre ] || [ "${CONTENDED:-0}" = 0 ] || { echo "Timing never runs contended"; exit 1; }
 [ "$MODE" = pre ] || grep -q '"timing"' "$X/configs/protocol.json" || { echo "Timing is not registered"; exit 1; }
 test ! -e "$RUN" || { echo "Refusing to reuse $RUN"; exit 1; }
 mkdir -p "$RUN/logs" "$RUN/raw" "$RUN/analysis" "$RUN/inputs" "$RUN/receipts"
@@ -33,6 +34,7 @@ fail() { echo "$(date -u +%FT%TZ) FAILED $*" | tee -a "$RUN/logs/stages.txt"; ex
 # shellcheck source=../../2026-11-22-range-v3-tune/code/session_lib.sh
 source "$T/code/session_lib.sh"
 source "$X/code/session_lib_h.sh"
+source "$X/code/session_lib_i.sh"   # CONTENDED=1 (gates only): overlaps recorded, not waited for or rerun
 X_SAVED=$X; X=$T   # run_slot calls $X/code/overlap.py
 stage "environment and inputs"
 { git rev-parse HEAD; hostname -s; nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader; nvcc --version | tail -1

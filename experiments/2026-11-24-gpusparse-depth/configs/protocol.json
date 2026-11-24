@@ -36,5 +36,12 @@
     "correctness": "every timed output: the adapter's own per-query check against the reference plus its post-timing integer score validation, and compare_topk.py against the oracle prefix (u4m: compare_topk.py); any mismatch stops the session",
     "cross_session_checks": "descriptive: GPUSparse U64 at k=10 against the published 6.890 ms and FP32 against 6.008 ms; u4m against Measurement F (0.403 / 0.455 / 0.833 ms)",
     "gpu_policy": "as part 1 (Measurement H rule), 12-hour window from the timing launch"
+  },
+  "gates_amendment_1": {
+    "date": "2026-11-24",
+    "by": "owner (option 1), before the relaunched gate run 20261124-cuda5-i-pre-02 and before any timing",
+    "reason": "gate run 20261124-cuda5-i-pre-01 (6 of 13 gates exact, both k=10 byte comparisons identical) met many short GPU processes of other users during each ~90-105 s gate (8-14 per attempt), then stopped on a session-script bug: the adapter's <tag>-validation.json and <tag>-jit.json were not moved with an overlapped attempt, so the rerun's adapter refused to overwrite them (fixed in 9392dd1: outputs named <tag>.validation.json / <tag>.jit.json)",
+    "rule": "gates (correctness only) run with CONTENDED=1 (code/session_lib_i.sh): they wait for none of our own GPU jobs but not for other users' processes; an overlap is detected and recorded per process (logs/overlap-checks.jsonl) and the attempt is kept, not rerun. Exactness, the byte comparisons and the FP32 rule are unchanged. The timing session never runs contended (run_i.sh refuses) and keeps the Measurement H rule.",
+    "effect_on_estimate": "gate process durations under contention can be longer, so the gate-based GPU-time estimate (the 60-minute start rule) is conservative; peak GPU memory per gate is the gate process's own nvidia-smi figure and is unaffected by other processes"
   }
 }
