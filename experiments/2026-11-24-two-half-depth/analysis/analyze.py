@@ -25,7 +25,7 @@ def ratio(num, den):  # lists [process][unit]
     return dict(ratio=math.exp(st.fmean(x for l in L for x in l)), interval_95=[pct(d, 2.5), pct(d, 97.5)])
 
 
-CONFIGS = ("half-k10", "v3-k10", "half-k100", "tm-k100", "v3-k100", "half-k1000", "tm-k1000", "v3-k1000")
+CONFIGS = ("half-k100", "tm-k100", "v3-k100", "half-k1000", "tm-k1000", "v3-k1000")
 lat, res = {}, {"configurations": {}, "contrasts": {}}
 for n in CONFIGS:
     lat[n], work = [], {}
@@ -38,7 +38,7 @@ for n in CONFIGS:
     v = [x for l in lat[n] for x in l]
     c = res["configurations"][n] = dict(median_ms=st.median(v), mean_ms=st.fmean(v), p95_ms=pct(v, 95), p99_ms=pct(v, 99), per_process_median_ms=[st.median(l) for l in lat[n]])
     if not n.startswith("v3"): c.update(total_scored_ranges=sum(x[0] for x in work.values()), total_scored_postings=sum(x[1] for x in work.values()))
-for k in ("k10", "k100", "k1000"):
+for k in ("k100", "k1000"):
     res["contrasts"]["two-half time / v3 time, " + k] = ratio(lat["half-" + k], lat["v3-" + k])
     if "tm-" + k in lat: res["contrasts"]["two-half time / control time, " + k] = ratio(lat["half-" + k], lat["tm-" + k])
 (run / "analysis/statistics.json").write_text(json.dumps(res, indent=2) + "\n"); print(json.dumps(res, indent=2))

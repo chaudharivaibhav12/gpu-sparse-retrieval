@@ -1,4 +1,4 @@
-"""cuda5 session: the W256 two-half filter at k=10/100/1000 against v3, and against its own control at k=100/1000.
+"""cuda5 session: the W256 two-half filter at k=100/1000 against v3 and its own control.
 
 python3 run.py RUN_ID [--smoke]     harness of 2026-11-23-gpusparse-k1000-batch; resumes a partly complete RUN_ID
 Needs W4096_RBP (read-only copy, checked by hash) and RUN_BASE (output folder).
@@ -14,16 +14,16 @@ assert HOST == "cuda5"
 F = Path("/scratch/psp8502/full"); HOME = BASE
 GSP, RBP, W256 = F / "full-8841823.gsp", Path(W4096), F / "full-8841823-w256.rbp"
 Q = Path("/scratch/psp8502/gpu-sparse-retrieval/data/derived/calibration-500.tsv")
-ORACLE = {k: Path(ORA % k) if ORA else F / "oracle-cuda5" / ("cpu-top%d-8841823.tsv" % k) for k in (10, 100, 1000)}
+ORACLE = {k: Path(ORA % k) if ORA else F / "oracle-cuda5" / ("cpu-top%d-8841823.tsv" % k) for k in (100, 1000)}
 PINS = {W256: "0ad6531c7698c7541fd9f6d62fb4fa34619e4b765656cccfa3d13fdc64202892", GSP: "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac", RBP: "06368cee88e0b1104760ecb1672be511e2685990b35178021dacdcd8eee98ba6",
-        Q: "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091", ORACLE[10]: "7a63bb5214891b0c820d7d8205a16701b473292f2f3bf6b05fc0c2494ff2b6ed"}
+        Q: "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091"}
 PREFIX = {ORACLE[100]: "70484b23", ORACLE[1000]: "302b63d4"}
 COMPARE = ROOT / "experiments/2026-11-13-range-bitpack/analysis/compare_topk.py"
 PACK = ROOT / "experiments/2026-11-15-range-batching/code/pack_answers.py"
 PARENT = ROOT / "results/2026-11-19-prune-depth-adaptive/20261118-cuda5-da-02/raw"  # measured runtime receipts of the unchanged control
 CPU_LIMIT, CORE_LIMIT = 4.0, 0.05
 # name: (system, k)
-CONFIGS = {"half-k10": ("half", 10), "v3-k10": ("v3", 10), "half-k100": ("half", 100), "tm-k100": ("tm", 100), "v3-k100": ("v3", 100),
+CONFIGS = {"half-k100": ("half", 100), "tm-k100": ("tm", 100), "v3-k100": ("v3", 100),
            "half-k1000": ("half", 1000), "tm-k1000": ("tm", 1000), "v3-k1000": ("v3", 1000)}
 spec = importlib.util.spec_from_file_location("gate", EXP / "code/gate.py"); gate = importlib.util.module_from_spec(spec); spec.loader.exec_module(gate)
 
@@ -71,7 +71,7 @@ def wait_quiet(tag):
         free = int(smi("-i", UUID, "--query-gpu=memory.free", "--format=csv,noheader,nounits"))
         ok = not active and free >= 10500 and machine <= CPU_LIMIT and busy <= CORE_LIMIT
         with (RUN / "logs/quiet.txt").open("a") as f: f.write("%s %s machine=%.2f core=%d busy=%.3f active=%d free=%d\n" % (tag, "quiet" if ok else "busy", machine, core, busy, len(active), free))
-        if active or free < 10500: need = 18  # amendment 2: an idle holder does not count
+        if active or free < 10500: need = 4  # amendment 1 of this experiment: 2 quiet minutes; amendment 2: an idle holder does not count
         streak = streak + 1 if ok else 0
         if streak >= need: return core
         time.sleep(30)
@@ -131,7 +131,7 @@ def hold(out, where):
 
 
 ap = argparse.ArgumentParser(); ap.add_argument("run_id"); ap.add_argument("--smoke", action="store_true"); a = ap.parse_args()
-PASSES, WARM, ROUNDS = (1, 1, 1) if a.smoke else (3, 3, 20)
+PASSES, WARM, ROUNDS = (1, 1, 1) if a.smoke else (3, 3, 10)
 if not a.smoke: assert not subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=ROOT, capture_output=True, text=True, check=True).stdout, "commit first"
 RUN = HOME / "runs" / EXP.name / a.run_id; BUILD = HOME / "build" / a.run_id; DEADLINE = float(os.environ["RUN_DEADLINE"])  # epoch seconds; no process starts after it
 for d in ("logs", "raw/ineligible", "raw/interrupted", "analysis"): (RUN / d).mkdir(parents=True, exist_ok=True)
@@ -158,14 +158,7 @@ for name in ("half-k1000",):
     stamp("STAGE", out.name); rc = run_cfg(out, name, 1, 0, 0, wait_quiet(out.name), drift=True)
     if rc != 3 or Path(str(out) + ".csv").exists(): stamp("FAILED rejection", name, rc); sys.exit(1)
     (RUN / "logs" / ("passed-" + out.name)).touch()
-if not a.smoke:
-    for name in [c for c in CONFIGS if CONFIGS[c][0] == "half"]:  # tm and v3: correctness reused from da-02 and gsb-02 (unchanged source); timing answers are still compared
-        out = RUN / "raw" / ("correct-" + name)
-        if (RUN / "analysis" / ("compare-%s.json" % out.name)).exists(): continue
-        hold(out, RUN / "raw/interrupted" / ("%s-%d" % (out.name, time.time())))
-        stamp("STAGE", out.name)
-        if run_cfg(out, name, 1, 0, 1, wait_quiet(out.name)): stamp("FAILED", out.name); sys.exit(1)
-        check(out, name, 1)
+# amendment 1: no separate correctness stage; every round of every timing process is compared with the CPU reference
 names = list(CONFIGS); n = len(names)
 for p in range(PASSES):
     for i in range(n):
