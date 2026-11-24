@@ -1,14 +1,16 @@
-// topk.cuh - the candidate record returned by the kernel, its canonical order (score descending, then
-// smaller original ID), and small CUDA helpers (error check, device array).
-// Extracted from src/cuda_topk.cuh (commit 6306666; repository main at 8fc44cd): only GpuCandidate,
-// candidate_better, cuda_checked and GpuArray; the unused local_topk kernel and DeviceTopK are not copied.
-#pragma once
+// topk.cuh - the candidate record returned by the kernel, and small CUDA helpers (error check, device array).
+// Extracted from src/cuda_topk.cuh (commit 6306666; repository main at 8fc44cd): GpuCandidate, cuda_checked and
+// GpuArray; the unused local_topk kernel and DeviceTopK are not copied, and candidate_better (canonical order)
+// is in main.cu, its only user.
+#ifndef U4M_TOPK_CUH
+#define U4M_TOPK_CUH
 #include <cuda_runtime.h>
-#include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 #include <vector>
 
+// Shared by main.cu and range_kernel.cu.
 inline void cuda_checked(cudaError_t result) {
     if (result != cudaSuccess) throw std::runtime_error(cudaGetErrorString(result));
 }
@@ -33,11 +35,4 @@ struct GpuCandidate {
     uint32_t doc, valid;
 };
 static_assert(sizeof(GpuCandidate)==24,"Candidate memory accounting changed");
-
-__host__ __device__ inline bool candidate_better(GpuCandidate a,GpuCandidate b) {
-    if (a.valid!=b.valid) return a.valid>b.valid;
-    if (!a.valid) return false;
-    if (a.score!=b.score) return a.score>b.score;
-    if (a.id!=b.id) return a.id<b.id;
-    return a.doc<b.doc;
-}
+#endif

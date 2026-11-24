@@ -13,6 +13,30 @@
 #include "topk.cuh"
 #include "range_kernel.cuh"
 #include <chrono>
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <numeric>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+using namespace std;
+
+// Canonical order of returned candidates: score descending, then smaller original ID (from src/cuda_topk.cuh).
+static bool candidate_better(GpuCandidate a,GpuCandidate b) {
+    if (a.valid!=b.valid) return a.valid>b.valid;
+    if (!a.valid) return false;
+    if (a.score!=b.score) return a.score>b.score;
+    if (a.id!=b.id) return a.id<b.id;
+    return a.doc<b.doc;
+}
 
 struct GpuEvent {
     cudaEvent_t event{};
@@ -87,8 +111,7 @@ int main(int argc,char** argv) {
         size_t shared_bytes=size_t(winner_cap)*8+size_t(RBP_RADIX_BUCKETS)*4+size_t(W)*4;
         // The merging block needs P = winner_cap winner slots in dynamic shared memory.
         shared_bytes=max(shared_bytes,size_t(winner_cap)*8);
-        require(cudaFuncSetAttribute(reinterpret_cast<const void*>(range_scores),cudaFuncAttributeMaxDynamicSharedMemorySize,int(shared_bytes))==cudaSuccess,
-                "Range size and k need more shared memory than this GPU allows per thread block");
+        range_scores_configure(shared_bytes);
         GpuArray<uint32_t> lookup_first(index.lookup_first.size()),lookup_range(index.blocks()),value_start(index.blocks()),encoded(index.encoded.size());
         GpuArray<uint64_t> bit_start(index.blocks()),ids(N);
         GpuArray<uint16_t> block_count(index.blocks()),tie_rank(N),rank_slot(N);
@@ -128,8 +151,7 @@ int main(int argc,char** argv) {
                 for (uint32_t i=0;i<terms;++i) args.term[i]={q.terms[i].first,q.terms[i].second};
                 cuda_checked(cudaEventRecord(begin.event));
                 if (wanted) {
-                    range_scores<<<R,threads,shared_bytes>>>(view,args,k,winner_cap,candidates.ptr,finished.ptr,merged.ptr,theta.ptr,lengths.ptr,merge_keys.ptr);
-                    cuda_checked(cudaGetLastError());
+                    range_scores_launch(R,threads,shared_bytes,view,args,k,winner_cap,candidates.ptr,finished.ptr,merged.ptr,theta.ptr,lengths.ptr,merge_keys.ptr);
                 }
                 cuda_checked(cudaEventRecord(end.event));
                 if (wanted) cuda_checked(cudaMemcpy(winners.data(),merged.ptr,size_t(wanted)*sizeof(GpuCandidate),cudaMemcpyDeviceToHost));

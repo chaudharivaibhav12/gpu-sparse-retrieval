@@ -6,7 +6,7 @@
 #   make run        run u4m on the queries at depth K, write runs/u4m-N-kK.trec and print the timing summary
 #   make verify     exact CPU reference for the same queries and compare: "Q/Q queries identical"
 #   make demo       the above on N=100000 passages, 50 queries, k=10
-#   make clean      remove bin/ and runs/ (data/ is kept)
+#   make clean      remove bin/, obj/ and runs/ (data/ is kept)
 # Variables: ARCH (GPU architecture, sm_89 for the RTX 4070 on cuda5), N, Q, K, W.
 ARCH ?= sm_89
 N ?= 8841823
@@ -38,15 +38,23 @@ INDEX_SHA_8841823_4096 := 06368cee88e0b1104760ecb1672be511e2685990b35178021dacdc
 
 build: $(BINS)
 
-bin/u4m: src/main.cu src/range_kernel.cuh src/range_index.h src/topk.cuh src/common.h | bin
-	$(NVCC) $(NVCCFLAGS) src/main.cu -o $@
-bin/prepare: src/prepare.cpp src/common.h | bin
-	$(CXX) $(CXXFLAGS) $< -o $@
-bin/build_index: src/build_index.cpp src/range_index.h src/common.h | bin
-	$(CXX) $(CXXFLAGS) $< -o $@
-bin/cpu_reference: src/cpu_reference.cpp src/common.h | bin
-	$(CXX) $(CXXFLAGS) $< -o $@
-bin runs data:
+HEADERS := src/common.h src/range_index.h src/topk.cuh src/range_kernel.cuh
+obj/%.o: src/%.cpp $(HEADERS) | obj
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+obj/range_kernel.o: src/range_kernel.cu $(HEADERS) | obj
+	$(NVCC) $(NVCCFLAGS) -c $< -o $@
+obj/main.o: src/main.cu $(HEADERS) | obj
+	$(NVCC) $(NVCCFLAGS) -c $< -o $@
+
+bin/u4m: obj/main.o obj/range_kernel.o obj/range_index.o obj/common.o | bin
+	$(NVCC) -arch=$(ARCH) $^ -o $@
+bin/prepare: obj/prepare.o obj/common.o | bin
+	$(CXX) $^ -o $@
+bin/build_index: obj/build_index.o obj/range_index.o obj/common.o | bin
+	$(CXX) $^ -o $@
+bin/cpu_reference: obj/cpu_reference.o obj/common.o | bin
+	$(CXX) $^ -o $@
+bin runs data obj:
 	mkdir -p $@
 
 fetch:
@@ -83,4 +91,4 @@ demo:
 	$(MAKE) N=100000 Q=50 K=10 prepare index run verify
 
 clean:
-	rm -rf bin runs
+	rm -rf bin obj runs

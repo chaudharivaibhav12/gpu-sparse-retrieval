@@ -7,6 +7,21 @@
 // to range_bitpack_tool's "build GSP OUTPUT W positions".
 #include "common.h"
 #include "range_index.h"
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <numeric>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+using namespace std;
 
 // Term-major blocks of in-range positions, packed at each block's width.
 static RangeIndex rbp_build(const Index& x,uint32_t range_size) {

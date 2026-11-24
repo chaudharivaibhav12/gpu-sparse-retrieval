@@ -10,6 +10,21 @@
 // With COUNT = 8841823 and CAL_COUNT = 500 it writes the same GSP and calibration file as
 // experiments/2026-11-15-full-collection-baselines/code/prepare_inputs.py and the team's query preparation.
 #include "common.h"
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <numeric>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+using namespace std;
 
 uint64_t mix(uint64_t x) { x+=0x9e3779b97f4a7c15ULL; x=(x^(x>>30))*0xbf58476d1ce4e5b9ULL; x=(x^(x>>27))*0x94d049bb133111ebULL; return x^(x>>31); }
 uint64_t hash_id(const string& s) { uint64_t x=14695981039346656037ULL; for(unsigned char c:s) { x^=c; x*=1099511628211ULL; } return mix(x); }

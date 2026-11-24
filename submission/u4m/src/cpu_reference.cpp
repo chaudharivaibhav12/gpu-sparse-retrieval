@@ -6,6 +6,21 @@
 // repository main at 8fc44cd); the TREC output and the comparison are new.
 #include "common.h"
 #include <map>
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <numeric>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+using namespace std;
 
 uint64_t dot(const Index& x,uint32_t d,const vector<uint32_t>& weights) { uint64_t sum=0; for(uint64_t j=x.offsets[d];j<x.offsets[d+1];j++)sum+=uint64_t(weights[x.terms[j]])*x.impacts[j]; return sum; }
 vector<uint32_t> ranking(const Index& x,const vector<uint64_t>& scores,const vector<uint8_t>& keep,uint32_t k) {
