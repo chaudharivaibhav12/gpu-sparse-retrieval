@@ -110,7 +110,7 @@ int main(int argc,char** argv) {
         encoded.upload(index.encoded);bit_start.upload(index.block_bit_start);ids.upload(index.ids);
         block_count.upload(index.block_count);block_width.upload(index.block_width);impacts.upload(index.impacts);
         tie_rank.upload(tie_rank_host);rank_slot.upload(rank_slot_host);
-        const RbpView view{lookup_first.ptr,lookup_range.ptr,bit_start.ptr,value_start.ptr,block_count.ptr,block_width.ptr,encoded.ptr,impacts.ptr,ids.ptr,tie_rank.ptr,rank_slot.ptr,range_start.ptr,N,W
+        const RbpView view{lookup_first.ptr,lookup_range.ptr,bit_start.ptr,value_start.ptr,block_count.ptr,block_width.ptr,encoded.ptr,impacts.ptr,ids.ptr,tie_rank.ptr,rank_slot.ptr,range_start.ptr,W
             ,global_rank.ptr,rank_doc.ptr};
         cuda_checked(cudaDeviceSynchronize());
         const double load_seconds=chrono::duration<double>(chrono::steady_clock::now()-load_begin).count();
@@ -128,8 +128,7 @@ int main(int argc,char** argv) {
                 for (uint32_t i=0;i<terms;++i) args.term[i]={q.terms[i].first,q.terms[i].second};
                 cuda_checked(cudaEventRecord(begin.event));
                 if (wanted) {
-                    // heads and scratch are not used at these defaults (see range_kernel.cuh).
-                    range_scores<<<R,threads,shared_bytes>>>(view,args,k,winner_cap,candidates.ptr,finished.ptr,nullptr,nullptr,merged.ptr,theta.ptr,lengths.ptr,merge_keys.ptr);
+                    range_scores<<<R,threads,shared_bytes>>>(view,args,k,winner_cap,candidates.ptr,finished.ptr,merged.ptr,theta.ptr,lengths.ptr,merge_keys.ptr);
                     cuda_checked(cudaGetLastError());
                 }
                 cuda_checked(cudaEventRecord(end.event));

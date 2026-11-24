@@ -6,9 +6,9 @@
 // theta-filtered candidates (RBP_V3_THETA=1), radix local top-k at every k (RBP_V3_RADIX=1, crossover 1),
 // unroll 4 (RBP_V3_UNROLL=4) and the radix merge (RBP_V3_MERGE_RADIX=1). Code paths that are off at these
 // defaults (warp-list selection and merge, unroll 1, the non-theta path) and the RBP_STAGE_CLOCKS
-// instrumentation are deleted; the remaining kernel text is unchanged. The kernel was the template
-// instantiation range_scores<true>; heads and scratch are unused at these defaults but kept so the
-// parameter layout matches the merged kernel.
+// instrumentation are deleted. The kernel was the template instantiation range_scores<true>.
+// Submission step A: the unused warp_length array, heads/scratch parameters and RbpView::docs are removed,
+// and every shared-memory array is __align__(16) so 128-bit shared loads stay aligned.
 #pragma once
 #include <cstdint>
 #include "topk.cuh"
@@ -35,7 +35,7 @@ struct RbpView {
     const uint16_t* tie_rank;const uint16_t* rank_slot;
     // ranges+1 document boundaries; range_size is the widest range.
     const uint32_t* range_start;
-    uint32_t docs,range_size;
+    uint32_t range_size;
     // Change D: rank of each document's original ID among all N IDs (0 = smallest), and its inverse.
     const uint32_t* global_rank;const uint32_t* rank_doc;
 };
@@ -54,10 +54,10 @@ struct RbpView {
 __device__ inline uint32_t rbp_dynamic_smem_bytes() { uint32_t b;asm("mov.u32 %0, %%dynamic_smem_size;" : "=r"(b));return b; }
 __device__ void merge_radix(const RbpView& v,const GpuCandidate* lists,uint32_t count,uint32_t k,uint32_t* lengths,uint32_t cut,
                             GpuCandidate* output,uint64_t* global_keys,uint64_t* smem) {
-    __shared__ uint32_t merge_buckets[RBP_RADIX_BUCKETS];
-    __shared__ uint64_t merge_warp_max[RBP_MAX_WARPS];
-    __shared__ uint32_t merge_warp_sum[RBP_MAX_WARPS];
-    __shared__ uint32_t merge_state[5];   // boundary bucket, count above it, its count, gathered, survivors
+    __shared__ __align__(16) uint32_t merge_buckets[RBP_RADIX_BUCKETS];
+    __shared__ __align__(16) uint64_t merge_warp_max[RBP_MAX_WARPS];
+    __shared__ __align__(16) uint32_t merge_warp_sum[RBP_MAX_WARPS];
+    __shared__ __align__(16) uint32_t merge_state[5];   // boundary bucket, count above it, its count, gathered, survivors
     const uint32_t thread=threadIdx.x,threads=blockDim.x,lane=thread&31,warp=thread>>5,warps=threads>>5;
     // 1. Survivors of list l: the prefix with score >= cut (binary search in canonical order).
     for (uint32_t l=thread;l<count;l+=threads) {
@@ -185,25 +185,23 @@ __device__ void merge_radix(const RbpView& v,const GpuCandidate* lists,uint32_t 
     }
 }
 
-// finished: device counter, 0 before every launch. heads (one per range) and
-// scratch (warps*k) are merge scratch; candidates holds every range's list.
+// finished: device counter, 0 before every launch; candidates holds every range's list.
 // RADIX: large-k instantiation (change 3). There list_cap is the winner
 // buffer size P (a power of two >= k) and dynamic shared memory holds
 // P winner keys, the radix buckets, then the scores.
 __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_cap,GpuCandidate* candidates,
-                             uint32_t* finished,uint16_t* heads,GpuCandidate* scratch,GpuCandidate* output
+                             uint32_t* finished,GpuCandidate* output
                              ,uint32_t* theta,uint32_t* lengths
                              ,uint64_t* merge_keys
                              ) {
     // Dynamic shared memory: warps*list_cap selection keys, then the scores.
-    extern __shared__ uint64_t dynamic_shared[];
+    extern __shared__ __align__(16) uint64_t dynamic_shared[];
     // Per query term in this range: its block's metadata (count 0 if absent),
     // and the number of work-list postings before it.
-    __shared__ uint64_t term_bit[RBP_MAX_TERMS];
-    __shared__ uint32_t term_count[RBP_MAX_TERMS],term_value[RBP_MAX_TERMS];
-    __shared__ uint32_t term_width[RBP_MAX_TERMS],term_weight[RBP_MAX_TERMS];
-    __shared__ uint32_t count_start[RBP_MAX_TERMS+1];
-    __shared__ uint32_t warp_length[RBP_MAX_WARPS];
+    __shared__ __align__(16) uint64_t term_bit[RBP_MAX_TERMS];
+    __shared__ __align__(16) uint32_t term_count[RBP_MAX_TERMS],term_value[RBP_MAX_TERMS];
+    __shared__ __align__(16) uint32_t term_width[RBP_MAX_TERMS],term_weight[RBP_MAX_TERMS];
+    __shared__ __align__(16) uint32_t count_start[RBP_MAX_TERMS+1];
     __shared__ uint32_t is_last;
     const uint32_t thread=threadIdx.x,threads=blockDim.x,lane=thread&31,warp=thread>>5,warps=threads>>5;
     const uint32_t terms=query.terms;
@@ -282,8 +280,8 @@ __global__ void range_scores(RbpView v,QueryArgs query,uint32_t k,uint32_t list_
         // r = in-range original-ID rank: unique, larger = higher score, then
         // smaller original ID. Find the want-th largest key digit by digit,
         // then gather the keys at or above it and sort them.
-        __shared__ uint64_t radix_warp_max[RBP_MAX_WARPS];
-        __shared__ uint32_t radix_state[4];   // boundary bucket, count above it, its count, gathered
+        __shared__ __align__(16) uint64_t radix_warp_max[RBP_MAX_WARPS];
+        __shared__ __align__(16) uint32_t radix_state[4];   // boundary bucket, count above it, its count, gathered
         uint32_t* buckets=reinterpret_cast<uint32_t*>(dynamic_shared+list_cap);
         const uint32_t key_bits=32-__clz(v.range_size-1);
         const uint64_t rank_top=uint64_t(v.range_size-1);
