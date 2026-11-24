@@ -108,6 +108,9 @@ AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 AllowShortBlocksOnASingleLine: Never
+AllowShortLambdasOnASingleLine: None
+AllowShortCaseLabelsOnASingleLine: false
+SortIncludes: Never
 InsertBraces: true
 SpaceBeforeParens: ControlStatements
 PointerAlignment: Left
