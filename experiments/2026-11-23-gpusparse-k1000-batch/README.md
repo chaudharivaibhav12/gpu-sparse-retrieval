@@ -17,4 +17,8 @@
 - batch 1, k=1000: v3 is **5.18x** faster than the GPUSparse adaptation (1.68 vs 8.94 ms);
 - throughput, k=1000: v3 747 q/s against GPUSparse batch 500 at 453 q/s (released code, **1.65x**) and 405 q/s (exact ties, **1.85x**).
 
-Run B (the same on cuda5) was not run: the GPU was occupied by another user on 2026-11-23.
+[20261123-cuda5-gsb-02](runs/20261123-cuda5-gsb-02/README.md), RTX 4070 (a separate table):
+- batch 1: v3 is **14.36x** faster at k=10, **12.81x** at k=100 and **7.51x** at k=1000;
+- throughput, k=1000: v3 1,606 q/s against GPUSparse batch 500 at 550 q/s (released code, **2.92x**) and 492 q/s (exact ties, **3.27x**).
+
+Run 20261123-cuda5-gsb-01 was stopped by the operator (amendment 2) after 1 of 27 timing processes; its timings were not read.

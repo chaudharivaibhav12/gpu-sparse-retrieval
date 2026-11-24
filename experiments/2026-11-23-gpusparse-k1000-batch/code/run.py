@@ -11,7 +11,7 @@ from pathlib import Path
 
 EXP = Path(__file__).resolve().parents[1]; ROOT = EXP.parents[1]
 HOST = os.uname().nodename.split(".")[0]
-W4096 = {"cuda2": "/scratch/psp8502/full/full-8841823-w4096-pos.rbp", "cuda5": "/scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp"}[HOST]
+W4096 = {"cuda2": "/scratch/psp8502/full/full-8841823-w4096-pos.rbp", "cuda5": os.environ.get("W4096_RBP", "")}[HOST]  # cuda5: a teammate's read-only copy, checked by hash; set W4096_RBP
 ARCH, CORES, SIBLING, SAMPLER, BASE, ORA = {"cuda2": ("sm_75", range(3, 20, 2), 20, 1, Path.home() / "v3s", "/scratch/psp8502/full/cpu-top%d-8841823.tsv"),
     "cuda5": ("sm_89", range(2, 16, 2), None, 1, Path("/scratch/psp8502/v3s"), None)}[HOST]
 F = Path("/scratch/psp8502/full"); ENV = Path("/scratch/psp8502/gpusparse-env"); HOME = BASE
@@ -71,6 +71,7 @@ def state():
 
 
 def wait_quiet(tag):
+    streak, need = 0, 1  # amendment 1 (cuda5): once the GPU was seen busy, require 10 minutes of quiet
     while True:
         if time.time() > DEADLINE: stamp("FAILED deadline before", tag); sys.exit(1)
         machine, core, busy = state()
@@ -79,7 +80,9 @@ def wait_quiet(tag):
         free = int(smi("-i", UUID, "--query-gpu=memory.free", "--format=csv,noheader,nounits"))
         ok = not active and free >= 10500 - (500 if HOST == "cuda2" else 0) and machine <= CPU_LIMIT and busy <= CORE_LIMIT
         with (RUN / "logs/quiet.txt").open("a") as f: f.write("%s %s machine=%.2f core=%d busy=%.3f active=%d free=%d\n" % (tag, "quiet" if ok else "busy", machine, core, busy, len(active), free))
-        if ok: return core
+        if HOST == "cuda5" and (active or free < 10500): need = 18  # amendment 2: an idle holder does not count
+        streak = streak + 1 if ok else 0
+        if streak >= need: return core
         time.sleep(30)
 
 
