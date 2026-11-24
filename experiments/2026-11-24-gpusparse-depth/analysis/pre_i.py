@@ -20,7 +20,7 @@ def main():
     for tag, impl, k, status in csv.reader(open(run / "logs/cell-status.tsv"), delimiter="\t"):
         rows = [r for r in csv.DictReader(open(run / "raw" / (tag + ".csv"))) if r["phase"] == "measured"] if (run / "raw" / (tag + ".csv")).exists() else []
         walls = [float(r["query_wall_ms"]) for r in rows]
-        v = run / "raw" / (tag + "-validation.json")
+        v = run / "raw" / (tag + ".validation.json")
         val = json.loads(v.read_text()) if v.exists() else {}
         comp = run / "analysis" / ("compare-%s.json" % tag)
         dur = float(proc[tag][4]) - float(proc[tag][3])

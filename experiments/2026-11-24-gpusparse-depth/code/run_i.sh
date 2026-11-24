@@ -67,7 +67,7 @@ slot() {
         TRITON_CACHE_DIR="$RUN/jit/$tag" CUDA_CACHE_PATH="$RUN/cuda-cache/$tag" \
         python3 "$X_SAVED/code/rt_gate.py" --expect "$RUN/receipts/$tag-expect.json" --receipt "$RUN/receipts/$tag-gate.json" -- \
         "$PY" "$adapter" --variant monolithic --index "$GSP" --queries "$Q" --reference "$ORACLE1000" --native-repo "$NATIVE" \
-        --csv "$RUN/raw/$tag.csv" --top "$RUN/raw/$tag.tsv" --validation "$RUN/raw/$tag-validation.json" --jit-manifest "$RUN/raw/$tag-jit.json" \
+        --csv "$RUN/raw/$tag.csv" --top "$RUN/raw/$tag.tsv" --validation "$RUN/raw/$tag.validation.json" --jit-manifest "$RUN/raw/$tag.jit.json" \
         --limit 500 --k "$k" --gpu 0 --block-pl 512 --repeats "$rounds" --warmups "$warmups" --verify 0
     SLOT_STATUS=$(cat "$RUN/receipts/$tag.status")
 }
