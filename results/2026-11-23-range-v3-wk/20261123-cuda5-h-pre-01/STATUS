@@ -1,0 +1,10 @@
+STOPPED (not complete): pre-registration session (probes + gates; nothing timed), commit d02c7d3.
+Started 2026-11-23T19:23:02Z. All 5 probes and 8 gates (every W=256 and W=512 cell) were exact; the
+W=512 k=1000 gate overlapped once (preserved as -overlap-1, rerun exact).
+From ~19:39Z another user's process pattern appeared while our processes ran: dozens of short GPU
+processes (10-156 MiB, ~1-2 s each, about one per 1.5 s), not seen by the 5-sample idle checks before
+each attempt. gate-w1024-k10 overlapped on 4 consecutive attempts (19:49-19:56Z; preserved as
+-overlap-1..4) and the session stopped at the replacement limit (logs/stages.txt). The timing launcher
+then did not start (launcher-session_h4.log in 20261123-cuda5-h-inputs-01).
+Rerun on the owner's instruction as 20261123-cuda5-h-pre-02 with the same rules (all 20 gates exact).
+No manifest: the session stopped before its analysis; artifacts listed by write_manifest afterwards.

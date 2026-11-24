@@ -1,0 +1,264 @@
+{
+  "label": "profile-clocks-k10-w1024",
+  "radix_labels": true,
+  "merge_radix": true,
+  "meta": {
+    "ranges": 8635,
+    "warps": 8,
+    "measured_rounds": 5,
+    "queries": 25,
+    "k": 10,
+    "range_size": 1024,
+    "threads": 256,
+    "split_decode_add": false
+  },
+  "sm_clock_ghz_median": 2.4962022569444446,
+  "sm_clock_ghz_range": [
+    2.4927734375,
+    2.500732421875
+  ],
+  "kernel_span_us_median": 674.816,
+  "block_duration_us_median": 13.312,
+  "merge_tail_us_median": 89.088,
+  "blocks_starting_after_first_block_ends_median": 8405,
+  "barrier_warp_time_share": 0.31695438399842724,
+  "sites": [
+    {
+      "site": "S1",
+      "source_line": 445,
+      "between": "setup: lookup+zero -> word-table prefix",
+      "stage_group": "setup",
+      "warps_observed": 8635000,
+      "mean_wait_cycles": 7708.062796757383,
+      "mean_wait_us": 3.0879159632652047,
+      "max_wait_cycles": 31480,
+      "max_wait_us": 12.611157574440337,
+      "median_block_max_wait_us": 3.728063290589002,
+      "critical_path_wait_us": 4.152363909087944,
+      "share_of_total_barrier_time": 0.6289060821647948
+    },
+    {
+      "site": "S2",
+      "source_line": 458,
+      "between": "setup: word-table prefix -> decode+add",
+      "stage_group": "setup",
+      "warps_observed": 8635000,
+      "mean_wait_cycles": 877.8983012159815,
+      "mean_wait_us": 0.35169357722262484,
+      "max_wait_cycles": 7041,
+      "max_wait_us": 2.820684894588133,
+      "median_block_max_wait_us": 0.42424446859378395,
+      "critical_path_wait_us": 0.526474029149956,
+      "share_of_total_barrier_time": 0.07162831903615718
+    },
+    {
+      "site": "S3",
+      "source_line": 518,
+      "between": "decode+add -> radix select",
+      "stage_group": "decode+add",
+      "warps_observed": 8635000,
+      "mean_wait_cycles": 775.3936368268674,
+      "mean_wait_us": 0.3106293308844342,
+      "max_wait_cycles": 10876,
+      "max_wait_us": 4.357018735057596,
+      "median_block_max_wait_us": 0.4999594870680286,
+      "critical_path_wait_us": 0.7547401773635954,
+      "share_of_total_barrier_time": 0.06326489380411389
+    },
+    {
+      "site": "S4",
+      "source_line": 656,
+      "between": "bitonic sort -> theta + candidate write",
+      "stage_group": "local top-k",
+      "warps_observed": 8635000,
+      "mean_wait_cycles": 209.723533178923,
+      "mean_wait_us": 0.08401704332870916,
+      "max_wait_cycles": 3637,
+      "max_wait_us": 1.457013344925016,
+      "median_block_max_wait_us": 0.08212475548793739,
+      "critical_path_wait_us": 0.08496203697308746,
+      "share_of_total_barrier_time": 0.017111485605021383
+    },
+    {
+      "site": "S5",
+      "source_line": 748,
+      "between": "candidate write+threadfence -> done ticket",
+      "stage_group": "candidate write + done counter",
+      "warps_observed": 8635000,
+      "mean_wait_cycles": 1546.7560456282572,
+      "mean_wait_us": 0.6196437173010223,
+      "max_wait_cycles": 11692,
+      "max_wait_us": 4.683915322755921,
+      "median_block_max_wait_us": 0.6814351662682024,
+      "critical_path_wait_us": 1.2423571508442355,
+      "share_of_total_barrier_time": 0.12620087697391347
+    },
+    {
+      "site": "S6",
+      "source_line": 763,
+      "between": "done ticket -> merge decision",
+      "stage_group": "candidate write + done counter",
+      "warps_observed": 8635000,
+      "mean_wait_cycles": 1138.4509454545455,
+      "mean_wait_us": 0.45607319770958876,
+      "max_wait_cycles": 8423,
+      "max_wait_us": 3.3743259291458374,
+      "median_block_max_wait_us": 0.4963540099978265,
+      "critical_path_wait_us": 0.5068820034861797,
+      "share_of_total_barrier_time": 0.09288698635717157
+    },
+    {
+      "site": "S7",
+      "source_line": 210,
+      "between": "radix select -> gather/sort/output (no barrier; last block only)",
+      "stage_group": "merge",
+      "warps_observed": 1000,
+      "mean_wait_cycles": 143.516,
+      "mean_wait_us": 0.05749373857856987,
+      "max_wait_cycles": 155,
+      "max_wait_us": 0.06209432732014779,
+      "median_block_max_wait_us": 0.06009128450336883,
+      "critical_path_wait_us": 0,
+      "share_of_total_barrier_time": 1.356058827653225e-06
+    }
+  ],
+  "stages": [
+    {
+      "stage": "lookup_and_zero",
+      "group": "setup",
+      "blocks_observed": 1079375,
+      "mean_per_block_cycles": 2901.963651302837,
+      "mean_per_block_us": 1.1625514892591586,
+      "critical_path_us": 4.428349621010824
+    },
+    {
+      "stage": "word_table_prefix",
+      "group": "setup",
+      "blocks_observed": 1079375,
+      "mean_per_block_cycles": 461.8704269832079,
+      "mean_per_block_us": 0.18502924821026923,
+      "critical_path_us": 0.5247643208368568
+    },
+    {
+      "stage": "decode_add",
+      "group": "decode+add",
+      "blocks_observed": 1079375,
+      "mean_per_block_cycles": 7772.43816282571,
+      "mean_per_block_us": 3.1137052861813403,
+      "critical_path_us": 24.810582015313248
+    },
+    {
+      "stage": "radix_select_gather",
+      "group": "local top-k",
+      "blocks_observed": 1079375,
+      "mean_per_block_cycles": 9737.893175911986,
+      "mean_per_block_us": 3.901083395314273,
+      "critical_path_us": 4.3706338635117135
+    },
+    {
+      "stage": "bitonic_sort",
+      "group": "local top-k",
+      "blocks_observed": 1079375,
+      "mean_per_block_cycles": 2566.184949971048,
+      "mean_per_block_us": 1.028035666113157,
+      "critical_path_us": 1.0220227533660369
+    },
+    {
+      "stage": "candidate_write",
+      "group": "candidate write + done counter",
+      "blocks_observed": 1079375,
+      "mean_per_block_cycles": 1036.4057529820498,
+      "mean_per_block_us": 0.41519301975581696,
+      "critical_path_us": 1.439521236024642
+    },
+    {
+      "stage": "threadfence",
+      "group": "candidate write + done counter",
+      "blocks_observed": 1079375,
+      "mean_per_block_cycles": 1132.6981073537927,
+      "mean_per_block_us": 0.45376856150282774,
+      "critical_path_us": 0.4844109558412521
+    },
+    {
+      "stage": "done_ticket",
+      "group": "candidate write + done counter",
+      "blocks_observed": 1079375,
+      "mean_per_block_cycles": 336.01147944412276,
+      "mean_per_block_us": 0.13460907605116432,
+      "critical_path_us": 0.5132520786461899
+    },
+    {
+      "stage": "merge_select",
+      "group": "merge",
+      "blocks_observed": 125,
+      "mean_per_block_cycles": 222804.634,
+      "mean_per_block_us": 89.25744433575308,
+      "critical_path_us": 0
+    },
+    {
+      "stage": "merge_scatter",
+      "group": "merge",
+      "blocks_observed": 125,
+      "mean_per_block_cycles": 2987.008,
+      "mean_per_block_us": 1.1966209836122579,
+      "critical_path_us": 0
+    },
+    {
+      "stage": "merge_count_scan",
+      "group": "merge detail",
+      "blocks_observed": 125,
+      "mean_per_block_cycles": 54675.85,
+      "mean_per_block_us": 21.90361371875679,
+      "critical_path_us": 0
+    },
+    {
+      "stage": "merge_compaction",
+      "group": "merge detail",
+      "blocks_observed": 125,
+      "mean_per_block_cycles": 165226.848,
+      "mean_per_block_us": 66.19129020508583,
+      "critical_path_us": 0
+    },
+    {
+      "stage": "merge_radix_select",
+      "group": "merge detail",
+      "blocks_observed": 125,
+      "mean_per_block_cycles": 2901.936,
+      "mean_per_block_us": 1.162540411910454,
+      "critical_path_us": 0
+    }
+  ],
+  "stage_groups": {
+    "setup": {
+      "critical_path_us": 4.953113941847681,
+      "mean_per_block_us": 1.347580737469428,
+      "barrier_wait_critical_path_us": 4.6788379382378995,
+      "barrier_wait_mean_per_warp_us": 3.4396095404878295
+    },
+    "decode+add": {
+      "critical_path_us": 24.810582015313248,
+      "mean_per_block_us": 3.1137052861813403,
+      "barrier_wait_critical_path_us": 0.7547401773635954,
+      "barrier_wait_mean_per_warp_us": 0.3106293308844342
+    },
+    "local top-k": {
+      "critical_path_us": 5.39265661687775,
+      "mean_per_block_us": 4.92911906142743,
+      "barrier_wait_critical_path_us": 0.08496203697308746,
+      "barrier_wait_mean_per_warp_us": 0.08401704332870916
+    },
+    "candidate write + done counter": {
+      "critical_path_us": 2.437184270512084,
+      "mean_per_block_us": 1.0035706573098089,
+      "barrier_wait_critical_path_us": 1.7492391543304153,
+      "barrier_wait_mean_per_warp_us": 1.0757169150106112
+    },
+    "merge": {
+      "critical_path_us": 0,
+      "mean_per_block_us": 90.45406531936534,
+      "barrier_wait_critical_path_us": 0,
+      "barrier_wait_mean_per_warp_us": 0
+    }
+  },
+  "definitions": "- Barrier wait of a warp at a site = (after - before) cycles.\n- Stage time of a warp = cycles between the stage's boundary events; barrier\n  segments are separate events, so stage times exclude barrier waits.\n- Per block: mean over warps. \"Mean per block\" averages blocks over all slices.\n- Critical path (per slice): the slowest range block up to its done-ticket\n  (event S6_after, i.e. excluding the merge), and in it the slowest warp per\n  stage; reported as the median over slices.\n- Merge tail (per slice, globaltimer): end of the merging block minus the\n  latest rank_write_end over all ranges.\n- Cycles -> microseconds with each slice's measured SM clock: median over\n  blocks of (clk_end - clk_start) / (gt_end - gt_start)."
+}

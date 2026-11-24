@@ -1,0 +1,8 @@
+Measurement H inputs (code/build_indexes_h.sh, launched by session_h2.sh at commit 61ea968).
+- Reused, verified by SHA-256 against their pins: W=256 0ad6531c..., W=1024 c7669620..., W=4096 06368cee...; GSP e838dfbf...
+- Built from the pinned GSP with round-trip checks: W=512 (d35a6990..., 453.5 s), W=2048 (bc63150c..., 425.7 s).
+- W=8192: stopped by the owner (grid changed to W <= 4096 before registration). The builder (PID 2143317)
+  was sent SIGTERM at 2026-11-23T19:21:1xZ about 4 min 20 s into the build; the parent script then
+  stopped (set -e) and session_h2.sh logged "H_FAILED indexes: Terminated". No W=8192 output existed
+  (the builder writes the index only at the end; build-w8192.log is empty), so nothing was deleted.
+- W=16384: not built (owner decision).

@@ -1,0 +1,818 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-23-range-v3-wk",
+  "run_id": "20261123-cuda5-h-pre-02",
+  "status": "completed-pre-registration",
+  "scope": "Measurement H pre-registration (protocol part 1): cuda5; u4m on the full collection; one-query probes per W and 500-query gates for W in {256,512,1024,2048,4096} x k in {10,100,316,1000}; correctness and feasibility only, nothing timed; holder-based idle rule; calibration only, after the freeze",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "d02c7d3da30064577c27e3c637e3d9e141edf28f",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6), code/build_h.sh",
+    "source_sha256": {
+      "experiments/2026-11-23-range-v3-wk/configs/protocol.json": "2bedf77f22cd7d7e92a8d87974b93270eed0da2c1493535bab2eaf93f81a9eea",
+      "experiments/2026-11-23-range-v3-wk/code/run_h_pre.sh": "eba57d633d0a3edb69242ffd7295b99a93b2d2e044116b8b3f17f73ce2bc5c27",
+      "experiments/2026-11-23-range-v3-wk/code/session_lib_h.sh": "fe24f007e355f8256945a3fc3f1b53fe8646d25d4b23e7f7f4825d3650525d6a",
+      "experiments/2026-11-23-range-v3-wk/code/gpu_holder.cu": "65b1ee1dc011bea1d30c704e1beddc284054054a7371130950bc65afb1409aab",
+      "experiments/2026-11-23-range-v3-wk/analysis/feasibility_h.py": "9e9702ff4f9e50f1a0bf4585717da99ee5f82b18574afd346471a6b985977622",
+      "experiments/2026-11-22-range-v3-tune/code/session_lib.sh": "f5e6aecfaa91d70872a25f70dee4173ff72e61ce2767b1d5bfc8b0e14b6daf69",
+      "experiments/2026-11-22-range-v3-tune/code/overlap.py": "0ce4280e3e0785260a8a48724b4ab771e85277c2d98484cf32f887ca5be45afc"
+    },
+    "binary_sha256": {
+      "build/h-d02c7d3d-2/u4m/scorer": "2011494df8599747de3d8e447bdba8a62cf35921c69c33cab6a603b7186fc1bb",
+      "build/h-d02c7d3d-2/holder/gpu_holder": "231014b1b4a836fee111c592f4f3884aac5e53aaa16c5d4f5646a50add5d67ae"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "unavailable"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "[probe-w256-k1000] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w256.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w256-k1000.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w256-k1000.tsv 1 1000 0 0 1 0 256 256 - 1",
+    "[probe-w256-k1000] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w256.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w256-k1000.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w256-k1000.tsv 1 1000 0 0 1 0 256 256 - 1",
+    "[probe-w512-k1000] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w512-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w512-k1000.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w512-k1000.tsv 1 1000 0 0 1 0 256 256 - 1",
+    "[probe-w1024-k1000] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w1024.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w1024-k1000.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w1024-k1000.tsv 1 1000 0 0 1 0 256 256 - 1",
+    "[probe-w2048-k1000] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w2048-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w2048-k1000.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w2048-k1000.tsv 1 1000 0 0 1 0 256 256 - 1",
+    "[probe-w4096-k1000] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w4096-k1000.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w4096-k1000.tsv 1 1000 0 0 1 0 256 256 - 1",
+    "[gate-w256-k10] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w256.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k10.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k10.tsv 500 10 0 0 1 1 256 256 - 1",
+    "[gate-w256-k100] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w256.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k100.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k100.tsv 500 100 0 0 1 1 256 256 - 1",
+    "[gate-w256-k316] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w256.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k316.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k316.tsv 500 316 0 0 1 1 256 256 - 1",
+    "[gate-w256-k316] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w256.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k316.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k316.tsv 500 316 0 0 1 1 256 256 - 1",
+    "[gate-w256-k1000] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w256.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k1000.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k1000.tsv 500 1000 0 0 1 1 256 256 - 1",
+    "[gate-w512-k10] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w512-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w512-k10.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w512-k10.tsv 500 10 0 0 1 1 256 256 - 1",
+    "[gate-w512-k100] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w512-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w512-k100.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w512-k100.tsv 500 100 0 0 1 1 256 256 - 1",
+    "[gate-w512-k316] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w512-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w512-k316.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w512-k316.tsv 500 316 0 0 1 1 256 256 - 1",
+    "[gate-w512-k1000] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w512-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w512-k1000.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w512-k1000.tsv 500 1000 0 0 1 1 256 256 - 1",
+    "[gate-w1024-k10] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w1024.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w1024-k10.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w1024-k10.tsv 500 10 0 0 1 1 256 256 - 1",
+    "[gate-w1024-k100] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w1024.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w1024-k100.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w1024-k100.tsv 500 100 0 0 1 1 256 256 - 1",
+    "[gate-w1024-k316] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w1024.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w1024-k316.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w1024-k316.tsv 500 316 0 0 1 1 256 256 - 1",
+    "[gate-w1024-k1000] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w1024.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w1024-k1000.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w1024-k1000.tsv 500 1000 0 0 1 1 256 256 - 1",
+    "[gate-w2048-k10] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w2048-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w2048-k10.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w2048-k10.tsv 500 10 0 0 1 1 256 256 - 1",
+    "[gate-w2048-k100] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w2048-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w2048-k100.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w2048-k100.tsv 500 100 0 0 1 1 256 256 - 1",
+    "[gate-w2048-k316] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w2048-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w2048-k316.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w2048-k316.tsv 500 316 0 0 1 1 256 256 - 1",
+    "[gate-w2048-k1000] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w2048-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w2048-k1000.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w2048-k1000.tsv 500 1000 0 0 1 1 256 256 - 1",
+    "[gate-w4096-k10] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w4096-k10.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w4096-k10.tsv 500 10 0 0 1 1 256 256 - 1",
+    "[gate-w4096-k100] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w4096-k100.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w4096-k100.tsv 500 100 0 0 1 1 256 256 - 1",
+    "[gate-w4096-k316] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w4096-k316.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w4096-k316.tsv 500 316 0 0 1 1 256 256 - 1",
+    "[gate-w4096-k1000] build/h-d02c7d3d-2/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w4096-k1000.csv results/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w4096-k1000.tsv 500 1000 0 0 1 1 256 256 - 1"
+  ],
+  "artifacts": {
+    "analysis/compare-gate-w1024-k10.json": {
+      "sha256": "64e3dad7b2c4cda606c323f44435879e3f23362869c03cfe246cf8a8b47ca3b1",
+      "bytes": 367
+    },
+    "analysis/compare-gate-w1024-k100.json": {
+      "sha256": "c531c502eec086fad83cd315e0dfa888562bd469c5480cfc8d7848508969b70d",
+      "bytes": 371
+    },
+    "analysis/compare-gate-w1024-k1000.json": {
+      "sha256": "ae7105e5b42b1254073172415a47aab305efe7de4dea84c3ef533d46cc45c07d",
+      "bytes": 375
+    },
+    "analysis/compare-gate-w1024-k316.json": {
+      "sha256": "460f4b487e9e8765259d3e91e95e2cf04570c3084ec36b00d2e2925e4f72749f",
+      "bytes": 371
+    },
+    "analysis/compare-gate-w2048-k10.json": {
+      "sha256": "14a70961896703504892a5839e6acd9aa8242a2be6f995f565feeb1489ec5a25",
+      "bytes": 367
+    },
+    "analysis/compare-gate-w2048-k100.json": {
+      "sha256": "8e879d66344259558bd47fd9a466fa2307ea0db742554dd923bc368383eb12fa",
+      "bytes": 371
+    },
+    "analysis/compare-gate-w2048-k1000.json": {
+      "sha256": "d3f405834065bb1251320bcbd5fa30f8aac4ed39ef22498eba188e143bb88228",
+      "bytes": 375
+    },
+    "analysis/compare-gate-w2048-k316.json": {
+      "sha256": "a8d63d22b5f5c2c37f414ec9045fa1a1a0da22babbc6488f39c47e5791dd7b73",
+      "bytes": 371
+    },
+    "analysis/compare-gate-w256-k10.json": {
+      "sha256": "e471c8491714fafc92f423aeaa109b99182c76223e19d8828b70e30417da95e1",
+      "bytes": 366
+    },
+    "analysis/compare-gate-w256-k100.json": {
+      "sha256": "febfed55857a8da65e095bc0f0a292212314770cba053fca1987589bcb731cb1",
+      "bytes": 370
+    },
+    "analysis/compare-gate-w256-k1000.json": {
+      "sha256": "db3ee6914cb319a6c62d55fc539244e3e7197c667a5844570e6b8987498ef0e1",
+      "bytes": 374
+    },
+    "analysis/compare-gate-w256-k316.json": {
+      "sha256": "6271ecd8520ec8dc54d8ed939cf9e8bec7136c7f5a6e3359e1d93980b4b174ce",
+      "bytes": 370
+    },
+    "analysis/compare-gate-w4096-k10.json": {
+      "sha256": "52caed7d18d0d30e1f722da216346d109005542e947763ec2214f79fd4acf22d",
+      "bytes": 367
+    },
+    "analysis/compare-gate-w4096-k100.json": {
+      "sha256": "8f26a47d62b251e1a83c96cddd91181c3194ed8efa2f7011d4806a6453295702",
+      "bytes": 371
+    },
+    "analysis/compare-gate-w4096-k1000.json": {
+      "sha256": "1a6a7e46501313103d390467c01fd28442b4b8a10b3cbc7bbc04772070493987",
+      "bytes": 375
+    },
+    "analysis/compare-gate-w4096-k316.json": {
+      "sha256": "372326e50b16765faa20f97abb2a2ec2bde89869406c63314b0e7bde8996103f",
+      "bytes": 371
+    },
+    "analysis/compare-gate-w512-k10.json": {
+      "sha256": "6de9061bce4d2a0dd8bd63f97026ed5aac9c9da929f36f6c068c30b315f0c53d",
+      "bytes": 366
+    },
+    "analysis/compare-gate-w512-k100.json": {
+      "sha256": "406ae7b2598adaae46522bc8239cbc6a360c3ed03935e864e64be55dd8bb18c7",
+      "bytes": 370
+    },
+    "analysis/compare-gate-w512-k1000.json": {
+      "sha256": "186ae780544ad8c82be9d5f320d87ceab5eb68c5bd8ce6f86c3c2313af4492cf",
+      "bytes": 374
+    },
+    "analysis/compare-gate-w512-k316.json": {
+      "sha256": "cabc44fb13aa4d4f19b1555a51bd0bb3afb88ea72ccc5276675c655946f92ef6",
+      "bytes": 370
+    },
+    "analysis/compare-probe-w1024-k1000.json": {
+      "sha256": "c6a6bcf4208c5299ec61a8d9649770e4e88e664f8122fa4c96dbbd0717c8fde7",
+      "bytes": 368
+    },
+    "analysis/compare-probe-w2048-k1000.json": {
+      "sha256": "d5fdd17a471e0089f73745f0951c74a84f65898b070545fb0fe54c484be5f49b",
+      "bytes": 368
+    },
+    "analysis/compare-probe-w256-k1000.json": {
+      "sha256": "8dedba4a1408da33beb625ad676503fc3460687dedf6b781645d82012b75910e",
+      "bytes": 367
+    },
+    "analysis/compare-probe-w4096-k1000.json": {
+      "sha256": "4bf473bd39d3a708453916f7737acee72fbd77342d35cff3cad248e60da3c091",
+      "bytes": 368
+    },
+    "analysis/compare-probe-w512-k1000.json": {
+      "sha256": "c1b496961fe95666712d46e4b6d01e791be78c7a88a85de5795e5216ee3ed9a0",
+      "bytes": 367
+    },
+    "analysis/feasibility.json": {
+      "sha256": "66dd186ea401af017dd5ac206fca2e7865dfa4ec9b4f04da7b99c0cd9450c471",
+      "bytes": 14194
+    },
+    "analysis/feasibility.md": {
+      "sha256": "09b7fabfc4eae19285b14eb383c323eccd3035a1f9d2b5199276cb9ee2df2af0",
+      "bytes": 2998
+    },
+    "analysis/gpu-memory.json": {
+      "sha256": "753f3a61d3e558d115fbb6a968608a5a1793770a3ba91460dd6fd9701d39a2da",
+      "bytes": 3040
+    },
+    "analysis/gpu-memory.txt": {
+      "sha256": "5f93eab029d59f9b4ddd2e5e11161a8aad0894ca6a61238de89393402248f43b",
+      "bytes": 1350
+    },
+    "inputs/oracle-top10.tsv.zst": {
+      "sha256": "19ff8f249d25cd8bfe9cada7d4d02b92ce03221f80f2542c851a33a37f27f89b",
+      "bytes": 44380
+    },
+    "inputs/oracle-top100.tsv.zst": {
+      "sha256": "7b9a1760dc9d61863b85058c09a387e0f39c198146099e0629ce1996d8d315ee",
+      "bytes": 471415
+    },
+    "inputs/oracle-top316.tsv.zst": {
+      "sha256": "075eb73c54f19d97b3830dc3b355fe85468871191f985c0b252053148b439808",
+      "bytes": 1504595
+    },
+    "logs/binaries.tsv": {
+      "sha256": "b4df63e8f40f3cc3252c5f7695fef94cee2d3e9d9e883c2a89377abe39129273",
+      "bytes": 460
+    },
+    "logs/commands.txt": {
+      "sha256": "f26fabe955123188291356c2ade33b0a3aa9b3b599125f0748f422213e79d8e6",
+      "bytes": 8655
+    },
+    "logs/environment.txt": {
+      "sha256": "0831eb853f8a3199acddffcaf8e5376336b38f2e89f3dce1d7e3860ef737889c",
+      "bytes": 146
+    },
+    "logs/feasibility.log": {
+      "sha256": "5a50f6639dd4119415bc28be9e26e9dee2c994dbb0cf47b6e8ac513491af1bad",
+      "bytes": 67
+    },
+    "logs/gpu-pmon.log": {
+      "sha256": "d92532b314ba25be2ad360a984083731b3ee686345e84359e155ac2352ae33f8",
+      "bytes": 130517
+    },
+    "logs/gpu-poll.log": {
+      "sha256": "2f0002529a5341221ea2d40ef3b4709928898135e440ed405bb6fa20de9ba2dc",
+      "bytes": 129694
+    },
+    "logs/holder-switch.tsv": {
+      "sha256": "f08182f8a6dcbfd1764dbacbf2c73adf395a89741562121f80b9a9d0b639f27d",
+      "bytes": 2106
+    },
+    "logs/holder.ctl": {
+      "sha256": "a11c3d917a2149a4b548217038bc8f2dd2130a1966e0c7af5c4225d81f25a8c3",
+      "bytes": 5
+    },
+    "logs/holder.log": {
+      "sha256": "33af5fa409fe9427f65690a6889d1d3cd0213fb060a2a4c6d60a5286d95c8f98",
+      "bytes": 1120
+    },
+    "logs/holder.out": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/host-utc-offset.txt": {
+      "sha256": "51ef6a6d539bbd38ac4fb4d8de42da0cf36eafb7fb7be71e3420d57982eebd9b",
+      "bytes": 6
+    },
+    "logs/idle-checks.txt": {
+      "sha256": "2cdf8581ff5d86798aea650ba3a80f210ffa358c7331396922c3230f43991dbb",
+      "bytes": 3888
+    },
+    "logs/indexes.tsv": {
+      "sha256": "f846430bdf29e60d23f6743cda5aa7f50d09b3f8f602a5370b85204b2cdca89c",
+      "bytes": 1024
+    },
+    "logs/input-sha256.txt": {
+      "sha256": "d4896199393c0ca1f54bd45dad1b89e2316a6addbe09d929e12d3eeb00b406a7",
+      "bytes": 629
+    },
+    "logs/overlap-checks.jsonl": {
+      "sha256": "880e146089592fc3eadb14a948e57cdbd0f578c09fd575490003617a80acb5df",
+      "bytes": 5251
+    },
+    "logs/processes.tsv": {
+      "sha256": "9bb25815cce0d918675214d4c95c8417ac08dab2e666b4b6d435d43ae5b8f947",
+      "bytes": 1566
+    },
+    "logs/ptxas-u4m-clocks.log": {
+      "sha256": "7fea07efc746cd47268e70608435d28ab5d7466730032624bfb470fcbc25372a",
+      "bytes": 1262
+    },
+    "logs/ptxas-u4m.log": {
+      "sha256": "e8d228124a62ab1c663c6e4aba5789f41d4515a96d41edf4623454a4de9fac6a",
+      "bytes": 1243
+    },
+    "logs/stages.txt": {
+      "sha256": "36f77f81ec84fe5c42d3f7a207fe0e7ccc232ee22dcb837255f38590b24972a9",
+      "bytes": 1333
+    },
+    "raw/gate-w1024-k10.csv": {
+      "sha256": "69240c9c8fa1065e6cdbf2afaef4c2ac10e6df5cd30f71856c9d036e62d005c9",
+      "bytes": 122146
+    },
+    "raw/gate-w1024-k10.log": {
+      "sha256": "de8d46c5b4072448b51aafe3b452083e044e18db3f753d794238e28170449d59",
+      "bytes": 359
+    },
+    "raw/gate-w1024-k10.tsv.zst": {
+      "sha256": "7bfacaed369cb5a53ce898e2badc34bba69ff14bc4f143601164025c5ea288d5",
+      "bytes": 72317
+    },
+    "raw/gate-w1024-k100.csv": {
+      "sha256": "d731bac842b6cd68894a25ce5616cfa38311461aa3b6917c3b3d48ee0fd34c48",
+      "bytes": 124117
+    },
+    "raw/gate-w1024-k100.log": {
+      "sha256": "dca91311525b3c088f1e1b931d6286238c05e545bbe687571ca869db19b2a242",
+      "bytes": 360
+    },
+    "raw/gate-w1024-k100.tsv.zst": {
+      "sha256": "d33c61f87aedc6de52c0c82d9a711973a9e9e98b43034b544becf810808282e4",
+      "bytes": 1008881
+    },
+    "raw/gate-w1024-k1000.csv": {
+      "sha256": "2cbee6d014dbbc436c8bef5a9d8bce51fe986076aff77f3ea437fd1415a78139",
+      "bytes": 124333
+    },
+    "raw/gate-w1024-k1000.log": {
+      "sha256": "7718c0d69040bd9f92903e6f3cfa2250c229baf3f4700009648c15585909eccd",
+      "bytes": 362
+    },
+    "raw/gate-w1024-k1000.tsv.zst": {
+      "sha256": "d5be5b21df06b6a92c5b711388b37b6dd988ddbca1c6983ef3e69c55ec060fa5",
+      "bytes": 9992884
+    },
+    "raw/gate-w1024-k316.csv": {
+      "sha256": "08a5ed26c77bc78083f56dc10ef1a862c2c6742ce5c83307227ea24928113575",
+      "bytes": 123184
+    },
+    "raw/gate-w1024-k316.log": {
+      "sha256": "8fb6f9d785e7566444558eeeb50463b1aface425836baeb9cc5d338f53732c4a",
+      "bytes": 360
+    },
+    "raw/gate-w1024-k316.tsv.zst": {
+      "sha256": "41b9f47b5a6304ba143ca9aeb6ddd81b156de49c631faab7ddb5d694f37ca6bb",
+      "bytes": 3235785
+    },
+    "raw/gate-w2048-k10.csv": {
+      "sha256": "76e5e784d9b773a1fadeb10205dddbbc9b1bb566896342ce578c941a283aafa3",
+      "bytes": 122192
+    },
+    "raw/gate-w2048-k10.log": {
+      "sha256": "f099c7324ee8b03a115bbf3698fd296645d031844a0da3431067c4abc6c38d22",
+      "bytes": 359
+    },
+    "raw/gate-w2048-k10.tsv.zst": {
+      "sha256": "7bfacaed369cb5a53ce898e2badc34bba69ff14bc4f143601164025c5ea288d5",
+      "bytes": 72317
+    },
+    "raw/gate-w2048-k100.csv": {
+      "sha256": "1450bac269019109f161a4a10cfbc7cb0683f2cd1803eb521b75e6fb070b1617",
+      "bytes": 124192
+    },
+    "raw/gate-w2048-k100.log": {
+      "sha256": "62d6fdb1e42a0977ca8ebf50f4c39c3183f65b7622e44131744d352eab40ce89",
+      "bytes": 361
+    },
+    "raw/gate-w2048-k100.tsv.zst": {
+      "sha256": "d33c61f87aedc6de52c0c82d9a711973a9e9e98b43034b544becf810808282e4",
+      "bytes": 1008881
+    },
+    "raw/gate-w2048-k1000.csv": {
+      "sha256": "16c4a83fef4ff69a143320d54cbe4deab11be5f71805daec03dc07e805cc4602",
+      "bytes": 125013
+    },
+    "raw/gate-w2048-k1000.log": {
+      "sha256": "9a2f5eb8533650e80fd8ebac1f7120c63e56fb0f657441af0df9d2ef91cd525d",
+      "bytes": 362
+    },
+    "raw/gate-w2048-k1000.tsv.zst": {
+      "sha256": "d5be5b21df06b6a92c5b711388b37b6dd988ddbca1c6983ef3e69c55ec060fa5",
+      "bytes": 9992884
+    },
+    "raw/gate-w2048-k316.csv": {
+      "sha256": "8f1500b1dfefad01e46faeb75e462b3d6834f2c86aa87b5995816e5e6c9e4e3a",
+      "bytes": 124165
+    },
+    "raw/gate-w2048-k316.log": {
+      "sha256": "f9225319cf473ca165daedcb13a14e574cfd479fe03cdb4284b453237a917c03",
+      "bytes": 361
+    },
+    "raw/gate-w2048-k316.tsv.zst": {
+      "sha256": "41b9f47b5a6304ba143ca9aeb6ddd81b156de49c631faab7ddb5d694f37ca6bb",
+      "bytes": 3235785
+    },
+    "raw/gate-w256-k10.csv": {
+      "sha256": "145fe03dbaf316785ed8d9b29c1f56d2f178b6008502717a1184182af7b6e6ed",
+      "bytes": 120316
+    },
+    "raw/gate-w256-k10.log": {
+      "sha256": "212d35f16a21ae0338d397e8e253149b9b89e3dc1fa4f4ee7d91e9121314c754",
+      "bytes": 358
+    },
+    "raw/gate-w256-k10.tsv.zst": {
+      "sha256": "7bfacaed369cb5a53ce898e2badc34bba69ff14bc4f143601164025c5ea288d5",
+      "bytes": 72317
+    },
+    "raw/gate-w256-k100.csv": {
+      "sha256": "49127c6ee9cfdd75d9f803a8615499747c59948c2971c346ec43dc585d6851ea",
+      "bytes": 122313
+    },
+    "raw/gate-w256-k100.log": {
+      "sha256": "434726dc623310e42536d405dd49557e7b6e47c97c5de21cb8ace7ab62d631f5",
+      "bytes": 359
+    },
+    "raw/gate-w256-k100.tsv.zst": {
+      "sha256": "d33c61f87aedc6de52c0c82d9a711973a9e9e98b43034b544becf810808282e4",
+      "bytes": 1008881
+    },
+    "raw/gate-w256-k1000.csv": {
+      "sha256": "737a8910fae62743788e89c2e086d1151443a7c87acfb7c271de02c4dd4526e4",
+      "bytes": 124327
+    },
+    "raw/gate-w256-k1000.log": {
+      "sha256": "e720156fd451fbd76a6a6fe4c767a2be94811faa3f78cbb56e85d601dced4e75",
+      "bytes": 361
+    },
+    "raw/gate-w256-k1000.tsv.zst": {
+      "sha256": "d5be5b21df06b6a92c5b711388b37b6dd988ddbca1c6983ef3e69c55ec060fa5",
+      "bytes": 9992884
+    },
+    "raw/gate-w256-k316-overlap-1.csv": {
+      "sha256": "12d771e672cf3d0e9cbbe2db902bcf3be94c921bdaa345e47d3a8bc3cbe1bd90",
+      "bytes": 122338
+    },
+    "raw/gate-w256-k316-overlap-1.log": {
+      "sha256": "9b38153d7337e8456ec4b4dc7f8a9302cc97806b82c0d9ef137a0b242effde10",
+      "bytes": 359
+    },
+    "raw/gate-w256-k316-overlap-1.tsv": {
+      "sha256": "685b9aef3175ba60cf1d548bbfd87213e0538dd5722982ab68dc0d72d517147d",
+      "bytes": 10967014
+    },
+    "raw/gate-w256-k316.csv": {
+      "sha256": "1cfc4991f39c8774fec5e6cfdff173129ea87128e154551208e0a66223c25306",
+      "bytes": 122289
+    },
+    "raw/gate-w256-k316.log": {
+      "sha256": "9b38153d7337e8456ec4b4dc7f8a9302cc97806b82c0d9ef137a0b242effde10",
+      "bytes": 359
+    },
+    "raw/gate-w256-k316.tsv.zst": {
+      "sha256": "41b9f47b5a6304ba143ca9aeb6ddd81b156de49c631faab7ddb5d694f37ca6bb",
+      "bytes": 3235785
+    },
+    "raw/gate-w4096-k10.csv": {
+      "sha256": "6cf4c6b1321693f87c59fb0677e42ce9aca84062143d51addf332a6eb181d5c6",
+      "bytes": 122189
+    },
+    "raw/gate-w4096-k10.log": {
+      "sha256": "8a25fe7bf06e31e7c243c929e4f175faa3e79528bce4958600ff21757af9cab1",
+      "bytes": 360
+    },
+    "raw/gate-w4096-k10.tsv.zst": {
+      "sha256": "7bfacaed369cb5a53ce898e2badc34bba69ff14bc4f143601164025c5ea288d5",
+      "bytes": 72317
+    },
+    "raw/gate-w4096-k100.csv": {
+      "sha256": "279231a15b9de147862f2c77f6fcb4a1a028db2cab6cef120cdcdff7bbdffbe0",
+      "bytes": 124200
+    },
+    "raw/gate-w4096-k100.log": {
+      "sha256": "eeb5c0894813a27185b9ea8ebbb23225c8941499cd1d46a7b223eb796c0b2cd8",
+      "bytes": 361
+    },
+    "raw/gate-w4096-k100.tsv.zst": {
+      "sha256": "d33c61f87aedc6de52c0c82d9a711973a9e9e98b43034b544becf810808282e4",
+      "bytes": 1008881
+    },
+    "raw/gate-w4096-k1000.csv": {
+      "sha256": "a3330f87ab84c7d450f8d91494e79010f6ceb70289ae48be9d49de59efc22282",
+      "bytes": 125788
+    },
+    "raw/gate-w4096-k1000.log": {
+      "sha256": "9cec70a5548bf8ce481d9297fb13e41eab079561d605ecd7214c419960f31ab0",
+      "bytes": 362
+    },
+    "raw/gate-w4096-k1000.tsv.zst": {
+      "sha256": "d5be5b21df06b6a92c5b711388b37b6dd988ddbca1c6983ef3e69c55ec060fa5",
+      "bytes": 9992884
+    },
+    "raw/gate-w4096-k316.csv": {
+      "sha256": "b3881220e603b22cd0dcdc6405ea0ab434c70541cb9ca02a5222d7b762c80b9b",
+      "bytes": 124195
+    },
+    "raw/gate-w4096-k316.log": {
+      "sha256": "247eab55127e9fd3988eaa8709a97abe85ecb15a3c52f625d741beeb2b804a24",
+      "bytes": 361
+    },
+    "raw/gate-w4096-k316.tsv.zst": {
+      "sha256": "41b9f47b5a6304ba143ca9aeb6ddd81b156de49c631faab7ddb5d694f37ca6bb",
+      "bytes": 3235785
+    },
+    "raw/gate-w512-k10.csv": {
+      "sha256": "e6cff66e3eb29c3ccab0ed17f55999fabc6217bba1cf5c45161dfbe89e6c1339",
+      "bytes": 120694
+    },
+    "raw/gate-w512-k10.log": {
+      "sha256": "dbc4a5bf77324ef2aa1a887098aaba92fd254ab370b7151964f7b1c2c1432c76",
+      "bytes": 358
+    },
+    "raw/gate-w512-k10.tsv.zst": {
+      "sha256": "7bfacaed369cb5a53ce898e2badc34bba69ff14bc4f143601164025c5ea288d5",
+      "bytes": 72317
+    },
+    "raw/gate-w512-k100.csv": {
+      "sha256": "b4bdaf5e6534c5d6e83ec2795591c4677cef6b33f9abb38905388ec85ab0d10b",
+      "bytes": 122286
+    },
+    "raw/gate-w512-k100.log": {
+      "sha256": "01fd8878e7a5a1b632558243cfa871923d4a023719fc580fbeb5dc922ca4d220",
+      "bytes": 359
+    },
+    "raw/gate-w512-k100.tsv.zst": {
+      "sha256": "d33c61f87aedc6de52c0c82d9a711973a9e9e98b43034b544becf810808282e4",
+      "bytes": 1008881
+    },
+    "raw/gate-w512-k1000.csv": {
+      "sha256": "ec5470d910a4b2db55f6880cc4a584c35e5eb835f996e5ac81ce478c7ab1fd51",
+      "bytes": 124326
+    },
+    "raw/gate-w512-k1000.log": {
+      "sha256": "cc0b6bf72b597132880436cfe3369155acd4c5164bc1cbfe77bfba7e18ec0dfa",
+      "bytes": 361
+    },
+    "raw/gate-w512-k1000.tsv.zst": {
+      "sha256": "d5be5b21df06b6a92c5b711388b37b6dd988ddbca1c6983ef3e69c55ec060fa5",
+      "bytes": 9992884
+    },
+    "raw/gate-w512-k316.csv": {
+      "sha256": "8a34d23f45656df71bdf79cf67a77be7779a3d99b4183486a3856e22eaf35903",
+      "bytes": 122324
+    },
+    "raw/gate-w512-k316.log": {
+      "sha256": "de672a6d6cf341475a6834c70a1a9abcdfdb8552b48ef7c623976110c7e36d80",
+      "bytes": 359
+    },
+    "raw/gate-w512-k316.tsv.zst": {
+      "sha256": "41b9f47b5a6304ba143ca9aeb6ddd81b156de49c631faab7ddb5d694f37ca6bb",
+      "bytes": 3235785
+    },
+    "raw/probe-w1024-k1000.csv": {
+      "sha256": "6bfd3c16d97f21b71939258c43f134f34f9c19b99a7a65c4b34ba119a0b080cc",
+      "bytes": 370
+    },
+    "raw/probe-w1024-k1000.log": {
+      "sha256": "05b51618982468df7e1502b07e59cca768b18c8cc94be6a0e41211af777429b6",
+      "bytes": 336
+    },
+    "raw/probe-w1024-k1000.tsv.zst": {
+      "sha256": "61410098e8d953b5287641badca16f0ad9b25bffb3dd66db231108a8d4396ce5",
+      "bytes": 7993
+    },
+    "raw/probe-w2048-k1000.csv": {
+      "sha256": "12103080123f4522928eba6c6865d0c37f71c6cedf958604e381a14fa22df5f3",
+      "bytes": 370
+    },
+    "raw/probe-w2048-k1000.log": {
+      "sha256": "c59cfb256149b34298ae4b11466988e361002d7f9d047b0314cb4d9f91c12105",
+      "bytes": 336
+    },
+    "raw/probe-w2048-k1000.tsv.zst": {
+      "sha256": "61410098e8d953b5287641badca16f0ad9b25bffb3dd66db231108a8d4396ce5",
+      "bytes": 7993
+    },
+    "raw/probe-w256-k1000-overlap-1.csv": {
+      "sha256": "701004b6fefb6bfd15e2dbd46b19c4617c8138b037e548fd02fb085ca662f19a",
+      "bytes": 369
+    },
+    "raw/probe-w256-k1000-overlap-1.log": {
+      "sha256": "664e91204905855ded69d7cae88cef5d65e02f9454d1b45f5032e8e4a0780085",
+      "bytes": 335
+    },
+    "raw/probe-w256-k1000-overlap-1.tsv": {
+      "sha256": "169ac7906697c564235e4163598d7d28171d62ca989cd4fc030453d8ddca6867",
+      "bytes": 35073
+    },
+    "raw/probe-w256-k1000.csv": {
+      "sha256": "c6c08cfbd6b18f0f4cb23555a0ebbd04bf97658e19fb22e79f483afa5333b673",
+      "bytes": 370
+    },
+    "raw/probe-w256-k1000.log": {
+      "sha256": "664e91204905855ded69d7cae88cef5d65e02f9454d1b45f5032e8e4a0780085",
+      "bytes": 335
+    },
+    "raw/probe-w256-k1000.tsv.zst": {
+      "sha256": "61410098e8d953b5287641badca16f0ad9b25bffb3dd66db231108a8d4396ce5",
+      "bytes": 7993
+    },
+    "raw/probe-w4096-k1000.csv": {
+      "sha256": "76684c406c5cc88d9ec2230b064bf65653265c706cc09a0f42f49831e1f5494e",
+      "bytes": 372
+    },
+    "raw/probe-w4096-k1000.log": {
+      "sha256": "d194cfab8e5e5fd7b14d75f548273f0492edc6f33f6a380fe8d5ff25d7b64202",
+      "bytes": 336
+    },
+    "raw/probe-w4096-k1000.tsv.zst": {
+      "sha256": "61410098e8d953b5287641badca16f0ad9b25bffb3dd66db231108a8d4396ce5",
+      "bytes": 7993
+    },
+    "raw/probe-w512-k1000.csv": {
+      "sha256": "989afa2333931e70ba7374cf9688f4489378229c9df9ea857d8855dbcedaef06",
+      "bytes": 370
+    },
+    "raw/probe-w512-k1000.log": {
+      "sha256": "f77f9c533ba0cb8c0e28f304f81971cd0eba436d76c63f2f0e0d8434fa79866e",
+      "bytes": 335
+    },
+    "raw/probe-w512-k1000.tsv.zst": {
+      "sha256": "61410098e8d953b5287641badca16f0ad9b25bffb3dd66db231108a8d4396ce5",
+      "bytes": 7993
+    },
+    "raw/topk-sha256.txt": {
+      "sha256": "27d1d1b1600b9e56f6b25932369628cd030ce1904452dd228b7ef6096dda0b1d",
+      "bytes": 2250
+    }
+  },
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [],
+    "excluded": [
+      {
+        "original": "inputs/oracle-top10.tsv.zst",
+        "sha256": "19ff8f249d25cd8bfe9cada7d4d02b92ce03221f80f2542c851a33a37f27f89b",
+        "bytes": 44380,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/inputs/oracle-top10.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "inputs/oracle-top100.tsv.zst",
+        "sha256": "7b9a1760dc9d61863b85058c09a387e0f39c198146099e0629ce1996d8d315ee",
+        "bytes": 471415,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/inputs/oracle-top100.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "inputs/oracle-top316.tsv.zst",
+        "sha256": "075eb73c54f19d97b3830dc3b355fe85468871191f985c0b252053148b439808",
+        "bytes": 1504595,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/inputs/oracle-top316.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w1024-k10.tsv.zst",
+        "sha256": "7bfacaed369cb5a53ce898e2badc34bba69ff14bc4f143601164025c5ea288d5",
+        "bytes": 72317,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w1024-k10.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w1024-k100.tsv.zst",
+        "sha256": "d33c61f87aedc6de52c0c82d9a711973a9e9e98b43034b544becf810808282e4",
+        "bytes": 1008881,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w1024-k100.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w1024-k1000.tsv.zst",
+        "sha256": "d5be5b21df06b6a92c5b711388b37b6dd988ddbca1c6983ef3e69c55ec060fa5",
+        "bytes": 9992884,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w1024-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w1024-k316.tsv.zst",
+        "sha256": "41b9f47b5a6304ba143ca9aeb6ddd81b156de49c631faab7ddb5d694f37ca6bb",
+        "bytes": 3235785,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w1024-k316.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w2048-k10.tsv.zst",
+        "sha256": "7bfacaed369cb5a53ce898e2badc34bba69ff14bc4f143601164025c5ea288d5",
+        "bytes": 72317,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w2048-k10.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w2048-k100.tsv.zst",
+        "sha256": "d33c61f87aedc6de52c0c82d9a711973a9e9e98b43034b544becf810808282e4",
+        "bytes": 1008881,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w2048-k100.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w2048-k1000.tsv.zst",
+        "sha256": "d5be5b21df06b6a92c5b711388b37b6dd988ddbca1c6983ef3e69c55ec060fa5",
+        "bytes": 9992884,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w2048-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w2048-k316.tsv.zst",
+        "sha256": "41b9f47b5a6304ba143ca9aeb6ddd81b156de49c631faab7ddb5d694f37ca6bb",
+        "bytes": 3235785,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w2048-k316.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w256-k10.tsv.zst",
+        "sha256": "7bfacaed369cb5a53ce898e2badc34bba69ff14bc4f143601164025c5ea288d5",
+        "bytes": 72317,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k10.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w256-k100.tsv.zst",
+        "sha256": "d33c61f87aedc6de52c0c82d9a711973a9e9e98b43034b544becf810808282e4",
+        "bytes": 1008881,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k100.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w256-k1000.tsv.zst",
+        "sha256": "d5be5b21df06b6a92c5b711388b37b6dd988ddbca1c6983ef3e69c55ec060fa5",
+        "bytes": 9992884,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w256-k316-overlap-1.tsv",
+        "sha256": "685b9aef3175ba60cf1d548bbfd87213e0538dd5722982ab68dc0d72d517147d",
+        "bytes": 10967014,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k316-overlap-1.tsv.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w256-k316.tsv.zst",
+        "sha256": "41b9f47b5a6304ba143ca9aeb6ddd81b156de49c631faab7ddb5d694f37ca6bb",
+        "bytes": 3235785,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w256-k316.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w4096-k10.tsv.zst",
+        "sha256": "7bfacaed369cb5a53ce898e2badc34bba69ff14bc4f143601164025c5ea288d5",
+        "bytes": 72317,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w4096-k10.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w4096-k100.tsv.zst",
+        "sha256": "d33c61f87aedc6de52c0c82d9a711973a9e9e98b43034b544becf810808282e4",
+        "bytes": 1008881,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w4096-k100.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w4096-k1000.tsv.zst",
+        "sha256": "d5be5b21df06b6a92c5b711388b37b6dd988ddbca1c6983ef3e69c55ec060fa5",
+        "bytes": 9992884,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w4096-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w4096-k316.tsv.zst",
+        "sha256": "41b9f47b5a6304ba143ca9aeb6ddd81b156de49c631faab7ddb5d694f37ca6bb",
+        "bytes": 3235785,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w4096-k316.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w512-k10.tsv.zst",
+        "sha256": "7bfacaed369cb5a53ce898e2badc34bba69ff14bc4f143601164025c5ea288d5",
+        "bytes": 72317,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w512-k10.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w512-k100.tsv.zst",
+        "sha256": "d33c61f87aedc6de52c0c82d9a711973a9e9e98b43034b544becf810808282e4",
+        "bytes": 1008881,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w512-k100.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w512-k1000.tsv.zst",
+        "sha256": "d5be5b21df06b6a92c5b711388b37b6dd988ddbca1c6983ef3e69c55ec060fa5",
+        "bytes": 9992884,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w512-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-w512-k316.tsv.zst",
+        "sha256": "41b9f47b5a6304ba143ca9aeb6ddd81b156de49c631faab7ddb5d694f37ca6bb",
+        "bytes": 3235785,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/gate-w512-k316.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/probe-w1024-k1000.tsv.zst",
+        "sha256": "61410098e8d953b5287641badca16f0ad9b25bffb3dd66db231108a8d4396ce5",
+        "bytes": 7993,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w1024-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/probe-w2048-k1000.tsv.zst",
+        "sha256": "61410098e8d953b5287641badca16f0ad9b25bffb3dd66db231108a8d4396ce5",
+        "bytes": 7993,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w2048-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/probe-w256-k1000.tsv.zst",
+        "sha256": "61410098e8d953b5287641badca16f0ad9b25bffb3dd66db231108a8d4396ce5",
+        "bytes": 7993,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w256-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/probe-w4096-k1000.tsv.zst",
+        "sha256": "61410098e8d953b5287641badca16f0ad9b25bffb3dd66db231108a8d4396ce5",
+        "bytes": 7993,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w4096-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/probe-w512-k1000.tsv.zst",
+        "sha256": "61410098e8d953b5287641badca16f0ad9b25bffb3dd66db231108a8d4396ce5",
+        "bytes": 7993,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-23-range-v3-wk/20261123-cuda5-h-pre-02/raw/probe-w512-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      }
+    ],
+    "recorded_artifacts_not_in_public_tree_or_lists": []
+  }
+}

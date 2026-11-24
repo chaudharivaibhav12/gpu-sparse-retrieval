@@ -4,4 +4,4 @@ Branch `exp/arnav/2026-11-23-range-v3-wk` from `origin/main` `76ded2b`. Scorer: 
 
 **Calibration queries only (500), after the freeze.**
 
-Order: inputs (index verification and builds, CPU) → feasibility and gates (`code/run_h_pre.sh`, nothing timed) → protocol registered in [configs/protocol.json](configs/protocol.json) → timing session → report ([report.md](report.md)).
+Status: complete. Result: W=4096 (the current default and the largest W tested) is best at every k; W=256 is not best at k=10. Report: [report.md](report.md); protocol: [configs/protocol.json](configs/protocol.json); runs: [runs/](runs/).
