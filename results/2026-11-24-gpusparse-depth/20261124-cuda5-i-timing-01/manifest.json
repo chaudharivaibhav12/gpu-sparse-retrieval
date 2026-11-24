@@ -1,0 +1,2915 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-24-gpusparse-depth",
+  "run_id": "20261124-cuda5-i-timing-01",
+  "status": "completed-measurement-I",
+  "scope": "Measurement I (20261124-cuda5-i-timing-01): cuda5; GPUSparse canonical U64 and guarded FP32 adaptations (unchanged at k=10/100, k-limit variant at k=1000) and u4m (W=4096) on the full collection (8,841,823 passages); 500 calibration queries; batch 1; calibration only, after the freeze",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "0a5f305ff9ec51b3ce57749ff9063f8fa0069e36",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "u4m: nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6), code/build_i.sh; GPUSparse: pinned venv (Python 3.12.7, torch 2.6.0+cu126, triton 3.2.0), native 92bb87b",
+    "source_sha256": {
+      "experiments/2026-11-24-gpusparse-depth/configs/protocol.json": "fa437fde94b0d476f7fa23f0207779ddda5c07e26253bec4544261fd45acebb6",
+      "experiments/2026-11-24-gpusparse-depth/code/run_i.sh": "5229f7fa65a97f9fd1ef0c06cf2a72d726da77b41dfbe2d956c2a8f41bdf21a4",
+      "experiments/2026-11-24-gpusparse-depth/code/rt_gate.py": "189971e34e502e34a1f2dc7d8c8af006d84240dd4b30dd847d23331ce5e5303c",
+      "experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh": "acb4388684bbdb0c5d4e964bdf1850192cb02b2d55b5672a60cacf46d31d13fc",
+      "experiments/2026-11-24-gpusparse-depth/code/session_lib_h.sh": "0ed1a61297c18a5d0a6c2fdad7cbfe554af9092a894790d18e7676d2fb381253",
+      "experiments/2026-11-24-gpusparse-depth/code/session_lib_i.sh": "69be90e709431d2b23232eee684d94dd09266f7f973cb9418fbf15148a21efe3",
+      "experiments/2026-11-24-gpusparse-depth/code/check_klimit.py": "a0d609824b32fb1a49c7274a38a3b51b2b79abab95c69350b291e69828b0d454",
+      "experiments/2026-11-24-gpusparse-depth/analysis/pre_i.py": "e9bd8a06d5d4f190011a3d7a13c57092a05c9379b70d818c28bba63a089be527",
+      "experiments/2026-11-24-gpusparse-depth/analysis/analyze_i.py": "45aa04c9efa91d16708247d07eea8e7975f81a1496cfb759664391ab31c80772",
+      "experiments/2026-11-22-range-v3-tune/code/session_lib.sh": "f5e6aecfaa91d70872a25f70dee4173ff72e61ce2767b1d5bfc8b0e14b6daf69",
+      "experiments/2026-11-22-range-v3-tune/code/overlap.py": "0ce4280e3e0785260a8a48724b4ab771e85277c2d98484cf32f887ca5be45afc"
+    },
+    "binary_sha256": {
+      "build/it5-0a5f305f/u4m/scorer": "9cdfa17c8fe2ae2133972db7b014478de677c0b3660b4e4b5a66839940c6f3e9",
+      "build/it5-0a5f305f/holder/gpu_holder": "3f03d4d9916fe6055529108e2a88b9f724ebab26b600fcaf94b56835fe9258e9"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "unavailable"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "[timing-k10-r0-u64] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r0-u64.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k10-r0-u64 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k10-r0-u64 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r0-u64-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r0-u64-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r0-u64.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r0-u64.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r0-u64.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r0-u64.jit.json --limit 500 --k 10 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k10-r0-f32] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r0-f32.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k10-r0-f32 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k10-r0-f32 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r0-f32-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r0-f32-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-16-guarded-fp32-baseline/code/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r0-f32.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r0-f32.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r0-f32.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r0-f32.jit.json --limit 500 --k 10 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k10-r0-u4m] build/it5-0a5f305f/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r0-u4m.csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r0-u4m.tsv 500 10 0 0 20 3 256 256 - 1",
+    "[timing-k10-r1-f32] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r1-f32.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k10-r1-f32 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k10-r1-f32 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r1-f32-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r1-f32-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-16-guarded-fp32-baseline/code/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r1-f32.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r1-f32.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r1-f32.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r1-f32.jit.json --limit 500 --k 10 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k10-r1-u4m] build/it5-0a5f305f/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r1-u4m.csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r1-u4m.tsv 500 10 0 0 20 3 256 256 - 1",
+    "[timing-k10-r1-u64] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r1-u64.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k10-r1-u64 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k10-r1-u64 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r1-u64-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r1-u64-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r1-u64.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r1-u64.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r1-u64.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r1-u64.jit.json --limit 500 --k 10 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k10-r2-u4m] build/it5-0a5f305f/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r2-u4m.csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r2-u4m.tsv 500 10 0 0 20 3 256 256 - 1",
+    "[timing-k10-r2-u64] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r2-u64.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k10-r2-u64 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k10-r2-u64 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r2-u64-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r2-u64-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r2-u64.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r2-u64.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r2-u64.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r2-u64.jit.json --limit 500 --k 10 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k10-r2-f32] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r2-f32.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k10-r2-f32 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k10-r2-f32 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r2-f32-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k10-r2-f32-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-16-guarded-fp32-baseline/code/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r2-f32.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r2-f32.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r2-f32.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r2-f32.jit.json --limit 500 --k 10 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k100-r0-u64] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r0-u64.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k100-r0-u64 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k100-r0-u64 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r0-u64-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r0-u64-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r0-u64.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r0-u64.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r0-u64.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r0-u64.jit.json --limit 500 --k 100 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k100-r0-f32] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r0-f32.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k100-r0-f32 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k100-r0-f32 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r0-f32-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r0-f32-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-16-guarded-fp32-baseline/code/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r0-f32.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r0-f32.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r0-f32.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r0-f32.jit.json --limit 500 --k 100 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k100-r0-u4m] build/it5-0a5f305f/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r0-u4m.csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r0-u4m.tsv 500 100 0 0 20 3 256 256 - 1",
+    "[timing-k100-r1-f32] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r1-f32.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k100-r1-f32 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k100-r1-f32 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r1-f32-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r1-f32-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-16-guarded-fp32-baseline/code/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r1-f32.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r1-f32.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r1-f32.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r1-f32.jit.json --limit 500 --k 100 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k100-r1-u4m] build/it5-0a5f305f/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r1-u4m.csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r1-u4m.tsv 500 100 0 0 20 3 256 256 - 1",
+    "[timing-k100-r1-u64] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r1-u64.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k100-r1-u64 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k100-r1-u64 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r1-u64-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r1-u64-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r1-u64.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r1-u64.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r1-u64.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r1-u64.jit.json --limit 500 --k 100 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k100-r2-u4m] build/it5-0a5f305f/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r2-u4m.csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r2-u4m.tsv 500 100 0 0 20 3 256 256 - 1",
+    "[timing-k100-r2-u64] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r2-u64.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k100-r2-u64 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k100-r2-u64 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r2-u64-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r2-u64-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r2-u64.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r2-u64.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r2-u64.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r2-u64.jit.json --limit 500 --k 100 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k100-r2-f32] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r2-f32.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k100-r2-f32 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k100-r2-f32 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r2-f32-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k100-r2-f32-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-16-guarded-fp32-baseline/code/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r2-f32.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r2-f32.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r2-f32.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r2-f32.jit.json --limit 500 --k 100 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k1000-r0-u64k] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r0-u64k.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k1000-r0-u64k CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k1000-r0-u64k python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r0-u64k-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r0-u64k-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-24-gpusparse-depth/code/klimit/u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r0-u64k.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r0-u64k.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r0-u64k.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r0-u64k.jit.json --limit 500 --k 1000 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k1000-r0-f32k] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r0-f32k.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k1000-r0-f32k CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k1000-r0-f32k python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r0-f32k-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r0-f32k-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-24-gpusparse-depth/code/klimit/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r0-f32k.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r0-f32k.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r0-f32k.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r0-f32k.jit.json --limit 500 --k 1000 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k1000-r0-u4m] build/it5-0a5f305f/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r0-u4m.csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r0-u4m.tsv 500 1000 0 0 20 3 256 256 - 1",
+    "[timing-k1000-r1-f32k] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r1-f32k.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k1000-r1-f32k CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k1000-r1-f32k python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r1-f32k-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r1-f32k-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-24-gpusparse-depth/code/klimit/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r1-f32k.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r1-f32k.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r1-f32k.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r1-f32k.jit.json --limit 500 --k 1000 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k1000-r1-u4m] build/it5-0a5f305f/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r1-u4m.csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r1-u4m.tsv 500 1000 0 0 20 3 256 256 - 1",
+    "[timing-k1000-r1-u64k] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r1-u64k.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k1000-r1-u64k CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k1000-r1-u64k python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r1-u64k-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r1-u64k-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-24-gpusparse-depth/code/klimit/u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r1-u64k.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r1-u64k.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r1-u64k.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r1-u64k.jit.json --limit 500 --k 1000 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k1000-r2-u4m] build/it5-0a5f305f/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r2-u4m.csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r2-u4m.tsv 500 1000 0 0 20 3 256 256 - 1",
+    "[timing-k1000-r2-u64k] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r2-u64k.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k1000-r2-u64k CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k1000-r2-u64k python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r2-u64k-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r2-u64k-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-24-gpusparse-depth/code/klimit/u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r2-u64k.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r2-u64k.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r2-u64k.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r2-u64k.jit.json --limit 500 --k 1000 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0",
+    "[timing-k1000-r2-f32k] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r2-f32k.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit/timing-k1000-r2-f32k CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache/timing-k1000-r2-f32k python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r2-f32k-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/receipts/timing-k1000-r2-f32k-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-24-gpusparse-depth/code/klimit/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r2-f32k.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r2-f32k.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r2-f32k.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r2-f32k.jit.json --limit 500 --k 1000 --gpu 0 --block-pl 512 --repeats 20 --warmups 3 --verify 0"
+  ],
+  "artifacts": {
+    "analysis/compare-timing-k10-r0-f32.json": {
+      "sha256": "006ac0649f7b37b105346bd5842761913b42c1c5bd8165ae303b67445fabd2d4",
+      "bytes": 386
+    },
+    "analysis/compare-timing-k10-r0-u4m.json": {
+      "sha256": "797e908f468de9610771b08b980eee9ee75aa7ee554d7e8f46c86da7896ffdbc",
+      "bytes": 386
+    },
+    "analysis/compare-timing-k10-r0-u64.json": {
+      "sha256": "9a326f7b8b7c9199246f533db39edfaca12712bd6b7997db448e81ac33a43024",
+      "bytes": 386
+    },
+    "analysis/compare-timing-k10-r1-f32.json": {
+      "sha256": "1e1b86e91979e7c5e0c66ab2c1bc6e340bf39fb745e36480f0c65a6e316b6571",
+      "bytes": 386
+    },
+    "analysis/compare-timing-k10-r1-u4m.json": {
+      "sha256": "158edd252142008776ac4be2ff1ef9624fcbd9510fcc57026b4b47c3fd6569e8",
+      "bytes": 386
+    },
+    "analysis/compare-timing-k10-r1-u64.json": {
+      "sha256": "a85ab4c52dc075a3c0f68c87eb02e22cb4780dd9881dee0555ea319c7f01fc09",
+      "bytes": 386
+    },
+    "analysis/compare-timing-k10-r2-f32.json": {
+      "sha256": "4b8b26f1df10c220755adbc68de3d0b43caa175caf67dffe0afa4cae94af43d4",
+      "bytes": 386
+    },
+    "analysis/compare-timing-k10-r2-u4m.json": {
+      "sha256": "4395129c658f0be5f3bfb8c5a4c659b1b0ae752ecfbac267cd5d12dd76ac2201",
+      "bytes": 386
+    },
+    "analysis/compare-timing-k10-r2-u64.json": {
+      "sha256": "965f930764ad601234f6aeb0f25f833b0219ef8a35cd7026963caebb842d45d6",
+      "bytes": 386
+    },
+    "analysis/compare-timing-k100-r0-f32.json": {
+      "sha256": "db699c8d02581052c68d167f80906251fc37ea6ae6f7680227fca46f9931fe8a",
+      "bytes": 390
+    },
+    "analysis/compare-timing-k100-r0-u4m.json": {
+      "sha256": "3fee4285745094c1fb914be2f6e795d131ecb61916e4799dc7f9d0b40635bd92",
+      "bytes": 390
+    },
+    "analysis/compare-timing-k100-r0-u64.json": {
+      "sha256": "e16cfcda215012d0979e1a98eed4ba117a1c540f09b051c941b1095237026bb4",
+      "bytes": 390
+    },
+    "analysis/compare-timing-k100-r1-f32.json": {
+      "sha256": "86e71ba326cbff341be5e58d135f67c1b91d64ba8629a85391978e8ed12ebbb5",
+      "bytes": 390
+    },
+    "analysis/compare-timing-k100-r1-u4m.json": {
+      "sha256": "63dbdd0489541abf7b26b73fe67043b12ff3f0cc6b602baea7b9a74529bbf976",
+      "bytes": 390
+    },
+    "analysis/compare-timing-k100-r1-u64.json": {
+      "sha256": "4f00f742e063a2aba9a9a17f09360894f87e06de9af77999c7c2ef4c42d2edbb",
+      "bytes": 390
+    },
+    "analysis/compare-timing-k100-r2-f32.json": {
+      "sha256": "a94cbdb2f604e088142a61365739bc0d349f668447c064b348148335779942e9",
+      "bytes": 390
+    },
+    "analysis/compare-timing-k100-r2-u4m.json": {
+      "sha256": "57a5f7be4f892ceaf1bf7435c11f0780c64e9ac4238643daee4e8faf7da0894a",
+      "bytes": 390
+    },
+    "analysis/compare-timing-k100-r2-u64.json": {
+      "sha256": "5101476e458f0435d056ddd17fc71e4b212f8d38153f27ac01c28646172c50d7",
+      "bytes": 390
+    },
+    "analysis/compare-timing-k1000-r0-f32k.json": {
+      "sha256": "81f6e9ccc7d908b1d103be7befb53c275e36d33131e002b2e6c5c0d1512daa66",
+      "bytes": 395
+    },
+    "analysis/compare-timing-k1000-r0-u4m.json": {
+      "sha256": "ecf1824a0aa8e334335bc2a492b775f2c6e6c200a46fab6078243abd858d76f6",
+      "bytes": 394
+    },
+    "analysis/compare-timing-k1000-r0-u64k.json": {
+      "sha256": "886c60337ac2f0696b0290978d745e813fa30ea59df03e806f4800472e8b2c2f",
+      "bytes": 395
+    },
+    "analysis/compare-timing-k1000-r1-f32k.json": {
+      "sha256": "f174174c4169b00edc6bf51b58927b178c9f0420e33819499e78fd7605623af9",
+      "bytes": 395
+    },
+    "analysis/compare-timing-k1000-r1-u4m.json": {
+      "sha256": "3b62c8c8a12f68892831c2d7853706690885b830788860f24f09db66b59848ea",
+      "bytes": 394
+    },
+    "analysis/compare-timing-k1000-r1-u64k.json": {
+      "sha256": "1f29469d66812cb14d4ad4ef69ce198e2c134533d89017d9fa3a3365ab2ccf65",
+      "bytes": 395
+    },
+    "analysis/compare-timing-k1000-r2-f32k.json": {
+      "sha256": "25340b1e11a17cbc6cf2888bddcb14b3aa8f065dabc6d2ebcf471db1ad71da3b",
+      "bytes": 395
+    },
+    "analysis/compare-timing-k1000-r2-u4m.json": {
+      "sha256": "1cff6dee27f42f1b4a9de7900a4f221dbeeca769ed65b7fe9a01323cd206bb0f",
+      "bytes": 394
+    },
+    "analysis/compare-timing-k1000-r2-u64k.json": {
+      "sha256": "267d63e3acae31f9c3073cbddfe8892ea0af52255474795c5fda0324f8db34c7",
+      "bytes": 395
+    },
+    "analysis/gpu-memory.json": {
+      "sha256": "aeaafb3496ea5cce291546810add3a7226a4fb065ec704807669e4589402e017",
+      "bytes": 3272
+    },
+    "analysis/gpu-memory.txt": {
+      "sha256": "045023379aff7850bef8768d70dd6b76f5629516dd1f4539323fc3a1e8955c70",
+      "bytes": 1491
+    },
+    "analysis/i-tables.md": {
+      "sha256": "5970474e28869bb19207698dd46c37a3bb2985a18add2cd229c45c8261dd61d9",
+      "bytes": 1670
+    },
+    "analysis/i.json": {
+      "sha256": "29f72dcdb6c14d26cc9bbf718614906edba40d5e0ddbf2dc5d94e183e1e3177b",
+      "bytes": 4859
+    },
+    "jit/timing-k10-r0-f32/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k10-r0-f32/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "71d08adbb151efa6cc9fdbc146442007c30d1bd5f0cad54b695b927a79527498",
+      "bytes": 1075
+    },
+    "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "c48abd73d91bdd61959616826eebf8733ccb12573ed59b41d302bb57f7d161ba",
+      "bytes": 6760
+    },
+    "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "243fbb0f9ff4ee9efb7acb2f96071b7ceb485c75c1226a711efab7343bc744b1",
+      "bytes": 4926
+    },
+    "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "672e25f59ea5552387670c3acb915b8f4611126a9a0c2bca8d796ecd91485c5a",
+      "bytes": 6290
+    },
+    "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "1f5355a8fddc3e9cd6b408c2da344ec44d31b1c334af807997ffc9038f6328cd",
+      "bytes": 5534
+    },
+    "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "50dc60c02f5b3d204f0ce10d416ed0de21b5be15ec68ba0b5fee16cc81ba306e",
+      "bytes": 4973
+    },
+    "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "8371039e014d78b1a354d8afdf345d6f314b79f7839da8a861908512e704676c",
+      "bytes": 1183
+    },
+    "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/timing-k10-r0-f32/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "1ae8a35d65adf1ce4c66fb50b24688aacfd0a3a8085eca07797bbf384ebcd6f1",
+      "bytes": 23080
+    },
+    "jit/timing-k10-r0-u64/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k10-r0-u64/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "7716d63a5bd25363d82b4de2fe5e34a95717b79dd2820e6c9cf21f6f15e1bebb",
+      "bytes": 1075
+    },
+    "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "01295ce222a0ef787f724a2e1206902f1734d2b767e1b3103f7aead1d1522a76",
+      "bytes": 6504
+    },
+    "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "0a76ea9796159cdf5b0fa664461e34037870ad913c78fbb0f7c7300ef1e4e5dc",
+      "bytes": 4693
+    },
+    "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "d8f28f186f3965766e30b945a8fe5d5331f41c195d5ccaee50bd5591ccbefa22",
+      "bytes": 6160
+    },
+    "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "b57b90fb5f6c0d9398ac355157cd187ec7e2dc21777a86569a0970f8c0b9ae81",
+      "bytes": 5483
+    },
+    "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "3ec3ecf89ee4074fae1bb87677f15bdf5e42ca6b24afb76f1ce7ea9df64fc37b",
+      "bytes": 4942
+    },
+    "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "9ca5d87cc296940319ca7492b9be6221a50d33b23fc511c022f24d932e788f33",
+      "bytes": 1183
+    },
+    "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "42d6f86f6a6d7e78c8f15b12330ab30aa579b577829a817904436f9dcabbc118",
+      "bytes": 12648
+    },
+    "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "c5d8e09f737cb5c97a3deba3490f9850344f39a116ca99b19f800694520b7304",
+      "bytes": 11184
+    },
+    "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "6c0941b42a86f4fb0cec5b72b09952a40ecc737d5f206564663cdc079de3bc6f",
+      "bytes": 11375
+    },
+    "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "e1e5262170b00bd909c9c0ba80670b1e797ffa095b599408f751ef22ecb82b7c",
+      "bytes": 11916
+    },
+    "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "bde2acfb55ed73ecd3eff77bf1ed966cf91a83833317e37b1e8114bc24ef7080",
+      "bytes": 11345
+    },
+    "jit/timing-k10-r0-u64/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "d58a6854400a0a9ed7eaecd675b63b5184fe0fe6790d41896a48f6911d001ea7",
+      "bytes": 23080
+    },
+    "jit/timing-k10-r1-f32/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k10-r1-f32/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "b4f4ae01d7ddb28c35cb3f4ff1a4da11ad61d7a7ebcf74c8bf462ccf970434e7",
+      "bytes": 1075
+    },
+    "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "c48abd73d91bdd61959616826eebf8733ccb12573ed59b41d302bb57f7d161ba",
+      "bytes": 6760
+    },
+    "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "243fbb0f9ff4ee9efb7acb2f96071b7ceb485c75c1226a711efab7343bc744b1",
+      "bytes": 4926
+    },
+    "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "672e25f59ea5552387670c3acb915b8f4611126a9a0c2bca8d796ecd91485c5a",
+      "bytes": 6290
+    },
+    "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "1f5355a8fddc3e9cd6b408c2da344ec44d31b1c334af807997ffc9038f6328cd",
+      "bytes": 5534
+    },
+    "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "50dc60c02f5b3d204f0ce10d416ed0de21b5be15ec68ba0b5fee16cc81ba306e",
+      "bytes": 4973
+    },
+    "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "a9b2f1bb7556bb5c38c33a9a801a5fb785f8a290272e7bb2cc35fb262403a0c9",
+      "bytes": 1183
+    },
+    "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/timing-k10-r1-f32/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "8d18eb04f5b5ec42b488721ee7f0e0ea8da2d866b39dd73610d42c40ff1ab4e7",
+      "bytes": 23080
+    },
+    "jit/timing-k10-r1-u64/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k10-r1-u64/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "7bd649482ce018581f2aedcfe822abbf4a6a5ad19ad9ae0f5c58c80c260ea524",
+      "bytes": 1075
+    },
+    "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "01295ce222a0ef787f724a2e1206902f1734d2b767e1b3103f7aead1d1522a76",
+      "bytes": 6504
+    },
+    "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "0a76ea9796159cdf5b0fa664461e34037870ad913c78fbb0f7c7300ef1e4e5dc",
+      "bytes": 4693
+    },
+    "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "d8f28f186f3965766e30b945a8fe5d5331f41c195d5ccaee50bd5591ccbefa22",
+      "bytes": 6160
+    },
+    "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "b57b90fb5f6c0d9398ac355157cd187ec7e2dc21777a86569a0970f8c0b9ae81",
+      "bytes": 5483
+    },
+    "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "3ec3ecf89ee4074fae1bb87677f15bdf5e42ca6b24afb76f1ce7ea9df64fc37b",
+      "bytes": 4942
+    },
+    "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "12674b2429cdeb0087bcce818c3e64e4630536501d90b745025860bd6187d51b",
+      "bytes": 1183
+    },
+    "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "42d6f86f6a6d7e78c8f15b12330ab30aa579b577829a817904436f9dcabbc118",
+      "bytes": 12648
+    },
+    "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "c5d8e09f737cb5c97a3deba3490f9850344f39a116ca99b19f800694520b7304",
+      "bytes": 11184
+    },
+    "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "6c0941b42a86f4fb0cec5b72b09952a40ecc737d5f206564663cdc079de3bc6f",
+      "bytes": 11375
+    },
+    "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "e1e5262170b00bd909c9c0ba80670b1e797ffa095b599408f751ef22ecb82b7c",
+      "bytes": 11916
+    },
+    "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "bde2acfb55ed73ecd3eff77bf1ed966cf91a83833317e37b1e8114bc24ef7080",
+      "bytes": 11345
+    },
+    "jit/timing-k10-r1-u64/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "a8ac6e79b1a932a0936dac3f63cd68abbabe3d0837eca6e3c42d80a2d696aae7",
+      "bytes": 23080
+    },
+    "jit/timing-k10-r2-f32/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k10-r2-f32/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "0fd8247a1e99198046de7144d307ae54733f8877698eea5aaf807d147734f612",
+      "bytes": 1075
+    },
+    "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "c48abd73d91bdd61959616826eebf8733ccb12573ed59b41d302bb57f7d161ba",
+      "bytes": 6760
+    },
+    "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "243fbb0f9ff4ee9efb7acb2f96071b7ceb485c75c1226a711efab7343bc744b1",
+      "bytes": 4926
+    },
+    "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "672e25f59ea5552387670c3acb915b8f4611126a9a0c2bca8d796ecd91485c5a",
+      "bytes": 6290
+    },
+    "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "1f5355a8fddc3e9cd6b408c2da344ec44d31b1c334af807997ffc9038f6328cd",
+      "bytes": 5534
+    },
+    "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "50dc60c02f5b3d204f0ce10d416ed0de21b5be15ec68ba0b5fee16cc81ba306e",
+      "bytes": 4973
+    },
+    "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "489f88787580518a777b2f9de7ccea05520ecf3ff6c09f02dc6c013b151ac5d0",
+      "bytes": 1183
+    },
+    "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/timing-k10-r2-f32/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "8af50fbf8a2fd8602d0a9f2677862ab01dc1190399311726d334d5311b467f5a",
+      "bytes": 23080
+    },
+    "jit/timing-k10-r2-u64/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k10-r2-u64/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "c4fadc609d0f595acaebad4e41b821892e0741e18c6471301b014db0e7e7addf",
+      "bytes": 1075
+    },
+    "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "01295ce222a0ef787f724a2e1206902f1734d2b767e1b3103f7aead1d1522a76",
+      "bytes": 6504
+    },
+    "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "0a76ea9796159cdf5b0fa664461e34037870ad913c78fbb0f7c7300ef1e4e5dc",
+      "bytes": 4693
+    },
+    "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "d8f28f186f3965766e30b945a8fe5d5331f41c195d5ccaee50bd5591ccbefa22",
+      "bytes": 6160
+    },
+    "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "b57b90fb5f6c0d9398ac355157cd187ec7e2dc21777a86569a0970f8c0b9ae81",
+      "bytes": 5483
+    },
+    "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "3ec3ecf89ee4074fae1bb87677f15bdf5e42ca6b24afb76f1ce7ea9df64fc37b",
+      "bytes": 4942
+    },
+    "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "6e6d1a15f3b276a48788db6aedf3130ee90ce70b6be90eaa6dfb684103c3ed91",
+      "bytes": 1183
+    },
+    "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "42d6f86f6a6d7e78c8f15b12330ab30aa579b577829a817904436f9dcabbc118",
+      "bytes": 12648
+    },
+    "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "c5d8e09f737cb5c97a3deba3490f9850344f39a116ca99b19f800694520b7304",
+      "bytes": 11184
+    },
+    "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "6c0941b42a86f4fb0cec5b72b09952a40ecc737d5f206564663cdc079de3bc6f",
+      "bytes": 11375
+    },
+    "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "e1e5262170b00bd909c9c0ba80670b1e797ffa095b599408f751ef22ecb82b7c",
+      "bytes": 11916
+    },
+    "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "bde2acfb55ed73ecd3eff77bf1ed966cf91a83833317e37b1e8114bc24ef7080",
+      "bytes": 11345
+    },
+    "jit/timing-k10-r2-u64/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "874565a15d9d38068246929b0da072816abf988324c61533fea9b4f932bf9580",
+      "bytes": 23080
+    },
+    "jit/timing-k100-r0-f32/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k100-r0-f32/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "1d09ce9af62d5ab386112fb6342459383b4ad4521f92cdfa68e5f5028abc6a92",
+      "bytes": 1081
+    },
+    "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "c48abd73d91bdd61959616826eebf8733ccb12573ed59b41d302bb57f7d161ba",
+      "bytes": 6760
+    },
+    "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "243fbb0f9ff4ee9efb7acb2f96071b7ceb485c75c1226a711efab7343bc744b1",
+      "bytes": 4926
+    },
+    "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "672e25f59ea5552387670c3acb915b8f4611126a9a0c2bca8d796ecd91485c5a",
+      "bytes": 6290
+    },
+    "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "1f5355a8fddc3e9cd6b408c2da344ec44d31b1c334af807997ffc9038f6328cd",
+      "bytes": 5534
+    },
+    "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "50dc60c02f5b3d204f0ce10d416ed0de21b5be15ec68ba0b5fee16cc81ba306e",
+      "bytes": 4973
+    },
+    "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "fc782f7dd9903052276086927b750521368edd711b02c162f9b2180fb20fe339",
+      "bytes": 1189
+    },
+    "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/timing-k100-r0-f32/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "9b53b99757444e5f7167b6556565b7e1ae8fa4a6adb3efcef1c2d9716c513a1b",
+      "bytes": 23080
+    },
+    "jit/timing-k100-r0-u64/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k100-r0-u64/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "c244d984408e07760a498b8fb77bbd3bf3d277af71f296712d31998a5f244490",
+      "bytes": 1081
+    },
+    "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "01295ce222a0ef787f724a2e1206902f1734d2b767e1b3103f7aead1d1522a76",
+      "bytes": 6504
+    },
+    "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "0a76ea9796159cdf5b0fa664461e34037870ad913c78fbb0f7c7300ef1e4e5dc",
+      "bytes": 4693
+    },
+    "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "d8f28f186f3965766e30b945a8fe5d5331f41c195d5ccaee50bd5591ccbefa22",
+      "bytes": 6160
+    },
+    "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "b57b90fb5f6c0d9398ac355157cd187ec7e2dc21777a86569a0970f8c0b9ae81",
+      "bytes": 5483
+    },
+    "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "3ec3ecf89ee4074fae1bb87677f15bdf5e42ca6b24afb76f1ce7ea9df64fc37b",
+      "bytes": 4942
+    },
+    "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "ffa3ef027ab5be9a4b814dec0edd20c6bd540e7385bf9f5dec33f6ce34cb7aca",
+      "bytes": 1189
+    },
+    "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "42d6f86f6a6d7e78c8f15b12330ab30aa579b577829a817904436f9dcabbc118",
+      "bytes": 12648
+    },
+    "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "c5d8e09f737cb5c97a3deba3490f9850344f39a116ca99b19f800694520b7304",
+      "bytes": 11184
+    },
+    "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "6c0941b42a86f4fb0cec5b72b09952a40ecc737d5f206564663cdc079de3bc6f",
+      "bytes": 11375
+    },
+    "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "e1e5262170b00bd909c9c0ba80670b1e797ffa095b599408f751ef22ecb82b7c",
+      "bytes": 11916
+    },
+    "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "bde2acfb55ed73ecd3eff77bf1ed966cf91a83833317e37b1e8114bc24ef7080",
+      "bytes": 11345
+    },
+    "jit/timing-k100-r0-u64/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "cc1b577ce9fc2fb4c240a0b80ad33a4b73da2334f3ce1011d7ebc25fa32af0f0",
+      "bytes": 23080
+    },
+    "jit/timing-k100-r1-f32/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k100-r1-f32/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "41ef24fa2829c902a630f2c06e452daf0f352b70ce5192eb9b4115721c7cf3f6",
+      "bytes": 1081
+    },
+    "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "c48abd73d91bdd61959616826eebf8733ccb12573ed59b41d302bb57f7d161ba",
+      "bytes": 6760
+    },
+    "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "243fbb0f9ff4ee9efb7acb2f96071b7ceb485c75c1226a711efab7343bc744b1",
+      "bytes": 4926
+    },
+    "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "672e25f59ea5552387670c3acb915b8f4611126a9a0c2bca8d796ecd91485c5a",
+      "bytes": 6290
+    },
+    "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "1f5355a8fddc3e9cd6b408c2da344ec44d31b1c334af807997ffc9038f6328cd",
+      "bytes": 5534
+    },
+    "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "50dc60c02f5b3d204f0ce10d416ed0de21b5be15ec68ba0b5fee16cc81ba306e",
+      "bytes": 4973
+    },
+    "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "323ecd18b42fa91fdfdbb74b55ddb06b0a00ccd38ee35ddcc7f683d497bcb13a",
+      "bytes": 1189
+    },
+    "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/timing-k100-r1-f32/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "bda408869772974b387a85b3ec0182a3bb2112b4632df3dca20289cc7fb16ed5",
+      "bytes": 23080
+    },
+    "jit/timing-k100-r1-u64/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k100-r1-u64/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "4dabd373ddd3887d6d223fac52e78fb65d5d49f9d964d32b537884b1819ae8b5",
+      "bytes": 1081
+    },
+    "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "01295ce222a0ef787f724a2e1206902f1734d2b767e1b3103f7aead1d1522a76",
+      "bytes": 6504
+    },
+    "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "0a76ea9796159cdf5b0fa664461e34037870ad913c78fbb0f7c7300ef1e4e5dc",
+      "bytes": 4693
+    },
+    "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "d8f28f186f3965766e30b945a8fe5d5331f41c195d5ccaee50bd5591ccbefa22",
+      "bytes": 6160
+    },
+    "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "b57b90fb5f6c0d9398ac355157cd187ec7e2dc21777a86569a0970f8c0b9ae81",
+      "bytes": 5483
+    },
+    "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "3ec3ecf89ee4074fae1bb87677f15bdf5e42ca6b24afb76f1ce7ea9df64fc37b",
+      "bytes": 4942
+    },
+    "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "8a7a4d9f2b629fc62745434302f6c16af62abcc0bb1c6bb768f49f8de5b387d6",
+      "bytes": 1189
+    },
+    "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "42d6f86f6a6d7e78c8f15b12330ab30aa579b577829a817904436f9dcabbc118",
+      "bytes": 12648
+    },
+    "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "c5d8e09f737cb5c97a3deba3490f9850344f39a116ca99b19f800694520b7304",
+      "bytes": 11184
+    },
+    "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "6c0941b42a86f4fb0cec5b72b09952a40ecc737d5f206564663cdc079de3bc6f",
+      "bytes": 11375
+    },
+    "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "e1e5262170b00bd909c9c0ba80670b1e797ffa095b599408f751ef22ecb82b7c",
+      "bytes": 11916
+    },
+    "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "bde2acfb55ed73ecd3eff77bf1ed966cf91a83833317e37b1e8114bc24ef7080",
+      "bytes": 11345
+    },
+    "jit/timing-k100-r1-u64/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "b6f2769a5b809ada2c35a56fedd2ed81b463492677ffbee82ae0e7dea8e876b8",
+      "bytes": 23080
+    },
+    "jit/timing-k100-r2-f32/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k100-r2-f32/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "58d2cb33ab6f5742f5f52bcddd864956df1311424fbbaea36604dfa95dac91a3",
+      "bytes": 1081
+    },
+    "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "c48abd73d91bdd61959616826eebf8733ccb12573ed59b41d302bb57f7d161ba",
+      "bytes": 6760
+    },
+    "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "243fbb0f9ff4ee9efb7acb2f96071b7ceb485c75c1226a711efab7343bc744b1",
+      "bytes": 4926
+    },
+    "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "672e25f59ea5552387670c3acb915b8f4611126a9a0c2bca8d796ecd91485c5a",
+      "bytes": 6290
+    },
+    "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "1f5355a8fddc3e9cd6b408c2da344ec44d31b1c334af807997ffc9038f6328cd",
+      "bytes": 5534
+    },
+    "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "50dc60c02f5b3d204f0ce10d416ed0de21b5be15ec68ba0b5fee16cc81ba306e",
+      "bytes": 4973
+    },
+    "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "8b1378a87cebcea09e7f28cfcf875752b5aeeb0ee5224ce2f7590fe1fc67c421",
+      "bytes": 1189
+    },
+    "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/timing-k100-r2-f32/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "c3851b0acf3a5d51a5d644c33bedebfe46836e56af78e2b0d721842573512198",
+      "bytes": 23080
+    },
+    "jit/timing-k100-r2-u64/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k100-r2-u64/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "89a6fd79df7024b25ccaa1529bb0131e6525e9e6ffa965b8ce78ee658a94002c",
+      "bytes": 1081
+    },
+    "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "01295ce222a0ef787f724a2e1206902f1734d2b767e1b3103f7aead1d1522a76",
+      "bytes": 6504
+    },
+    "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "0a76ea9796159cdf5b0fa664461e34037870ad913c78fbb0f7c7300ef1e4e5dc",
+      "bytes": 4693
+    },
+    "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "d8f28f186f3965766e30b945a8fe5d5331f41c195d5ccaee50bd5591ccbefa22",
+      "bytes": 6160
+    },
+    "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "b57b90fb5f6c0d9398ac355157cd187ec7e2dc21777a86569a0970f8c0b9ae81",
+      "bytes": 5483
+    },
+    "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "3ec3ecf89ee4074fae1bb87677f15bdf5e42ca6b24afb76f1ce7ea9df64fc37b",
+      "bytes": 4942
+    },
+    "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "55c015ddfced6541aa688107634da965766a0538ee6ec5e98d7133cfb7ae0c6c",
+      "bytes": 1189
+    },
+    "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "42d6f86f6a6d7e78c8f15b12330ab30aa579b577829a817904436f9dcabbc118",
+      "bytes": 12648
+    },
+    "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "c5d8e09f737cb5c97a3deba3490f9850344f39a116ca99b19f800694520b7304",
+      "bytes": 11184
+    },
+    "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "6c0941b42a86f4fb0cec5b72b09952a40ecc737d5f206564663cdc079de3bc6f",
+      "bytes": 11375
+    },
+    "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "e1e5262170b00bd909c9c0ba80670b1e797ffa095b599408f751ef22ecb82b7c",
+      "bytes": 11916
+    },
+    "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "bde2acfb55ed73ecd3eff77bf1ed966cf91a83833317e37b1e8114bc24ef7080",
+      "bytes": 11345
+    },
+    "jit/timing-k100-r2-u64/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "8e7acf39f30a74dd6efe38e50ffca5a553af4d360e852f6eba549bb613c1b4bd",
+      "bytes": 23080
+    },
+    "jit/timing-k1000-r0-f32k/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k1000-r0-f32k/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "0ff4f71c1b3b22794049f2e6723dd9e7824bce3bf4d3c1e8600920a7cab38ebc",
+      "bytes": 1093
+    },
+    "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "c38093d31b92c84941adddca33a0b7d4b2dbe906f7f84c67cd9ad0e0d34db413",
+      "bytes": 6760
+    },
+    "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "ed90f4b67623015f19872891cc5446ed6f41bfdb262b17ea7a440d537e1bf119",
+      "bytes": 4927
+    },
+    "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "5770ca680a894acf498366651c53d50959dfeb169fe0cc2b8fcd27467e807c2f",
+      "bytes": 6303
+    },
+    "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "22f25cbd5bcc452919a412e7cae8e561fe00ba7aee107c07cde5438d04007567",
+      "bytes": 5557
+    },
+    "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "3fd5930a97e05c302343a6c84c193300ef19224ad5d4e0ce868f2a9b2856286a",
+      "bytes": 4996
+    },
+    "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "ee32e696becceb395f90ee92eaea1d0030a6d7d0ae484a0c5c7364961c840cbb",
+      "bytes": 1201
+    },
+    "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/timing-k1000-r0-f32k/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "af8024bb212d491b2bba0b1922ac0eba99f2743ae350acb73430c3d901e66af1",
+      "bytes": 23080
+    },
+    "jit/timing-k1000-r0-u64k/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k1000-r0-u64k/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "ae7f6853bf3a6ed6f161bbf9dd08d16142d006f8363916ed3b4c71eecc240879",
+      "bytes": 1093
+    },
+    "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "fbeb9947f9fba59bc6e920a9876ff68834067f0aeb62943d5f23304d5df20901",
+      "bytes": 6504
+    },
+    "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "a91b8a09d4563bfa191c077ca0ec46be263a670f82466b0e44f836f8661cd1da",
+      "bytes": 4685
+    },
+    "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "36b3c1b867591905380b32f53e6b04cea47b565b8f69000ab652d43a62a948a7",
+      "bytes": 6094
+    },
+    "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "b7365cf1c847e1a160e0204aa603da206fef23f0a524a865133c98727f4d333a",
+      "bytes": 5307
+    },
+    "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "7d543b685fbc88aec6bccb07f92d85b51ca5848b508c6466d9b8077c71a8cd0f",
+      "bytes": 4766
+    },
+    "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "5a7b4112d5c6fe212301b92e951df8d6581877e454561c79fa07f125fb3201a3",
+      "bytes": 1201
+    },
+    "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "3a4b07987c7b24ec2135a3ebdbc465c31648d97bd26e76a1e79eee075944fa8d",
+      "bytes": 12648
+    },
+    "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "c37dd3b52170686f4616ac3ba94aaa9ccd492cb9770ad4e7debdee38d7984e17",
+      "bytes": 11176
+    },
+    "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "0dd0f5c02c9731bfb20a7dbad7b4824f76c7312d5a259b9402fc34fb84a337f5",
+      "bytes": 11309
+    },
+    "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "6eae9ff48ca24c0453d7221ed0819d426739460b654fdea08268627f45a06c6d",
+      "bytes": 11476
+    },
+    "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "35a89ccc7de6173e40089dfaf427c735e2c8372d9975ae83976daeae3a30d343",
+      "bytes": 10905
+    },
+    "jit/timing-k1000-r0-u64k/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "6368fe55dac56a7ad4cafe26432b23b589ac55aeea4c17ea2a3feb5a60c83ce8",
+      "bytes": 23080
+    },
+    "jit/timing-k1000-r1-f32k/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k1000-r1-f32k/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "f9c9359a59f7e63ec652768b905b2ebf461181aaddd44f0f2b5982e191415aae",
+      "bytes": 1093
+    },
+    "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "c38093d31b92c84941adddca33a0b7d4b2dbe906f7f84c67cd9ad0e0d34db413",
+      "bytes": 6760
+    },
+    "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "ed90f4b67623015f19872891cc5446ed6f41bfdb262b17ea7a440d537e1bf119",
+      "bytes": 4927
+    },
+    "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "5770ca680a894acf498366651c53d50959dfeb169fe0cc2b8fcd27467e807c2f",
+      "bytes": 6303
+    },
+    "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "22f25cbd5bcc452919a412e7cae8e561fe00ba7aee107c07cde5438d04007567",
+      "bytes": 5557
+    },
+    "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "3fd5930a97e05c302343a6c84c193300ef19224ad5d4e0ce868f2a9b2856286a",
+      "bytes": 4996
+    },
+    "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "566c4db235957bc005d27215689010e8d89832d92f7f43bf8c105406f83d3604",
+      "bytes": 1201
+    },
+    "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/timing-k1000-r1-f32k/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "b1c1057c55d6fe27f71be0d4bc24652a8df86a63aae776b4acac26556db72eac",
+      "bytes": 23080
+    },
+    "jit/timing-k1000-r1-u64k/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k1000-r1-u64k/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "201fcaf45e101538ff4fc738915abfad68326fa3127a0b3f93db49e88c7ae0b8",
+      "bytes": 1093
+    },
+    "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "fbeb9947f9fba59bc6e920a9876ff68834067f0aeb62943d5f23304d5df20901",
+      "bytes": 6504
+    },
+    "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "a91b8a09d4563bfa191c077ca0ec46be263a670f82466b0e44f836f8661cd1da",
+      "bytes": 4685
+    },
+    "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "36b3c1b867591905380b32f53e6b04cea47b565b8f69000ab652d43a62a948a7",
+      "bytes": 6094
+    },
+    "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "b7365cf1c847e1a160e0204aa603da206fef23f0a524a865133c98727f4d333a",
+      "bytes": 5307
+    },
+    "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "7d543b685fbc88aec6bccb07f92d85b51ca5848b508c6466d9b8077c71a8cd0f",
+      "bytes": 4766
+    },
+    "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "1d2a17efdc8cfa1565f7e28fbc8964863686ca1b38d2c56cd0450b6e3e5328e2",
+      "bytes": 1201
+    },
+    "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "3a4b07987c7b24ec2135a3ebdbc465c31648d97bd26e76a1e79eee075944fa8d",
+      "bytes": 12648
+    },
+    "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "c37dd3b52170686f4616ac3ba94aaa9ccd492cb9770ad4e7debdee38d7984e17",
+      "bytes": 11176
+    },
+    "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "0dd0f5c02c9731bfb20a7dbad7b4824f76c7312d5a259b9402fc34fb84a337f5",
+      "bytes": 11309
+    },
+    "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "6eae9ff48ca24c0453d7221ed0819d426739460b654fdea08268627f45a06c6d",
+      "bytes": 11476
+    },
+    "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "35a89ccc7de6173e40089dfaf427c735e2c8372d9975ae83976daeae3a30d343",
+      "bytes": 10905
+    },
+    "jit/timing-k1000-r1-u64k/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "559ddba8918406a02473ebfe8fcd544e4e95cf99a85e44d136f7c30473d4ce8d",
+      "bytes": 23080
+    },
+    "jit/timing-k1000-r2-f32k/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k1000-r2-f32k/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "62409d4f88e327c21718084fa69c5ed9cf8eb33cfb2de3f7b3785bc13c4f5cef",
+      "bytes": 1093
+    },
+    "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "c38093d31b92c84941adddca33a0b7d4b2dbe906f7f84c67cd9ad0e0d34db413",
+      "bytes": 6760
+    },
+    "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "ed90f4b67623015f19872891cc5446ed6f41bfdb262b17ea7a440d537e1bf119",
+      "bytes": 4927
+    },
+    "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "5770ca680a894acf498366651c53d50959dfeb169fe0cc2b8fcd27467e807c2f",
+      "bytes": 6303
+    },
+    "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "22f25cbd5bcc452919a412e7cae8e561fe00ba7aee107c07cde5438d04007567",
+      "bytes": 5557
+    },
+    "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "3fd5930a97e05c302343a6c84c193300ef19224ad5d4e0ce868f2a9b2856286a",
+      "bytes": 4996
+    },
+    "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "98f2fba64076f67cee5084f1ebf5e05ed9811dadbc60ebf4b29e1c8c67efe7a3",
+      "bytes": 1201
+    },
+    "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/timing-k1000-r2-f32k/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "70623ce0efb1a5ed56f0b044c5f399addd4d36693606fa1392592c8c3aeab375",
+      "bytes": 23080
+    },
+    "jit/timing-k1000-r2-u64k/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/timing-k1000-r2-u64k/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "a8fd5114ed2f2b64f85b7eedce819138e8aa1fcd72c6a1d72157dc70dd7930dc",
+      "bytes": 1093
+    },
+    "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "fbeb9947f9fba59bc6e920a9876ff68834067f0aeb62943d5f23304d5df20901",
+      "bytes": 6504
+    },
+    "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "a91b8a09d4563bfa191c077ca0ec46be263a670f82466b0e44f836f8661cd1da",
+      "bytes": 4685
+    },
+    "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "36b3c1b867591905380b32f53e6b04cea47b565b8f69000ab652d43a62a948a7",
+      "bytes": 6094
+    },
+    "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "b7365cf1c847e1a160e0204aa603da206fef23f0a524a865133c98727f4d333a",
+      "bytes": 5307
+    },
+    "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "7d543b685fbc88aec6bccb07f92d85b51ca5848b508c6466d9b8077c71a8cd0f",
+      "bytes": 4766
+    },
+    "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "c1194e49f9bc91e3ffa9410a664fc2a13f70dcff74eda59765fa573ff43885f7",
+      "bytes": 1201
+    },
+    "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "3a4b07987c7b24ec2135a3ebdbc465c31648d97bd26e76a1e79eee075944fa8d",
+      "bytes": 12648
+    },
+    "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "c37dd3b52170686f4616ac3ba94aaa9ccd492cb9770ad4e7debdee38d7984e17",
+      "bytes": 11176
+    },
+    "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "0dd0f5c02c9731bfb20a7dbad7b4824f76c7312d5a259b9402fc34fb84a337f5",
+      "bytes": 11309
+    },
+    "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "6eae9ff48ca24c0453d7221ed0819d426739460b654fdea08268627f45a06c6d",
+      "bytes": 11476
+    },
+    "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "35a89ccc7de6173e40089dfaf427c735e2c8372d9975ae83976daeae3a30d343",
+      "bytes": 10905
+    },
+    "jit/timing-k1000-r2-u64k/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "81f157715fd32fdbdb0e7894c58bb4fb6eae35a07c2ce4fa13fce71dcb9a8acc",
+      "bytes": 23080
+    },
+    "logs/analyze-i.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/binaries.tsv": {
+      "sha256": "65c3f72e16facd8b19d3f919ea6bd9d19c576529f8c8243b2bb427897698f53b",
+      "bytes": 175
+    },
+    "logs/cell-status.tsv": {
+      "sha256": "a4e20f421db655ac8b0f48c241fa9c55d60f8e3196cb1bf2c2070925e5c5a7a6",
+      "bytes": 822
+    },
+    "logs/commands.txt": {
+      "sha256": "6f24ec5901d69357556c5ce7947fd944beaf15e2f3cf2f30df959f8b2458c108",
+      "bytes": 32070
+    },
+    "logs/environment.txt": {
+      "sha256": "d59e28c62076f6918f7ad7f122310443dedc0dd2c1e8455e82c883c20ac770c6",
+      "bytes": 366
+    },
+    "logs/gpu-pmon.log": {
+      "sha256": "8ab65fde824ef1833b31d522e66001fe271d83896b74cd19ad50941f20fdf234",
+      "bytes": 414889
+    },
+    "logs/gpu-poll.log": {
+      "sha256": "deb19cfdbbdb3053dab47a4f7392803ccbc91fe6fde472e38312423d50602946",
+      "bytes": 406398
+    },
+    "logs/holder-switch.tsv": {
+      "sha256": "00820975f21e26756ef83c9dd65e79f1c6969e131749b8fdab3951b736a6673f",
+      "bytes": 2193
+    },
+    "logs/holder.ctl": {
+      "sha256": "a11c3d917a2149a4b548217038bc8f2dd2130a1966e0c7af5c4225d81f25a8c3",
+      "bytes": 5
+    },
+    "logs/holder.log": {
+      "sha256": "9f9b0e270806455db0cc0934ac5473b4e37c0b88a9117633787a183317210e78",
+      "bytes": 1120
+    },
+    "logs/holder.out": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/host-utc-offset.txt": {
+      "sha256": "51ef6a6d539bbd38ac4fb4d8de42da0cf36eafb7fb7be71e3420d57982eebd9b",
+      "bytes": 6
+    },
+    "logs/idle-checks.txt": {
+      "sha256": "21677db7a26354efc9dfa7e5527e1e60036dfef4a7bf200bc358d2039d56382f",
+      "bytes": 4122
+    },
+    "logs/input-sha256.txt": {
+      "sha256": "35b5df9ebc3d738b5ce6fe87d2980a2ca3b3dabfd866f5d31978485e2a35b91c",
+      "bytes": 2067
+    },
+    "logs/klimit-check.json": {
+      "sha256": "844967a63649ba27b3d75fffa4b5df5e590ad1aafe840a8f2b62d250061144d7",
+      "bytes": 6125
+    },
+    "logs/klimit-check.txt": {
+      "sha256": "fe26d7aba60df1309f62e57eefc21ebe185d146aea77d2bbc67ef00d188179d3",
+      "bytes": 688
+    },
+    "logs/order.tsv": {
+      "sha256": "bc1ab66226f300f97c7fc8e95060bdff6e74faa539fce0a1dab7bd9a30a25351",
+      "bytes": 384
+    },
+    "logs/overlap-checks.jsonl": {
+      "sha256": "62f81e267e5ee94358a4c698b1be5e8625608e2258db7a7f8113495ff729f674",
+      "bytes": 5198
+    },
+    "logs/processes.tsv": {
+      "sha256": "5a29b280f2b84890fc267e4d05cb64960da0ea9ce0cd98cd340dce0378686ca0",
+      "bytes": 1653
+    },
+    "logs/ptxas-u4m.log": {
+      "sha256": "e8d228124a62ab1c663c6e4aba5789f41d4515a96d41edf4623454a4de9fac6a",
+      "bytes": 1243
+    },
+    "logs/slot-attempts.tsv": {
+      "sha256": "7325b2c77444925214a8e39d11240a0fce4759f45140e1d5077fd5d2ea854ca7",
+      "bytes": 573
+    },
+    "logs/stages.txt": {
+      "sha256": "d61eb4a78907d1adf801f4ac2d57ba9e2d1ca1d3a47fedeb95f7adbc5b781d3a",
+      "bytes": 334
+    },
+    "logs/timed-cells.tsv": {
+      "sha256": "4b1610575fdb8009b4ba9e9ca4366382bcd7671babae962e4a3d31b1f7bdbe01",
+      "bytes": 53
+    },
+    "raw/timing-k10-r0-f32.csv": {
+      "sha256": "82663a34d8593c7eb8b5111bbca1b974eb88e9d7b33618f8f39f7b0e99ce11a8",
+      "bytes": 1143003
+    },
+    "raw/timing-k10-r0-f32.jit.json": {
+      "sha256": "8a6146a414d2e79c9f468e03bd9f11abf448bfa69aeccd7ae093341def161a1d",
+      "bytes": 8653
+    },
+    "raw/timing-k10-r0-f32.log": {
+      "sha256": "c2ab1669cb07ccc91f6795ec8441bdba285c2d95efe09ed129a0c78ed9dd28eb",
+      "bytes": 680
+    },
+    "raw/timing-k10-r0-f32.tsv.zst": {
+      "sha256": "9dd72116c79200aaf59fc962063c7047d100de9e141fde57edbaf0259cacd898",
+      "bytes": 229105
+    },
+    "raw/timing-k10-r0-f32.validation.json": {
+      "sha256": "f616ebfcc6d2b102fa1679b3de462200a067ce24156ea42ef802c4f1aac71fc3",
+      "bytes": 700
+    },
+    "raw/timing-k10-r0-u4m.csv": {
+      "sha256": "9f5df2fd150a239f6da01db8a8e50119610fd793edad8adbbeefd87c2bd9f59b",
+      "bytes": 1416097
+    },
+    "raw/timing-k10-r0-u4m.log": {
+      "sha256": "b49ee8e6a2c1e763cfa5dfc46aa5ea3cd847e46d22f957c6fec84c2aa8b179c1",
+      "bytes": 912
+    },
+    "raw/timing-k10-r0-u4m.tsv.zst": {
+      "sha256": "573ca2615e51347d26459ca4fd0177448bfc5898ee323456e831493480e3707d",
+      "bytes": 172705
+    },
+    "raw/timing-k10-r0-u64.csv": {
+      "sha256": "ab676e466ebf76bd782d89260fd80090e732582b9942926607e36a8ccfbd9781",
+      "bytes": 1143009
+    },
+    "raw/timing-k10-r0-u64.jit.json": {
+      "sha256": "fe53901115df51eccec8dd87638b647227b11daf6f71ed5df3d2b84a0fec31e5",
+      "bytes": 8604
+    },
+    "raw/timing-k10-r0-u64.log": {
+      "sha256": "d474bf848a125275ce7c58a50adc0b7fbc349abf3d34d70ab4e087f57f11165b",
+      "bytes": 668
+    },
+    "raw/timing-k10-r0-u64.tsv.zst": {
+      "sha256": "9dd72116c79200aaf59fc962063c7047d100de9e141fde57edbaf0259cacd898",
+      "bytes": 229105
+    },
+    "raw/timing-k10-r0-u64.validation.json": {
+      "sha256": "ab151a23c855ded04a2b9cd87d21b64b1c2d9ce5111a2783e7f13e769b8cdaf1",
+      "bytes": 688
+    },
+    "raw/timing-k10-r1-f32.csv": {
+      "sha256": "97dcb5783a28e29275416b72c90f56c609594076134b1577a2e8b8e38f7c96ad",
+      "bytes": 1143080
+    },
+    "raw/timing-k10-r1-f32.jit.json": {
+      "sha256": "0fdb59fb8f5f894bfbe1bb074d72676b1028008611a948a0108deee3e9c69e44",
+      "bytes": 8653
+    },
+    "raw/timing-k10-r1-f32.log": {
+      "sha256": "c2ab1669cb07ccc91f6795ec8441bdba285c2d95efe09ed129a0c78ed9dd28eb",
+      "bytes": 680
+    },
+    "raw/timing-k10-r1-f32.tsv.zst": {
+      "sha256": "9dd72116c79200aaf59fc962063c7047d100de9e141fde57edbaf0259cacd898",
+      "bytes": 229105
+    },
+    "raw/timing-k10-r1-f32.validation.json": {
+      "sha256": "f616ebfcc6d2b102fa1679b3de462200a067ce24156ea42ef802c4f1aac71fc3",
+      "bytes": 700
+    },
+    "raw/timing-k10-r1-u4m.csv": {
+      "sha256": "40936655a2e936f5b48b4902e53ab4dc74e81439dcd6570942c9a9ca4cad0c25",
+      "bytes": 1416031
+    },
+    "raw/timing-k10-r1-u4m.log": {
+      "sha256": "b49ee8e6a2c1e763cfa5dfc46aa5ea3cd847e46d22f957c6fec84c2aa8b179c1",
+      "bytes": 912
+    },
+    "raw/timing-k10-r1-u4m.tsv.zst": {
+      "sha256": "573ca2615e51347d26459ca4fd0177448bfc5898ee323456e831493480e3707d",
+      "bytes": 172705
+    },
+    "raw/timing-k10-r1-u64.csv": {
+      "sha256": "3687579025cd25a4f5eb91bacc02625f668a284b2cc64f5626b2baa2e36aa17f",
+      "bytes": 1143137
+    },
+    "raw/timing-k10-r1-u64.jit.json": {
+      "sha256": "3fb69747f436a4a54198e87ddf95e7d505ad4bc68a1a4653ba68122090ba55e9",
+      "bytes": 8604
+    },
+    "raw/timing-k10-r1-u64.log": {
+      "sha256": "d474bf848a125275ce7c58a50adc0b7fbc349abf3d34d70ab4e087f57f11165b",
+      "bytes": 668
+    },
+    "raw/timing-k10-r1-u64.tsv.zst": {
+      "sha256": "9dd72116c79200aaf59fc962063c7047d100de9e141fde57edbaf0259cacd898",
+      "bytes": 229105
+    },
+    "raw/timing-k10-r1-u64.validation.json": {
+      "sha256": "ab151a23c855ded04a2b9cd87d21b64b1c2d9ce5111a2783e7f13e769b8cdaf1",
+      "bytes": 688
+    },
+    "raw/timing-k10-r2-f32.csv": {
+      "sha256": "f43b6d879414fc3bfaec73acf7ab8ef66e18dfae342f6ffcb218de1ab38b484b",
+      "bytes": 1143077
+    },
+    "raw/timing-k10-r2-f32.jit.json": {
+      "sha256": "6e6fe22130751652564b2f26d2511ddb296ae7f44c704766c8ee884701a58271",
+      "bytes": 8653
+    },
+    "raw/timing-k10-r2-f32.log": {
+      "sha256": "c2ab1669cb07ccc91f6795ec8441bdba285c2d95efe09ed129a0c78ed9dd28eb",
+      "bytes": 680
+    },
+    "raw/timing-k10-r2-f32.tsv.zst": {
+      "sha256": "9dd72116c79200aaf59fc962063c7047d100de9e141fde57edbaf0259cacd898",
+      "bytes": 229105
+    },
+    "raw/timing-k10-r2-f32.validation.json": {
+      "sha256": "f616ebfcc6d2b102fa1679b3de462200a067ce24156ea42ef802c4f1aac71fc3",
+      "bytes": 700
+    },
+    "raw/timing-k10-r2-u4m.csv": {
+      "sha256": "2bf4daad54a8e13fa527245d91b6d8b74889e7131b3356f439a159e4befaa48d",
+      "bytes": 1416092
+    },
+    "raw/timing-k10-r2-u4m.log": {
+      "sha256": "b49ee8e6a2c1e763cfa5dfc46aa5ea3cd847e46d22f957c6fec84c2aa8b179c1",
+      "bytes": 912
+    },
+    "raw/timing-k10-r2-u4m.tsv.zst": {
+      "sha256": "573ca2615e51347d26459ca4fd0177448bfc5898ee323456e831493480e3707d",
+      "bytes": 172705
+    },
+    "raw/timing-k10-r2-u64.csv": {
+      "sha256": "a9e229e8cbe1ec8c77a36d0eda9e1bd9c60bbd6ccfb431b27e59a4568a8b45a5",
+      "bytes": 1143068
+    },
+    "raw/timing-k10-r2-u64.jit.json": {
+      "sha256": "6d6fb0e91ff6ecaeaf95577112e0c8371b633996294acff32d0012371ed642c8",
+      "bytes": 8604
+    },
+    "raw/timing-k10-r2-u64.log": {
+      "sha256": "d474bf848a125275ce7c58a50adc0b7fbc349abf3d34d70ab4e087f57f11165b",
+      "bytes": 668
+    },
+    "raw/timing-k10-r2-u64.tsv.zst": {
+      "sha256": "9dd72116c79200aaf59fc962063c7047d100de9e141fde57edbaf0259cacd898",
+      "bytes": 229105
+    },
+    "raw/timing-k10-r2-u64.validation.json": {
+      "sha256": "ab151a23c855ded04a2b9cd87d21b64b1c2d9ce5111a2783e7f13e769b8cdaf1",
+      "bytes": 688
+    },
+    "raw/timing-k100-r0-f32.csv": {
+      "sha256": "26c30a0b990df9bf7cbcc02debd658dd23b401f7b8c3bbb8c203ada511d06595",
+      "bytes": 1177455
+    },
+    "raw/timing-k100-r0-f32.jit.json": {
+      "sha256": "50a41d634d449096d3299a90cb1e00c8d9935df89e21f2ebec392065564ec649",
+      "bytes": 8688
+    },
+    "raw/timing-k100-r0-f32.log": {
+      "sha256": "cb1a0891e4d6901bddcf3622c2be198898ce9cc641c1b8484ee3789a8767d440",
+      "bytes": 680
+    },
+    "raw/timing-k100-r0-f32.tsv.zst": {
+      "sha256": "9024348b7275f2d914779d80831eb1711404db76afd0bce7df9d2a1196d4ef27",
+      "bytes": 16603382
+    },
+    "raw/timing-k100-r0-f32.validation.json": {
+      "sha256": "26f93a8d6fb6517d9e16aad84dc47008477aac59de6f84187a83fb20f5564734",
+      "bytes": 700
+    },
+    "raw/timing-k100-r0-u4m.csv": {
+      "sha256": "eed707b5b0ef1b4a30b79ebd71a139490cd3d1b54c576fede3d0f683d44af1c0",
+      "bytes": 1439160
+    },
+    "raw/timing-k100-r0-u4m.log": {
+      "sha256": "42700489354ca36f6b0bf1abe175f7cff25cd89eba2434dfbdcd3b16f76f4f2c",
+      "bytes": 913
+    },
+    "raw/timing-k100-r0-u4m.tsv.zst": {
+      "sha256": "4fd50141c53fdf250dd0ff14d204d59f957beb36b9dd923e31cadb4abefd2827",
+      "bytes": 3757236
+    },
+    "raw/timing-k100-r0-u64.csv": {
+      "sha256": "4b7a94c8f93be651a3a3d1ab3a7f3fa3f8566c29a1682e037532651276489065",
+      "bytes": 1177605
+    },
+    "raw/timing-k100-r0-u64.jit.json": {
+      "sha256": "6ae485e58f713532be7420335cb751b201bd02f9857a79ee71a5574d44024234",
+      "bytes": 8639
+    },
+    "raw/timing-k100-r0-u64.log": {
+      "sha256": "48c60a9c1145d89ef6a6013ea480b2c57b1734c2b45ce2c6b70bc91e0c9177fa",
+      "bytes": 668
+    },
+    "raw/timing-k100-r0-u64.tsv.zst": {
+      "sha256": "9024348b7275f2d914779d80831eb1711404db76afd0bce7df9d2a1196d4ef27",
+      "bytes": 16603382
+    },
+    "raw/timing-k100-r0-u64.validation.json": {
+      "sha256": "16f22cc54e22f07b92295b59e4480378e7bcca0844d845c9261c60ac888c042f",
+      "bytes": 688
+    },
+    "raw/timing-k100-r1-f32.csv": {
+      "sha256": "8643c4494fb764d9922d9451a9db5d13da8977782f986bf11da5a2e442b0a8c2",
+      "bytes": 1177456
+    },
+    "raw/timing-k100-r1-f32.jit.json": {
+      "sha256": "e36d374b5169d3ca4e5b7f5bee78af7d5811ef4ffbf4080b111798a27189c980",
+      "bytes": 8688
+    },
+    "raw/timing-k100-r1-f32.log": {
+      "sha256": "cb1a0891e4d6901bddcf3622c2be198898ce9cc641c1b8484ee3789a8767d440",
+      "bytes": 680
+    },
+    "raw/timing-k100-r1-f32.tsv.zst": {
+      "sha256": "9024348b7275f2d914779d80831eb1711404db76afd0bce7df9d2a1196d4ef27",
+      "bytes": 16603382
+    },
+    "raw/timing-k100-r1-f32.validation.json": {
+      "sha256": "26f93a8d6fb6517d9e16aad84dc47008477aac59de6f84187a83fb20f5564734",
+      "bytes": 700
+    },
+    "raw/timing-k100-r1-u4m.csv": {
+      "sha256": "98264ec05a35046050d9a44911cd3a6e41b222e46201924e562de96be311ff8b",
+      "bytes": 1439071
+    },
+    "raw/timing-k100-r1-u4m.log": {
+      "sha256": "42700489354ca36f6b0bf1abe175f7cff25cd89eba2434dfbdcd3b16f76f4f2c",
+      "bytes": 913
+    },
+    "raw/timing-k100-r1-u4m.tsv.zst": {
+      "sha256": "4fd50141c53fdf250dd0ff14d204d59f957beb36b9dd923e31cadb4abefd2827",
+      "bytes": 3757236
+    },
+    "raw/timing-k100-r1-u64.csv": {
+      "sha256": "b5abc39186fbfe08741a9f448c3e94270bddf4daa60c0db0d7e619fea51945af",
+      "bytes": 1177588
+    },
+    "raw/timing-k100-r1-u64.jit.json": {
+      "sha256": "495b17f1ce1d8747366b1219ad5e94da2476b6f3735e056b32b22706cec7b7a3",
+      "bytes": 8639
+    },
+    "raw/timing-k100-r1-u64.log": {
+      "sha256": "48c60a9c1145d89ef6a6013ea480b2c57b1734c2b45ce2c6b70bc91e0c9177fa",
+      "bytes": 668
+    },
+    "raw/timing-k100-r1-u64.tsv.zst": {
+      "sha256": "9024348b7275f2d914779d80831eb1711404db76afd0bce7df9d2a1196d4ef27",
+      "bytes": 16603382
+    },
+    "raw/timing-k100-r1-u64.validation.json": {
+      "sha256": "16f22cc54e22f07b92295b59e4480378e7bcca0844d845c9261c60ac888c042f",
+      "bytes": 688
+    },
+    "raw/timing-k100-r2-f32.csv": {
+      "sha256": "b6c85b68b6143ae12fd43d6c8913320589ee4a190ae42d29693a548f762ba4f7",
+      "bytes": 1177474
+    },
+    "raw/timing-k100-r2-f32.jit.json": {
+      "sha256": "41cb4feca37441b2e193d748927e2783a17f630c527dabd50edc5687986eb153",
+      "bytes": 8688
+    },
+    "raw/timing-k100-r2-f32.log": {
+      "sha256": "cb1a0891e4d6901bddcf3622c2be198898ce9cc641c1b8484ee3789a8767d440",
+      "bytes": 680
+    },
+    "raw/timing-k100-r2-f32.tsv.zst": {
+      "sha256": "9024348b7275f2d914779d80831eb1711404db76afd0bce7df9d2a1196d4ef27",
+      "bytes": 16603382
+    },
+    "raw/timing-k100-r2-f32.validation.json": {
+      "sha256": "26f93a8d6fb6517d9e16aad84dc47008477aac59de6f84187a83fb20f5564734",
+      "bytes": 700
+    },
+    "raw/timing-k100-r2-u4m.csv": {
+      "sha256": "b01a54f79c31f8b008335cdb87733a0c8b57ec5e2dc3753b2041275410f6b155",
+      "bytes": 1439002
+    },
+    "raw/timing-k100-r2-u4m.log": {
+      "sha256": "42700489354ca36f6b0bf1abe175f7cff25cd89eba2434dfbdcd3b16f76f4f2c",
+      "bytes": 913
+    },
+    "raw/timing-k100-r2-u4m.tsv.zst": {
+      "sha256": "4fd50141c53fdf250dd0ff14d204d59f957beb36b9dd923e31cadb4abefd2827",
+      "bytes": 3757236
+    },
+    "raw/timing-k100-r2-u64.csv": {
+      "sha256": "3063ffe7b90fe2906a6cb47ef02e7c0047ef2e9c760d2d8102b03e394f319213",
+      "bytes": 1177498
+    },
+    "raw/timing-k100-r2-u64.jit.json": {
+      "sha256": "7f696ba657834bc621bafd073f4ff10a168c8f70f1b970c2fccee9ceba8328c4",
+      "bytes": 8639
+    },
+    "raw/timing-k100-r2-u64.log": {
+      "sha256": "48c60a9c1145d89ef6a6013ea480b2c57b1734c2b45ce2c6b70bc91e0c9177fa",
+      "bytes": 668
+    },
+    "raw/timing-k100-r2-u64.tsv.zst": {
+      "sha256": "9024348b7275f2d914779d80831eb1711404db76afd0bce7df9d2a1196d4ef27",
+      "bytes": 16603382
+    },
+    "raw/timing-k100-r2-u64.validation.json": {
+      "sha256": "16f22cc54e22f07b92295b59e4480378e7bcca0844d845c9261c60ac888c042f",
+      "bytes": 688
+    },
+    "raw/timing-k1000-r0-f32k.csv": {
+      "sha256": "3a1f117d5d2020b578f2ca1b9632d93ad03589d79729d6759b71fa63c8e6e2ed",
+      "bytes": 1211897
+    },
+    "raw/timing-k1000-r0-f32k.jit.json": {
+      "sha256": "56ddc1abae225fffa730c89fe74c0c503a909aaf46d73c3d20091b0cd8b324ba",
+      "bytes": 8758
+    },
+    "raw/timing-k1000-r0-f32k.log": {
+      "sha256": "51f31a025ec1039af26b67f1454027d7fc4cc9b50307d12a1cb37095b5bab5d9",
+      "bytes": 680
+    },
+    "raw/timing-k1000-r0-f32k.tsv.zst": {
+      "sha256": "5ed45dd57bcdffda4b7f7eb99d690107f2468386fc512952262d86034eecd58f",
+      "bytes": 162268112
+    },
+    "raw/timing-k1000-r0-f32k.validation.json": {
+      "sha256": "e3108120cbfc45c6ffef2010a0118892806f72849d6e423af3261e6801382654",
+      "bytes": 700
+    },
+    "raw/timing-k1000-r0-u4m.csv": {
+      "sha256": "d0ca7898be2d9540d7c8eb981137cfbd70ea0ecd1eef6454b365b059a91d06ff",
+      "bytes": 1457759
+    },
+    "raw/timing-k1000-r0-u4m.log": {
+      "sha256": "9374e5367f8ecf26a7959416317f72aefe11b893e424007b8239da3a5adf6e1d",
+      "bytes": 914
+    },
+    "raw/timing-k1000-r0-u4m.tsv.zst": {
+      "sha256": "c4fb0ac84105cd9ff21072f823b4f0cf927e13d9e135fcd66b0e3b20fc618ad0",
+      "bytes": 115217809
+    },
+    "raw/timing-k1000-r0-u64k.csv": {
+      "sha256": "cbb496205db4a04f0a8ba59a0357db0d0c8b3977c4f5acefa52e1ff2ac7178bd",
+      "bytes": 1212234
+    },
+    "raw/timing-k1000-r0-u64k.jit.json": {
+      "sha256": "c837e818e42545d2ce49e69f84b9b60b7e0d5181ecbb7c0b47d67dbec43b614b",
+      "bytes": 8709
+    },
+    "raw/timing-k1000-r0-u64k.log": {
+      "sha256": "89bfae006250f8b5fccfb5a270b9cd2b2cc452004fe2bc74a229d89e27ee72b6",
+      "bytes": 668
+    },
+    "raw/timing-k1000-r0-u64k.tsv.zst": {
+      "sha256": "5ed45dd57bcdffda4b7f7eb99d690107f2468386fc512952262d86034eecd58f",
+      "bytes": 162268112
+    },
+    "raw/timing-k1000-r0-u64k.validation.json": {
+      "sha256": "f28593272231d7e7bb88fffd3cdb81782bd6d0872e7e7e92a59ee572309dd3e7",
+      "bytes": 688
+    },
+    "raw/timing-k1000-r1-f32k.csv": {
+      "sha256": "d6f06b866d8c4529afac29fbe65fbcd4a961b7a49a377d056a5e4bc7f7988c68",
+      "bytes": 1211994
+    },
+    "raw/timing-k1000-r1-f32k.jit.json": {
+      "sha256": "4d1523729c0dedffa3fb773b6c7b455802401ec34bdd04f8079818a6316a7705",
+      "bytes": 8758
+    },
+    "raw/timing-k1000-r1-f32k.log": {
+      "sha256": "51f31a025ec1039af26b67f1454027d7fc4cc9b50307d12a1cb37095b5bab5d9",
+      "bytes": 680
+    },
+    "raw/timing-k1000-r1-f32k.tsv.zst": {
+      "sha256": "5ed45dd57bcdffda4b7f7eb99d690107f2468386fc512952262d86034eecd58f",
+      "bytes": 162268112
+    },
+    "raw/timing-k1000-r1-f32k.validation.json": {
+      "sha256": "e3108120cbfc45c6ffef2010a0118892806f72849d6e423af3261e6801382654",
+      "bytes": 700
+    },
+    "raw/timing-k1000-r1-u4m.csv": {
+      "sha256": "da5fc27119d53e75a75c76286ffb12e9e75f27824d9cee1e795cb74b485f21ec",
+      "bytes": 1457920
+    },
+    "raw/timing-k1000-r1-u4m.log": {
+      "sha256": "9374e5367f8ecf26a7959416317f72aefe11b893e424007b8239da3a5adf6e1d",
+      "bytes": 914
+    },
+    "raw/timing-k1000-r1-u4m.tsv.zst": {
+      "sha256": "c4fb0ac84105cd9ff21072f823b4f0cf927e13d9e135fcd66b0e3b20fc618ad0",
+      "bytes": 115217809
+    },
+    "raw/timing-k1000-r1-u64k.csv": {
+      "sha256": "7ff9e8e1dbea13a793e21120a82df991dc65d6ee5b9c77a1134ac726f7a0b9d8",
+      "bytes": 1212218
+    },
+    "raw/timing-k1000-r1-u64k.jit.json": {
+      "sha256": "18780885ee6a3df1f911b4e2682f3d55757225229ef24bb50bb68eb7daf8e08e",
+      "bytes": 8709
+    },
+    "raw/timing-k1000-r1-u64k.log": {
+      "sha256": "89bfae006250f8b5fccfb5a270b9cd2b2cc452004fe2bc74a229d89e27ee72b6",
+      "bytes": 668
+    },
+    "raw/timing-k1000-r1-u64k.tsv.zst": {
+      "sha256": "5ed45dd57bcdffda4b7f7eb99d690107f2468386fc512952262d86034eecd58f",
+      "bytes": 162268112
+    },
+    "raw/timing-k1000-r1-u64k.validation.json": {
+      "sha256": "f28593272231d7e7bb88fffd3cdb81782bd6d0872e7e7e92a59ee572309dd3e7",
+      "bytes": 688
+    },
+    "raw/timing-k1000-r2-f32k.csv": {
+      "sha256": "3d115d71731f3d09234f07570a81b44dfb3e9ec4414ffda8d6ca678fb1f18589",
+      "bytes": 1212006
+    },
+    "raw/timing-k1000-r2-f32k.jit.json": {
+      "sha256": "168803958af1b5a5fa4bdc66f68fedca57dd4959305427f26155d1b1efa8cade",
+      "bytes": 8758
+    },
+    "raw/timing-k1000-r2-f32k.log": {
+      "sha256": "51f31a025ec1039af26b67f1454027d7fc4cc9b50307d12a1cb37095b5bab5d9",
+      "bytes": 680
+    },
+    "raw/timing-k1000-r2-f32k.tsv.zst": {
+      "sha256": "5ed45dd57bcdffda4b7f7eb99d690107f2468386fc512952262d86034eecd58f",
+      "bytes": 162268112
+    },
+    "raw/timing-k1000-r2-f32k.validation.json": {
+      "sha256": "e3108120cbfc45c6ffef2010a0118892806f72849d6e423af3261e6801382654",
+      "bytes": 700
+    },
+    "raw/timing-k1000-r2-u4m.csv": {
+      "sha256": "306575811a5bb994cbb922332acc79ef1957ee19496d53baacba9d692e44fe69",
+      "bytes": 1457862
+    },
+    "raw/timing-k1000-r2-u4m.log": {
+      "sha256": "9374e5367f8ecf26a7959416317f72aefe11b893e424007b8239da3a5adf6e1d",
+      "bytes": 914
+    },
+    "raw/timing-k1000-r2-u4m.tsv.zst": {
+      "sha256": "c4fb0ac84105cd9ff21072f823b4f0cf927e13d9e135fcd66b0e3b20fc618ad0",
+      "bytes": 115217809
+    },
+    "raw/timing-k1000-r2-u64k.csv": {
+      "sha256": "edf9fdb7b5acab4f265c8a41cbda61293d6274708bbf8735af2d876fb0da8040",
+      "bytes": 1212431
+    },
+    "raw/timing-k1000-r2-u64k.jit.json": {
+      "sha256": "a04d87dd57503104220b9a7fda980889abdd3375c9f0612409daa3cd8b9399d8",
+      "bytes": 8709
+    },
+    "raw/timing-k1000-r2-u64k.log": {
+      "sha256": "89bfae006250f8b5fccfb5a270b9cd2b2cc452004fe2bc74a229d89e27ee72b6",
+      "bytes": 668
+    },
+    "raw/timing-k1000-r2-u64k.tsv.zst": {
+      "sha256": "5ed45dd57bcdffda4b7f7eb99d690107f2468386fc512952262d86034eecd58f",
+      "bytes": 162268112
+    },
+    "raw/timing-k1000-r2-u64k.validation.json": {
+      "sha256": "f28593272231d7e7bb88fffd3cdb81782bd6d0872e7e7e92a59ee572309dd3e7",
+      "bytes": 688
+    },
+    "raw/topk-sha256.txt": {
+      "sha256": "3788601f379d2f623aa14820b32748f31b52598a961bca2911725dcb3d0b7e39",
+      "bytes": 2517
+    },
+    "receipts/timing-k10-r0-f32-expect.json": {
+      "sha256": "441498366462205d243aec45e693d659bf7bf23273bb6c91f601ba563c6820ac",
+      "bytes": 128
+    },
+    "receipts/timing-k10-r0-f32-gate.json": {
+      "sha256": "4e5f9fc7bfad313816d7e510fb5bee05b6c971ccbf4a7ab95a4b96073c767bac",
+      "bytes": 5401
+    },
+    "receipts/timing-k10-r0-f32.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k10-r0-u64-expect.json": {
+      "sha256": "441498366462205d243aec45e693d659bf7bf23273bb6c91f601ba563c6820ac",
+      "bytes": 128
+    },
+    "receipts/timing-k10-r0-u64-gate.json": {
+      "sha256": "a7ad43f8ddca1a85cc599053325ca48b423638131a4cf2dec74b9ccd610085ab",
+      "bytes": 5066
+    },
+    "receipts/timing-k10-r0-u64.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k10-r1-f32-expect.json": {
+      "sha256": "441498366462205d243aec45e693d659bf7bf23273bb6c91f601ba563c6820ac",
+      "bytes": 128
+    },
+    "receipts/timing-k10-r1-f32-gate.json": {
+      "sha256": "f259deffa721eb955c9ee3dbd53a9b04c6240b52f70d76a85a51c9256712f0d0",
+      "bytes": 5401
+    },
+    "receipts/timing-k10-r1-f32.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k10-r1-u64-expect.json": {
+      "sha256": "441498366462205d243aec45e693d659bf7bf23273bb6c91f601ba563c6820ac",
+      "bytes": 128
+    },
+    "receipts/timing-k10-r1-u64-gate.json": {
+      "sha256": "be4a6b70bb9c659cd45e40c5c933570c57fcc8c4ef995deeb4a62fbf5a69af37",
+      "bytes": 5066
+    },
+    "receipts/timing-k10-r1-u64.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k10-r2-f32-expect.json": {
+      "sha256": "441498366462205d243aec45e693d659bf7bf23273bb6c91f601ba563c6820ac",
+      "bytes": 128
+    },
+    "receipts/timing-k10-r2-f32-gate.json": {
+      "sha256": "90c2c9669305abafed2f74e7e082447b24c882abb5af149899a710f16b07db8b",
+      "bytes": 5401
+    },
+    "receipts/timing-k10-r2-f32.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k10-r2-u64-expect.json": {
+      "sha256": "441498366462205d243aec45e693d659bf7bf23273bb6c91f601ba563c6820ac",
+      "bytes": 128
+    },
+    "receipts/timing-k10-r2-u64-gate.json": {
+      "sha256": "cb1f7f96e4eba50fea75b2cbc0f5698fa00430e830a863b64442cbd58d5dffed",
+      "bytes": 5066
+    },
+    "receipts/timing-k10-r2-u64.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k100-r0-f32-expect.json": {
+      "sha256": "2e32dd170b3b21e15f053d0841f86fdd0da7032935face4ef31fffca81f1755f",
+      "bytes": 129
+    },
+    "receipts/timing-k100-r0-f32-gate.json": {
+      "sha256": "12ce506b71eeba88afe158252fbc9a5495a299c056b756e593b7184e23f6f4c7",
+      "bytes": 5409
+    },
+    "receipts/timing-k100-r0-f32.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k100-r0-u64-expect.json": {
+      "sha256": "2e32dd170b3b21e15f053d0841f86fdd0da7032935face4ef31fffca81f1755f",
+      "bytes": 129
+    },
+    "receipts/timing-k100-r0-u64-gate.json": {
+      "sha256": "c2754bc701b48ffc3e8edee0469dace8ad65d205437960b478cf141ea3b8cee4",
+      "bytes": 5074
+    },
+    "receipts/timing-k100-r0-u64.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k100-r1-f32-expect.json": {
+      "sha256": "2e32dd170b3b21e15f053d0841f86fdd0da7032935face4ef31fffca81f1755f",
+      "bytes": 129
+    },
+    "receipts/timing-k100-r1-f32-gate.json": {
+      "sha256": "c2052db386850bae1cd53113f7167ba6343eff352d16f055a0f50b8ef65006fa",
+      "bytes": 5409
+    },
+    "receipts/timing-k100-r1-f32.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k100-r1-u64-expect.json": {
+      "sha256": "2e32dd170b3b21e15f053d0841f86fdd0da7032935face4ef31fffca81f1755f",
+      "bytes": 129
+    },
+    "receipts/timing-k100-r1-u64-gate.json": {
+      "sha256": "9d19f2345a5c801d5fe705451033a05a9c1af796ceaa4c61db048247037ab0a9",
+      "bytes": 5074
+    },
+    "receipts/timing-k100-r1-u64.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k100-r2-f32-expect.json": {
+      "sha256": "2e32dd170b3b21e15f053d0841f86fdd0da7032935face4ef31fffca81f1755f",
+      "bytes": 129
+    },
+    "receipts/timing-k100-r2-f32-gate.json": {
+      "sha256": "b0f8d370ae789afd243ace6f298252996b8adbeb2d06f4aacd7f41202c512d7f",
+      "bytes": 5409
+    },
+    "receipts/timing-k100-r2-f32.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k100-r2-u64-expect.json": {
+      "sha256": "2e32dd170b3b21e15f053d0841f86fdd0da7032935face4ef31fffca81f1755f",
+      "bytes": 129
+    },
+    "receipts/timing-k100-r2-u64-gate.json": {
+      "sha256": "09fb41516bb4e722e23da434975caaaa12d413ee4b1874fba71cb64d98cec793",
+      "bytes": 5074
+    },
+    "receipts/timing-k100-r2-u64.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k1000-r0-f32k-expect.json": {
+      "sha256": "640e79a95d73d6f956d16c499b9d83481b069bd60e77079daffdd253dfc77334",
+      "bytes": 130
+    },
+    "receipts/timing-k1000-r0-f32k-gate.json": {
+      "sha256": "472885ee5194a1399fab8916ea7f9de6e53cc170ed6f372daa0d2e1dddc0bb13",
+      "bytes": 5422
+    },
+    "receipts/timing-k1000-r0-f32k.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k1000-r0-u64k-expect.json": {
+      "sha256": "640e79a95d73d6f956d16c499b9d83481b069bd60e77079daffdd253dfc77334",
+      "bytes": 130
+    },
+    "receipts/timing-k1000-r0-u64k-gate.json": {
+      "sha256": "b64a970654a2214149076ba80087eb27e417f52a61dfd7e289c6b0f8eca26a18",
+      "bytes": 5078
+    },
+    "receipts/timing-k1000-r0-u64k.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k1000-r1-f32k-expect.json": {
+      "sha256": "640e79a95d73d6f956d16c499b9d83481b069bd60e77079daffdd253dfc77334",
+      "bytes": 130
+    },
+    "receipts/timing-k1000-r1-f32k-gate.json": {
+      "sha256": "b0a00c55a2bdc9051239c5ed331912a6c1904fe34b3160e73fac70501aa6e08a",
+      "bytes": 5422
+    },
+    "receipts/timing-k1000-r1-f32k.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k1000-r1-u64k-expect.json": {
+      "sha256": "640e79a95d73d6f956d16c499b9d83481b069bd60e77079daffdd253dfc77334",
+      "bytes": 130
+    },
+    "receipts/timing-k1000-r1-u64k-gate.json": {
+      "sha256": "c429ae0ecbbd01862fc3ef72de1f5424216431af9b6c2deab4f91035e7c52faf",
+      "bytes": 5078
+    },
+    "receipts/timing-k1000-r1-u64k.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k1000-r2-f32k-expect.json": {
+      "sha256": "640e79a95d73d6f956d16c499b9d83481b069bd60e77079daffdd253dfc77334",
+      "bytes": 130
+    },
+    "receipts/timing-k1000-r2-f32k-gate.json": {
+      "sha256": "19c260b109bcd1f8232a85e16ae8c55201bf02c35f1c5908defdb1692f11775e",
+      "bytes": 5422
+    },
+    "receipts/timing-k1000-r2-f32k.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/timing-k1000-r2-u64k-expect.json": {
+      "sha256": "640e79a95d73d6f956d16c499b9d83481b069bd60e77079daffdd253dfc77334",
+      "bytes": 130
+    },
+    "receipts/timing-k1000-r2-u64k-gate.json": {
+      "sha256": "61d55cb2e7423ad7f8961165ffde188433e6e167909c8aa94a3bbbc0f43110fe",
+      "bytes": 5078
+    },
+    "receipts/timing-k1000-r2-u64k.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    }
+  },
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [
+      {
+        "original": "raw/timing-k10-r0-f32.csv",
+        "sha256": "82663a34d8593c7eb8b5111bbca1b974eb88e9d7b33618f8f39f7b0e99ce11a8",
+        "bytes": 1143003,
+        "public": "raw/timing-k10-r0-f32.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r0-u4m.csv",
+        "sha256": "9f5df2fd150a239f6da01db8a8e50119610fd793edad8adbbeefd87c2bd9f59b",
+        "bytes": 1416097,
+        "public": "raw/timing-k10-r0-u4m.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r0-u64.csv",
+        "sha256": "ab676e466ebf76bd782d89260fd80090e732582b9942926607e36a8ccfbd9781",
+        "bytes": 1143009,
+        "public": "raw/timing-k10-r0-u64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r1-f32.csv",
+        "sha256": "97dcb5783a28e29275416b72c90f56c609594076134b1577a2e8b8e38f7c96ad",
+        "bytes": 1143080,
+        "public": "raw/timing-k10-r1-f32.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r1-u4m.csv",
+        "sha256": "40936655a2e936f5b48b4902e53ab4dc74e81439dcd6570942c9a9ca4cad0c25",
+        "bytes": 1416031,
+        "public": "raw/timing-k10-r1-u4m.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r1-u64.csv",
+        "sha256": "3687579025cd25a4f5eb91bacc02625f668a284b2cc64f5626b2baa2e36aa17f",
+        "bytes": 1143137,
+        "public": "raw/timing-k10-r1-u64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r2-f32.csv",
+        "sha256": "f43b6d879414fc3bfaec73acf7ab8ef66e18dfae342f6ffcb218de1ab38b484b",
+        "bytes": 1143077,
+        "public": "raw/timing-k10-r2-f32.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r2-u4m.csv",
+        "sha256": "2bf4daad54a8e13fa527245d91b6d8b74889e7131b3356f439a159e4befaa48d",
+        "bytes": 1416092,
+        "public": "raw/timing-k10-r2-u4m.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k10-r2-u64.csv",
+        "sha256": "a9e229e8cbe1ec8c77a36d0eda9e1bd9c60bbd6ccfb431b27e59a4568a8b45a5",
+        "bytes": 1143068,
+        "public": "raw/timing-k10-r2-u64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k100-r0-f32.csv",
+        "sha256": "26c30a0b990df9bf7cbcc02debd658dd23b401f7b8c3bbb8c203ada511d06595",
+        "bytes": 1177455,
+        "public": "raw/timing-k100-r0-f32.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k100-r0-u4m.csv",
+        "sha256": "eed707b5b0ef1b4a30b79ebd71a139490cd3d1b54c576fede3d0f683d44af1c0",
+        "bytes": 1439160,
+        "public": "raw/timing-k100-r0-u4m.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k100-r0-u64.csv",
+        "sha256": "4b7a94c8f93be651a3a3d1ab3a7f3fa3f8566c29a1682e037532651276489065",
+        "bytes": 1177605,
+        "public": "raw/timing-k100-r0-u64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k100-r1-f32.csv",
+        "sha256": "8643c4494fb764d9922d9451a9db5d13da8977782f986bf11da5a2e442b0a8c2",
+        "bytes": 1177456,
+        "public": "raw/timing-k100-r1-f32.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k100-r1-u4m.csv",
+        "sha256": "98264ec05a35046050d9a44911cd3a6e41b222e46201924e562de96be311ff8b",
+        "bytes": 1439071,
+        "public": "raw/timing-k100-r1-u4m.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k100-r1-u64.csv",
+        "sha256": "b5abc39186fbfe08741a9f448c3e94270bddf4daa60c0db0d7e619fea51945af",
+        "bytes": 1177588,
+        "public": "raw/timing-k100-r1-u64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k100-r2-f32.csv",
+        "sha256": "b6c85b68b6143ae12fd43d6c8913320589ee4a190ae42d29693a548f762ba4f7",
+        "bytes": 1177474,
+        "public": "raw/timing-k100-r2-f32.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k100-r2-u4m.csv",
+        "sha256": "b01a54f79c31f8b008335cdb87733a0c8b57ec5e2dc3753b2041275410f6b155",
+        "bytes": 1439002,
+        "public": "raw/timing-k100-r2-u4m.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k100-r2-u64.csv",
+        "sha256": "3063ffe7b90fe2906a6cb47ef02e7c0047ef2e9c760d2d8102b03e394f319213",
+        "bytes": 1177498,
+        "public": "raw/timing-k100-r2-u64.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k1000-r0-f32k.csv",
+        "sha256": "3a1f117d5d2020b578f2ca1b9632d93ad03589d79729d6759b71fa63c8e6e2ed",
+        "bytes": 1211897,
+        "public": "raw/timing-k1000-r0-f32k.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k1000-r0-u4m.csv",
+        "sha256": "d0ca7898be2d9540d7c8eb981137cfbd70ea0ecd1eef6454b365b059a91d06ff",
+        "bytes": 1457759,
+        "public": "raw/timing-k1000-r0-u4m.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k1000-r0-u64k.csv",
+        "sha256": "cbb496205db4a04f0a8ba59a0357db0d0c8b3977c4f5acefa52e1ff2ac7178bd",
+        "bytes": 1212234,
+        "public": "raw/timing-k1000-r0-u64k.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k1000-r1-f32k.csv",
+        "sha256": "d6f06b866d8c4529afac29fbe65fbcd4a961b7a49a377d056a5e4bc7f7988c68",
+        "bytes": 1211994,
+        "public": "raw/timing-k1000-r1-f32k.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k1000-r1-u4m.csv",
+        "sha256": "da5fc27119d53e75a75c76286ffb12e9e75f27824d9cee1e795cb74b485f21ec",
+        "bytes": 1457920,
+        "public": "raw/timing-k1000-r1-u4m.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k1000-r1-u64k.csv",
+        "sha256": "7ff9e8e1dbea13a793e21120a82df991dc65d6ee5b9c77a1134ac726f7a0b9d8",
+        "bytes": 1212218,
+        "public": "raw/timing-k1000-r1-u64k.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k1000-r2-f32k.csv",
+        "sha256": "3d115d71731f3d09234f07570a81b44dfb3e9ec4414ffda8d6ca678fb1f18589",
+        "bytes": 1212006,
+        "public": "raw/timing-k1000-r2-f32k.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k1000-r2-u4m.csv",
+        "sha256": "306575811a5bb994cbb922332acc79ef1957ee19496d53baacba9d692e44fe69",
+        "bytes": 1457862,
+        "public": "raw/timing-k1000-r2-u4m.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      },
+      {
+        "original": "raw/timing-k1000-r2-u64k.csv",
+        "sha256": "edf9fdb7b5acab4f265c8a41cbda61293d6274708bbf8735af2d876fb0da8040",
+        "bytes": 1212431,
+        "public": "raw/timing-k1000-r2-u64k.csv.gz",
+        "transformation": "verbatim original; lossless gzip (level 9, no name/mtime)"
+      }
+    ],
+    "excluded": [
+      {
+        "original": "cuda-cache.tar",
+        "sha256": "d7ff634a397ffb9ee3fe3c5720af45e910587a262d1042b0950ac57842d2f874",
+        "bytes": 20480,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/cuda-cache.tar.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "jit.tar",
+        "sha256": "e969299c926d6ca4ec3812b4bd911abfeb53a400a8ca300cdc4291fc87eb3364",
+        "bytes": 3102720,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/jit.tar.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r0-f32.tsv.zst",
+        "sha256": "9dd72116c79200aaf59fc962063c7047d100de9e141fde57edbaf0259cacd898",
+        "bytes": 229105,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r0-f32.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r0-u4m.tsv.zst",
+        "sha256": "573ca2615e51347d26459ca4fd0177448bfc5898ee323456e831493480e3707d",
+        "bytes": 172705,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r0-u4m.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r0-u64.tsv.zst",
+        "sha256": "9dd72116c79200aaf59fc962063c7047d100de9e141fde57edbaf0259cacd898",
+        "bytes": 229105,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r0-u64.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r1-f32.tsv.zst",
+        "sha256": "9dd72116c79200aaf59fc962063c7047d100de9e141fde57edbaf0259cacd898",
+        "bytes": 229105,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r1-f32.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r1-u4m.tsv.zst",
+        "sha256": "573ca2615e51347d26459ca4fd0177448bfc5898ee323456e831493480e3707d",
+        "bytes": 172705,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r1-u4m.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r1-u64.tsv.zst",
+        "sha256": "9dd72116c79200aaf59fc962063c7047d100de9e141fde57edbaf0259cacd898",
+        "bytes": 229105,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r1-u64.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r2-f32.tsv.zst",
+        "sha256": "9dd72116c79200aaf59fc962063c7047d100de9e141fde57edbaf0259cacd898",
+        "bytes": 229105,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r2-f32.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r2-u4m.tsv.zst",
+        "sha256": "573ca2615e51347d26459ca4fd0177448bfc5898ee323456e831493480e3707d",
+        "bytes": 172705,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r2-u4m.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k10-r2-u64.tsv.zst",
+        "sha256": "9dd72116c79200aaf59fc962063c7047d100de9e141fde57edbaf0259cacd898",
+        "bytes": 229105,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k10-r2-u64.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k100-r0-f32.tsv.zst",
+        "sha256": "9024348b7275f2d914779d80831eb1711404db76afd0bce7df9d2a1196d4ef27",
+        "bytes": 16603382,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r0-f32.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k100-r0-u4m.tsv.zst",
+        "sha256": "4fd50141c53fdf250dd0ff14d204d59f957beb36b9dd923e31cadb4abefd2827",
+        "bytes": 3757236,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r0-u4m.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k100-r0-u64.tsv.zst",
+        "sha256": "9024348b7275f2d914779d80831eb1711404db76afd0bce7df9d2a1196d4ef27",
+        "bytes": 16603382,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r0-u64.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k100-r1-f32.tsv.zst",
+        "sha256": "9024348b7275f2d914779d80831eb1711404db76afd0bce7df9d2a1196d4ef27",
+        "bytes": 16603382,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r1-f32.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k100-r1-u4m.tsv.zst",
+        "sha256": "4fd50141c53fdf250dd0ff14d204d59f957beb36b9dd923e31cadb4abefd2827",
+        "bytes": 3757236,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r1-u4m.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k100-r1-u64.tsv.zst",
+        "sha256": "9024348b7275f2d914779d80831eb1711404db76afd0bce7df9d2a1196d4ef27",
+        "bytes": 16603382,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r1-u64.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k100-r2-f32.tsv.zst",
+        "sha256": "9024348b7275f2d914779d80831eb1711404db76afd0bce7df9d2a1196d4ef27",
+        "bytes": 16603382,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r2-f32.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k100-r2-u4m.tsv.zst",
+        "sha256": "4fd50141c53fdf250dd0ff14d204d59f957beb36b9dd923e31cadb4abefd2827",
+        "bytes": 3757236,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r2-u4m.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k100-r2-u64.tsv.zst",
+        "sha256": "9024348b7275f2d914779d80831eb1711404db76afd0bce7df9d2a1196d4ef27",
+        "bytes": 16603382,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k100-r2-u64.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k1000-r0-f32k.tsv.zst",
+        "sha256": "5ed45dd57bcdffda4b7f7eb99d690107f2468386fc512952262d86034eecd58f",
+        "bytes": 162268112,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r0-f32k.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k1000-r0-u4m.tsv.zst",
+        "sha256": "c4fb0ac84105cd9ff21072f823b4f0cf927e13d9e135fcd66b0e3b20fc618ad0",
+        "bytes": 115217809,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r0-u4m.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k1000-r0-u64k.tsv.zst",
+        "sha256": "5ed45dd57bcdffda4b7f7eb99d690107f2468386fc512952262d86034eecd58f",
+        "bytes": 162268112,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r0-u64k.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k1000-r1-f32k.tsv.zst",
+        "sha256": "5ed45dd57bcdffda4b7f7eb99d690107f2468386fc512952262d86034eecd58f",
+        "bytes": 162268112,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r1-f32k.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k1000-r1-u4m.tsv.zst",
+        "sha256": "c4fb0ac84105cd9ff21072f823b4f0cf927e13d9e135fcd66b0e3b20fc618ad0",
+        "bytes": 115217809,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r1-u4m.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k1000-r1-u64k.tsv.zst",
+        "sha256": "5ed45dd57bcdffda4b7f7eb99d690107f2468386fc512952262d86034eecd58f",
+        "bytes": 162268112,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r1-u64k.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k1000-r2-f32k.tsv.zst",
+        "sha256": "5ed45dd57bcdffda4b7f7eb99d690107f2468386fc512952262d86034eecd58f",
+        "bytes": 162268112,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r2-f32k.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k1000-r2-u4m.tsv.zst",
+        "sha256": "c4fb0ac84105cd9ff21072f823b4f0cf927e13d9e135fcd66b0e3b20fc618ad0",
+        "bytes": 115217809,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r2-u4m.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/timing-k1000-r2-u64k.tsv.zst",
+        "sha256": "5ed45dd57bcdffda4b7f7eb99d690107f2468386fc512952262d86034eecd58f",
+        "bytes": 162268112,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-timing-01/raw/timing-k1000-r2-u64k.tsv.zst.",
+        "reason": "kept outside Git"
+      }
+    ],
+    "recorded_artifacts_not_in_public_tree_or_lists": [
+      "jit/timing-k10-r0-f32/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k10-r0-f32/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/timing-k10-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k10-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k10-r0-f32/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k10-r0-u64/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k10-r0-u64/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/timing-k10-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k10-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k10-r0-u64/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k10-r1-f32/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k10-r1-f32/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/timing-k10-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k10-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k10-r1-f32/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k10-r1-u64/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k10-r1-u64/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/timing-k10-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k10-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k10-r1-u64/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k10-r2-f32/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k10-r2-f32/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/timing-k10-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k10-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k10-r2-f32/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k10-r2-u64/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k10-r2-u64/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/timing-k10-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k10-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k10-r2-u64/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k100-r0-f32/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k100-r0-f32/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/timing-k100-r0-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k100-r0-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k100-r0-f32/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k100-r0-u64/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k100-r0-u64/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/timing-k100-r0-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k100-r0-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k100-r0-u64/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k100-r1-f32/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k100-r1-f32/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/timing-k100-r1-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k100-r1-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k100-r1-f32/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k100-r1-u64/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k100-r1-u64/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/timing-k100-r1-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k100-r1-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k100-r1-u64/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k100-r2-f32/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k100-r2-f32/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/timing-k100-r2-f32/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k100-r2-f32/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k100-r2-f32/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k100-r2-u64/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k100-r2-u64/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/timing-k100-r2-u64/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k100-r2-u64/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k100-r2-u64/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k1000-r0-f32k/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k1000-r0-f32k/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/timing-k1000-r0-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k1000-r0-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k1000-r0-f32k/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k1000-r0-u64k/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k1000-r0-u64k/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/timing-k1000-r0-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k1000-r0-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k1000-r0-u64k/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k1000-r1-f32k/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k1000-r1-f32k/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/timing-k1000-r1-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k1000-r1-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k1000-r1-f32k/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k1000-r1-u64k/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k1000-r1-u64k/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/timing-k1000-r1-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k1000-r1-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k1000-r1-u64k/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k1000-r2-f32k/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k1000-r2-f32k/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/timing-k1000-r2-f32k/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k1000-r2-f32k/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k1000-r2-f32k/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/timing-k1000-r2-u64k/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/timing-k1000-r2-u64k/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/timing-k1000-r2-u64k/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/timing-k1000-r2-u64k/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/timing-k1000-r2-u64k/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so"
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+STOPPED (not complete): gate session (correctness only), commit 73a3f02. A first launch at 03:43Z failed before any GPU
+work (run_i.sh was not executable; fixed in 73a3f02; launcher log kept on cuda5).
+Started 04:01Z; waited for a clear GPU until 04:37Z. Six of 13 gates were exact: U64, U64 k-limit copy, FP32, FP32
+k-limit copy and u4m at k=10 (both k-limit copies byte-identical to the originals), and U64 at k=100.
+gate-u64k-k100 overlapped other users' short GPU processes (8 and 14 processes during the ~90-105 s attempts;
+preserved as -overlap-1 and -overlap-2). A session-script bug then stopped the run (05:24Z): the adapter's
+<tag>-validation.json and <tag>-jit.json were not moved with an overlapped attempt, so the rerun's adapter refused to
+overwrite them (assertion at canonical_baseline.py:51; raw/gate-u64k-k100.log). The second preserved attempt had also
+failed at that assertion before it was flagged as an overlap. Fixed in 9392dd1 (outputs named <tag>.validation.json /
+<tag>.jit.json); the owner then chose contended gates (gates amendment 1) and the gates were rerun as
+20261124-cuda5-i-pre-02 (all 13 exact).

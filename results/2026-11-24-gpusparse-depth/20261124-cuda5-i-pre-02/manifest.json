@@ -1,0 +1,1541 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-24-gpusparse-depth",
+  "run_id": "20261124-cuda5-i-pre-02",
+  "status": "completed-gates",
+  "scope": "Measurement I (20261124-cuda5-i-pre-02): cuda5; GPUSparse canonical U64 and guarded FP32 adaptations (unchanged at k=10/100, k-limit variant at k=1000) and u4m (W=4096) on the full collection (8,841,823 passages); 500 calibration queries; batch 1; calibration only, after the freeze",
+  "recording": "not recorded by the team runtime; self-recorded manifest",
+  "source_commit": "011652d48cd7ba9686db2a16b7dbf518a6fcfc56",
+  "working_tree_changes": "",
+  "build": {
+    "flags": "u4m: nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6), code/build_i.sh; GPUSparse: pinned venv (Python 3.12.7, torch 2.6.0+cu126, triton 3.2.0), native 92bb87b",
+    "source_sha256": {
+      "experiments/2026-11-24-gpusparse-depth/configs/protocol.json": "2bf8218c3d3c7db5625124f59bd5d46d1989e780d545001987c8baa2dc15deae",
+      "experiments/2026-11-24-gpusparse-depth/code/run_i.sh": "5229f7fa65a97f9fd1ef0c06cf2a72d726da77b41dfbe2d956c2a8f41bdf21a4",
+      "experiments/2026-11-24-gpusparse-depth/code/rt_gate.py": "189971e34e502e34a1f2dc7d8c8af006d84240dd4b30dd847d23331ce5e5303c",
+      "experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh": "acb4388684bbdb0c5d4e964bdf1850192cb02b2d55b5672a60cacf46d31d13fc",
+      "experiments/2026-11-24-gpusparse-depth/code/session_lib_h.sh": "0ed1a61297c18a5d0a6c2fdad7cbfe554af9092a894790d18e7676d2fb381253",
+      "experiments/2026-11-24-gpusparse-depth/code/session_lib_i.sh": "69be90e709431d2b23232eee684d94dd09266f7f973cb9418fbf15148a21efe3",
+      "experiments/2026-11-24-gpusparse-depth/code/check_klimit.py": "a0d609824b32fb1a49c7274a38a3b51b2b79abab95c69350b291e69828b0d454",
+      "experiments/2026-11-24-gpusparse-depth/analysis/pre_i.py": "e9bd8a06d5d4f190011a3d7a13c57092a05c9379b70d818c28bba63a089be527",
+      "experiments/2026-11-24-gpusparse-depth/analysis/analyze_i.py": "45aa04c9efa91d16708247d07eea8e7975f81a1496cfb759664391ab31c80772",
+      "experiments/2026-11-22-range-v3-tune/code/session_lib.sh": "f5e6aecfaa91d70872a25f70dee4173ff72e61ce2767b1d5bfc8b0e14b6daf69",
+      "experiments/2026-11-22-range-v3-tune/code/overlap.py": "0ce4280e3e0785260a8a48724b4ab771e85277c2d98484cf32f887ca5be45afc"
+    },
+    "binary_sha256": {
+      "build/i3-011652d4/u4m/scorer": "f66a8dee447c3f4b5cdfcf05784a4447a9f9a01d3bec49a1f4c437a0fc3a3d47",
+      "build/i3-011652d4/holder/gpu_holder": "2ad1acb53c3a7535f06a7385e81fe6876523802ec1c55bf9facf9492659dcdc6"
+    }
+  },
+  "inputs": {
+    "data/derived/calibration-500.tsv": {
+      "sha256": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091",
+      "bytes": 175592
+    }
+  },
+  "environment": {
+    "host": "cuda5.cims.nyu.edu",
+    "kernel": "Linux 5.14.0-687.61.1.el9_8.x86_64",
+    "gpu": "NVIDIA GeForce RTX 4070, 595.104.02, 12282 MiB, 8.9",
+    "nvcc": [
+      "unavailable"
+    ],
+    "gxx": [
+      "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-17)"
+    ],
+    "python": "Python 3.9.25"
+  },
+  "commands": [
+    "[gate-u64-k10] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64-k10.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/jit/gate-u64-k10 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/cuda-cache/gate-u64-k10 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64-k10-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64-k10-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64-k10.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64-k10.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64-k10.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64-k10.jit.json --limit 500 --k 10 --gpu 0 --block-pl 512 --repeats 1 --warmups 1 --verify 0",
+    "[gate-u64k-k10] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64k-k10.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/jit/gate-u64k-k10 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/cuda-cache/gate-u64k-k10 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64k-k10-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64k-k10-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-24-gpusparse-depth/code/klimit/u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k10.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k10.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k10.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k10.jit.json --limit 500 --k 10 --gpu 0 --block-pl 512 --repeats 1 --warmups 1 --verify 0",
+    "[gate-f32-k10] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32-k10.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/jit/gate-f32-k10 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/cuda-cache/gate-f32-k10 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32-k10-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32-k10-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-16-guarded-fp32-baseline/code/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32-k10.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32-k10.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32-k10.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32-k10.jit.json --limit 500 --k 10 --gpu 0 --block-pl 512 --repeats 1 --warmups 1 --verify 0",
+    "[gate-f32k-k10] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32k-k10.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/jit/gate-f32k-k10 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/cuda-cache/gate-f32k-k10 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32k-k10-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32k-k10-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-24-gpusparse-depth/code/klimit/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k10.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k10.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k10.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k10.jit.json --limit 500 --k 10 --gpu 0 --block-pl 512 --repeats 1 --warmups 1 --verify 0",
+    "[gate-u4m-k10] build/i3-011652d4/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u4m-k10.csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u4m-k10.tsv 500 10 0 0 1 1 256 256 - 1",
+    "[gate-u64-k100] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64-k100.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/jit/gate-u64-k100 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/cuda-cache/gate-u64-k100 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64-k100-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64-k100-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64-k100.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64-k100.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64-k100.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64-k100.jit.json --limit 500 --k 100 --gpu 0 --block-pl 512 --repeats 1 --warmups 1 --verify 0",
+    "[gate-u64k-k100] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64k-k100.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/jit/gate-u64k-k100 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/cuda-cache/gate-u64k-k100 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64k-k100-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64k-k100-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-24-gpusparse-depth/code/klimit/u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k100.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k100.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k100.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k100.jit.json --limit 500 --k 100 --gpu 0 --block-pl 512 --repeats 1 --warmups 1 --verify 0",
+    "[gate-f32-k100] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32-k100.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/jit/gate-f32-k100 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/cuda-cache/gate-f32-k100 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32-k100-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32-k100-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-16-guarded-fp32-baseline/code/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32-k100.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32-k100.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32-k100.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32-k100.jit.json --limit 500 --k 100 --gpu 0 --block-pl 512 --repeats 1 --warmups 1 --verify 0",
+    "[gate-f32k-k100] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32k-k100.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/jit/gate-f32k-k100 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/cuda-cache/gate-f32k-k100 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32k-k100-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32k-k100-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-24-gpusparse-depth/code/klimit/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k100.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k100.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k100.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k100.jit.json --limit 500 --k 100 --gpu 0 --block-pl 512 --repeats 1 --warmups 1 --verify 0",
+    "[gate-u4m-k100] build/i3-011652d4/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u4m-k100.csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u4m-k100.tsv 500 100 0 0 1 1 256 256 - 1",
+    "[gate-u64k-k1000] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64k-k1000.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/jit/gate-u64k-k1000 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/cuda-cache/gate-u64k-k1000 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64k-k1000-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-u64k-k1000-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-24-gpusparse-depth/code/klimit/u64/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k1000.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k1000.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k1000.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k1000.jit.json --limit 500 --k 1000 --gpu 0 --block-pl 512 --repeats 1 --warmups 1 --verify 0",
+    "[gate-f32k-k1000] experiments/2026-11-24-gpusparse-depth/code/gs_wrap.sh results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32k-k1000.status -- env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY TRITON_CACHE_DIR=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/jit/gate-f32k-k1000 CUDA_CACHE_PATH=results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/cuda-cache/gate-f32k-k1000 python3 experiments/2026-11-24-gpusparse-depth/code/rt_gate.py --expect results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32k-k1000-expect.json --receipt results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/receipts/gate-f32k-k1000-gate.json -- /scratch/ag11163/gpusparse-env/venv/bin/python3 experiments/2026-11-24-gpusparse-depth/code/klimit/fp32/canonical_baseline.py --variant monolithic --index /scratch/ag11163/full-inputs/full-8841823.gsp --queries data/derived/calibration-500.tsv --reference /scratch/ag11163/full-inputs/oracle/cpu-top1000-8841823.tsv --native-repo /scratch/ag11163/gpusparse-env/source --csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k1000.csv --top results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k1000.tsv --validation results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k1000.validation.json --jit-manifest results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k1000.jit.json --limit 500 --k 1000 --gpu 0 --block-pl 512 --repeats 1 --warmups 1 --verify 0",
+    "[gate-u4m-k1000] build/i3-011652d4/u4m/scorer /scratch/ag11163/full-inputs/full-8841823-w4096-pos.rbp data/derived/calibration-500.tsv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u4m-k1000.csv results/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u4m-k1000.tsv 500 1000 0 0 1 1 256 256 - 1"
+  ],
+  "artifacts": {
+    "analysis/compare-gate-f32-k10.json": {
+      "sha256": "00bde16d091d5333830f5ce38c7db09aac49fb05fdab991690a2cfa254827639",
+      "bytes": 373
+    },
+    "analysis/compare-gate-f32-k100.json": {
+      "sha256": "d9907c443551da0a97cfb0bc6f0c815d4190f877e512b07e7e1c531fb91d545a",
+      "bytes": 377
+    },
+    "analysis/compare-gate-f32k-k10.json": {
+      "sha256": "a7c7fa969ffc52c85328b3c6714ed0afc6a4d71d67dc625bb7ced2bbb07afdad",
+      "bytes": 374
+    },
+    "analysis/compare-gate-f32k-k100.json": {
+      "sha256": "5f23d4bb7867e9f25f5e3c2e59065106f78f5ec2612c4c9a721e14edcc5fc528",
+      "bytes": 378
+    },
+    "analysis/compare-gate-f32k-k1000.json": {
+      "sha256": "c6979ded1fd841708dded0f1cd9e466938752a255eecf8a1e174e4a1a264852c",
+      "bytes": 382
+    },
+    "analysis/compare-gate-u4m-k10.json": {
+      "sha256": "c2ad602f096778e08af23055c9edc44b60ed6c38d8748acb1f5ac25d013d850e",
+      "bytes": 373
+    },
+    "analysis/compare-gate-u4m-k100.json": {
+      "sha256": "b9a4a78b62408345924218a7deeb456bf8158dc179a679d95e13eac12b41e970",
+      "bytes": 377
+    },
+    "analysis/compare-gate-u4m-k1000.json": {
+      "sha256": "2875e06e7e7dfc4e58f8af217c6a4175014daa085ff85de3594e8347855ba81b",
+      "bytes": 381
+    },
+    "analysis/compare-gate-u64-k10.json": {
+      "sha256": "415b57dc837774c453fd6da0b714d562e25b271d6a6540640d8800203b38d9e9",
+      "bytes": 373
+    },
+    "analysis/compare-gate-u64-k100.json": {
+      "sha256": "254cd1e52747ec20613eef1009f295e6eb5fdc963b6a33661e2fedbb09bf0a7e",
+      "bytes": 377
+    },
+    "analysis/compare-gate-u64k-k10.json": {
+      "sha256": "a0f47e96666b841362a4c350d2ec846a59739a3e8d7a0bb0145e9ecb3e587405",
+      "bytes": 374
+    },
+    "analysis/compare-gate-u64k-k100.json": {
+      "sha256": "049be4293dd019572dfa48263cd55dacb9d5978aa653807b4161679cda240562",
+      "bytes": 378
+    },
+    "analysis/compare-gate-u64k-k1000.json": {
+      "sha256": "f841616fbb88bcdb2e02705ece520912ef48b5185b6635c1dfe188430e15422d",
+      "bytes": 382
+    },
+    "analysis/gpu-memory.json": {
+      "sha256": "63d28cc56f23ef8ee3512006b1caa6923aba9d6db6b4ef71bbcba553bd38bb8c",
+      "bytes": 1505
+    },
+    "analysis/gpu-memory.txt": {
+      "sha256": "68973621f41749b1b069106438120fa49ba6e2d313269f78ec56cab0ac3ace38",
+      "bytes": 650
+    },
+    "analysis/pre.json": {
+      "sha256": "87c65096269f1031248f60139b8e7ad74b49143d7b295efea46ada314eb61905",
+      "bytes": 5179
+    },
+    "analysis/pre.md": {
+      "sha256": "ff4b2c7c0c98043d478ad9408855ecb9179f136a06603d8b53fcb528a6181771",
+      "bytes": 1263
+    },
+    "jit/gate-f32-k10/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/gate-f32-k10/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "624a6ffa3f8b71ca15df1437cb3a7033dad7dc1f0f0533e90cf5099de0a8e5f1",
+      "bytes": 1027
+    },
+    "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "bec449a8a41405719116d3aa4a240529b3e50e8663945205bd14138e40eb69e9",
+      "bytes": 6760
+    },
+    "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "9262547e5363a0c3d02cbda8d35ea53865ee3d0d4f707b20fd618bdd9fe350c3",
+      "bytes": 4924
+    },
+    "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "1aa587ddd153cdb4e70cf197f0e770831a3657fbb04146cf76d63b02d4515cb4",
+      "bytes": 6273
+    },
+    "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "5b8dd8a405caf5024489aa6c1e0ced065655cd9e1d235eef967392a8e77ecc5c",
+      "bytes": 5488
+    },
+    "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "53567fdae0dba5c81376906beb831155fc7420fcec976004d5332d9c00ffcf15",
+      "bytes": 4927
+    },
+    "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "b88cf4d49e55df4583c386aa7a859e5028381ed564b357675b746f320ce8e83b",
+      "bytes": 1135
+    },
+    "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/gate-f32-k10/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "220b462a8713444d7c3649b22c55c560337e6d96dfa1da0d26a68e9851814bc0",
+      "bytes": 23080
+    },
+    "jit/gate-f32-k100/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/gate-f32-k100/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "5cf678bf7b8478ca3f424b46960b6a835a89214d7c9c46cc439379c58f0a1fdb",
+      "bytes": 1033
+    },
+    "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "bec449a8a41405719116d3aa4a240529b3e50e8663945205bd14138e40eb69e9",
+      "bytes": 6760
+    },
+    "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "9262547e5363a0c3d02cbda8d35ea53865ee3d0d4f707b20fd618bdd9fe350c3",
+      "bytes": 4924
+    },
+    "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "1aa587ddd153cdb4e70cf197f0e770831a3657fbb04146cf76d63b02d4515cb4",
+      "bytes": 6273
+    },
+    "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "5b8dd8a405caf5024489aa6c1e0ced065655cd9e1d235eef967392a8e77ecc5c",
+      "bytes": 5488
+    },
+    "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "53567fdae0dba5c81376906beb831155fc7420fcec976004d5332d9c00ffcf15",
+      "bytes": 4927
+    },
+    "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "ec197bf20a09b6a47ee913a67a774a5f453b6c29c6b8545a89d83eaa103d7a22",
+      "bytes": 1141
+    },
+    "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/gate-f32-k100/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "ad70c0f48843ab116ff795b793dc69444ea5914b102909b71bb15ce2ab8a435c",
+      "bytes": 23080
+    },
+    "jit/gate-f32k-k10/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/gate-f32k-k10/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "275060f373228ad7ed6e4ba1a5394af2d153c5bc2d5193482ef55d95d31f2af7",
+      "bytes": 1033
+    },
+    "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "3f456e5747219e544f658d1d8871bb5330a2a4a920d185a9bc8fe9f59f7729d1",
+      "bytes": 6760
+    },
+    "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "8a9353eaab5ba39d6d8bd6f75807539205d73593d2185d0fee438b36d1bfc81d",
+      "bytes": 4925
+    },
+    "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "d41d0de616e0843ce3119f54ff95f33e21f9595e6ccc9c91cbe9de8c0bcd78cf",
+      "bytes": 6286
+    },
+    "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "3f770b4cfe0c40847c5d64de21452f7aa725dd0fd6f21009c2f20cacab0b161f",
+      "bytes": 5511
+    },
+    "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "29ce96c76b9dcd04cbfcbb7f41350c1c704d804562cb4b00fd0fd9d9765ba3c8",
+      "bytes": 4950
+    },
+    "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "9118f704a412dbb5a69a3d0a2adb109067abb4ae41f4bd4e78b93e4f59afe2fe",
+      "bytes": 1141
+    },
+    "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/gate-f32k-k10/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "236fd6afdc62e290d588ac84530d92eeb473e55daf71ddac2b3c67c8a88ae6e1",
+      "bytes": 23080
+    },
+    "jit/gate-f32k-k100/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/gate-f32k-k100/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "69c748e4c4616f2aa807757574eef98a9844a02d9fb546751650610de0b7b892",
+      "bytes": 1039
+    },
+    "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "3f456e5747219e544f658d1d8871bb5330a2a4a920d185a9bc8fe9f59f7729d1",
+      "bytes": 6760
+    },
+    "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "8a9353eaab5ba39d6d8bd6f75807539205d73593d2185d0fee438b36d1bfc81d",
+      "bytes": 4925
+    },
+    "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "d41d0de616e0843ce3119f54ff95f33e21f9595e6ccc9c91cbe9de8c0bcd78cf",
+      "bytes": 6286
+    },
+    "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "3f770b4cfe0c40847c5d64de21452f7aa725dd0fd6f21009c2f20cacab0b161f",
+      "bytes": 5511
+    },
+    "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "29ce96c76b9dcd04cbfcbb7f41350c1c704d804562cb4b00fd0fd9d9765ba3c8",
+      "bytes": 4950
+    },
+    "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "b259cd6d81f753687f0b25199765aadb9cec8f797faa7a1931b747276142de76",
+      "bytes": 1147
+    },
+    "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/gate-f32k-k100/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "5b86649c31d1877c2a63f5a324ae36042c5265b6c0c071ba9792db2bab24266a",
+      "bytes": 23080
+    },
+    "jit/gate-f32k-k1000/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/gate-f32k-k1000/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json": {
+      "sha256": "ce2afe2255c1dcb889e510f2433c5c43797392e879da002f0cc6b167cc216b05",
+      "bytes": 1045
+    },
+    "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin": {
+      "sha256": "3f456e5747219e544f658d1d8871bb5330a2a4a920d185a9bc8fe9f59f7729d1",
+      "bytes": 6760
+    },
+    "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json": {
+      "sha256": "904a2b7d0213dd56bd35646b5724f65ae376a506994cdb585241d9d70895fbf8",
+      "bytes": 847
+    },
+    "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir": {
+      "sha256": "8a9353eaab5ba39d6d8bd6f75807539205d73593d2185d0fee438b36d1bfc81d",
+      "bytes": 4925
+    },
+    "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx": {
+      "sha256": "d41d0de616e0843ce3119f54ff95f33e21f9595e6ccc9c91cbe9de8c0bcd78cf",
+      "bytes": 6286
+    },
+    "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir": {
+      "sha256": "3f770b4cfe0c40847c5d64de21452f7aa725dd0fd6f21009c2f20cacab0b161f",
+      "bytes": 5511
+    },
+    "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir": {
+      "sha256": "29ce96c76b9dcd04cbfcbb7f41350c1c704d804562cb4b00fd0fd9d9765ba3c8",
+      "bytes": 4950
+    },
+    "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "e4e99a036e9fa80fba8bf3d126efd2f6ab4500760bb4b818733e4269a4193f63",
+      "bytes": 1153
+    },
+    "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin": {
+      "sha256": "d7b70e01a59e92ef645486f7e40c7fd50af59271ad2d95d6c3f140b69eb84af5",
+      "bytes": 12008
+    },
+    "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json": {
+      "sha256": "e6a1f180ab7ddcc8dd4baa9cdaca35b71463b41f90c1cd44ee53c1f36be87b1e",
+      "bytes": 856
+    },
+    "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir": {
+      "sha256": "d130c100aca4e0c26d4677f74a9561f47a6ecb2bd3690aedf1e6c241d5616b75",
+      "bytes": 10893
+    },
+    "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx": {
+      "sha256": "57606a37b32cb57ade97b8ce2b94695ee8bcf1c110cee435b6381ae764da7952",
+      "bytes": 10803
+    },
+    "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "582f3c399eab914ecab45abbf8143b1925729335e64b171d9a2cc71e9cdf184c",
+      "bytes": 9063
+    },
+    "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir": {
+      "sha256": "e92df1b5aab27a680b99d7c808872264533d9bde83c4d93858d50470744b9892",
+      "bytes": 8512
+    },
+    "jit/gate-f32k-k1000/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "5df46ac02892db61d8e0b6dde061f55d3f6106d33f6c8e65dc2a7a38ecd6459b",
+      "bytes": 23080
+    },
+    "jit/gate-u64-k10/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/gate-u64-k10/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "4fb0d9b02d481982b92ecfd0b799de47e3544ac9ccd0c6f860c466cca30cfcc2",
+      "bytes": 1027
+    },
+    "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "ad5f19ae769cd490caea97146f175fa54e4e21628bf456751ea0989244dc7c81",
+      "bytes": 6504
+    },
+    "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "380b9cd9aac82bae816fde4f819d703904d3ad0818ff086e86a2b491d81806fd",
+      "bytes": 4691
+    },
+    "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "2ba5844bd902e76f666d96d5079cd91750a480f4d5f7760ded12ae4d7769a521",
+      "bytes": 6143
+    },
+    "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "22a01c7b57807e235cfdfd53154356a0bd1e6a1a061caa09f4cb4a38d4f9d776",
+      "bytes": 5439
+    },
+    "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "403ae7986782c6ae8708733e7e89a24fb8c7592cd334452dbebfd1875dc659ec",
+      "bytes": 4898
+    },
+    "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "a7ef77f85c39efab03fbfc865346fab7aea528365e019526ec368ac594c0b69d",
+      "bytes": 1135
+    },
+    "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "0c615adf88a491f554b3746a7a0bcb5e6fe9f58d3422ecc4ccc734c2b63cbd93",
+      "bytes": 12648
+    },
+    "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "85a43a61343262a7e8db596e305e847fcbeb9e69d617c0310e684f3808548c08",
+      "bytes": 11182
+    },
+    "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "cf0803b7d8bda95c880b34c9348a04fe8653719c660afcf0a5e648f680b50afc",
+      "bytes": 11358
+    },
+    "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "2b1f9ea6fe5b7f846678c203d6e8f138848bd06acff48ddcc3d8eb918ae84e39",
+      "bytes": 11806
+    },
+    "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "ae195b6d996088af474ec6af061b740cf45555976115728f773738cd9b80318a",
+      "bytes": 11235
+    },
+    "jit/gate-u64-k10/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "525f828689bba4743f1da978c6e05d1cb15d42e2aa3951757756116d8b365cea",
+      "bytes": 23080
+    },
+    "jit/gate-u64-k100/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/gate-u64-k100/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "a417f685b97390e80118ae8c60ccffd139ed949f5cf9aebc17701abd57d4b665",
+      "bytes": 1033
+    },
+    "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "ad5f19ae769cd490caea97146f175fa54e4e21628bf456751ea0989244dc7c81",
+      "bytes": 6504
+    },
+    "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "380b9cd9aac82bae816fde4f819d703904d3ad0818ff086e86a2b491d81806fd",
+      "bytes": 4691
+    },
+    "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "2ba5844bd902e76f666d96d5079cd91750a480f4d5f7760ded12ae4d7769a521",
+      "bytes": 6143
+    },
+    "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "22a01c7b57807e235cfdfd53154356a0bd1e6a1a061caa09f4cb4a38d4f9d776",
+      "bytes": 5439
+    },
+    "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "403ae7986782c6ae8708733e7e89a24fb8c7592cd334452dbebfd1875dc659ec",
+      "bytes": 4898
+    },
+    "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "f9c920d2f04e96f2280392f7da6c1ea237ee7c0a0c599c1ea5676c221f28d82d",
+      "bytes": 1141
+    },
+    "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "0c615adf88a491f554b3746a7a0bcb5e6fe9f58d3422ecc4ccc734c2b63cbd93",
+      "bytes": 12648
+    },
+    "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "85a43a61343262a7e8db596e305e847fcbeb9e69d617c0310e684f3808548c08",
+      "bytes": 11182
+    },
+    "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "cf0803b7d8bda95c880b34c9348a04fe8653719c660afcf0a5e648f680b50afc",
+      "bytes": 11358
+    },
+    "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "2b1f9ea6fe5b7f846678c203d6e8f138848bd06acff48ddcc3d8eb918ae84e39",
+      "bytes": 11806
+    },
+    "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "ae195b6d996088af474ec6af061b740cf45555976115728f773738cd9b80318a",
+      "bytes": 11235
+    },
+    "jit/gate-u64-k100/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "5a27bb8eddfeb576c98ea7a35148e1f14ec05530e7e99b31d8631cee927d29ff",
+      "bytes": 23080
+    },
+    "jit/gate-u64k-k10/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/gate-u64k-k10/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "09f1d9ac0647097051e1a18a7897c71694294da72fa44245f57c55fce482e4d8",
+      "bytes": 1033
+    },
+    "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "7dcb2e3d5766cd7d01beb50c9744007f746c0e63288bd591db88a930e3a7d30e",
+      "bytes": 6504
+    },
+    "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "45c3466e0227ea0b9c2736777bfaeb9c0064bf0b819a79b2f53f55fb80daca2e",
+      "bytes": 4683
+    },
+    "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "ca820a055d56ca053032d852f798806fe67c12886727883dfb9f43d3ecb9917f",
+      "bytes": 6077
+    },
+    "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "21914b204daff8eaa5a6d36c173ff01ce4124f027863078ab412b51010e6e316",
+      "bytes": 5263
+    },
+    "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "49be713854da639fa4ebafa829da6777540379bf9c9297edc00bda5a75d12b0f",
+      "bytes": 4722
+    },
+    "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "d9827f09a6b6e452f77dbf76771e727405832e450f00d68675a2d88792f4d6e1",
+      "bytes": 1141
+    },
+    "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "786c2e5ee8796bb0ae7593e8c0d182df91c4e976ff658b6ef9475eb357592fe1",
+      "bytes": 12648
+    },
+    "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "2b32165660f5e924a3d509b54496e1583dc04752f5b21ae7f56d17e8395eedd0",
+      "bytes": 11174
+    },
+    "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "32c2a93be3d5464bbacf8268cde8c67badc42e7cb927edfeb30425ac938632ee",
+      "bytes": 11292
+    },
+    "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "0342d160448e15b2cf838fa967f24fbe2fde3ebc8405b9459f02f31031907b9b",
+      "bytes": 11366
+    },
+    "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "1d9471f96ef9e65b88b8e515c56d612ef9a59805a84948e26f9e35d5dbecf6c1",
+      "bytes": 10795
+    },
+    "jit/gate-u64k-k10/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "33c1116202e149445945a358c9fd763b7899666c2534a6e9a2d0ae1f1ccae583",
+      "bytes": 23080
+    },
+    "jit/gate-u64k-k100/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/gate-u64k-k100/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "027f0a5d9fa4e589e7c567c77aa27e2b19233a0d9c593595869c97746d8397f5",
+      "bytes": 1039
+    },
+    "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "7dcb2e3d5766cd7d01beb50c9744007f746c0e63288bd591db88a930e3a7d30e",
+      "bytes": 6504
+    },
+    "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "45c3466e0227ea0b9c2736777bfaeb9c0064bf0b819a79b2f53f55fb80daca2e",
+      "bytes": 4683
+    },
+    "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "ca820a055d56ca053032d852f798806fe67c12886727883dfb9f43d3ecb9917f",
+      "bytes": 6077
+    },
+    "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "21914b204daff8eaa5a6d36c173ff01ce4124f027863078ab412b51010e6e316",
+      "bytes": 5263
+    },
+    "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "49be713854da639fa4ebafa829da6777540379bf9c9297edc00bda5a75d12b0f",
+      "bytes": 4722
+    },
+    "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "7d2183e07b3fb9fa30896c641c56e29a92428fc9816af20b0500012bcefd72a2",
+      "bytes": 1147
+    },
+    "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "786c2e5ee8796bb0ae7593e8c0d182df91c4e976ff658b6ef9475eb357592fe1",
+      "bytes": 12648
+    },
+    "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "2b32165660f5e924a3d509b54496e1583dc04752f5b21ae7f56d17e8395eedd0",
+      "bytes": 11174
+    },
+    "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "32c2a93be3d5464bbacf8268cde8c67badc42e7cb927edfeb30425ac938632ee",
+      "bytes": 11292
+    },
+    "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "0342d160448e15b2cf838fa967f24fbe2fde3ebc8405b9459f02f31031907b9b",
+      "bytes": 11366
+    },
+    "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "1d9471f96ef9e65b88b8e515c56d612ef9a59805a84948e26f9e35d5dbecf6c1",
+      "bytes": 10795
+    },
+    "jit/gate-u64k-k100/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "354b4c65c5f322318066c6d14c312da6f0da2f0604d5669b8a172a9062c03f00",
+      "bytes": 23080
+    },
+    "jit/gate-u64k-k1000/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so": {
+      "sha256": "7c4de71d69cda612d93ddc663addadeda071aad0d2ab7d9aa169e568210a9d74",
+      "bytes": 22360
+    },
+    "jit/gate-u64k-k1000/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so": {
+      "sha256": "1605e6a405c9537b451ac57b87dff77d09474fe565e836a1aca177d47f4538e4",
+      "bytes": 22360
+    },
+    "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json": {
+      "sha256": "83cf556dc53f5801a69f055b2f3b2a95a19bfef8f509a7ed5e848dac2ca3f1ed",
+      "bytes": 1045
+    },
+    "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin": {
+      "sha256": "7dcb2e3d5766cd7d01beb50c9744007f746c0e63288bd591db88a930e3a7d30e",
+      "bytes": 6504
+    },
+    "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json": {
+      "sha256": "937d9365aff351445c9a38b9c13eb5e81c733f41d0b9c2f5ae26530d5d1ac5f5",
+      "bytes": 847
+    },
+    "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir": {
+      "sha256": "45c3466e0227ea0b9c2736777bfaeb9c0064bf0b819a79b2f53f55fb80daca2e",
+      "bytes": 4683
+    },
+    "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx": {
+      "sha256": "ca820a055d56ca053032d852f798806fe67c12886727883dfb9f43d3ecb9917f",
+      "bytes": 6077
+    },
+    "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir": {
+      "sha256": "21914b204daff8eaa5a6d36c173ff01ce4124f027863078ab412b51010e6e316",
+      "bytes": 5263
+    },
+    "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir": {
+      "sha256": "49be713854da639fa4ebafa829da6777540379bf9c9297edc00bda5a75d12b0f",
+      "bytes": 4722
+    },
+    "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json": {
+      "sha256": "683aaffd106cb888a299f2660c99ad17a18d7b980ab4e17a444e4655689572f3",
+      "bytes": 1153
+    },
+    "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin": {
+      "sha256": "786c2e5ee8796bb0ae7593e8c0d182df91c4e976ff658b6ef9475eb357592fe1",
+      "bytes": 12648
+    },
+    "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json": {
+      "sha256": "35a3970ec65245d2806842f4f37d1d4c4c9e8c16dbe2b1f986ff5d3fa7ce571e",
+      "bytes": 856
+    },
+    "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir": {
+      "sha256": "2b32165660f5e924a3d509b54496e1583dc04752f5b21ae7f56d17e8395eedd0",
+      "bytes": 11174
+    },
+    "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx": {
+      "sha256": "32c2a93be3d5464bbacf8268cde8c67badc42e7cb927edfeb30425ac938632ee",
+      "bytes": 11292
+    },
+    "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir": {
+      "sha256": "0342d160448e15b2cf838fa967f24fbe2fde3ebc8405b9459f02f31031907b9b",
+      "bytes": 11366
+    },
+    "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir": {
+      "sha256": "1d9471f96ef9e65b88b8e515c56d612ef9a59805a84948e26f9e35d5dbecf6c1",
+      "bytes": 10795
+    },
+    "jit/gate-u64k-k1000/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so": {
+      "sha256": "72e38180e7c5263e9ccf5da158a6769696ed31ea649f9cbb9dc33f7715eab439",
+      "bytes": 23080
+    },
+    "logs/binaries.tsv": {
+      "sha256": "7e1c418fc9b1174083db57ed87da525839fcadd3ec27911a751f84436e2672de",
+      "bytes": 175
+    },
+    "logs/cell-status.tsv": {
+      "sha256": "f3a8df807f8a34e22f56f2a349ea1164f3d037880e60b15ffa7f1331046f3280",
+      "bytes": 333
+    },
+    "logs/commands.txt": {
+      "sha256": "67210d14ec41d79498d9fc593ecb56bf80f682812d85645460637a9fa124ca0a",
+      "bytes": 16269
+    },
+    "logs/environment.txt": {
+      "sha256": "5a64e77682850c362c029edfd70f4d49b2626687f11744c1dd976308626a5fea",
+      "bytes": 366
+    },
+    "logs/gpu-pmon.log": {
+      "sha256": "e871902ae848e05b9bdf2ac26fc10c45b47f511264d8e97815158177a0e36e0e",
+      "bytes": 95081
+    },
+    "logs/gpu-poll.log": {
+      "sha256": "f54cb62db20297f03026335521266f7a7474285226df5586a969862122f9e2cb",
+      "bytes": 97689
+    },
+    "logs/holder-switch.tsv": {
+      "sha256": "4c601dc76fdcb02443f41db087dd322108239b0b7a70a63fbe71690537d967f1",
+      "bytes": 992
+    },
+    "logs/holder.ctl": {
+      "sha256": "a11c3d917a2149a4b548217038bc8f2dd2130a1966e0c7af5c4225d81f25a8c3",
+      "bytes": 5
+    },
+    "logs/holder.log": {
+      "sha256": "48050b4ded843c191e8b081b9bae92e7459174adb22f0d5d5a0052ea6be168d9",
+      "bytes": 560
+    },
+    "logs/holder.out": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/host-utc-offset.txt": {
+      "sha256": "51ef6a6d539bbd38ac4fb4d8de42da0cf36eafb7fb7be71e3420d57982eebd9b",
+      "bytes": 6
+    },
+    "logs/idle-checks.txt": {
+      "sha256": "438dbde995b32433cc636a36fe92befa5c4c806227590c7d7622af42df890d15",
+      "bytes": 1579
+    },
+    "logs/input-sha256.txt": {
+      "sha256": "35b5df9ebc3d738b5ce6fe87d2980a2ca3b3dabfd866f5d31978485e2a35b91c",
+      "bytes": 2067
+    },
+    "logs/klimit-byte-equality.tsv": {
+      "sha256": "e5d3fee2fb15c2973ee8192122d1032d106dcc999396348da6be6bce8f74eba3",
+      "bytes": 74
+    },
+    "logs/klimit-check.json": {
+      "sha256": "844967a63649ba27b3d75fffa4b5df5e590ad1aafe840a8f2b62d250061144d7",
+      "bytes": 6125
+    },
+    "logs/klimit-check.txt": {
+      "sha256": "fe26d7aba60df1309f62e57eefc21ebe185d146aea77d2bbc67ef00d188179d3",
+      "bytes": 688
+    },
+    "logs/overlap-checks.jsonl": {
+      "sha256": "a858d5e030cfb627d097d37eead7919d4e589e7a2f84dee250eb48c05af9daa0",
+      "bytes": 2817
+    },
+    "logs/pre-analysis.log": {
+      "sha256": "6fe36e0de1ec2cc23948a539a0a61232ec6a79af360e0b0f01d7a75ff64f95fa",
+      "bytes": 97
+    },
+    "logs/processes.tsv": {
+      "sha256": "973717f2b52fd1fa7982341a11f43d8f72f594a3ac6c63a75e3ed46f50419891",
+      "bytes": 732
+    },
+    "logs/ptxas-u4m.log": {
+      "sha256": "e8d228124a62ab1c663c6e4aba5789f41d4515a96d41edf4623454a4de9fac6a",
+      "bytes": 1243
+    },
+    "logs/stages.txt": {
+      "sha256": "40dec6d8769e6182f9913a44516791708dc17049207b9b28615fe5af467b8097",
+      "bytes": 1021
+    },
+    "raw/gate-f32-k10.csv": {
+      "sha256": "f16fbe420f9a3630c60703750b9010c60b47f68fe14aaf6f469dcade90a6bb6a",
+      "bytes": 98436
+    },
+    "raw/gate-f32-k10.jit.json": {
+      "sha256": "8a807adfca0599479bdd86757a82ee3dc28d2e768c4c73bd61d69020e0935241",
+      "bytes": 8303
+    },
+    "raw/gate-f32-k10.log": {
+      "sha256": "b80a1db7023c61ce51fbadbf1886dfa71f0e024bdeca714894338e79f7756e27",
+      "bytes": 679
+    },
+    "raw/gate-f32-k10.tsv.zst": {
+      "sha256": "2dc18bf4d870f8905d57e59221a403c814d1eb04d75edfe3522e91d48142cb32",
+      "bytes": 92076
+    },
+    "raw/gate-f32-k10.validation.json": {
+      "sha256": "6b4a10d43ae24a3a356b67949432722858cae926269a2f60dd90649148a76af6",
+      "bytes": 699
+    },
+    "raw/gate-f32-k100.csv": {
+      "sha256": "23bedcbd71bf35c5c7ddc5810d0299e3e0a29f3502bfa4fb359ed26b67f6fe52",
+      "bytes": 101411
+    },
+    "raw/gate-f32-k100.jit.json": {
+      "sha256": "94f4105daf8482eb1f3c780d08188d0b0963317273d5759b1664ae964938e97f",
+      "bytes": 8338
+    },
+    "raw/gate-f32-k100.log": {
+      "sha256": "9df2e832d60a8ccb2f83945d9e68eb27d29c5692698f7a49caadd79ec2abedef",
+      "bytes": 679
+    },
+    "raw/gate-f32-k100.tsv.zst": {
+      "sha256": "b95e193b1664689fbdfc1a151e135455fa32035fe46eabb77cea798dac1ad74f",
+      "bytes": 1429996
+    },
+    "raw/gate-f32-k100.validation.json": {
+      "sha256": "c97911ec0d8b825bd2de4d07073edab4aa44045424052b4551000e642e90307d",
+      "bytes": 699
+    },
+    "raw/gate-f32k-k10.csv": {
+      "sha256": "486fa4238a5d81c9a2dc95d26ed0ffc8b9abc6350717459f1f62caef0d997985",
+      "bytes": 98429
+    },
+    "raw/gate-f32k-k10.jit.json": {
+      "sha256": "d45d6add298dcf9403fd52e2e4ac01f6f29eadac6c6ac8f14f6d8f5a333ebf57",
+      "bytes": 8338
+    },
+    "raw/gate-f32k-k10.log": {
+      "sha256": "b80a1db7023c61ce51fbadbf1886dfa71f0e024bdeca714894338e79f7756e27",
+      "bytes": 679
+    },
+    "raw/gate-f32k-k10.tsv.zst": {
+      "sha256": "2dc18bf4d870f8905d57e59221a403c814d1eb04d75edfe3522e91d48142cb32",
+      "bytes": 92076
+    },
+    "raw/gate-f32k-k10.validation.json": {
+      "sha256": "6b4a10d43ae24a3a356b67949432722858cae926269a2f60dd90649148a76af6",
+      "bytes": 699
+    },
+    "raw/gate-f32k-k100.csv": {
+      "sha256": "00c9a6c807b33a84187c20187a9735718289d2ddc78b9835a6bfec4323e7ce55",
+      "bytes": 101404
+    },
+    "raw/gate-f32k-k100.jit.json": {
+      "sha256": "88d62ec1a608901d79cbded0c639596dca57e5056e34152940aafd040ccef45d",
+      "bytes": 8373
+    },
+    "raw/gate-f32k-k100.log": {
+      "sha256": "9df2e832d60a8ccb2f83945d9e68eb27d29c5692698f7a49caadd79ec2abedef",
+      "bytes": 679
+    },
+    "raw/gate-f32k-k100.tsv.zst": {
+      "sha256": "b95e193b1664689fbdfc1a151e135455fa32035fe46eabb77cea798dac1ad74f",
+      "bytes": 1429996
+    },
+    "raw/gate-f32k-k100.validation.json": {
+      "sha256": "c97911ec0d8b825bd2de4d07073edab4aa44045424052b4551000e642e90307d",
+      "bytes": 699
+    },
+    "raw/gate-f32k-k1000.csv": {
+      "sha256": "57e64555d58209b403d4a5fc58b7080153de20381daa43b906dea778bc36eda6",
+      "bytes": 104392
+    },
+    "raw/gate-f32k-k1000.jit.json": {
+      "sha256": "0e2aa72c9c34dcc3f733719a6159efdefc0e9999f359dae7cf059643b25be4fd",
+      "bytes": 8408
+    },
+    "raw/gate-f32k-k1000.log": {
+      "sha256": "e0315db1a55c8cc721a9a6724ae31ae55345744418aea76bd1ec930dd1dc135d",
+      "bytes": 679
+    },
+    "raw/gate-f32k-k1000.tsv.zst": {
+      "sha256": "9a95ec37c501d69e2cb4b0f53dfa5e3221d9025dc0bbd0d1442bd9145f35e729",
+      "bytes": 14082677
+    },
+    "raw/gate-f32k-k1000.validation.json": {
+      "sha256": "2dd708f93176eafa74aedf483b82bada812dc44949946a0903f0c388b7f42f1d",
+      "bytes": 699
+    },
+    "raw/gate-u4m-k10.csv": {
+      "sha256": "f8dc614b505dde823957d96b18a1f9cd0516579cf518b74402794a9f9e240002",
+      "bytes": 122206
+    },
+    "raw/gate-u4m-k10.log": {
+      "sha256": "8a25fe7bf06e31e7c243c929e4f175faa3e79528bce4958600ff21757af9cab1",
+      "bytes": 360
+    },
+    "raw/gate-u4m-k10.tsv.zst": {
+      "sha256": "7bfacaed369cb5a53ce898e2badc34bba69ff14bc4f143601164025c5ea288d5",
+      "bytes": 72317
+    },
+    "raw/gate-u4m-k100.csv": {
+      "sha256": "eea03a52623ca1b453b64e28ae7e7c142a98343f2b670fde0958d9f1703ba797",
+      "bytes": 124201
+    },
+    "raw/gate-u4m-k100.log": {
+      "sha256": "eeb5c0894813a27185b9ea8ebbb23225c8941499cd1d46a7b223eb796c0b2cd8",
+      "bytes": 361
+    },
+    "raw/gate-u4m-k100.tsv.zst": {
+      "sha256": "d33c61f87aedc6de52c0c82d9a711973a9e9e98b43034b544becf810808282e4",
+      "bytes": 1008881
+    },
+    "raw/gate-u4m-k1000.csv": {
+      "sha256": "d5498221e67e1043e79f65f49d0662a926beea80ca8bc97babc3ac9babe90761",
+      "bytes": 125816
+    },
+    "raw/gate-u4m-k1000.log": {
+      "sha256": "9cec70a5548bf8ce481d9297fb13e41eab079561d605ecd7214c419960f31ab0",
+      "bytes": 362
+    },
+    "raw/gate-u4m-k1000.tsv.zst": {
+      "sha256": "d5be5b21df06b6a92c5b711388b37b6dd988ddbca1c6983ef3e69c55ec060fa5",
+      "bytes": 9992884
+    },
+    "raw/gate-u64-k10.csv": {
+      "sha256": "f19c7ddd5f1c6b472da67d5e679a877e40665298b86ad597341602169b4336d1",
+      "bytes": 98367
+    },
+    "raw/gate-u64-k10.jit.json": {
+      "sha256": "2c9df0af8fe36014fbc168264d288ef3ca26918822e576acd02105bb8d7220e5",
+      "bytes": 8254
+    },
+    "raw/gate-u64-k10.log": {
+      "sha256": "4cd599c4fab1ee2a0f2f408e4c8e9525f861dd54d8abeecd41479037853d287d",
+      "bytes": 667
+    },
+    "raw/gate-u64-k10.tsv.zst": {
+      "sha256": "2dc18bf4d870f8905d57e59221a403c814d1eb04d75edfe3522e91d48142cb32",
+      "bytes": 92076
+    },
+    "raw/gate-u64-k10.validation.json": {
+      "sha256": "6365ea9d1c5ad385bfe4a1719dd15e2cbfdf024b12ca273bfc3c162b49ea9bbb",
+      "bytes": 687
+    },
+    "raw/gate-u64-k100.csv": {
+      "sha256": "57a5999b4b58ead82bb74a7eebaaa703496d60aa77306bbec8d0d231cfdcab01",
+      "bytes": 101404
+    },
+    "raw/gate-u64-k100.jit.json": {
+      "sha256": "8b601090f3f99978bcf599631ef632218adc4a35740ea47d5f57344408917ba1",
+      "bytes": 8289
+    },
+    "raw/gate-u64-k100.log": {
+      "sha256": "a402e62a980bc6fedc0bfb0679d84a108e7d6af6fd0a04295ce1075cbc60b16f",
+      "bytes": 667
+    },
+    "raw/gate-u64-k100.tsv.zst": {
+      "sha256": "b95e193b1664689fbdfc1a151e135455fa32035fe46eabb77cea798dac1ad74f",
+      "bytes": 1429996
+    },
+    "raw/gate-u64-k100.validation.json": {
+      "sha256": "1e6a8e3c29fb2da029996db74d37e77e50194ab7ce037cb23dfbef615f225d78",
+      "bytes": 687
+    },
+    "raw/gate-u64k-k10.csv": {
+      "sha256": "b9d691be1120e3b5a4b51bf83693c4b96f03235a75f44e3a39b036b29b36c231",
+      "bytes": 98408
+    },
+    "raw/gate-u64k-k10.jit.json": {
+      "sha256": "608516db7b97d1db98ca4cc2f991df3cd20005c92a9325f96f5daa83539c78ca",
+      "bytes": 8289
+    },
+    "raw/gate-u64k-k10.log": {
+      "sha256": "4cd599c4fab1ee2a0f2f408e4c8e9525f861dd54d8abeecd41479037853d287d",
+      "bytes": 667
+    },
+    "raw/gate-u64k-k10.tsv.zst": {
+      "sha256": "2dc18bf4d870f8905d57e59221a403c814d1eb04d75edfe3522e91d48142cb32",
+      "bytes": 92076
+    },
+    "raw/gate-u64k-k10.validation.json": {
+      "sha256": "6365ea9d1c5ad385bfe4a1719dd15e2cbfdf024b12ca273bfc3c162b49ea9bbb",
+      "bytes": 687
+    },
+    "raw/gate-u64k-k100.csv": {
+      "sha256": "091d8b3558b21cdf90e19aa873ab04b8e8649b3879ad8e0dcaabc6475009cfcf",
+      "bytes": 101425
+    },
+    "raw/gate-u64k-k100.jit.json": {
+      "sha256": "7c80c5d40ecee977776e7592797ee4d21703e87f5fdcc7f3bb7de1dad285969f",
+      "bytes": 8324
+    },
+    "raw/gate-u64k-k100.log": {
+      "sha256": "a402e62a980bc6fedc0bfb0679d84a108e7d6af6fd0a04295ce1075cbc60b16f",
+      "bytes": 667
+    },
+    "raw/gate-u64k-k100.tsv.zst": {
+      "sha256": "b95e193b1664689fbdfc1a151e135455fa32035fe46eabb77cea798dac1ad74f",
+      "bytes": 1429996
+    },
+    "raw/gate-u64k-k100.validation.json": {
+      "sha256": "1e6a8e3c29fb2da029996db74d37e77e50194ab7ce037cb23dfbef615f225d78",
+      "bytes": 687
+    },
+    "raw/gate-u64k-k1000.csv": {
+      "sha256": "8da97a10397774c998210d38d22d8271f0984cbeabc3fdffaa40e319c08d8695",
+      "bytes": 104421
+    },
+    "raw/gate-u64k-k1000.jit.json": {
+      "sha256": "3265f07b503552dd89e6edf005d4f09b063e0c48a673e3526d044badff996436",
+      "bytes": 8359
+    },
+    "raw/gate-u64k-k1000.log": {
+      "sha256": "6d8fe3772dcebfc71646509acd32056053be1776368ff4a58f83bfa99b01aa21",
+      "bytes": 667
+    },
+    "raw/gate-u64k-k1000.tsv.zst": {
+      "sha256": "9a95ec37c501d69e2cb4b0f53dfa5e3221d9025dc0bbd0d1442bd9145f35e729",
+      "bytes": 14082677
+    },
+    "raw/gate-u64k-k1000.validation.json": {
+      "sha256": "4499b5cbbe365f56c672e2fd542f82bbd7157c4c24ac9ecddd39c4fcc2545fc8",
+      "bytes": 687
+    },
+    "raw/topk-sha256.txt": {
+      "sha256": "e02ca98c8a4fa2fec6be34e79e3391d885054168c62cd935a9f7aa86d06b8485",
+      "bytes": 1148
+    },
+    "receipts/gate-f32-k10-expect.json": {
+      "sha256": "441498366462205d243aec45e693d659bf7bf23273bb6c91f601ba563c6820ac",
+      "bytes": 128
+    },
+    "receipts/gate-f32-k10-gate.json": {
+      "sha256": "7b1812f84d24f1343a71e4417d8e1457419592744baca20ae57db40442239b52",
+      "bytes": 5367
+    },
+    "receipts/gate-f32-k10.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/gate-f32-k100-expect.json": {
+      "sha256": "2e32dd170b3b21e15f053d0841f86fdd0da7032935face4ef31fffca81f1755f",
+      "bytes": 129
+    },
+    "receipts/gate-f32-k100-gate.json": {
+      "sha256": "58467c45137007114cb37a01c1b891cb7e842c78e5f21e4980ced461ddb1b2d1",
+      "bytes": 5375
+    },
+    "receipts/gate-f32-k100.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/gate-f32k-k10-expect.json": {
+      "sha256": "441498366462205d243aec45e693d659bf7bf23273bb6c91f601ba563c6820ac",
+      "bytes": 128
+    },
+    "receipts/gate-f32k-k10-gate.json": {
+      "sha256": "28cc2e0271c96bc0b670db588f2d17b5757528ebd895e3639096466612bfd9ed",
+      "bytes": 5372
+    },
+    "receipts/gate-f32k-k10.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/gate-f32k-k100-expect.json": {
+      "sha256": "2e32dd170b3b21e15f053d0841f86fdd0da7032935face4ef31fffca81f1755f",
+      "bytes": 129
+    },
+    "receipts/gate-f32k-k100-gate.json": {
+      "sha256": "599cc5ad7ece185bcf09b136d7aad3964d0d09b744deae9fbefd1ab328ed69a9",
+      "bytes": 5380
+    },
+    "receipts/gate-f32k-k100.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/gate-f32k-k1000-expect.json": {
+      "sha256": "640e79a95d73d6f956d16c499b9d83481b069bd60e77079daffdd253dfc77334",
+      "bytes": 130
+    },
+    "receipts/gate-f32k-k1000-gate.json": {
+      "sha256": "946f40ce5f560ab85253902c0c41bff24a97c59d2c9f82e10e5fad610a1abad9",
+      "bytes": 5388
+    },
+    "receipts/gate-f32k-k1000.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/gate-u64-k10-expect.json": {
+      "sha256": "441498366462205d243aec45e693d659bf7bf23273bb6c91f601ba563c6820ac",
+      "bytes": 128
+    },
+    "receipts/gate-u64-k10-gate.json": {
+      "sha256": "d8b88a4da46d45631413b928d33243954ab9ae38f92f4fa46cd0b4f30a6bb23a",
+      "bytes": 5032
+    },
+    "receipts/gate-u64-k10.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/gate-u64-k100-expect.json": {
+      "sha256": "2e32dd170b3b21e15f053d0841f86fdd0da7032935face4ef31fffca81f1755f",
+      "bytes": 129
+    },
+    "receipts/gate-u64-k100-gate.json": {
+      "sha256": "4e3bc8cea0e9f85b81e1f7168dbac5186d1e0022d84a5147196b1a7a84a6238d",
+      "bytes": 5040
+    },
+    "receipts/gate-u64-k100.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/gate-u64k-k10-expect.json": {
+      "sha256": "441498366462205d243aec45e693d659bf7bf23273bb6c91f601ba563c6820ac",
+      "bytes": 128
+    },
+    "receipts/gate-u64k-k10-gate.json": {
+      "sha256": "685e102f28eeac3062e07ca2f42b19e185fab9b2870622e1713cf9126a5f9eac",
+      "bytes": 5028
+    },
+    "receipts/gate-u64k-k10.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/gate-u64k-k100-expect.json": {
+      "sha256": "2e32dd170b3b21e15f053d0841f86fdd0da7032935face4ef31fffca81f1755f",
+      "bytes": 129
+    },
+    "receipts/gate-u64k-k100-gate.json": {
+      "sha256": "b7e8c66008787b72b5fa20dda0c00947e0233485d876ff9236b58ce55976abe7",
+      "bytes": 5036
+    },
+    "receipts/gate-u64k-k100.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "receipts/gate-u64k-k1000-expect.json": {
+      "sha256": "640e79a95d73d6f956d16c499b9d83481b069bd60e77079daffdd253dfc77334",
+      "bytes": 130
+    },
+    "receipts/gate-u64k-k1000-gate.json": {
+      "sha256": "06dee85c20436e16be8f55403be321f645e407a0161cb439a3542aa9e0fe78bc",
+      "bytes": 5044
+    },
+    "receipts/gate-u64k-k1000.status": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    }
+  },
+  "public_packaging": {
+    "convention": "Team layout on main: raw per-query .csv/.tsv over 1 MB are stored as lossless .gz; full profiler reports, JIT caches and listings too large for Git stay outside Git with their SHA-256; 'artifacts' above still lists every file exactly as produced.",
+    "tool": "scripts/package_run.py",
+    "originals": [],
+    "excluded": [
+      {
+        "original": "cuda-cache.tar",
+        "sha256": "37ec96f849b3f146350561d4513cede5eba2a09bfe6e08e2b4dc7aebd333ad41",
+        "bytes": 10240,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/cuda-cache.tar.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "jit.tar",
+        "sha256": "7a463a66535ab1acd045de2f7ab2d6ae24909e0cd9546d81b0dc24b0be75262e",
+        "bytes": 1710080,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/jit.tar.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-f32-k10.tsv.zst",
+        "sha256": "2dc18bf4d870f8905d57e59221a403c814d1eb04d75edfe3522e91d48142cb32",
+        "bytes": 92076,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32-k10.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-f32-k100.tsv.zst",
+        "sha256": "b95e193b1664689fbdfc1a151e135455fa32035fe46eabb77cea798dac1ad74f",
+        "bytes": 1429996,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32-k100.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-f32k-k10.tsv.zst",
+        "sha256": "2dc18bf4d870f8905d57e59221a403c814d1eb04d75edfe3522e91d48142cb32",
+        "bytes": 92076,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k10.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-f32k-k100.tsv.zst",
+        "sha256": "b95e193b1664689fbdfc1a151e135455fa32035fe46eabb77cea798dac1ad74f",
+        "bytes": 1429996,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k100.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-f32k-k1000.tsv.zst",
+        "sha256": "9a95ec37c501d69e2cb4b0f53dfa5e3221d9025dc0bbd0d1442bd9145f35e729",
+        "bytes": 14082677,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-f32k-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-u4m-k10.tsv.zst",
+        "sha256": "7bfacaed369cb5a53ce898e2badc34bba69ff14bc4f143601164025c5ea288d5",
+        "bytes": 72317,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u4m-k10.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-u4m-k100.tsv.zst",
+        "sha256": "d33c61f87aedc6de52c0c82d9a711973a9e9e98b43034b544becf810808282e4",
+        "bytes": 1008881,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u4m-k100.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-u4m-k1000.tsv.zst",
+        "sha256": "d5be5b21df06b6a92c5b711388b37b6dd988ddbca1c6983ef3e69c55ec060fa5",
+        "bytes": 9992884,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u4m-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-u64-k10.tsv.zst",
+        "sha256": "2dc18bf4d870f8905d57e59221a403c814d1eb04d75edfe3522e91d48142cb32",
+        "bytes": 92076,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64-k10.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-u64-k100.tsv.zst",
+        "sha256": "b95e193b1664689fbdfc1a151e135455fa32035fe46eabb77cea798dac1ad74f",
+        "bytes": 1429996,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64-k100.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-u64k-k10.tsv.zst",
+        "sha256": "2dc18bf4d870f8905d57e59221a403c814d1eb04d75edfe3522e91d48142cb32",
+        "bytes": 92076,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k10.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-u64k-k100.tsv.zst",
+        "sha256": "b95e193b1664689fbdfc1a151e135455fa32035fe46eabb77cea798dac1ad74f",
+        "bytes": 1429996,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k100.tsv.zst.",
+        "reason": "kept outside Git"
+      },
+      {
+        "original": "raw/gate-u64k-k1000.tsv.zst",
+        "sha256": "9a95ec37c501d69e2cb4b0f53dfa5e3221d9025dc0bbd0d1442bd9145f35e729",
+        "bytes": 14082677,
+        "custody": "Full original retained outside Git: owner local archive run-bulk/2026-11-24-gpusparse-depth/20261124-cuda5-i-pre-02/raw/gate-u64k-k1000.tsv.zst.",
+        "reason": "kept outside Git"
+      }
+    ],
+    "recorded_artifacts_not_in_public_tree_or_lists": [
+      "jit/gate-f32-k10/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/gate-f32-k10/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/gate-f32-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/gate-f32-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/gate-f32-k10/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/gate-f32-k100/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/gate-f32-k100/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/gate-f32-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/gate-f32-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/gate-f32-k100/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/gate-f32k-k10/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/gate-f32k-k10/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/gate-f32k-k10/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/gate-f32k-k10/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/gate-f32k-k10/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/gate-f32k-k100/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/gate-f32k-k100/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/gate-f32k-k100/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/gate-f32k-k100/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/gate-f32k-k100/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/gate-f32k-k1000/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/gate-f32k-k1000/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/__grp___canonical_keys.json",
+      "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.cubin",
+      "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.json",
+      "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.llir",
+      "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ptx",
+      "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttgir",
+      "jit/gate-f32k-k1000/K5jv3o9IE04_r7RVRycBduiVYuNps6lY7FFGsobbovE/_canonical_keys.ttir",
+      "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/__grp___fast_scatter_add_kernel.json",
+      "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.cubin",
+      "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.json",
+      "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.llir",
+      "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ptx",
+      "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttgir",
+      "jit/gate-f32k-k1000/PwYnPf9XuCuwZwQ3HevNEvKFucnSs49i_iS19KFXzwQ/_fast_scatter_add_kernel.ttir",
+      "jit/gate-f32k-k1000/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/gate-u64-k10/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/gate-u64-k10/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/gate-u64-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/gate-u64-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/gate-u64-k10/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/gate-u64-k100/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/gate-u64-k100/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/gate-u64-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/gate-u64-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/gate-u64-k100/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/gate-u64k-k10/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/gate-u64k-k10/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/gate-u64k-k10/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/gate-u64k-k10/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/gate-u64k-k10/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/gate-u64k-k100/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/gate-u64k-k100/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/gate-u64k-k100/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/gate-u64k-k100/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/gate-u64k-k100/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so",
+      "jit/gate-u64k-k1000/-wevsICfqB80d6u-PLeF2swPx8C7MRBmNVPM6LhIIWU/__triton_launcher.so",
+      "jit/gate-u64k-k1000/3MPuJUaYvpwuo26F0i9sD-SrgipgQ7LVMkCr6WhTCRA/__triton_launcher.so",
+      "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/__grp___canonical_keys.json",
+      "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.cubin",
+      "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.json",
+      "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.llir",
+      "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ptx",
+      "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttgir",
+      "jit/gate-u64k-k1000/MOKNRAA0ZcwNoIG7KNLlgJYwJXsrb4puZYFhsga36HI/_canonical_keys.ttir",
+      "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/__grp___fast_scatter_add_kernel.json",
+      "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.cubin",
+      "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.json",
+      "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.llir",
+      "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ptx",
+      "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttgir",
+      "jit/gate-u64k-k1000/hdB7V07zTuMF3jhC3WxwmlWyljzzAB6vFiVxwW0TYPs/_fast_scatter_add_kernel.ttir",
+      "jit/gate-u64k-k1000/q4oIpkjOtdHHfi8xBkm4jC4JWIk5AjKtN8WRkZb8MD8/cuda_utils.so"
+    ]
+  }
+}
