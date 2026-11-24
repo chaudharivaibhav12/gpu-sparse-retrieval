@@ -15,8 +15,8 @@ K ?= 10
 W ?= 4096
 NVCC ?= nvcc
 CXX ?= g++
-NVCCFLAGS ?= -O3 -arch=$(ARCH) -std=c++17 -Xcompiler -Wall,-Wextra
-CXXFLAGS ?= -O3 -std=c++17 -Wall -Wextra
+NVCCFLAGS ?= -O3 -arch=$(ARCH) -std=c++17 -Xcompiler -Wall,-Wextra,-Wnarrowing
+CXXFLAGS ?= -O3 -std=c++17 -Wall -Wextra -Wnarrowing
 
 RAW := data/raw
 CIFF := $(RAW)/bp-msmarco-passage-splade-quantized.ciff
