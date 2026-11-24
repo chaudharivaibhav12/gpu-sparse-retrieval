@@ -80,7 +80,7 @@ def wait_quiet(tag):
         free = int(smi("-i", UUID, "--query-gpu=memory.free", "--format=csv,noheader,nounits"))
         ok = not active and free >= 10500 - (500 if HOST == "cuda2" else 0) and machine <= CPU_LIMIT and busy <= CORE_LIMIT
         with (RUN / "logs/quiet.txt").open("a") as f: f.write("%s %s machine=%.2f core=%d busy=%.3f active=%d free=%d\n" % (tag, "quiet" if ok else "busy", machine, core, busy, len(active), free))
-        if HOST == "cuda5" and (pids or free < 10500): need = 18
+        if HOST == "cuda5" and (active or free < 10500): need = 18  # amendment 2: an idle holder does not count
         streak = streak + 1 if ok else 0
         if streak >= need: return core
         time.sleep(30)
