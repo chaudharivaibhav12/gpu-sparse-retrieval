@@ -39,5 +39,16 @@
     "cross_session_check": "W=4096 pooled medians against Measurement F's 0.403 / 0.455 / 0.833 ms at k = 10 / 100 / 1000 (descriptive)",
     "gpu_policy": "as part 1 (holder, 5-sample clear window, retry every 300 s for up to 12 hours from the timing launch, then stop and report)",
     "label": "calibration queries only (500), after the freeze"
+  },
+  "part_2_amendment_1": {
+    "date": "2026-11-24",
+    "by": "owner (option 1), after the pre-registration run 20261123-cuda5-h-pre-02 and before any timing",
+    "reason": "all 20 gates were exact, but the registered estimate was 143 min for the 15-cell grid (201 min with k=316), above the 90-min limit; the three W < k cells (W=256 at k=316 and 1000, W=512 at k=1000), where no range can raise theta, run at 54-57 ms per query and take ~93 of the 143 min",
+    "timed_cells": "only cells with W >= k: k=10 and k=100 at W = 256, 512, 1024, 2048, 4096; k=316 at W = 512, 1024, 2048, 4096; k=1000 at W = 1024, 2048, 4096 (17 cells)",
+    "k316": "included: the estimate for the W >= k cells including k=316 is 64 min (50 min without), <= 90 min",
+    "untimed_cells": "W=256 k=316, W=256 k=1000, W=512 k=1000 are reported from their pre-registration gates (exact; one process, one measured round of 500 queries; median per-query wall 54.3 / 57.0 / 55.5 ms), as descriptive numbers, not under the timing design",
+    "rules": "H1 per k over the W timed at that k; H2 over the W timed at every k (1024, 2048, 4096), regret against the best timed W at each k (including W=256 and 512 at k=10 and 100); H3 unchanged; H4 at k=10 over every W (all timed)",
+    "rotation": "within each k, the timed W list is cyclically shifted by the process round p",
+    "code": "code/run_h.sh (ws_for_k, logs/timed-cells.tsv) and analysis/analyze_h.py (--timed-cells); laptop dry run with a W < k cell passed. session_lib_h.sh changed only in its DRY=1 branch (a process shorter than the dry trigger is recorded as dry-end)"
   }
 }

@@ -71,6 +71,8 @@ run_slot() {
             if [ "${DRY:-0}" = 1 ] && [ "$(python3 -c "print(int($(date -u +%s.%3N)-$start>=3))")" = 1 ]; then seen=dry-$(date -u +%s.%3N); holder_set idle; idle=$(date -u +%s.%3N); break; fi
             sleep 0.2
         done
+        # DRY=1 only: a process shorter than the dry trigger is recorded as "dry-end".
+        [ "${DRY:-0}" = 1 ] && [ "$seen" = - ] && { seen=dry-end; idle=-; }
         status=0; wait "$pid" || status=$?
         end=$(date -u +%s.%3N)
         holder_set work

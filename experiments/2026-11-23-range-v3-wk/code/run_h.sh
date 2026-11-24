@@ -25,6 +25,9 @@ COMPARE=experiments/2026-11-13-range-bitpack/analysis/compare_topk.py
 ORACLE1000=${ORACLE1000:-$FULL/oracle/cpu-top1000-8841823.tsv}
 NQ=${QUERIES_LIMIT:-500}; ROUNDS=${ROUNDS:-20}; WARMUPS=${WARMUPS:-3}; PQ=${PROFILE_QUERIES:-25}
 WS=(${WS:-256 512 1024 2048 4096}); KS=(${KS:-10 100 1000}); PROFILE_WS=(${PROFILE_WS:-256 1024 4096})
+# Amendment 1 to part 2 (owner, before timing): only cells with W >= k are timed; the W < k cells
+# (theta cannot rise) are reported from their pre-registration gates. TIME_W_GE_K=0 times every W.
+ws_for_k() { local W; for W in "${WS[@]}"; do if [ "${TIME_W_GE_K:-1}" = 0 ] || [ "$W" -ge "$1" ]; then printf '%s ' "$W"; fi; done; }
 if [ "$DRY" != 1 ]; then
     [ "$NQ" = 500 ] && [ "$ROUNDS" = 20 ] && [ "$WARMUPS" = 3 ] && [ "$PQ" = 25 ] || { echo "Registered settings only"; exit 1; }
     test -z "$(git status --porcelain --untracked-files=no)" || { echo "Commit first"; exit 1; }
@@ -57,12 +60,13 @@ check() {  # tag k groups queries
 start_monitors
 holder_start
 trap 'holder_stop; stop_monitors' EXIT
-n=${#WS[@]}
 for k in "${KS[@]}"; do
+    read -r -a WK <<< "$(ws_for_k "$k")"; n=${#WK[@]}
+    echo -e "k$k\t${WK[*]}" >> "$RUN/logs/timed-cells.tsv"
     stage "timing k=$k"
     for p in 0 1 2; do
         for ((i = 0; i < n; i++)); do
-            W=${WS[$(( (i + p) % n ))]}
+            W=${WK[$(( (i + p) % n ))]}
             tag=timing-k$k-r$p-w$W
             echo -e "k$k\tr$p\t$i\tw$W" >> "$RUN/logs/order.tsv"
             run_slot "$tag" -- "$BUILD/u4m/scorer" "$(index "$W")" "$Q" "$RUN/raw/$tag.csv" "$RUN/raw/$tag.tsv" "$NQ" "$k" 0 0 "$ROUNDS" "$WARMUPS" 256 256 - 1
@@ -89,13 +93,13 @@ for W in "${PROFILE_WS[@]}"; do
     python3 "$T/analysis/analyze_clocks.py" "$RUN/raw/$tag" --label "$tag" --source "$BUILD/u4m-clocks/src/cuda_range_v3.cu" --radix \
         --output "$RUN/analysis/$tag.json" --sites-csv "$RUN/analysis/$tag-sites.csv" --stages-csv "$RUN/analysis/$tag-stages.csv" > /dev/null || fail "analyze clocks $tag"
 done
-python3 "$X/analysis/analyze_h.py" "$RUN" --ws "${WS[@]}" --ks "${KS[@]}" --profile-ws "${PROFILE_WS[@]}" --profile-k "$PK" --queries "$NQ" --rounds "$ROUNDS" --warmups "$WARMUPS" \
+python3 "$X/analysis/analyze_h.py" "$RUN" --ws "${WS[@]}" --timed-cells "$RUN/logs/timed-cells.tsv" --ks "${KS[@]}" --profile-ws "${PROFILE_WS[@]}" --profile-k "$PK" --queries "$NQ" --rounds "$ROUNDS" --warmups "$WARMUPS" \
     ${FEASIBILITY:+--feasibility "$FEASIBILITY"} --output "$RUN/analysis/h.json" --tables "$RUN/analysis/h-tables.md" > "$RUN/logs/analyze-h.log" 2>&1 || fail "analyze h"
 rm -f "$RUN"/inputs/oracle-top*.tsv   # prefixes of the pinned top-1000; SHA-256 in logs/input-sha256.txt
 [ "$DRY" = 1 ] && { echo "DRY_RUN_COMPLETE $RUN"; exit 0; }
 stage manifest
 python3 experiments/2026-11-13-range-bitpack/code/write_manifest.py "$RUN" --status completed-measurement-H \
-    --scope "Measurement H (configs/protocol.json part 2): cuda5; u4m (src/cuda_range_v3.cu defaults, radix at every k) on the full collection (8,841,823 passages); W in ${WS[*]}; k in ${KS[*]}; 500 calibration queries; 3 processes per cell x (3 + 20 rounds), W rotated within k; diagnostic clock profile at k=$PK for W in ${PROFILE_WS[*]}; holder-based idle rule; calibration only, after the freeze" \
+    --scope "Measurement H (configs/protocol.json part 2): cuda5; u4m (src/cuda_range_v3.cu defaults, radix at every k) on the full collection (8,841,823 passages); W in ${WS[*]}; k in ${KS[*]}; timed cells W >= k (amendment 1; logs/timed-cells.tsv); 500 calibration queries; 3 processes per cell x (3 + 20 rounds), W rotated within k; diagnostic clock profile at k=$PK for W in ${PROFILE_WS[*]}; holder-based idle rule; calibration only, after the freeze" \
     --flags "nvcc -O3 -lineinfo -arch=sm_89 -std=c++17 (CUDA 12.6), code/build_h.sh" --input "$Q" \
     --binary "$BUILD/u4m/scorer" --binary "$BUILD/u4m-clocks/scorer" --binary "$BUILD/holder/gpu_holder" \
     --source "$X/configs/protocol.json" --source "$X/code/run_h.sh" --source "$X/code/session_lib_h.sh" --source "$X/code/gpu_holder.cu" --source "$X/code/build_h.sh" \
