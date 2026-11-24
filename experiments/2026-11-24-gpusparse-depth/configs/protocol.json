@@ -1,0 +1,28 @@
+{
+  "experiment_id": "2026-11-24-gpusparse-depth",
+  "owner": "Arnav",
+  "status": "part 1 (gates) registered before any GPU work; timing registered after the gates, before timing",
+  "label": "calibration queries only (500), after the freeze",
+  "question": "u4m against the team's canonical GPUSparse adaptation at the full collection (8,841,823 passages), k = 10 / 100 / 1000, batch 1, in one session, so that u4m / GPUSparse is paired at the paper's headline depth (k=1000)",
+  "harness": {
+    "study": "experiments/2026-11-16-guarded-fp32-baseline (run_fp32_study.py; parent 2026-11-15-full-collection-baselines), run 20261117-cuda5-fp32-repair02 (source receipt and execution evidence)",
+    "argv": "<venv python> <adapter> --variant monolithic --index GSP --queries Q --reference ORACLE --native-repo NATIVE --csv --top --validation --jit-manifest --limit 500 --k K --gpu 0 --block-pl 512 --repeats R --warmups W --verify 0; env CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 CUDA_MODULE_LOADING=LAZY, one TRITON_CACHE_DIR / CUDA_CACHE_PATH per process (run_fp32_study.py:177,192)",
+    "adapters": {
+      "u64": "experiments/2026-11-14-range-bitpack-paired/code/gpusparse-u64/canonical_baseline.py (dc9035d6...)",
+      "fp32": "experiments/2026-11-16-guarded-fp32-baseline/code/fp32/canonical_baseline.py (0da6f055...)"
+    },
+    "native": "GPUSparse checkout at 92bb87b36f10e78ab39c81e9db2412dbb7a3b650, clean; src/triton_kernel.py ef298aba... (team pin native_monolithic_sha256); owner's copy on cuda5 /scratch/ag11163/gpusparse-env/source",
+    "environment": "owner's venv /scratch/ag11163/gpusparse-env/venv: Python 3.12.7, torch 2.6.0+cu126 (CUDA 12.6), triton 3.2.0, numpy 2.2.6, scipy 1.15.3; the six torch library SHA-256 hashes recorded in the repair02 build record match",
+    "runtime_gate": "the adapters require RESEARCH_RUNTIME_DIR (an external runtime in the study); code/rt_gate.py implements the public handshake of runtime_gate.py: it checks the reported config (variant, docs, query_count, requested_k, block_pl, batch_size) before any query and writes continue/reject"
+  },
+  "klimit_variant": {
+    "approved": "owner, 2026-11-24 (option 1)",
+    "what": "code/klimit/: copies of both canonical adapters and their scoring modules with only the k upper limit changed (128 -> 1000) in the argument checks and the asserts; dependencies copied byte-identical; code/check_klimit.py verifies every copy against its pinned original by SHA-256 and the allowed substitutions",
+    "use": "unchanged adapters at k = 10 and 100; k-limit variant at k = 1000, labelled 'k-limit variant'",
+    "label_note": "the adapters' reported metadata (max_supported_k=128, requested_k_domain positive-request-through128) is left unchanged by the owner's rule"
+  },
+  "inputs": "GSP e838dfbf... (full-8841823.gsp), u4m index W=4096 positions 06368cee..., queries data/derived/calibration-500.tsv 150917d7..., oracle pinned top-1000 302b63d4... (the adapters truncate it to k; u4m checks use its top-k prefixes)",
+  "gates": "code/run_i.sh MODE=pre: 500 queries, 1 warm-up + 1 measured round, exact against the oracle: k = 10 and 100: U64 original, U64 k-limit copy, FP32 original, FP32 k-limit copy, u4m; k = 1000: U64 k-limit, FP32 k-limit, u4m. The copies' top.tsv must equal the originals' byte for byte at k = 10 and 100. U64 and u4m must be exact (else the session stops); FP32 is recorded as not exact at a k where it fails and left out of timing there. Peak GPU memory per gate (nvidia-smi peak; adapter torch allocator peak).",
+  "gpu_policy": "Measurement H rule: code/session_lib_h.sh and code/gpu_holder.cu (copied from exp/arnav/2026-11-23-range-v3-wk @ 5550120, hashes in code/COPIED-FROM.txt): holder working except during our processes, 5-sample clear window, retry every 300 s for up to 12 h; overlapped processes preserved and rerun (at most 3 per slot)",
+  "u4m": "src/cuda_range_v3.cu defaults, CUDA 12.6 SASS 8f8a5d49e0e0ad3f (code/build_i.sh)"
+}
