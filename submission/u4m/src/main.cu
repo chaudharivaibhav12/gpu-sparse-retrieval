@@ -2,7 +2,9 @@
 // uploads the index, runs every query through the range kernel at batch 1, writes a TREC run and
 // prints a timing summary.
 //   u4m --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] [--warmup N] [--repeat N]
-//   [--threads 256] [--gpu 0]
+//   [--threads 256] [--gpu 0] [--timings FILE.csv]
+// --timings writes one row per query and round (warm-up rounds included):
+// phase,round,query_id,query_wall_ms,gpu_span_ms.
 // Extracted from the host code of src/cuda_range_v3.cu (commit 5528bb2; repository main at 8fc44cd)
 // at its defaults (radix selection at every k, theta filter, radix merge). Removed: research_gate /
 // research_runtime.h, VERIFY and the GSP cross-check argument, the refuse-to-overwrite check, the
@@ -77,6 +79,7 @@ int main(int argc, char** argv) {
         string index_path;
         string queries_path;
         string out_path;
+        string timings_path;
         uint32_t k{0};
         uint32_t warmups{3};
         uint32_t rounds{20};
@@ -99,6 +102,8 @@ int main(int argc, char** argv) {
                 queries_path = value;
             } else if (a == "--out") {
                 out_path = value;
+            } else if (a == "--timings") {
+                timings_path = value;
             } else if (a == "--k") {
                 k = parse(value);
             } else if (a == "--warmup") {
@@ -113,12 +118,12 @@ int main(int argc, char** argv) {
                 throw runtime_error(
                     "Unknown option " + a +
                     "\nUsage: u4m --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] "
-                    "[--warmup N] [--repeat N] [--threads 256] [--gpu 0]");
+                    "[--warmup N] [--repeat N] [--threads 256] [--gpu 0] [--timings FILE.csv]");
             }
         }
         require(!index_path.empty() && !queries_path.empty() && k > 0,
                 "Usage: u4m --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] [--warmup "
-                "N] [--repeat N] [--threads 256] [--gpu 0]");
+                "N] [--repeat N] [--threads 256] [--gpu 0] [--timings FILE.csv]");
         require(
             k <= RBP_MAX_K && rounds > 0 && threads >= 32 && threads <= 32 * RBP_MAX_WARPS &&
                 threads % 32 == 0,
@@ -258,6 +263,8 @@ int main(int argc, char** argv) {
         vector<vector<double>> span(count);
         GpuEvent begin;
         GpuEvent end;
+        ostringstream timings;
+        timings << "phase,round,query_id,query_wall_ms,gpu_span_ms\n";
         for (uint32_t phase{0}; phase < 2; ++phase) {
             for (uint32_t round{0}; round < (phase ? rounds : warmups); ++round) {
                 for (uint32_t qi{0}; qi < count; ++qi) {
@@ -298,8 +305,18 @@ int main(int argc, char** argv) {
                         span[qi].push_back(gpu_ms);
                         results[qi] = winners;
                     }
+                    if (!timings_path.empty()) {
+                        timings << (phase ? "measured" : "warmup") << ',' << round << ',' << q.id
+                                << ',' << wall_ms << ',' << gpu_ms << '\n';
+                    }
                 }
             }
+        }
+        if (!timings_path.empty()) {
+            ofstream timings_file{timings_path};
+            require(bool(timings_file), "Cannot create timings file " + timings_path);
+            timings_file << timings.str();
+            require(bool(timings_file), "Timings file write failed");
         }
         if (!out_path.empty()) {
             ofstream out{out_path};

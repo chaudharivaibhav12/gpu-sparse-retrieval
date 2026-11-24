@@ -31,7 +31,9 @@ Other depths: make run verify K=100 (k up to 1000). A small end-to-end check: ma
 
 DIRECT USE
     bin/u4m --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] [--warmup N] [--repeat N] [--threads 256] [--gpu 0]
-Defaults: 3 warm-up rounds, 20 measured rounds, 256 threads per block, GPU 0. The run file has one line per
+            [--timings FILE.csv]
+Defaults: 3 warm-up rounds, 20 measured rounds, 256 threads per block, GPU 0. --timings writes every query's
+per-round time (phase,round,query_id,query_wall_ms,gpu_span_ms), warm-up rounds included. The run file has one line per
 result: "qid Q0 docid rank score u4m" (docid = MS MARCO passage ID, score = exact integer score).
 
 EXPECTED OUTPUT (shape; numbers are filled in after the cuda5 runs, see sample_output/)
