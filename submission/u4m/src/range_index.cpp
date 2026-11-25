@@ -1,7 +1,4 @@
-// range_index.cpp - definitions for range_index.h: SHA-256, the RBP loader with its structural
-// checks, uniform range boundaries and the multiplicity scan. Extracted from src/range_bitpack.h
-// (commit 223cf4b; repository main at 8fc44cd), restricted to the format u4m uses (positions
-// encoding, uniform ranges).
+// SHA-256, the range index loader with its checks, and range helpers.
 #include "range_index.h"
 #include "common.h"
 #include <algorithm>
@@ -9,31 +6,36 @@
 #include <fstream>
 using namespace std;
 
-uint32_t Sha256::rotr(uint32_t x, int n) {
-    return (x >> n) | (x << (32 - n));
+// Rotates a 32-bit value right by n bits.
+uint32_t Sha256::rotr(uint32_t x, int n)
+{
+    return (x>>n)|(x<<(32-n));
 }
 
-void Sha256::block(const uint8_t* p) {
-    static const uint32_t K[64] = {
-        0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4,
-        0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe,
-        0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f,
-        0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7,
-        0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc,
-        0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b,
-        0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116,
-        0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
-        0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7,
-        0xc67178f2};
+// Processes one 64-byte block of input.
+void Sha256::block(const uint8_t *p)
+{
+    static const uint32_t K[64]={0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b,
+            0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
+            0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6,
+            0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d,
+            0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85,
+            0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+            0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585,
+            0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a,
+            0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa,
+            0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
     uint32_t w[64];
-    for (int i{0}; i < 16; ++i) {
-        w[i] = uint32_t(p[4 * i]) << 24 | uint32_t(p[4 * i + 1]) << 16 |
-               uint32_t(p[4 * i + 2]) << 8 | p[4 * i + 3];
+    for(int i{0}; i<16; ++i)
+    {
+        w[i]=uint32_t(p[4*i])<<24|uint32_t(p[4*i+1])<<16 |
+               uint32_t(p[4*i+2])<<8|p[4*i+3];
     }
-    for (int i{16}; i < 64; ++i) {
-        const uint32_t s0{rotr(w[i - 15], 7) ^ rotr(w[i - 15], 18) ^ (w[i - 15] >> 3)};
-        const uint32_t s1{rotr(w[i - 2], 17) ^ rotr(w[i - 2], 19) ^ (w[i - 2] >> 10)};
-        w[i] = w[i - 16] + s0 + w[i - 7] + s1;
+    for(int i{16}; i<64; ++i)
+    {
+        const uint32_t s0{rotr(w[i-15], 7)^rotr(w[i-15], 18)^(w[i-15]>>3)};
+        const uint32_t s1{rotr(w[i-2], 17)^rotr(w[i-2], 19)^(w[i-2]>>10)};
+        w[i]=w[i-16]+s0+w[i-7]+s1;
     }
     uint32_t a{h[0]};
     uint32_t b{h[1]};
@@ -43,171 +45,201 @@ void Sha256::block(const uint8_t* p) {
     uint32_t f{h[5]};
     uint32_t g{h[6]};
     uint32_t hh{h[7]};
-    for (int i{0}; i < 64; ++i) {
-        const uint32_t t1{hh + (rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25)) + ((e & f) ^ (~e & g)) +
-                          K[i] + w[i]};
-        const uint32_t t2{(rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))};
-        hh = g;
-        g = f;
-        f = e;
-        e = d + t1;
-        d = c;
-        c = b;
-        b = a;
-        a = t1 + t2;
+    for(int i{0}; i<64; ++i)
+    {
+        const uint32_t t1{
+                hh+(rotr(e, 6)^rotr(e, 11)^rotr(e, 25))+((e&f)^(~e&g))+K[i]+w[i]};
+        const uint32_t t2{(rotr(a, 2)^rotr(a, 13)^rotr(a, 22))+((a&b)^(a&c)^(b&c))};
+        hh=g;
+        g=f;
+        f=e;
+        e=d+t1;
+        d=c;
+        c=b;
+        b=a;
+        a=t1+t2;
     }
-    h[0] += a;
-    h[1] += b;
-    h[2] += c;
-    h[3] += d;
-    h[4] += e;
-    h[5] += f;
-    h[6] += g;
-    h[7] += hh;
+    h[0]+=a;
+    h[1]+=b;
+    h[2]+=c;
+    h[3]+=d;
+    h[4]+=e;
+    h[5]+=f;
+    h[6]+=g;
+    h[7]+=hh;
 }
 
-void Sha256::update(const void* data, size_t bytes) {
-    const uint8_t* p{static_cast<const uint8_t*>(data)};
-    length += bytes;
-    if (fill) {
-        const size_t take{min(bytes, size_t(64) - fill)};
-        memcpy(buffer + fill, p, take);
-        fill += take;
-        p += take;
-        bytes -= take;
-        if (fill < 64) {
+// Adds more bytes to the hash.
+void Sha256::update(const void *data, size_t bytes)
+{
+    const uint8_t *p{static_cast<const uint8_t *>(data)};
+    length+=bytes;
+    if(fill)
+    {
+        const size_t take{min(bytes, size_t(64)-fill)};
+        memcpy(buffer+fill, p, take);
+        fill+=take;
+        p+=take;
+        bytes-=take;
+        if(fill<64)
+        {
             return;
         }
         block(buffer);
-        fill = 0;
+        fill=0;
     }
-    for (; bytes >= 64; p += 64, bytes -= 64) {
+    for(; bytes>=64; p+=64, bytes-=64)
+    {
         block(p);
     }
-    if (bytes) {
+    if(bytes)
+    {
         memcpy(buffer, p, bytes);
-        fill = bytes;
+        fill=bytes;
     }
 }
 
-array<uint8_t, 32> Sha256::finish() {
-    const uint64_t bits{length * 8};
+// Pads the input and returns the final 32-byte digest.
+array<uint8_t, 32> Sha256::finish()
+{
+    const uint64_t bits{length*8};
     const uint8_t one{0x80};
     const uint8_t zero{0};
     update(&one, 1);
-    while (fill != 56) {
+    while(fill!=56)
+    {
         update(&zero, 1);
     }
     uint8_t tail[8];
-    for (int i{0}; i < 8; ++i) {
-        tail[i] = uint8_t(bits >> (56 - 8 * i));
+    for(int i{0}; i<8; ++i)
+    {
+        tail[i]=uint8_t(bits>>(56-8*i));
     }
     update(tail, 8);
     array<uint8_t, 32> out{};
-    for (int i{0}; i < 8; ++i) {
-        for (int j{0}; j < 4; ++j) {
-            out[4 * i + j] = uint8_t(h[i] >> (24 - 8 * j));
+    for(int i{0}; i<8; ++i)
+    {
+        for(int j{0}; j<4; ++j)
+        {
+            out[4*i+j]=uint8_t(h[i]>>(24-8*j));
         }
     }
     return out;
 }
 
-string sha_hex(const array<uint8_t, 32>& digest) {
-    static const char* digits{"0123456789abcdef"};
+// Converts a digest to a hex string.
+string sha_hex(const array<uint8_t, 32> &digest)
+{
+    static const char *digits{"0123456789abcdef"};
     string out;
-    for (uint8_t byte : digest) {
-        out += digits[byte >> 4];
-        out += digits[byte & 15];
+    for(uint8_t byte:digest)
+    {
+        out+=digits[byte>>4];
+        out+=digits[byte&15];
     }
     return out;
 }
 
-array<uint8_t, 32> sha_file(const string& path) {
+// Computes the SHA-256 of a whole file.
+array<uint8_t, 32> sha_file(const string &path)
+{
     ifstream in{path, ios::binary};
-    require(bool(in), "Cannot open file for hashing: " + path);
+    require(bool(in), "Cannot open file for hashing: "+path);
     Sha256 sha;
-    vector<char> chunk(1 << 20);
-    while (in) {
+    vector<char> chunk(1<<20);
+    while(in)
+    {
         in.read(chunk.data(), chunk.size());
         sha.update(chunk.data(), size_t(in.gcount()));
     }
     return sha.finish();
 }
 
-size_t RangeIndex::blocks() const {
+// Returns the number of (term, range) blocks.
+size_t RangeIndex::blocks() const
+{
     return lookup_range.size();
 }
 
-vector<uint32_t> rbp_uniform_ranges(uint32_t docs, uint32_t range_size) {
+// Returns the boundaries of equal ranges of range_size documents.
+vector<uint32_t> rbp_uniform_ranges(uint32_t docs, uint32_t range_size)
+{
     vector<uint32_t> starts{0};
-    for (uint64_t first{range_size}; first < docs; first += range_size) {
+    for(uint64_t first{range_size}; first<docs; first+=range_size)
+    {
         starts.push_back(uint32_t(first));
     }
-    if (docs) {
+    if(docs)
+    {
         starts.push_back(docs);
     }
     return starts;
 }
 
-bool rbp_little_endian() {
+// Checks that this machine is little endian.
+bool rbp_little_endian()
+{
     const uint16_t probe{1};
-    return *reinterpret_cast<const uint8_t*>(&probe) == 1;
+    return *reinterpret_cast<const uint8_t *>(&probe)==1;
 }
 
-// Loads, checks the trailing SHA-256 of all preceding bytes, then checks every
-// structural invariant the kernel relies on for in-bounds access.
-RangeIndex rbp_load(const string& path) {
+// Loads the index file, checks its hash and every structure the kernel relies on.
+RangeIndex rbp_load(const string &path)
+{
     require(rbp_little_endian(), "RBP files require a little-endian host");
-    ifstream in{path, ios::binary | ios::ate};
+    ifstream in{path, ios::binary|ios::ate};
     require(bool(in), "Cannot open range index");
     const size_t size{size_t(in.tellg())};
-    require(size >= 8 + 16 + 32 + 32 + 32, "Truncated range index");
+    require(size>=8+16+32+32+32, "Truncated range index");
     vector<uint8_t> bytes(size);
     in.seekg(0);
-    in.read(reinterpret_cast<char*>(bytes.data()), streamsize(size));
+    in.read(reinterpret_cast<char *>(bytes.data()), streamsize(size));
     require(bool(in), "Range index read failed");
     RangeIndex r;
     Sha256 sha;
-    sha.update(bytes.data(), size - 32);
-    memcpy(r.file_sha.data(), bytes.data() + size - 32, 32);
-    require(sha.finish() == r.file_sha, "Range index SHA-256 mismatch");
+    sha.update(bytes.data(), size-32);
+    memcpy(r.file_sha.data(), bytes.data()+size-32, 32);
+    require(sha.finish()==r.file_sha, "Range index SHA-256 mismatch");
     size_t at{0};
-    const size_t limit{size - 32};
-    const auto take = [&](void* target, size_t count) {
-        require(count <= limit - at, "Truncated range index");
-        if (count) {
-            memcpy(target, bytes.data() + at, count);
+    const size_t limit{size-32};
+    const auto take=[&](void *target, size_t count)
+    {
+        require(count<=limit-at, "Truncated range index");
+        if(count)
+        {
+            memcpy(target, bytes.data()+at, count);
         }
-        at += count;
+        at+=count;
     };
-    const auto take_vec = [&](auto& v, uint64_t count) {
-        require(count <= limit / sizeof(v[0]), "Bad range index count");
+    const auto take_vec=[&](auto &v, uint64_t count)
+    {
+        require(count<=limit/sizeof(v[0]), "Bad range index count");
         v.resize(size_t(count));
-        take(v.data(), v.size() * sizeof(v[0]));
+        take(v.data(), v.size()*sizeof(v[0]));
     };
     char magic[8];
     take(magic, 8);
-    require(memcmp(magic, "GSPRBP02", 8) == 0,
+    require(memcmp(magic, "GSPRBP02", 8)==0,
             "Bad range index magic (u4m needs a positions-encoded GSPRBP02 index)");
     uint32_t head32[4];
     uint64_t head64[4];
     take(head32, sizeof head32);
     take(head64, sizeof head64);
-    r.docs = head32[0];
-    r.vocab = head32[1];
-    r.range_size = head32[2];
-    r.ranges = head32[3];
-    r.total_bits = head64[3];
+    r.docs=head32[0];
+    r.vocab=head32[1];
+    r.range_size=head32[2];
+    r.ranges=head32[3];
+    r.total_bits=head64[3];
     take(r.source_sha.data(), 32);
     uint32_t extra[2];
     take(extra, sizeof extra);
-    require(extra[0] == 1 && extra[1] == 0,
+    require(extra[0]==1&&extra[1]==0,
             "Unsupported range index encoding or flags (u4m needs positions, uniform ranges)");
     const uint64_t blocks{head64[0]};
     const uint64_t nnz{head64[1]};
     const uint64_t words{head64[2]};
     take_vec(r.ids, r.docs);
-    take_vec(r.lookup_first, uint64_t(r.vocab) + 1);
+    take_vec(r.lookup_first, uint64_t(r.vocab)+1);
     take_vec(r.lookup_range, blocks);
     take_vec(r.block_bit_start, blocks);
     take_vec(r.block_value_start, blocks);
@@ -215,56 +247,61 @@ RangeIndex rbp_load(const string& path) {
     take_vec(r.block_width, blocks);
     take_vec(r.encoded, words);
     take_vec(r.impacts, nnz);
-    require(at == limit, "Trailing range index bytes");
-    require(r.range_size >= 1 && r.range_size <= RBP_MAX_RANGE, "Bad range size");
-    r.range_start = rbp_uniform_ranges(r.docs, r.range_size);
-    require(r.ranges == r.range_start.size() - 1, "Bad range count");
-    require(r.range_start.size() == size_t(r.ranges) + 1 && r.range_start.front() == 0 &&
-                r.range_start.back() == r.docs,
+    require(at==limit, "Trailing range index bytes");
+    require(r.range_size>=1&&r.range_size<=RBP_MAX_RANGE, "Bad range size");
+    r.range_start=rbp_uniform_ranges(r.docs, r.range_size);
+    require(r.ranges==r.range_start.size()-1, "Bad range count");
+    require(r.range_start.size()==size_t(r.ranges)+1&&r.range_start.front()==0 &&
+                    r.range_start.back()==r.docs,
             "Bad range boundaries");
-    for (uint32_t range{0}; range < r.ranges; ++range) {
-        require(r.range_start[range + 1] > r.range_start[range] &&
-                    r.range_start[range + 1] - r.range_start[range] <= r.range_size,
+    for(uint32_t range{0}; range<r.ranges; ++range)
+    {
+        require(r.range_start[range+1]>r.range_start[range] &&
+                        r.range_start[range+1]-r.range_start[range]<=r.range_size,
                 "Bad range width");
     }
-    require(blocks < RBP_NONE && nnz <= UINT32_MAX && words == (r.total_bits + 31) / 32 + 1,
+    require(blocks<RBP_NONE&&nnz<=UINT32_MAX&&words==(r.total_bits+31)/32+1,
             "Bad range index sizes");
-    require(r.lookup_first.front() == 0 && r.lookup_first.back() == blocks &&
-                is_sorted(r.lookup_first.begin(), r.lookup_first.end()),
+    require(r.lookup_first.front()==0&&r.lookup_first.back()==blocks &&
+                    is_sorted(r.lookup_first.begin(), r.lookup_first.end()),
             "Bad term lookup");
-    require(r.encoded.back() == 0, "Padding word is not zero");
+    require(r.encoded.back()==0, "Padding word is not zero");
     uint64_t values{0};
     uint64_t bits{0};
-    for (uint32_t t{0}; t < r.vocab; ++t) {
-        for (uint32_t b{r.lookup_first[t]}; b < r.lookup_first[t + 1]; ++b) {
-            require(r.lookup_range[b] < r.ranges &&
-                        (b == r.lookup_first[t] || r.lookup_range[b] > r.lookup_range[b - 1]),
+    for(uint32_t t{0}; t<r.vocab; ++t)
+    {
+        for(uint32_t b{r.lookup_first[t]}; b<r.lookup_first[t+1]; ++b)
+        {
+            require(r.lookup_range[b]<r.ranges &&
+                            (b==r.lookup_first[t]||r.lookup_range[b]>r.lookup_range[b-1]),
                     "Block ranges not ascending within a term");
-            require(r.block_count[b] >= 1 && r.block_width[b] >= 1 && r.block_width[b] <= 16,
+            require(r.block_count[b]>=1&&r.block_width[b]>=1&&r.block_width[b]<=16,
                     "Bad block count or width");
-            require(r.block_value_start[b] == values && r.block_bit_start[b] == bits,
+            require(r.block_value_start[b]==values&&r.block_bit_start[b]==bits,
                     "Blocks are not contiguous");
-            values += r.block_count[b];
-            bits += uint64_t(r.block_count[b]) * r.block_width[b];
+            values+=r.block_count[b];
+            bits+=uint64_t(r.block_count[b])*r.block_width[b];
         }
     }
-    require(values == nnz && bits == r.total_bits, "Block totals do not match payload");
+    require(values==nnz&&bits==r.total_bits, "Block totals do not match payload");
     return r;
 }
 
-// Largest number of postings one term has for a single document. The source
-// data has 1; a repeated (term, document) pair multiplies the score bound.
-uint32_t rbp_max_multiplicity(const RangeIndex& r) {
-    uint32_t longest{r.impacts.empty() ? 0u : 1u};
-    for (size_t b{0}; b < r.blocks(); ++b) {
+// Returns the largest number of postings one term has in one document.
+uint32_t rbp_max_multiplicity(const RangeIndex &r)
+{
+    uint32_t longest{r.impacts.empty()?0u:1u};
+    for(size_t b{0}; b<r.blocks(); ++b)
+    {
         uint32_t run{1};
-        for (uint32_t j{1}; j < r.block_count[b]; ++j) {
-            const uint64_t bit{r.block_bit_start[b] + uint64_t(j) * r.block_width[b]};
+        for(uint32_t j{1}; j<r.block_count[b]; ++j)
+        {
+            const uint64_t bit{r.block_bit_start[b]+uint64_t(j)*r.block_width[b]};
             const uint32_t value{rbp_extract(r.encoded.data(), bit, r.block_width[b])};
-            const bool repeat{
-                value == rbp_extract(r.encoded.data(), bit - r.block_width[b], r.block_width[b])};
-            run = repeat ? run + 1 : 1;
-            longest = max(longest, run);
+            const bool repeat{value==rbp_extract(r.encoded.data(), bit-r.block_width[b],
+                                               r.block_width[b])};
+            run=repeat?run+1:1;
+            longest=max(longest, run);
         }
     }
     return longest;

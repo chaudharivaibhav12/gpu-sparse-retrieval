@@ -1,10 +1,4 @@
-// cpu_reference.cpp - exact CPU reference for u4m: scores every passage of the GSP forward index
-// for each query (sum of weight x impact over the query's terms, 64-bit), ranks by score descending
-// then smaller original passage ID, and writes the top k as a TREC run. With a second run file it
-// compares the two query by query.
-//   cpu_reference GSP QUERIES.tsv K OUT.trec [RUN.trec]
-// Scoring and ranking extracted from src/cpu_pilot.cpp (commit d84ca0b; the "score" mode, dot and
-// ranking; repository main at 8fc44cd); the TREC output and the comparison are new.
+// Exact CPU reference: scores every passage for each query and writes or compares a TREC run.
 #include "common.h"
 #include <map>
 #include <algorithm>
@@ -23,37 +17,46 @@
 #include <vector>
 using namespace std;
 
-// A run: qid -> ranked (docid, score) list.
-using Run = map<string, vector<pair<string, string>>>;
+using Run=map<string, vector<pair<string, string>>>;
 
-uint64_t dot(const Index& x, uint32_t d, const vector<uint32_t>& weights) {
+// Returns the exact score of one document for one query.
+uint64_t dot(const Index &x, uint32_t d, const vector<uint32_t> &weights)
+{
     uint64_t sum{0};
-    for (uint64_t j{x.offsets[d]}; j < x.offsets[d + 1]; j++) {
-        sum += uint64_t(weights[x.terms[j]]) * x.impacts[j];
+    for(uint64_t j{x.offsets[d]}; j<x.offsets[d+1]; j++)
+    {
+        sum+=uint64_t(weights[x.terms[j]])*x.impacts[j];
     }
     return sum;
 }
-vector<uint32_t> ranking(const Index& x, const vector<uint64_t>& scores,
-                         const vector<uint8_t>& keep, uint32_t k) {
+
+// Returns the top k documents: higher score first, then smaller original ID.
+vector<uint32_t> ranking(
+        const Index &x, const vector<uint64_t> &scores, const vector<uint8_t> &keep, uint32_t k)
+{
     vector<uint32_t> docs;
-    for (uint32_t d{0}; d < x.ids.size(); d++) {
-        if (keep.empty() || keep[d]) {
+    for(uint32_t d{0}; d<x.ids.size(); d++)
+    {
+        if(keep.empty()||keep[d])
+        {
             docs.push_back(d);
         }
     }
-    auto cmp = [&](uint32_t a, uint32_t b) {
-        return scores[a] != scores[b] ? scores[a] > scores[b] : x.ids[a] < x.ids[b];
+    auto cmp=[&](uint32_t a, uint32_t b)
+    {
+        return scores[a]!=scores[b]?scores[a]>scores[b]:x.ids[a]<x.ids[b];
     };
     size_t size{min(size_t(k), docs.size())};
-    partial_sort(docs.begin(), docs.begin() + size, docs.end(), cmp);
+    partial_sort(docs.begin(), docs.begin()+size, docs.end(), cmp);
     docs.resize(size);
     return docs;
 }
 
-// Run file: qid Q0 docid rank score tag. Returns qid -> ranked (docid, score) list.
-static Run read_run(const string& path) {
+// Reads a TREC run file into a map from query ID to its ranked list.
+static Run read_run(const string &path)
+{
     ifstream in{path};
-    require(bool(in), "Cannot open run file: " + path);
+    require(bool(in), "Cannot open run file: "+path);
     Run run;
     string qid;
     string q0;
@@ -61,57 +64,69 @@ static Run read_run(const string& path) {
     string score;
     string tag;
     uint64_t rank;
-    while (in >> qid >> q0 >> docid >> rank >> score >> tag) {
-        vector<pair<string, string>>& list{run[qid]};
-        require(rank == list.size() + 1, "Run ranks are not 1, 2, ... in " + path);
+    while(in>>qid>>q0>>docid>>rank>>score>>tag)
+    {
+        vector<pair<string, string>> &list{run[qid]};
+        require(rank==list.size()+1, "Run ranks are not 1, 2, ... in "+path);
         list.emplace_back(docid, score);
     }
     return run;
 }
 
-int main(int argc, char** argv) {
-    try {
-        require(argc == 5 || argc == 6,
+// Scores all queries on the CPU, writes the run and compares it with another run if given.
+int main(int argc, char **argv)
+{
+    try
+    {
+        require(argc==5||argc==6,
                 "Usage: cpu_reference GSP QUERIES.tsv K OUT.trec [RUN.trec]");
         Index x{load(argv[1])};
         vector<Query> queries{read_queries(argv[2])};
         const uint32_t k{static_cast<uint32_t>(stoul(argv[3]))};
         ofstream out{argv[4]};
         require(bool(out), "Cannot create reference output");
-        for (size_t qi{0}; qi < queries.size(); qi++) {
+        for(size_t qi{0}; qi<queries.size(); qi++)
+        {
             vector<uint32_t> w(x.vocab.size());
-            for (auto p : queries[qi].terms) {
-                require(p.first < w.size(), "Bad query term");
-                w[p.first] = p.second;
+            for(auto p:queries[qi].terms)
+            {
+                require(p.first<w.size(), "Bad query term");
+                w[p.first]=p.second;
             }
             vector<uint64_t> sc(x.ids.size());
-            for (uint32_t d{0}; d < x.ids.size(); d++) {
-                sc[d] = dot(x, d, w);
+            for(uint32_t d{0}; d<x.ids.size(); d++)
+            {
+                sc[d]=dot(x, d, w);
             }
             vector<uint32_t> top{ranking(x, sc, {}, k)};
-            for (size_t r{0}; r < top.size(); r++) {
-                out << queries[qi].id << " Q0 " << x.ids[top[r]] << ' ' << r + 1 << ' '
-                    << sc[top[r]] << " cpu\n";
+            for(size_t r{0}; r<top.size(); r++)
+            {
+                out<<queries[qi].id<<" Q0 "<<x.ids[top[r]]<<' '<<r+1<<' '
+                    << sc[top[r]]<<" cpu\n";
             }
         }
         out.close();
-        cout << "REFERENCE docs=" << x.ids.size() << " queries=" << queries.size() << " k=" << k
-             << " out=" << argv[4] << '\n';
-        if (argc == 6) {
+        cout<<"REFERENCE docs="<<x.ids.size()<<" queries="<<queries.size()<<" k="<<k
+             << " out="<<argv[4]<<'\n';
+        if(argc==6)
+        {
             const Run ref{read_run(argv[4])};
             const Run run{read_run(argv[5])};
             size_t same{0};
-            for (const auto& q : queries) {
+            for(const auto &q:queries)
+            {
                 const Run::const_iterator a{ref.find(q.id)};
                 const Run::const_iterator b{run.find(q.id)};
-                same += a != ref.end() && b != run.end() && a->second == b->second;
+                same+=a!=ref.end()&&b!=run.end()&&a->second==b->second;
             }
-            cout << same << '/' << queries.size() << " queries identical\n";
-            return same == queries.size() ? 0 : 2;
+            cout<<same<<'/'<<queries.size()<<" queries identical\n";
+            return same==queries.size()?0:2;
         }
         return 0;
-    } catch (const exception& e) {
-        cerr << "ERROR: " << e.what() << '\n';
+    }
+    catch(const exception &e)
+    {
+        cerr<<"ERROR: "<<e.what()<<'\n';
         return 1;
     }
 }
