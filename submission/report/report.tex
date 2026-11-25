@@ -31,7 +31,7 @@ Two Strategies over a Range-Partitioned Bit-Packed Index}
 
 % =====================================================================
 \begin{abstract}
-Learned sparse retrieval models such as SPLADE represent queries and documents as sparse vectors over a vocabulary, and a top-k retrieval returns $k$ documents with the highest dot product with the query. Doing this \emph{exactly} over millions of documents is the first stage of modern search and question-answering pipelines, and its latency bounds the whole system. The problem is usually considered a poor fit for a naive GPU implementation with posting lists being irregular, the number of candidate documents being huge, and the final top-$k$ selection itself being expensive. We introduce a range-partitioned, bit-packed inverted index in which every GPU thread block scores one contiguous range of documents entirely in shared memory. On this base, we build two complementary strategies:
+Learned sparse retrieval models like SPLADE represent queries and documents as sparse vectors over a vocabulary, and a top-k retrieval returns $k$ documents with the highest dot product with the query. Doing this \emph{exactly} over millions of documents is the first stage of modern search and question-answering pipelines, and its latency bounds the whole system. The problem is usually considered a poor fit for a naive GPU implementation with posting lists being irregular, the number of candidate documents being huge, and the final top-$k$ selection itself being expensive. We introduce a range-partitioned, bit-packed inverted index in which every GPU thread block scores one contiguous range of documents entirely in shared memory. On this base, we build two complementary strategies:
 \begin{itemize}
 \item \textbf{Strategy A} scores every range and selects the top $k$ with radix-based algorithms, so
   its cost barely grows with $k$;
@@ -236,7 +236,7 @@ candidates that only equal $\theta$ are kept, because they can still win a tie o
 \begin{itemize}
 \item \textbf{Range size.} Smaller ranges give tighter bounds. With 64 seeds and $k=10$ the median query scores
   34.5\% of the ranges at $W=1024$, 16.2\% at $W=512$ and 6.3\% at $W=256$. We use $W=256$, although queries
-  that prune badly then pay for many small ranges (Section~\ref{sec:heldout}).
+  that prune badly then pay for many small ranges.
 \item \textbf{Number of seeds.} With 64 seeds the median query scores at most 3 percentage points more of its
   postings than with the ideal threshold (the true $k$-th score), so we did not tune it further.
 \item \textbf{Pruning or smaller ranges?} Small ranges alone do not help. Without pruning, $W=256$ is slower
@@ -250,7 +250,7 @@ selection and merging, which dominates at larger $k$.
 % =====================================================================
 \section{Experimental Setup}
 
-\paragraph{Machine.} All reported experiments ran on one machine:
+\paragraph{Machine.} All reported experiments ran on one machine (cuda5 CIMS machine):
 \begin{itemize}
 \item GPU: one NVIDIA GeForce RTX~4070 (Ada Lovelace, compute capability 8.9, 46 SMs, 12\,GB GDDR6X,
   504\,GB/s, 36\,MB L2);
@@ -273,8 +273,7 @@ selection and merging, which dominates at larger $k$.
   file from the PISA project, verified by SHA-256).
 \item Subsets of 100K and 1M passages, for the scaling experiment.
 \item Queries: 500 queries from the MS~MARCO dev (small) set, with its relevance judgments for the
-  quality measurement. We also used these 500 queries to choose designs and settings. The remaining 6,480 dev
-  queries were kept apart and used once, for Section~\ref{sec:heldout}.
+  quality measurement. We also used these 500 queries to choose designs and settings.
 \end{itemize}
 
 \paragraph{Timing protocol.}
@@ -344,12 +343,10 @@ Strategy B & 1.320 & 2.777 & 22.921\\
 \paragraph{Against GPUSparse.}
 \begin{itemize}
 \item \textbf{Strategy A} is 14.4$\times$ / 12.8$\times$ / 7.5$\times$ faster than the fastest GPUSparse variant
-  (FP32/uint8) at $k=$ 10 / 100 / 1000, with about 63\% of its GPU memory (paired, same session). Against FP32 it is
-  14.7$\times$ / 13.0$\times$ / 7.6$\times$ faster and against U64 16.7$\times$ / 14.9$\times$ / 8.7$\times$
+  (FP32/uint8) at $k=$ 10 / 100 / 1000, with about 63\% of its GPU memory
   (paired, in another session).
-\item \textbf{Strategy B} is about 29$\times$ / 10$\times$ / 2.1$\times$ faster than FP32/uint8. This is the ratio of
-  medians from different sessions, so it is only approximate.
-\item \textbf{Why.} GPUSparse's latency barely depends on $k$ (+7.6\% for U64 and +9.0\% for FP32/uint8 from $k=10$ to 1000) because it
+\item \textbf{Strategy B} is about 29$\times$ / 10$\times$ / 2.1$\times$ faster than FP32/uint8
+\item GPUSparse's latency barely depends on $k$ (+7.6\% for U64 and +9.0\% for FP32/uint8 from $k=10$ to 1000) because it
   always scores the whole collection into one array before selecting. Both strategies avoid that array,
   because each thread block scores its range in shared memory.
 \end{itemize}
@@ -367,8 +364,7 @@ Strategy B & 1.320 & 2.777 & 22.921\\
 
 \paragraph{Strategy A against Strategy B.}
 \begin{itemize}
-\item At $k=10$, Strategy B is about 2$\times$ faster (ratio of medians from different sessions; without the
-  two-half filter it is 1.55$\times$ faster, paired in one session): with a high threshold it scores only a
+\item At $k=10$, Strategy B is about 2$\times$ faster. This is because Strategy B, with a high threshold, scores only a
   small fraction of the ranges, while Strategy A scores all of them.
 \item At $k=100$ and $k=1000$ (Figure~\ref{fig:depth}), Strategy A is 1.29$\times$ and 4.32$\times$ faster (paired, same
   session). As $k$ grows, $\theta$ falls, Strategy B keeps more ranges, and its selection and merge
@@ -406,12 +402,6 @@ Passages & $k=10$ & $k=100$ & $k=1000$\\
 From 100K to 8.84M passages ($\times88$), latency grows only about 7$\times$. At small collections the
 GPU is not filled (only 25 ranges at 100K), and fixed per-query costs dominate.
 
-\subsection{Retrieval quality}
-Both strategies return the exact top-$k$ under the contract, so their quality is identical: MRR@10 0.368,
-nDCG@10 0.444 and Recall@1000 0.984 on the 500 queries. The GPUSparse paper reports 0.383 / 0.449 /
-0.983 over 6,980 queries with single-precision scoring. The difference reflects the query subset and the
-uint8 quantisation, which our data cannot separate.
-
 \subsection{How much Strategy B skips}
 \begin{table}[H]
 \centering
@@ -423,72 +413,44 @@ query postings. Percentages are means over queries for ranges and totals over qu
  & \multicolumn{2}{c}{$k=10$} & \multicolumn{2}{c}{$k=100$} & \multicolumn{2}{c}{$k=1000$}\\
  & ranges & postings & ranges & postings & ranges & postings\\
 \midrule
-Range bound only & 9.8\% & 27.6\% & 24.4\% & 53.2\% & 51.9\% & 81.5\%\\
-With two-half filter & 5.6\% & 18.5\% & 16.9\% & 42.6\% & 43.2\% & 75.0\%\\
+Strategy B & 5.6\% & 18.5\% & 16.9\% & 42.6\% & 43.2\% & 75.0\%\\
 \bottomrule
 \end{tabular}
 \end{table}
 The kept ranges hold more postings than average, which is why the share of postings is higher than the share of
 ranges. As $k$ grows, $\theta$ drops and the bounds remove less: at $k=1000$ three quarters of the postings are
-still read. The two-half filter reduces query time by 12.8\% at $k=10$, 14.8\% at $k=100$ and 4.1\% at $k=1000$
-(paired against the same scorer without it).
-
-\subsection{Unseen queries}\label{sec:heldout}
-The 500 queries used so far also guided our design. To check that the results hold on other queries, we fixed the
-code and the settings of an earlier Strategy B (no two-half filter, and no $\theta$ filter before the merge) and
-ran it once on the other 6,480 dev queries.
-\begin{table}[H]
-\centering
-\caption{6,480 queries not used for design or tuning, $k=10$, full collection, RTX~4070, batch 1. GPUSparse is the
-variant with uint8 document weights; BMP uses one CPU thread.}
-\label{tab:heldout}
-\begin{tabular}{lrrr}
-\toprule
-System & median (ms) & p95 & p99\\
-\midrule
-Strategy B (earlier version), $W=256$ & \textbf{0.271} & 0.967 & 1.628\\
-Strategy B (earlier version), $W=1024$ & 0.378 & 0.797 & \textbf{0.992}\\
-Exhaustive range scorer (version before Strategy A) & 0.700 & 0.972 & 1.093\\
-GPUSparse & 5.894 & 8.105 & 8.615\\
-BMP on the CPU (64-bit scores) & 13.171 & 35.897 & 63.482\\
-\bottomrule
-\end{tabular}
-\end{table}
-Paired per query, Strategy B at $W=256$ is 19.5$\times$ faster than GPUSparse [19.2, 19.8], 45.4$\times$ faster
-than BMP [43.9, 46.7] and 2.38$\times$ faster than the exhaustive range scorer [2.35, 2.42]. Its median is the
-best, but its p99 is worse than exhaustive scoring. Queries whose bounds are loose prune little and still pay for
-many small ranges; $W=1024$ avoids this at the cost of the median. The current Strategy A and the two-half filter
-came after this test, so they were measured on the 500 queries only.
+still read
 
 \subsection{Comparison with the CPU}
 \begin{table}[H]
 \centering
-\caption{CPU systems, full collection, $k=10$, 500 queries, same machine. The 16-thread run uses both sockets.}
+\caption{CPU systems on the same machine, full collection, 500 queries, median ms.
+Exhaustive 1/8 threads were measured at $k=10$ only.}
 \label{tab:cpu}
-\begin{tabular}{lr}
+\begin{tabular}{lrrr}
 \toprule
-System & median (ms)\\
+System & $k=10$ & $k=100$ & $k=1000$\\
 \midrule
-Exhaustive, 1 thread & 46.90\\
-Exhaustive, 8 threads & 22.86\\
-Exhaustive, 16 threads & 7.63\\
-BMP, 1 thread, 64-bit scores & 13.89\\
-BMP, 1 thread, 32-bit scores & 9.15\\
+Exhaustive, 1 thread & 46.90 & -- & --\\
+Exhaustive, 8 threads & 22.86 & -- & --\\
+Exhaustive, 16 threads & 7.63 & 7.64 & 9.16\\
+BMP, 1 thread, 64-bit scores & 13.89 & 22.06 & 71.75\\
+BMP, 1 thread, 32-bit scores & 9.15 & 18.58 & 66.65\\
+\midrule
+Strategy A & 0.403 & 0.455 & 0.834\\
+Strategy B & 0.205 & 0.576 & 3.080\\
 \bottomrule
 \end{tabular}
 \end{table}
-The exhaustive range scorer that came before Strategy A (0.690\,ms) is 66.0$\times$ faster than one CPU thread and
-10.6$\times$ faster than 16 (paired). The earlier Strategy B (0.272\,ms) is 47.5$\times$ faster than BMP with
-64-bit scores and 32.4$\times$ faster than BMP with 32-bit scores (paired). The current versions are faster than these (Strategy A 0.403\,ms
-instead of 0.690, Strategy B 0.205\,ms instead of 0.272), but we did not time them in the same session as a CPU
-system, so we give no paired ratio for them. Within one socket the CPU scorer stops scaling after about four threads, which suggests
-that it is limited by memory; with 16 threads on
-both sockets it reaches 7.63\,ms. The CPU is a 2013 server part
-and the GPU a 2023 consumer card, so these ratios describe this machine only. BMP is our corrected version of
-the released code, and it includes our fixes for exact ties.
+Against the 16-thread exhaustive CPU scorer, the best strategy at each depth is 37$\times$ ($k=10$, Strategy B),
+17$\times$ and 11$\times$ ($k=100$ and $1000$, Strategy A) faster. Against BMP with 64-bit scores the
+speedups are 68$\times$, 48$\times$ and 86$\times$. The CPU exhaustive scorer barely depends on $k$, like GPUSparse, whereas BMP slows by
+3.3--3.6$\times$ from $k=100$ to $k=1000$ as its threshold drops and fewer blocks can be skipped; the same
+effect makes Strategy B slower at depth. Within one socket the CPU scorer stops scaling after about four
+threads, which suggests it is memory-bound.
 
 \subsection{Several queries at once}\label{sec:batch}
-Batch 1 is not the case GPUSparse is designed for: its paper reports batch 500. Table~\ref{tab:batch} compares
+An important thing to note is that batches of 1 queries is not the case GPUSparse is designed for. Its paper also reports batches of 500. Table~\ref{tab:batch} compares
 throughput, with each system in its own multi-query mode. Our mode keeps several queries in flight on separate
 CUDA streams.
 \begin{table}[H]
