@@ -23,7 +23,7 @@ Two Strategies over a Range-Partitioned Bit-Packed Index}
 
 % =====================================================================
 \begin{abstract}
-Learned sparse retrieval models such as SPLADE represent queries and documents as sparse vectors over a vocabulary, and a top-k retrieval returns $k$ documents with the highest dot product with the query. Doing this \emph{exactly} over millions of documents is the first stage of modern search and question-answering pipelines, and its latency bounds the whole system. The problem is usully considered a poor fit for a naive GPU implementation with posting lists being irregular, the number of candidate documents being huge, and the final top-$k$ selection itself being expensive. We introduce a range-partitioned, bit-packed inverted index in which every GPU thread block scores one contiguous range of documents entirely in shared memory. On this base, we build two complementary strategies:
+Learned sparse retrieval models such as SPLADE represent queries and documents as sparse vectors over a vocabulary, and a top-k retrieval returns $k$ documents with the highest dot product with the query. Doing this \emph{exactly} over millions of documents is the first stage of modern search and question-answering pipelines, and its latency bounds the whole system. The problem is usually considered a poor fit for a naive GPU implementation with posting lists being irregular, the number of candidate documents being huge, and the final top-$k$ selection itself being expensive. We introduce a range-partitioned, bit-packed inverted index in which every GPU thread block scores one contiguous range of documents entirely in shared memory. On this base, we build two complementary strategies:
 \begin{itemize}
 \item \textbf{Strategy A} scores every range and selects the top $k$ with radix-based algorithms, so
   its cost barely grows with $k$;
@@ -31,7 +31,9 @@ Learned sparse retrieval models such as SPLADE represent queries and documents a
 \end{itemize}
 On the full 8.8M-passage MS~MARCO collection on an RTX~4070, both return exact results. Strategy B is fastest at $k=10$ (0.205\,ms per query), and Strategy A is fastest at $k=100$ and
 $k=1000$ (0.455 and 0.834\,ms). Against a same-hardware adaptation of the recent GPUSparse system,
-the best strategy at each depth is 8.7--34$\times$ faster.
+the best strategy at each depth is 7.5--29$\times$ faster. On 6,480 queries that played no part in the
+design, an earlier version of Strategy B is 19.5$\times$ faster than GPUSparse and 45.4$\times$ faster than the
+CPU engine BMP at $k=10$.
 \end{abstract}
 
 % =====================================================================
@@ -229,7 +231,7 @@ selection and merging, which dominates at larger $k$.
 % =====================================================================
 \section{Experimental Setup}
 
-\paragraph{Machine.} All experiments ran on \texttt{cuda5.cims.nyu.edu}:
+\paragraph{Machine.} All reported experiments ran on one machine:
 \begin{itemize}
 \item GPU: one NVIDIA GeForce RTX~4070 (Ada Lovelace, compute capability 8.9, 46 SMs, 12\,GB GDDR6X,
   504\,GB/s, 36\,MB L2);
@@ -240,7 +242,7 @@ selection and merging, which dominates at larger $k$.
 
 \paragraph{Software.}
 \begin{itemize}
-\item CUDA 12.6 (\texttt{nvcc -O3 -arch=sm\_89}), g++ with C++17 \todo{g++ version}, Nsight Systems and
+\item CUDA 12.6 (\texttt{nvcc -O3 -arch=sm\_89}), g++ 11.5 with C++17, Nsight Systems and
   Nsight Compute for profiling;
 \item the GPUSparse baseline: Python 3.12.7, PyTorch 2.6.0 (CUDA 12.6) and Triton 3.2.0.
 \end{itemize}
@@ -252,7 +254,8 @@ selection and merging, which dominates at larger $k$.
   file from the PISA project, verified by SHA-256).
 \item Subsets of 100K and 1M passages, for the scaling experiment.
 \item Queries: 500 queries from the MS~MARCO dev (small) set, with its relevance judgments for the
-  quality measurement.
+  quality measurement. We also used these 500 queries to choose designs and settings. The remaining 6,480 dev
+  queries were kept apart and used once, for Section~\ref{sec:heldout}.
 \end{itemize}
 
 \paragraph{Timing protocol.}
@@ -260,18 +263,21 @@ selection and merging, which dominates at larger $k$.
 \item Batch size 1. The timed region runs from building the query on the host to receiving the ordered
   top-$k$ back on the host. Index building, loading and upload are excluded.
 \item Each configuration runs as 3 separate processes, each with 3 warm-up and 20 measured rounds over
-  all queries. We report the median over the per-query, per-process medians.
+  all queries (10 rounds in the session that timed Strategy B at $k=100$ and $k=1000$). We report the median over the per-query, per-process medians.
 \item Systems compared within one session are paired by (process, query), with the order rotated between
   processes. Ratios are geometric means with 95\% bootstrap intervals (10,000 draws).
-\item Decision rules were fixed before timing. The GPU was checked to be idle before every process, and
-  any process that overlapped another user's job was discarded and rerun.
+\item Decision rules were fixed before timing. The GPU had to have no active process of another user
+  before every process, and a process that overlapped another user's GPU activity was discarded and rerun.
+  Idle processes of other users were allowed to stay resident.
 \item Every timed output was checked against the CPU reference: all results reported are exact.
 \end{itemize}
 
 \paragraph{Baselines.}
 \begin{itemize}
 \item \textbf{GPUSparse} \cite{gpusparse}: the released code, adapted to the exactness contract above,
-  in two variants: exact 64-bit integer scoring (U64) and guarded single-precision scoring (FP32).
+  in three variants: exact 64-bit integer scoring (U64), guarded single-precision scoring (FP32), and FP32 scoring
+  with document weights stored as uint8 (FP32/uint8), which is the fastest. Above $k=128$ we only raised the
+  adapter's limit on $k$.
 \item \textbf{CPU:} an exact exhaustive scorer (single- and multi-threaded) and BMP \cite{bmp}.
 \end{itemize}
 
@@ -282,7 +288,9 @@ selection and merging, which dominates at larger $k$.
 \begin{table}[h]
 \centering
 \caption{Median per-query latency (ms) and peak GPU memory, full collection (8.84M passages),
-RTX~4070, batch 1, 500 queries. All results are exact. Best per column in bold.}
+RTX~4070, batch 1, 500 queries. All results are exact. Best per column in bold. The rows come from several
+sessions: GPUSparse U64/FP32 and Strategy A share one, FP32/uint8 has its own, and Strategy B has one for
+$k=10$ and one for $k=100$ and $k=1000$.}
 \label{tab:main}
 \begin{tabular}{lrrrr}
 \toprule
@@ -290,20 +298,37 @@ System & $k=10$ & $k=100$ & $k=1000$ & GPU memory\\
 \midrule
 GPUSparse, U64 & 6.903 & 6.950 & 7.425 & 8.4\,GB\\
 GPUSparse, FP32 & 6.021 & 6.077 & 6.534 & 8.3\,GB\\
+GPUSparse, FP32/uint8 & 5.884 & 5.950 & 6.414 & 5.3\,GB\\
 \midrule
-Strategy A & 0.403 & \textbf{0.455} & \textbf{0.834} & 3.3\,GB\\
-Strategy B & \textbf{0.205} & 0.576 & 3.080 & 5.1\,GB\\
+Strategy A & 0.403 & \textbf{0.455} & \textbf{0.834} & 3.3--3.4\,GB\\
+Strategy B & \textbf{0.205} & 0.576 & 3.080 & 5.1--5.9\,GB\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{The slowest queries: p99 latency (ms) of the systems in Table~\ref{tab:main}.}
+\label{tab:tail}
+\begin{tabular}{lrrr}
+\toprule
+System & $k=10$ & $k=100$ & $k=1000$\\
+\midrule
+GPUSparse, FP32/uint8 & 8.571 & 8.636 & 9.115\\
+Strategy A & \textbf{0.648} & \textbf{0.718} & \textbf{1.416}\\
+Strategy B & 1.320 & 2.777 & 22.921\\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \paragraph{Against GPUSparse.}
 \begin{itemize}
-\item \textbf{Strategy A} is 16.7$\times$ / 14.9$\times$ / 8.7$\times$ faster than GPUSparse U64 at
-  $k=$ 10 / 100 / 1000 (paired, same session), and 14.7$\times$ / 13.0$\times$ / 7.6$\times$ faster than
-  FP32, using 40\% of its GPU memory.
-\item \textbf{Strategy B} is about 34$\times$ / 12$\times$ / 2.4$\times$ faster than GPUSparse U64
-  (ratio of medians).
+\item \textbf{Strategy A} is 14.4$\times$ / 12.8$\times$ / 7.5$\times$ faster than the fastest GPUSparse variant
+  (FP32/uint8) at $k=$ 10 / 100 / 1000, with about 63\% of its GPU memory (paired, same session). Against FP32 it is
+  14.7$\times$ / 13.0$\times$ / 7.6$\times$ faster and against U64 16.7$\times$ / 14.9$\times$ / 8.7$\times$
+  (paired, in another session).
+\item \textbf{Strategy B} is about 29$\times$ / 10$\times$ / 2.1$\times$ faster than FP32/uint8. This is the ratio of
+  medians from different sessions, so it is only approximate.
 \item \textbf{Why.} GPUSparse's latency barely depends on $k$ (+7.6\% from $k=10$ to 1000) because it
   always scores the whole collection into one array before selecting. Both strategies avoid that array,
   because each thread block scores its range in shared memory.
@@ -311,12 +336,15 @@ Strategy B & \textbf{0.205} & 0.576 & 3.080 & 5.1\,GB\\
 
 \paragraph{Strategy A against Strategy B.}
 \begin{itemize}
-\item At $k=10$, Strategy B is about 2$\times$ faster: with a high threshold it scores only a small
-  fraction of the ranges, while Strategy A scores all of them.
+\item At $k=10$, Strategy B is about 2$\times$ faster (ratio of medians from different sessions; without the
+  two-half filter it is 1.55$\times$ faster, paired in one session): with a high threshold it scores only a
+  small fraction of the ranges, while Strategy A scores all of them.
 \item At $k=100$ and $k=1000$, Strategy A is 1.29$\times$ and 4.32$\times$ faster (paired, same
   session). As $k$ grows, $\theta$ falls, Strategy B keeps more ranges, and its selection and merge
   grow with $k$. Strategy A's grow very little: from $k=10$ to $k=1000$ its latency only doubles, while
   Strategy B's grows 15$\times$.
+\item Strategy A also has the shorter tail at every depth (Table~\ref{tab:tail}). Strategy B's slowest queries are
+  those whose bounds prune little.
 \end{itemize}
 
 \subsection{Where Strategy A spends its time}
@@ -458,9 +486,9 @@ Strategy B gains 1.41$\times$ from 32 queries in flight, and the median query th
 \begin{itemize}
 \item \textbf{A range-partitioned, bit-packed index makes exact LSR fast on a consumer GPU.} Scoring each
   range in shared memory removes the collection-sized score array. The best strategy at each depth is
-  8.7--34$\times$ faster than a same-hardware GPUSparse adaptation.
+  7.5--29$\times$ faster than the fastest GPUSparse variant we measured on the same GPU.
 \item \textbf{The two strategies are complementary.} Bound-based pruning with a two-half filter is fastest
-  at small $k$ (0.205\,ms at $k=10$). Exhaustive scoring with radix-based selection and merge is fastest
+  at small $k$ (0.205\,ms at $k=10$), with a heavier tail. Exhaustive scoring with radix-based selection and merge is fastest
   at larger $k$ (0.455\,ms at $k=100$, 0.834\,ms at $k=1000$), because its cost barely grows with $k$.
 \item \textbf{The workload is latency-bound, not bandwidth-bound.} Independent decoding, overlapped
   memory loads and parallel radix selection mattered more than compression or memory traffic.
@@ -487,11 +515,11 @@ evaluation using a two-level retrieval process,'' in \emph{Proc.\ CIKM}, 2003.
 \bibitem{bmp} A.~Mallia, T.~Suel and N.~Tonellotto, ``Faster learned sparse retrieval with block-max
 pruning,'' in \emph{Proc.\ SIGIR}, 2024.
 \bibitem{gaiosowand} R.~Gaioso, V.~Gil-Costa, H.~Guardia and H.~Senger, ``A parallel implementation of
-WAND on GPUs,'' in \emph{Proc.\ Euromicro PDP}, 2018. \todo{verify}
+WAND on GPUs,'' in \emph{Proc.\ Euromicro PDP}, pp.~10--17, 2018.
 \bibitem{huangbmw} H.~Huang, M.~Ren, Y.~Zhao, R.~J.~Stones, R.~Zhang, G.~Wang and X.~Liu,
 ``GPU-Accelerated Block-Max Query Processing,'' in \emph{Proc.\ ICA3PP}, LNCS, vol.~10393,
 pp.~225--238, Springer, 2017.
-\bibitem{gpusparse} \todo{authors}, ``GPUSparse: Fast and exact learned sparse retrieval on a GPU-resident
+\bibitem{gpusparse} A.~Sharma, ``GPUSparse: Fast and exact learned sparse retrieval on a GPU-resident
 inverted index,'' arXiv:2606.26441, 2026.
 \bibitem{mergespmv} D.~Merrill and M.~Garland, ``Merge-based parallel sparse matrix-vector
 multiplication,'' in \emph{Proc.\ SC}, 2016.
