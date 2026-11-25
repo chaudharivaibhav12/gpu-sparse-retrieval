@@ -39,9 +39,7 @@ Learned sparse retrieval models like SPLADE represent queries and documents as s
 \end{itemize}
 On the full 8.8M-passage MS~MARCO collection on an RTX~4070, both return exact results. Strategy B is fastest at $k=10$ (0.205\,ms per query), and Strategy A is fastest at $k=100$ and
 $k=1000$ (0.455 and 0.834\,ms). Against a same-hardware adaptation of the recent GPUSparse system,
-the best strategy at each depth is 7.5--29$\times$ faster. On 6,480 queries that played no part in the
-design, an earlier version of Strategy B is 19.5$\times$ faster than GPUSparse and 45.4$\times$ faster than the
-CPU engine BMP at $k=10$.
+the best strategy at each depth is 7.5--29$\times$ faster.
 \end{abstract}
 
 % =====================================================================
@@ -272,8 +270,7 @@ selection and merging, which dominates at larger $k$.
   CoCondenser-EnsembleDistil, impacts quantised to uint8 and documents in graph-bisection order (CIFF
   file from the PISA project, verified by SHA-256).
 \item Subsets of 100K and 1M passages, for the scaling experiment.
-\item Queries: 500 queries from the MS~MARCO dev (small) set, with its relevance judgments for the
-  quality measurement. We also used these 500 queries to choose designs and settings.
+\item Queries: 500 queries from the MS~MARCO dev (small) set. We also used these 500 queries to choose designs and settings.
 \end{itemize}
 
 \paragraph{Timing protocol.}
@@ -343,8 +340,7 @@ Strategy B & 1.320 & 2.777 & 22.921\\
 \paragraph{Against GPUSparse.}
 \begin{itemize}
 \item \textbf{Strategy A} is 14.4$\times$ / 12.8$\times$ / 7.5$\times$ faster than the fastest GPUSparse variant
-  (FP32/uint8) at $k=$ 10 / 100 / 1000, with about 63\% of its GPU memory
-  (paired, in another session).
+  (FP32/uint8) at $k=$ 10 / 100 / 1000, with about 63\% of its GPU memory.
 \item \textbf{Strategy B} is about 29$\times$ / 10$\times$ / 2.1$\times$ faster than FP32/uint8
 \item GPUSparse's latency barely depends on $k$ (+7.6\% for U64 and +9.0\% for FP32/uint8 from $k=10$ to 1000) because it
   always scores the whole collection into one array before selecting. Both strategies avoid that array,
@@ -459,7 +455,7 @@ CUDA streams.
 \label{tab:batch}
 \begin{tabular}{llrr}
 \toprule
-System & $k$ & in flight / batch & queries/s\\
+System & $k$ & queries at once & queries/s\\
 \midrule
 Strategy A & 1000 & 32 & \textbf{1,606}\\
 GPUSparse, released batch code & 1000 & 500 & 550\\
