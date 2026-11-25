@@ -1,17 +1,5 @@
-// main.cu - the pruned scorer's driver: loads a range index (RBP, positions encoding) and prepared
-// queries, builds the pruning tables, uploads everything, runs every query at batch 1, writes a
-// TREC run and prints a timing summary.
-//   pruned --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] [--seeds 64] [--two-halves
-//   0|1]
-//   [--warmup N] [--repeat N] [--threads 256] [--gpu 0]
-// Extracted from the host code of src/cuda_range_prune_tm.cu (commit 284db27; unchanged at
-// repository main 8fc44cd); the option parsing, run file and summary follow
-// submission/u4m/src/main.cu. Removed: research_gate / research_runtime.h, VERIFY and the GSP
-// cross-check argument, the refuse-to-overwrite check and the CSV/TSV research outputs. Kept
-// unchanged: the input checks, the score overflow gate, the device data layout, the launch
-// configuration and the timing boundary. Timing boundary (as in the experiments): per query, from
-// packing the query argument on the host, through all kernel launches, to the copy of the top k
-// back to the host and the end event's completion. Pruning statistics are read after it.
+// Driver of the pruned scorer: loads the index and queries, runs each query on the GPU, writes a TREC run, prints timing.
+// Usage: pruned --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] [--seeds 64] [--two-halves 0|1] [--warmup N] [--repeat N] [--threads 256] [--gpu 0]
 #include "common.h"
 #include "range_index.h"
 #include "topk.cuh"
@@ -33,26 +21,29 @@
 #include <vector>
 using namespace std;
 
-struct GpuEvent {
+struct GpuEvent
+{
     cudaEvent_t event{};
-    GpuEvent() {
+    GpuEvent()
+    {
         cuda_checked(cudaEventCreate(&event));
     }
-    ~GpuEvent() {
+    ~GpuEvent()
+    {
         cudaEventDestroy(event);
     }
 };
 
-static const char* USAGE{
+static const char *USAGE{
     "Usage: pruned --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] [--seeds 64] "
     "[--two-halves 0|1] [--warmup N] [--repeat N] [--threads 256] [--gpu 0]"};
 
-// Name printed and written as the run tag.
-static const char* SYSTEM{PRUNE_THETA_FILTER ? "pruned" : "pruned_ts"};
+static const char *SYSTEM{PRUNE_THETA_FILTER ? "pruned" : "pruned_ts"};
 
-static double quantile(vector<double> v,
-                       double q) { // linear interpolation between order statistics
-    if (v.empty()) {
+static double quantile(vector<double> v, double q)
+{
+    if (v.empty())
+    {
         return 0;
     }
     sort(v.begin(), v.end());
@@ -62,8 +53,10 @@ static double quantile(vector<double> v,
     return v[lo] + (v[hi] - v[lo]) * (pos - double(lo));
 }
 
-int main(int argc, char** argv) {
-    try {
+int main(int argc, char **argv)
+{
+    try
+    {
         string index_path;
         string queries_path;
         string out_path;
@@ -74,38 +67,61 @@ int main(int argc, char** argv) {
         uint32_t seed_ranges{64};
         uint32_t halves{0};
         uint32_t gpu{0};
-        const auto parse = [](const string& s) {
+        const auto parse = [](const string &s)
+        {
             size_t used{0};
             require(!s.empty() && s[0] != '-', "Invalid unsigned argument: " + s);
             const unsigned long long n{stoull(s, &used)};
             require(used == s.size() && n <= UINT32_MAX, "Invalid unsigned argument: " + s);
             return uint32_t(n);
         };
-        for (int i{1}; i < argc; ++i) {
+        for (int i{1}; i < argc; ++i)
+        {
             const string a{argv[i]};
             require(i + 1 < argc, "Missing value for " + a);
             const string value{argv[++i]};
-            if (a == "--index") {
+            if (a == "--index")
+            {
                 index_path = value;
-            } else if (a == "--queries") {
+            }
+            else if (a == "--queries")
+            {
                 queries_path = value;
-            } else if (a == "--out") {
+            }
+            else if (a == "--out")
+            {
                 out_path = value;
-            } else if (a == "--k") {
+            }
+            else if (a == "--k")
+            {
                 k = parse(value);
-            } else if (a == "--warmup") {
+            }
+            else if (a == "--warmup")
+            {
                 warmups = parse(value);
-            } else if (a == "--repeat") {
+            }
+            else if (a == "--repeat")
+            {
                 rounds = parse(value);
-            } else if (a == "--threads") {
+            }
+            else if (a == "--threads")
+            {
                 threads = parse(value);
-            } else if (a == "--seeds") {
+            }
+            else if (a == "--seeds")
+            {
                 seed_ranges = parse(value);
-            } else if (a == "--two-halves") {
+            }
+            else if (a == "--two-halves")
+            {
                 halves = parse(value);
-            } else if (a == "--gpu") {
+            }
+            else if (a == "--gpu")
+            {
                 gpu = parse(value);
-            } else {
+            }
+            else
+            {
                 throw runtime_error("Unknown option " + a + "\n" + USAGE);
             }
         }
@@ -138,60 +154,64 @@ int main(int argc, char** argv) {
         require(!two_halves || (W == 2 * HALF_RANGE_WIDTH && multiplicity <= 1),
                 "--two-halves 1 requires W = 256 and unique term/document pairs");
         unordered_set<string> qids;
-        // Bit length of each query's conservative score bound, for select_seeds.
         vector<uint32_t> bound_bits(count, 0);
-        for (uint32_t qi{0}; qi < count; ++qi) {
+        for (uint32_t qi{0}; qi < count; ++qi)
+        {
             require(!queries[qi].id.empty() && qids.insert(queries[qi].id).second, "Bad query ID");
             unordered_set<uint32_t> terms;
             uint64_t weight_sum{0};
-            for (auto p : queries[qi].terms) {
+            for (auto p : queries[qi].terms)
+            {
                 require(p.first < index.vocab && p.second <= 32 && terms.insert(p.first).second,
                         "Bad cap32 query");
                 weight_sum += p.second;
             }
             require(queries[qi].terms.size() <= RBP_MAX_TERMS,
                     "Query has more terms than RBP_MAX_TERMS");
-            // Overflow gate: uint32 shared scores and range bounds must hold every possible sum.
-            // A term repeated within a document contributes once per posting.
+
             require(weight_sum * 255 * multiplicity < uint64_t(UINT32_MAX),
                     "Query score bound does not fit uint32 shared scores");
-            for (uint64_t c{weight_sum * 255 * multiplicity}; c; c >>= 1) {
+            for (uint64_t c{weight_sum * 255 * multiplicity}; c; c >>= 1)
+            {
                 ++bound_bits[qi];
             }
         }
-        // Original-ID order inside each range, so ties need no 64-bit compares.
         vector<uint16_t> tie_rank_host(N);
         vector<uint16_t> rank_slot_host(N);
         {
             vector<uint32_t> order;
-            for (uint32_t range{0}; range < R; ++range) {
+            for (uint32_t range{0}; range < R; ++range)
+            {
                 const uint64_t first{index.range_start[range]};
                 const uint32_t n{index.range_start[range + 1] - index.range_start[range]};
                 order.resize(n);
                 iota(order.begin(), order.end(), 0);
-                sort(order.begin(), order.end(), [&](uint32_t a, uint32_t b) {
-                    return index.ids[first + a] < index.ids[first + b];
-                });
-                for (uint32_t rank{0}; rank < n; ++rank) {
+                sort(order.begin(), order.end(), [&](uint32_t a, uint32_t b)
+                     { return index.ids[first + a] < index.ids[first + b]; });
+                for (uint32_t rank{0}; rank < n; ++rank)
+                {
                     tie_rank_host[first + order[rank]] = uint16_t(rank);
                     rank_slot_host[first + rank] = uint16_t(order[rank]);
                 }
             }
         }
-        // Largest impact of every (term, range) block, and of its two halves: an index-load step.
         vector<uint8_t> block_max_host(index.blocks(), 0);
-        for (size_t b{0}; b < index.blocks(); ++b) {
-            for (uint32_t j{0}; j < index.block_count[b]; ++j) {
+        for (size_t b{0}; b < index.blocks(); ++b)
+        {
+            for (uint32_t j{0}; j < index.block_count[b]; ++j)
+            {
                 block_max_host[b] =
                     max(block_max_host[b], index.impacts[size_t(index.block_value_start[b]) + j]);
             }
         }
         vector<HalfMax> half_max_host(two_halves ? index.blocks() : 0);
-        for (size_t b{0}; b < half_max_host.size(); ++b) {
+        for (size_t b{0}; b < half_max_host.size(); ++b)
+        {
             const uint32_t range{index.lookup_range[b]};
             const uint32_t docs_in_range{index.range_start[range + 1] - index.range_start[range]};
             uint32_t previous{0};
-            for (uint32_t j{0}; j < index.block_count[b]; ++j) {
+            for (uint32_t j{0}; j < index.block_count[b]; ++j)
+            {
                 const uint32_t pos{
                     rbp_extract(index.encoded.data(),
                                 index.block_bit_start[b] + uint64_t(j) * index.block_width[b],
@@ -199,7 +219,7 @@ int main(int argc, char** argv) {
                 require(pos < docs_in_range && (!j || previous < pos),
                         "Invalid or repeated packed position");
                 previous = pos;
-                uint8_t& highest{pos < HALF_RANGE_WIDTH ? half_max_host[b].lower
+                uint8_t &highest{pos < HALF_RANGE_WIDTH ? half_max_host[b].lower
                                                         : half_max_host[b].upper};
                 highest = max(highest, index.impacts[size_t(index.block_value_start[b]) + j]);
             }
@@ -248,7 +268,8 @@ int main(int argc, char** argv) {
         impacts.upload(index.impacts);
         tie_rank.upload(tie_rank_host);
         rank_slot.upload(rank_slot_host);
-        if (R) {
+        if (R)
+        {
             cuda_checked(cudaMemset(mark.ptr, 0, size_t(R) * 4));
         }
         const RbpView view{lookup_first.ptr,
@@ -281,23 +302,27 @@ int main(int argc, char** argv) {
         uint32_t epoch{0};
         GpuEvent begin;
         GpuEvent end;
-        for (uint32_t phase{0}; phase < 2; ++phase) {
-            for (uint32_t round{0}; round < (phase ? rounds : warmups); ++round) {
-                for (uint32_t qi{0}; qi < count; ++qi) {
-                    const Query& q{queries[qi]};
+        for (uint32_t phase{0}; phase < 2; ++phase)
+        {
+            for (uint32_t round{0}; round < (phase ? rounds : warmups); ++round)
+            {
+                for (uint32_t qi{0}; qi < count; ++qi)
+                {
+                    const Query &q{queries[qi]};
                     const uint32_t terms{uint32_t(q.terms.size())};
                     const chrono::steady_clock::time_point wall_begin{chrono::steady_clock::now()};
                     args.terms = terms;
-                    for (uint32_t i{0}; i < terms; ++i) {
+                    for (uint32_t i{0}; i < terms; ++i)
+                    {
                         args.term[i] = {q.terms[i].first, q.terms[i].second};
                     }
                     cuda_checked(cudaEventRecord(begin.event));
-                    if (wanted) {
+                    if (wanted)
+                    {
                         ++epoch;
                         cuda_checked(cudaMemsetAsync(bound.ptr, 0, size_t(R) * 4));
-                        if (terms) {
-                            // About four thread blocks per SM in total, split across the query's
-                            // terms.
+                        if (terms)
+                        {
                             const uint32_t chunks{max(
                                 1u, (4u * uint32_t(properties.multiProcessorCount) + terms - 1) /
                                         terms)};
@@ -306,15 +331,19 @@ int main(int argc, char** argv) {
                         }
                         select_seeds_launch(bound.ptr, R, seed_ranges, bound_bits[qi], epoch,
                                             mark.ptr, work.ptr, state.ptr);
-                        if (seeds) {
+                        if (seeds)
+                        {
                             score_ranges_launch(seed_grid, threads, shared_bytes, view, args, k,
                                                 list_cap, 0, state.ptr, work.ptr, candidates.ptr,
                                                 heads.ptr, scratch.ptr, merged.ptr);
                         }
-                        if (two_halves) {
+                        if (two_halves)
+                        {
                             compact_kept_two_halves_launch(view, args, half_max.ptr, bound.ptr,
                                                            mark.ptr, epoch, work.ptr, state.ptr);
-                        } else {
+                        }
+                        else
+                        {
                             compact_kept_launch(bound.ptr, mark.ptr, epoch, R, work.ptr, state.ptr);
                         }
                         score_ranges_launch(grid, threads, shared_bytes, view, args, k, list_cap, 1,
@@ -322,7 +351,8 @@ int main(int argc, char** argv) {
                                             scratch.ptr, merged.ptr);
                     }
                     cuda_checked(cudaEventRecord(end.event));
-                    if (wanted) {
+                    if (wanted)
+                    {
                         cuda_checked(cudaMemcpy(winners.data(), merged.ptr,
                                                 size_t(wanted) * sizeof(GpuCandidate),
                                                 cudaMemcpyDeviceToHost));
@@ -331,22 +361,24 @@ int main(int argc, char** argv) {
                     const double wall_ms{
                         chrono::duration<double, milli>(chrono::steady_clock::now() - wall_begin)
                             .count()};
-                    // Pruning statistics are read after the timed region.
                     stats = PruneState{};
-                    if (wanted) {
+                    if (wanted)
+                    {
                         cuda_checked(cudaMemcpy(&stats, state.ptr, sizeof(PruneState),
                                                 cudaMemcpyDeviceToHost));
                     }
                     float gpu_ms{0};
                     cuda_checked(cudaEventElapsedTime(&gpu_ms, begin.event, end.event));
-                    for (uint32_t rank{0}; rank < wanted; ++rank) {
+                    for (uint32_t rank{0}; rank < wanted; ++rank)
+                    {
                         const GpuCandidate c{winners[rank]};
                         require(c.valid && c.doc < N && c.id == index.ids[c.doc],
                                 "Invalid returned candidate");
                         require(!rank || candidate_better(winners[rank - 1], c),
                                 "Returned candidates are not in canonical order");
                     }
-                    if (phase) {
+                    if (phase)
+                    {
                         wall[qi].push_back(wall_ms);
                         span[qi].push_back(gpu_ms);
                         results[qi] = winners;
@@ -356,25 +388,29 @@ int main(int argc, char** argv) {
                 }
             }
         }
-        if (!out_path.empty()) {
+        if (!out_path.empty())
+        {
             ofstream out{out_path};
             require(bool(out), "Cannot create run file " + out_path);
-            for (uint32_t qi{0}; qi < count; ++qi) {
-                for (uint32_t rank{0}; rank < results[qi].size(); ++rank) {
+            for (uint32_t qi{0}; qi < count; ++qi)
+            {
+                for (uint32_t rank{0}; rank < results[qi].size(); ++rank)
+                {
                     out << queries[qi].id << " Q0 " << results[qi][rank].id << ' ' << rank + 1
                         << ' ' << results[qi][rank].score << ' ' << SYSTEM << '\n';
                 }
             }
             require(bool(out), "Run file write failed");
         }
-        // Per query: median over the measured rounds; then the distribution over queries.
         vector<double> per_query;
         vector<double> per_query_span;
         double total_ms{0};
-        for (uint32_t qi{0}; qi < count; ++qi) {
+        for (uint32_t qi{0}; qi < count; ++qi)
+        {
             per_query.push_back(quantile(wall[qi], 0.5));
             per_query_span.push_back(quantile(span[qi], 0.5));
-            for (double w : wall[qi]) {
+            for (double w : wall[qi])
+            {
                 total_ms += w;
             }
         }
@@ -395,11 +431,14 @@ int main(int argc, char** argv) {
              << (count ? double(scored_postings) / runs : 0.0) << '\n';
         cout << "QPS: " << (total_ms > 0 ? double(count) * rounds / (total_ms / 1000.0) : 0.0)
              << " (batch 1, measured rounds)\n";
-        if (!out_path.empty()) {
+        if (!out_path.empty())
+        {
             cout << "run file: " << out_path << '\n';
         }
         return 0;
-    } catch (const exception& e) {
+    }
+    catch (const exception &e)
+    {
         cerr << "ERROR: " << e.what() << '\n';
         return 1;
     }

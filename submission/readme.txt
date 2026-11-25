@@ -14,9 +14,8 @@ Components
   pruned/   pruned range scorer (src/cuda_range_prune_tm.cu with the optional two-half filter, W=256) and the scorer of
             the frozen 6,480-query evaluation (src/cuda_range_prune_ts.cu). Needs u4m/ next to it.
             owner: Parva (two-half filter: Vaibhav)      see pruned/readme.txt
-  baselines/  cpu/: multi-threaded exact CPU scorer (builds with make). The GPUSparse and BMP code is linked from its
-            readme: it needs software that is not on CIMS.   owner: Parva     see baselines/readme.txt
-  report/: the course report (LaTeX)
+  baselines/  cpu/: multi-threaded exact CPU scorer (builds with make). GPUSparse and BMP are other authors' systems; our
+            adapted versions are linked from its readme.   owner: Parva     see baselines/readme.txt
 
 Which scorer to use: pruned/ (two-half filter) is our fastest at k = 10, u4m/ at k = 100 and k = 1000.
 
