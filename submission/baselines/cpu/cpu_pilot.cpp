@@ -1,3 +1,5 @@
+// Input reading and exact reference scoring (GSP index, queries, ranking); cpu_exhaustive.cpp includes this file.
+// Not built or run directly here: "make" in baselines/cpu compiles it as part of cpu_exhaustive.
 #include <algorithm>
 #include <cmath>
 #include <cstdint>

@@ -14,20 +14,16 @@ No dropped passage can reach the k-th score; scores equal to theta are kept, so 
 passage ID first) are exact too.
 
 Two programs are built from the same source:
-  bin/pruned      src/cuda_range_prune_tm.cu (commit 284db27): all five steps. HALVES=1 adds the two-half filter.
-  bin/pruned_ts   src/cuda_range_prune_ts.cu (as at commit 61c8a00): without the theta filter in step 5. This is the
-                  scorer of the frozen evaluation on the 6,480 queries that were not used for tuning.
-
-AUTHORS
-Pruned scorers (cuda_range_prune*.cu): Parva Patel. Two-half filter: Vaibhav Chaudhari. Range index and the
-exhaustive range scorer it builds on: Arnav Gupta. The theta-filtered merge follows an idea of Arnav's.
+  bin/pruned      all five steps. HALVES=1 adds the two-half filter.
+  bin/pruned_ts   the same without the theta filter in step 5. This is the scorer of the frozen evaluation on the
+                  6,480 queries that were not used for tuning.
 
 REQUIREMENTS
 As u4m/readme.txt (CUDA 12.6 nvcc, g++ C++17, GNU make, Python 3 standard library). In addition:
 - The u4m folder next to this one: the inputs, the index builder and the CPU reference are shared with it.
 - An NVIDIA GPU with __match_any_sync (Volta or newer). Default: sm_89 (RTX 4070, CIMS cuda5).
 - Disk: 4.7 GB more for the W=256 index of the full collection.
-- GPU memory, full collection, W=256 (team measurements on cuda5): 4.8 GB at k=10 and 5.6 GB at k=1000;
+- GPU memory, full collection, W=256 (measured on cuda5): 4.8 GB at k=10 and 5.6 GB at k=1000;
   the two-half filter adds 0.27 GB.
 
 FROM SCRATCH (full collection, 8,841,823 passages, 500 calibration queries, k = 10)
@@ -48,39 +44,29 @@ DIRECT USE
 Defaults: 64 seeds, two-halves 0, 3 warm-up rounds, 20 measured rounds, 256 threads per block, GPU 0.
 --seeds 0 scores every range (no pruning). bin/pruned_ts was evaluated without the two-half filter.
 
-OUTPUT (shape)
+SAMPLE OUTPUT
+Full collection, k=10, two-half filter on, RTX 4070 (one round without warm-up, so not a timing from the report):
     pruned: documents=8841823 queries=500 k=10 W=256 ranges=34539 threads=256 seeds=64 two-halves=1
     GPU: NVIDIA GeForce RTX 4070 (CC 8.9)
-    index load: ... s (read, checks, host preparation, upload)
-    rounds: 3 warm-up + 20 measured
-    per-query latency (ms, median over rounds): median ...  p95 ...  p99 ...
-    kernel span (ms, CUDA events, median): ...
-    ranges scored per query: mean ... of 34539  postings scored per query: mean ...
-    QPS: ... (batch 1, measured rounds)
-The run file has one line per result: "qid Q0 docid rank score pruned" (or pruned_ts).
+    index load: 91.3537 s (read, checks, host preparation, upload)
+    rounds: 0 warm-up + 1 measured
+    per-query latency (ms, median over rounds): median 0.209178  p95 0.651719  p99 1.38722
+    kernel span (ms, CUDA events, median): 0.195952
+    ranges scored per query: mean 1925.68 of 34539  postings scored per query: mean 2.91273e+06
+    QPS: 3617.55 (batch 1, measured rounds)
+    run file: runs/pruned-8841823-k10-h1.trec
+The run file has one line per result: "qid Q0 docid rank score pruned" (or pruned_ts). "make verify" then compares it
+with the exact CPU reference and prints "500/500 queries identical".
 
 HOW TIME IS MEASURED
-As in u4m and the team's experiments, per query on the host's steady clock: from packing the query argument,
+As in u4m, per query on the host's steady clock: from packing the query argument,
 through all kernel launches, to the copy of the top k back to the host and the completion of the end event.
 Index loading, the block-maximum tables and reading the pruning statistics are outside. The reported latency is
 the median over the measured rounds, then median / p95 / p99 over the queries.
-
-FULL EXPERIMENTS (in the repository; RTX 4070, full collection)
-    experiments/2026-11-18-range-pruning, -prune-term-bounds, -prune-seed-select    development
-    experiments/2026-11-19-prune-depth-adaptive            theta filter; k = 10, 100, 1000
-    experiments/2026-11-21-w256-two-half-filter            two-half filter, k = 10
-    experiments/2026-11-24-two-half-depth                  two-half filter, k = 100, 1000, against u4m
-    results/2026-11-18-matched-final-evaluation            frozen 6,480-query evaluation
-
-SAMPLE OUTPUT
-sample_output/ has the k=10 summary of one answer check on cuda5 (full collection, 500 queries, one round, no warm-up;
-every row equal to the CPU reference). One unwarmed round: not the timings of the report, which come from the
-repeated runs listed above. --warmup 0 --repeat 1 was used.
 
 FILES
     Makefile, readme.txt
     src/prune_kernel.cuh   types, limits, launch functions
     src/prune_kernel.cu    the kernels and their launch functions
     src/main.cu            the driver
-    sample_output/         see above
     ../u4m/src             shared: common, range_index, topk.cuh, prepare, build_index, cpu_reference

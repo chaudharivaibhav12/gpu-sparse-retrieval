@@ -5,15 +5,9 @@ cpu/  Exact exhaustive CPU scorer, single- or multi-threaded. Runs on CIMS with 
     bin/cpu_exhaustive INDEX.gsp QUERIES.tsv OUT.csv OUT_TOP.tsv LIMIT K THREADS ROUNDS WARMUPS
     Example, with the inputs that u4m's "make prepare" creates:
     bin/cpu_exhaustive ../../u4m/data/gsp-8841823.gsp ../../u4m/data/queries-500.tsv out.csv top.tsv 500 10 8 1 1
-    OUT.csv and OUT_TOP.tsv must not exist. OUT.csv holds the per-query times.
-    Authors: cpu_exhaustive.cpp, Parva Patel; cpu_pilot.cpp and research_runtime.h, Vaibhav Chaudhari.
+    OUT.csv and OUT_TOP.tsv must not exist. It prints "SCORED queries=500 rounds=1 warmups=1"; the per-query times
+    are in OUT.csv and the answers in OUT_TOP.tsv.
 
 GPUSparse and BMP are other authors' systems, so their code is not part of this submission. The report compares with
-our adapted versions of them, which are in the project repository (at commit 60d421c23367):
-    https://github.com/chaudharivaibhav12/gpu-sparse-retrieval/tree/60d421c23367
-    GPUSparse adaptation (Vaibhav Chaudhari; k = 1000 and batch 500 by Parva Patel):
-        experiments/2026-11-17-gpusparse-u8-storage, experiments/2026-11-23-gpusparse-k1000-batch
-    BMP, Block-Max Pruning on the CPU (Vaibhav Chaudhari; full-collection runs by Parva Patel):
-        experiments/2026-11-10-bmp-correctness-fixes, 2026-11-11-bmp-resident-timing, 2026-11-18-bmp-full-collection,
-        2026-11-20-bmp-guarded-u32
+our adapted versions of them, which are in the project repository: https://github.com/chaudharivaibhav12/gpu-sparse-retrieval/
 The other methods, all tests and all raw results are in the same repository.
