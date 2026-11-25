@@ -1,6 +1,6 @@
 // Shared types and helpers for the forward index and the queries.
-#ifndef U4M_COMMON_H
-#define U4M_COMMON_H
+#ifndef STRATEGY_A_COMMON_H
+#define STRATEGY_A_COMMON_H
 #include <cstdint>
 #include <string>
 #include <utility>

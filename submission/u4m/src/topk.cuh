@@ -1,6 +1,6 @@
 // The candidate type returned by the kernel and small CUDA helpers.
-#ifndef U4M_TOPK_CUH
-#define U4M_TOPK_CUH
+#ifndef STRATEGY_A_TOPK_CUH
+#define STRATEGY_A_TOPK_CUH
 #include <cuda_runtime.h>
 #include <cstddef>
 #include <cstdint>

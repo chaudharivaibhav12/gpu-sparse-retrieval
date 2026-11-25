@@ -1,4 +1,4 @@
-# Builds the u4m tools, prepares the inputs, and runs and checks the scorer.
+# Builds the strategy_a tools, prepares the inputs, and runs and checks the scorer.
 ARCH ?= sm_89
 N ?= 8841823
 Q ?= 500
@@ -15,9 +15,9 @@ DEV := $(RAW)/dev.pisa
 GSP := data/gsp-$(N).gsp
 QUERIES := data/queries-$(Q).tsv
 INDEX := data/index-$(N)-w$(W).rbp
-RUN := runs/u4m-$(N)-k$(K).trec
+RUN := runs/strategy_a-$(N)-k$(K).trec
 REF := runs/cpu-$(N)-k$(K).trec
-BINS := bin/u4m bin/prepare bin/build_index bin/cpu_reference
+BINS := bin/strategy_a bin/prepare bin/build_index bin/cpu_reference
 
 GSP_SHA_8841823 := e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac
 QUERIES_SHA_500 := 150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091
@@ -36,7 +36,7 @@ obj/range_kernel.o: src/range_kernel.cu $(HEADERS) | obj
 obj/main.o: src/main.cu $(HEADERS) | obj
 	$(NVCC) $(NVCCFLAGS) -c $< -o $@
 
-bin/u4m: obj/main.o obj/range_kernel.o obj/range_index.o obj/common.o | bin
+bin/strategy_a: obj/main.o obj/range_kernel.o obj/range_index.o obj/common.o | bin
 	$(NVCC) -arch=$(ARCH) $^ -o $@
 bin/prepare: obj/prepare.o obj/common.o | bin
 	$(CXX) $^ -o $@
@@ -68,8 +68,8 @@ $(INDEX): $(GSP) bin/build_index
 	bin/build_index $(GSP) $@ $(W)
 	$(call check,$@,$(INDEX_SHA_$(N)_$(W)))
 
-run: $(INDEX) $(QUERIES) bin/u4m | runs
-	bin/u4m --index $(INDEX) --queries $(QUERIES) --k $(K) --out $(RUN)
+run: $(INDEX) $(QUERIES) bin/strategy_a | runs
+	bin/strategy_a --index $(INDEX) --queries $(QUERIES) --k $(K) --out $(RUN)
 
 verify: $(GSP) $(QUERIES) bin/cpu_reference | runs
 	bin/cpu_reference $(GSP) $(QUERIES) $(K) $(REF) $(RUN)

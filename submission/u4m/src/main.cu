@@ -107,14 +107,14 @@ int main(int argc, char** argv) {
             } else {
                 throw runtime_error(
                     "Unknown option " + a +
-                    "\nUsage: u4m --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] "
+                    "\nUsage: strategy_a --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] "
                     "[--warmup N] [--repeat N] [--threads 256] [--gpu 0] [--timings FILE.csv]"
                 );
             }
         }
         require(
             !index_path.empty() && !queries_path.empty() && k > 0,
-            "Usage: u4m --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] [--warmup "
+            "Usage: strategy_a --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] [--warmup "
             "N] [--repeat N] [--threads 256] [--gpu 0] [--timings FILE.csv]"
         );
         require(
@@ -309,7 +309,7 @@ int main(int argc, char** argv) {
             for (uint32_t qi{0}; qi < count; ++qi) {
                 for (uint32_t rank{0}; rank < results[qi].size(); ++rank) {
                     out << queries[qi].id << " Q0 " << results[qi][rank].id << ' ' << rank + 1 << ' ' << results[qi][rank].score
-                        << " u4m\n";
+                        << " strategy_a\n";
                 }
             }
             require(bool(out), "Run file write failed");
@@ -324,7 +324,7 @@ int main(int argc, char** argv) {
                 total_ms += w;
             }
         }
-        cout << "u4m: documents=" << N << " queries=" << count << " k=" << k << " W=" << W << " ranges=" << R
+        cout << "strategy_a: documents=" << N << " queries=" << count << " k=" << k << " W=" << W << " ranges=" << R
              << " threads=" << threads << '\n';
         cout << "GPU: " << properties.name << " (CC " << properties.major << '.' << properties.minor << ")\n";
         cout << "index load: " << load_seconds << " s (read, checks, host preparation, upload)\n";

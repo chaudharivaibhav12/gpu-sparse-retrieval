@@ -1,6 +1,6 @@
 // The range index (RBP) types, SHA-256 and the loader declarations.
-#ifndef U4M_RANGE_INDEX_H
-#define U4M_RANGE_INDEX_H
+#ifndef STRATEGY_A_RANGE_INDEX_H
+#define STRATEGY_A_RANGE_INDEX_H
 #include <array>
 #include <cstddef>
 #include <cstdint>

@@ -188,7 +188,7 @@ RangeIndex rbp_load(const string& path) {
     };
     char magic[8];
     take(magic, 8);
-    require(memcmp(magic, "GSPRBP02", 8) == 0, "Bad range index magic (u4m needs a positions-encoded GSPRBP02 index)");
+    require(memcmp(magic, "GSPRBP02", 8) == 0, "Bad range index magic (the scorer needs a positions-encoded GSPRBP02 index)");
     uint32_t head32[4];
     uint64_t head64[4];
     take(head32, sizeof head32);
@@ -201,7 +201,10 @@ RangeIndex rbp_load(const string& path) {
     take(r.source_sha.data(), 32);
     uint32_t extra[2];
     take(extra, sizeof extra);
-    require(extra[0] == 1 && extra[1] == 0, "Unsupported range index encoding or flags (u4m needs positions, uniform ranges)");
+    require(
+        extra[0] == 1 && extra[1] == 0,
+        "Unsupported range index encoding or flags (the scorer needs positions and uniform ranges)"
+    );
     const uint64_t blocks{head64[0]};
     const uint64_t nnz{head64[1]};
     const uint64_t words{head64[2]};

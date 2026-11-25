@@ -1,6 +1,6 @@
 // Types and launch functions of the range scoring kernel.
-#ifndef U4M_RANGE_KERNEL_CUH
-#define U4M_RANGE_KERNEL_CUH
+#ifndef STRATEGY_A_RANGE_KERNEL_CUH
+#define STRATEGY_A_RANGE_KERNEL_CUH
 #include <cstddef>
 #include <cstdint>
 #include "topk.cuh"
