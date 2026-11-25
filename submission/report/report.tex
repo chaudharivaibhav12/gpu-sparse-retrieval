@@ -34,7 +34,7 @@ Two Strategies over a Range-Partitioned Bit-Packed Index}
 Learned sparse retrieval models like SPLADE represent queries and documents as sparse vectors over a vocabulary, and a top-k retrieval returns $k$ documents with the highest dot product with the query. Doing this \emph{exactly} over millions of documents is the first stage of modern search and question-answering pipelines, and its latency bounds the whole system. The problem is usually considered a poor fit for a naive GPU implementation with posting lists being irregular, the number of candidate documents being huge, and the final top-$k$ selection itself being expensive. We introduce a range-partitioned, bit-packed inverted index in which every GPU thread block scores one contiguous range of documents entirely in shared memory. On this base, we build two complementary strategies:
 \begin{itemize}
 \item \textbf{Strategy A} scores every range and selects the top $k$ with radix-based algorithms, so
-  its cost barely grows with $k$;
+  its latency only doubles from $k=10$ to $k=1000$;
 \item \textbf{Strategy B} uses upper bounds to skip whole ranges that cannot reach the top $k$.
 \end{itemize}
 On the full 8.8M-passage MS~MARCO collection on an RTX~4070, both return exact results. Strategy B is fastest at $k=10$ (0.205\,ms per query), and Strategy A is fastest at $k=100$ and
@@ -480,7 +480,7 @@ released batch code orders tied passages arbitrarily, so for that row we checked
   7.5--29$\times$ faster than the fastest GPUSparse variant we measured on the same GPU.
 \item \textbf{The two strategies are complementary.} Bound-based pruning with a two-half filter is fastest
   at small $k$ (0.205\,ms at $k=10$), with a heavier tail. Exhaustive scoring with radix-based selection and merge is fastest
-  at larger $k$ (0.455\,ms at $k=100$, 0.834\,ms at $k=1000$), because its cost barely grows with $k$.
+  at larger $k$ (0.455\,ms at $k=100$, 0.834\,ms at $k=1000$), because its latency only doubles from $k=10$ to $k=1000$.
 \item \textbf{The workload is latency-bound, not bandwidth-bound.} Independent decoding, overlapped
   memory loads and parallel radix selection mattered more than memory traffic.
 \end{itemize}
