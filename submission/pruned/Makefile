@@ -16,7 +16,7 @@ K ?= 10
 W ?= 256
 SEEDS ?= 64
 BIN ?= pruned
-# The two-half filter is on for pruned; the frozen pruned_ts was evaluated without it.
+# The two-half filter is on for pruned; off for pruned_ts (no theta filter), as we measured it.
 HALVES ?= $(if $(filter pruned,$(BIN)),1,0)
 U4M ?= ../u4m
 NVCC ?= nvcc
