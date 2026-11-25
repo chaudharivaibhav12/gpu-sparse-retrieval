@@ -73,7 +73,7 @@ FULL EXPERIMENTS (in the repository; RTX 4070, full collection)
     results/2026-11-18-matched-final-evaluation            frozen 6,480-query evaluation
 
 SAMPLE OUTPUT
-sample_output/ has the summaries of one answer check on cuda5 (full collection, 500 queries, one round, no warm-up;
+sample_output/ has the k=10 summary of one answer check on cuda5 (full collection, 500 queries, one round, no warm-up;
 every row equal to the CPU reference). One unwarmed round: not the timings of the report, which come from the
 repeated runs listed above. --warmup 0 --repeat 1 was used.
 
