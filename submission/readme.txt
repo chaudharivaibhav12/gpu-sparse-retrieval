@@ -10,14 +10,14 @@ collection, dev queries, prepared GSP) are meant to live in submission/data/ (no
 `make fetch` / `make prepare`.
 
 Components
-  u4m/      range scorer v3 (src/cuda_range_v3.cu, W=4096)   owner: Arnav   see u4m/readme.txt
+  u4m/      Strategy A (program strategy_a): exact range scorer, W=4096   owner: Arnav   see u4m/readme.txt
   pruned/   pruned range scorer (src/cuda_range_prune_tm.cu with the optional two-half filter, W=256) and the scorer of
             the frozen 6,480-query evaluation (src/cuda_range_prune_ts.cu). Needs u4m/ next to it.
             owner: Parva (two-half filter: Vaibhav)      see pruned/readme.txt
   baselines/  cpu/: multi-threaded exact CPU scorer (builds with make). GPUSparse and BMP are other authors' systems; our
             adapted versions are linked from its readme.   owner: Parva     see baselines/readme.txt
 
-Which scorer to use: pruned/ (two-half filter) is our fastest at k = 10, u4m/ at k = 100 and k = 1000.
+Which scorer to use: pruned/ (two-half filter) is our fastest at k = 10, Strategy A (u4m/) at k = 100 and k = 1000.
 
 How the code here is written and refactored: REFACTORING.md (process, layout, rules for every component)
 and CODESTYLE.md (C++/CUDA code style and the shared .clang-format).

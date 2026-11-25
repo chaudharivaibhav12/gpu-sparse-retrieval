@@ -31,7 +31,7 @@ Current components:
 
 | Folder | System | Owner |
 |---|---|---|
-| `u4m/` | range scorer v3 (`src/cuda_range_v3.cu`, W=4096) | Arnav |
+| `u4m/` | Strategy A, program `strategy_a`: exact range scorer, W=4096 | Arnav |
 | others | e.g. the pruned scorer, the GPUSparse adaptation, CPU baselines | to be agreed |
 
 Each component is self-contained: it builds and runs from its own folder with its own `Makefile`. If

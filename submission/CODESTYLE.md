@@ -30,7 +30,7 @@ in the `.cu`.
 #endif  // PROJECT_RANGE_INDEX_H
 ```
 
-The guard name is a project prefix plus the file name in upper case, e.g. `U4M_RANGE_KERNEL_CUH`.
+The guard name is a project prefix plus the file name in upper case, e.g. `STRATEGY_A_RANGE_KERNEL_CUH`.
 
 ## 3. Brace initialisation for declarations
 
