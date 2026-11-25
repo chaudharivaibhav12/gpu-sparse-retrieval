@@ -16,6 +16,7 @@ Components
             owner: Parva (two-half filter: Vaibhav)      see pruned/readme.txt
   baselines/  cpu/: multi-threaded exact CPU scorer (builds with make). The GPUSparse and BMP code is linked from its
             readme: it needs software that is not on CIMS.   owner: Parva     see baselines/readme.txt
+  report/: the course report (LaTeX)
 
 Which scorer to use: pruned/ (two-half filter) is our fastest at k = 10, u4m/ at k = 100 and k = 1000.
 
