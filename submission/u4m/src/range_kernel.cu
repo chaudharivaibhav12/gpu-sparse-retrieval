@@ -1,3 +1,4 @@
+// Range scoring kernel: each block scores one range and the last block merges the top k.
 #include "range_kernel.cuh"
 #include <stdexcept>
 
@@ -6,11 +7,14 @@
 static_assert(RBP_RADIX_BUCKETS == 1u << RBP_RADIX_BITS, "RBP_RADIX_BUCKETS must be 1 << RBP_RADIX_BITS");
 static_assert(RBP_RADIX_BUCKETS % 32 == 0, "warp 0 scans the buckets in 32 equal chunks");
 
+// Returns the size of this block's dynamic shared memory.
 __device__ inline uint32_t rbp_dynamic_smem_bytes() {
     uint32_t b;
     asm("mov.u32 %0, %%dynamic_smem_size;" : "=r"(b));
     return b;
 }
+
+// Merges all ranges' candidates into the final top k with radix select and a sort.
 __device__ void merge_radix(
     const RbpView& v,
     const GpuCandidate* lists,
@@ -27,7 +31,6 @@ __device__ void merge_radix(
     __shared__ __align__(16) uint32_t merge_warp_sum[RBP_MAX_WARPS];
     __shared__ __align__(16) uint32_t merge_state[5];
     const uint32_t thread = threadIdx.x, threads = blockDim.x, lane = thread & 31, warp = thread >> 5, warps = threads >> 5;
-
     for (uint32_t l{thread}; l < count; l += threads) {
         const GpuCandidate* list{lists + uint64_t(l) * k};
         uint32_t lo{0};
@@ -43,9 +46,7 @@ __device__ void merge_radix(
         lengths[l] = lo;
     }
     __syncthreads();
-
     const uint32_t per = (count + threads - 1) / threads, begin = min(count, thread * per), end = min(count, begin + per);
-
     uint32_t sum{0};
     for (uint32_t l{begin}; l < end; ++l) {
         sum += lengths[l];
@@ -86,7 +87,6 @@ __device__ void merge_radix(
     }
     const uint32_t smem_words{rbp_dynamic_smem_bytes() / 8};
     uint64_t* keys{survivors <= smem_words - P ? smem + P : global_keys};
-
     for (uint32_t l{warp}; l < count; l += warps) {
         const uint32_t off{lengths[l]};
         const uint32_t stop{l + 1 < count ? lengths[l + 1] : survivors};
@@ -97,7 +97,6 @@ __device__ void merge_radix(
         }
     }
     __syncthreads();
-
     uint64_t threshold{0};
     if (want < survivors) {
         uint64_t top_key{0};
@@ -178,7 +177,6 @@ __device__ void merge_radix(
         }
         threshold = prefix;
     }
-
     if (thread == 0) {
         merge_state[3] = 0;
     }
@@ -208,7 +206,6 @@ __device__ void merge_radix(
             __syncthreads();
         }
     }
-
     for (uint32_t r{thread}; r < want; r += threads) {
         const uint64_t key{smem[r]};
         const uint32_t doc{v.rank_doc[0xffffffffu - uint32_t(key)]};
@@ -216,6 +213,7 @@ __device__ void merge_radix(
     }
 }
 
+// Scores one query: each block scores one range and keeps its best candidates.
 __global__ void range_scores(
     RbpView v,
     QueryArgs query,
@@ -228,7 +226,6 @@ __global__ void range_scores(
     uint32_t* lengths,
     uint64_t* merge_keys
 ) {
-
     extern __shared__ __align__(16) uint64_t dynamic_shared[];
     __shared__ __align__(16) uint64_t term_bit[RBP_MAX_TERMS];
     __shared__ __align__(16) uint32_t term_count[RBP_MAX_TERMS];
@@ -267,12 +264,10 @@ __global__ void range_scores(
         term_width[i] = present ? v.width[lo] : 1;
         term_weight[i] = q.weight;
     }
-
     for (uint32_t s{thread}; s < range_docs; s += threads) {
         scores[s] = 0;
     }
     __syncthreads();
-
     for (uint32_t i{thread}; i <= terms; i += threads) {
         uint32_t postings{0};
         for (uint32_t earlier{0}; earlier < i; ++earlier) {
@@ -283,7 +278,6 @@ __global__ void range_scores(
     __syncthreads();
 
     const uint32_t postings{count_start[terms]};
-
     for (uint32_t base{thread}; base < postings; base += RBP_V3_UNROLL * threads) {
         uint32_t lo[RBP_V3_UNROLL];
         uint32_t hi[RBP_V3_UNROLL];
@@ -291,7 +285,6 @@ __global__ void range_scores(
         uint32_t shift[RBP_V3_UNROLL];
         uint32_t width[RBP_V3_UNROLL];
         uint32_t weight[RBP_V3_UNROLL];
-
 #pragma unroll
         for (uint32_t u{0}; u < RBP_V3_UNROLL; ++u) {
             const uint32_t g{base + u * threads};
@@ -318,7 +311,6 @@ __global__ void range_scores(
             hi[u] = v.encoded[word + 1];
             impact[u] = v.impacts[term_value[i] + j];
         }
-
 #pragma unroll
         for (uint32_t u{0}; u < RBP_V3_UNROLL; ++u) {
             if (base + u * threads >= postings) {
@@ -367,7 +359,6 @@ __global__ void range_scores(
                     top_key = radix_warp_max[w];
                 }
             }
-
             int shift{(63 - __clzll(top_key)) / RBP_RADIX_BITS * RBP_RADIX_BITS};
             uint64_t prefix{0};
             uint64_t mask{0};
@@ -425,7 +416,6 @@ __global__ void range_scores(
             }
             threshold = prefix;
         }
-
         if (thread == 0) {
             radix_state[3] = 0;
         }
@@ -510,6 +500,7 @@ __global__ void range_scores(
     }
 }
 
+// Sets the kernel's dynamic shared memory size, or fails if the GPU cannot.
 void range_scores_configure(size_t shared_bytes) {
     if (cudaFuncSetAttribute(
             reinterpret_cast<const void*>(range_scores), cudaFuncAttributeMaxDynamicSharedMemorySize, int(shared_bytes)
@@ -518,6 +509,7 @@ void range_scores_configure(size_t shared_bytes) {
     }
 }
 
+// Launches the kernel for one query with one block per range.
 void range_scores_launch(
     uint32_t ranges,
     uint32_t threads,

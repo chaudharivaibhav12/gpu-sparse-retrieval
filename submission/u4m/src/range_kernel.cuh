@@ -1,3 +1,4 @@
+// Types and launch functions of the range scoring kernel.
 #ifndef U4M_RANGE_KERNEL_CUH
 #define U4M_RANGE_KERNEL_CUH
 #include <cstddef>
@@ -8,6 +9,7 @@ constexpr uint32_t RBP_RADIX_BUCKETS{256};
 constexpr uint32_t RBP_MAX_TERMS{128};
 constexpr uint32_t RBP_MAX_WARPS{32};
 constexpr uint32_t RBP_MAX_K{1000};
+
 struct QueryTerm {
     uint32_t term;
     uint32_t weight;
@@ -38,7 +40,6 @@ struct RbpView {
 };
 
 void range_scores_configure(size_t shared_bytes);
-
 void range_scores_launch(
     uint32_t ranges,
     uint32_t threads,
@@ -54,5 +55,4 @@ void range_scores_launch(
     uint32_t* lengths,
     uint64_t* merge_keys
 );
-
 #endif

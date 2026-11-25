@@ -1,3 +1,4 @@
+// Exact CPU reference: scores every passage for each query and writes or compares a TREC run.
 #include "common.h"
 #include <map>
 #include <algorithm>
@@ -18,6 +19,7 @@ using namespace std;
 
 using Run = map<string, vector<pair<string, string>>>;
 
+// Returns the exact score of one document for one query.
 uint64_t dot(const Index& x, uint32_t d, const vector<uint32_t>& weights) {
     uint64_t sum{0};
     for (uint64_t j{x.offsets[d]}; j < x.offsets[d + 1]; j++) {
@@ -25,6 +27,8 @@ uint64_t dot(const Index& x, uint32_t d, const vector<uint32_t>& weights) {
     }
     return sum;
 }
+
+// Returns the top k documents: higher score first, then smaller original ID.
 vector<uint32_t> ranking(const Index& x, const vector<uint64_t>& scores, const vector<uint8_t>& keep, uint32_t k) {
     vector<uint32_t> docs;
     for (uint32_t d{0}; d < x.ids.size(); d++) {
@@ -41,6 +45,7 @@ vector<uint32_t> ranking(const Index& x, const vector<uint64_t>& scores, const v
     return docs;
 }
 
+// Reads a TREC run file into a map from query ID to its ranked list.
 static Run read_run(const string& path) {
     ifstream in{path};
     require(bool(in), "Cannot open run file: " + path);
@@ -59,6 +64,7 @@ static Run read_run(const string& path) {
     return run;
 }
 
+// Scores all queries on the CPU, writes the run and compares it with another run if given.
 int main(int argc, char** argv) {
     try {
         require(argc == 5 || argc == 6, "Usage: cpu_reference GSP QUERIES.tsv K OUT.trec [RUN.trec]");

@@ -1,3 +1,4 @@
+// The range index (RBP) types, SHA-256 and the loader declarations.
 #ifndef U4M_RANGE_INDEX_H
 #define U4M_RANGE_INDEX_H
 #include <array>
@@ -43,6 +44,7 @@ struct RangeIndex {
     size_t blocks() const;
 };
 
+// Reads a value of the given bit width starting at the given bit.
 inline uint32_t rbp_extract(const uint32_t* encoded, uint64_t bit, uint32_t width) {
     const uint64_t word{bit >> 5};
     const uint32_t shift{uint32_t(bit & 31)};
@@ -57,5 +59,4 @@ std::vector<uint32_t> rbp_uniform_ranges(uint32_t docs, uint32_t range_size);
 bool rbp_little_endian();
 RangeIndex rbp_load(const std::string& path);
 uint32_t rbp_max_multiplicity(const RangeIndex& r);
-
 #endif

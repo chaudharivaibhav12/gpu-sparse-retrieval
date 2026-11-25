@@ -1,3 +1,4 @@
+// Error checks, the forward index loader and the query reader.
 #include "common.h"
 #include <algorithm>
 #include <cstring>
@@ -7,11 +8,14 @@
 #include <stdexcept>
 using namespace std;
 
+// Throws an error with the given message when the condition is false.
 void require(bool v, const string& s) {
     if (!v) {
         throw runtime_error(s);
     }
 }
+
+// Reads one little-endian value from the stream.
 template <class T> static T get(istream& in) {
     uint64_t x{0};
     for (size_t i{0}; i < sizeof(T); ++i) {
@@ -21,6 +25,8 @@ template <class T> static T get(istream& in) {
     }
     return T(x);
 }
+
+// Reads n little-endian values from the stream.
 template <class T> static vector<T> get_vec(istream& in, size_t n) {
     vector<T> v(n);
     if (sizeof(T) == 1) {
@@ -33,6 +39,8 @@ template <class T> static vector<T> get_vec(istream& in, size_t n) {
     }
     return v;
 }
+
+// Loads the forward index file and checks it.
 Index load(const string& path) {
     ifstream in{path, ios::binary};
     require(bool(in), "Cannot open index");
@@ -64,6 +72,8 @@ Index load(const string& path) {
     require(in.peek() == EOF, "Trailing index bytes");
     return x;
 }
+
+// Reads the prepared queries from a TSV file.
 vector<Query> read_queries(const string& file) {
     ifstream in{file};
     require(bool(in), "Cannot open prepared queries");

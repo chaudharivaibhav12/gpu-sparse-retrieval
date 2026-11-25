@@ -1,3 +1,4 @@
+// Driver: loads the index and queries, runs each query on the GPU, writes a run and prints timing.
 #include "common.h"
 #include "range_index.h"
 #include "topk.cuh"
@@ -19,6 +20,7 @@
 #include <vector>
 using namespace std;
 
+// Returns true when a ranks before b: higher score, then smaller original ID.
 static bool candidate_better(GpuCandidate a, GpuCandidate b) {
     if (a.valid != b.valid) {
         return a.valid > b.valid;
@@ -37,14 +39,19 @@ static bool candidate_better(GpuCandidate a, GpuCandidate b) {
 
 struct GpuEvent {
     cudaEvent_t event{};
+
+    // Creates a CUDA event.
     GpuEvent() {
         cuda_checked(cudaEventCreate(&event));
     }
+
+    // Destroys the CUDA event.
     ~GpuEvent() {
         cudaEventDestroy(event);
     }
 };
 
+// Returns the q-th quantile of the values.
 static double quantile(vector<double> v, double q) {
     if (v.empty()) {
         return 0;
@@ -56,6 +63,7 @@ static double quantile(vector<double> v, double q) {
     return v[lo] + (v[hi] - v[lo]) * (pos - double(lo));
 }
 
+// Reads the options, uploads the index, runs and times every query and writes the results.
 int main(int argc, char** argv) {
     try {
         string index_path;

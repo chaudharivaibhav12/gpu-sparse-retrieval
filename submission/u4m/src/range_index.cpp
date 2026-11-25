@@ -1,3 +1,4 @@
+// SHA-256, the range index loader with its checks, and range helpers.
 #include "range_index.h"
 #include "common.h"
 #include <algorithm>
@@ -5,10 +6,12 @@
 #include <fstream>
 using namespace std;
 
+// Rotates a 32-bit value right by n bits.
 uint32_t Sha256::rotr(uint32_t x, int n) {
     return (x >> n) | (x << (32 - n));
 }
 
+// Processes one 64-byte block of input.
 void Sha256::block(const uint8_t* p) {
     static const uint32_t K[64] = {
         0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01,
@@ -58,6 +61,7 @@ void Sha256::block(const uint8_t* p) {
     h[7] += hh;
 }
 
+// Adds more bytes to the hash.
 void Sha256::update(const void* data, size_t bytes) {
     const uint8_t* p{static_cast<const uint8_t*>(data)};
     length += bytes;
@@ -82,6 +86,7 @@ void Sha256::update(const void* data, size_t bytes) {
     }
 }
 
+// Pads the input and returns the final 32-byte digest.
 array<uint8_t, 32> Sha256::finish() {
     const uint64_t bits{length * 8};
     const uint8_t one{0x80};
@@ -104,6 +109,7 @@ array<uint8_t, 32> Sha256::finish() {
     return out;
 }
 
+// Converts a digest to a hex string.
 string sha_hex(const array<uint8_t, 32>& digest) {
     static const char* digits{"0123456789abcdef"};
     string out;
@@ -114,6 +120,7 @@ string sha_hex(const array<uint8_t, 32>& digest) {
     return out;
 }
 
+// Computes the SHA-256 of a whole file.
 array<uint8_t, 32> sha_file(const string& path) {
     ifstream in{path, ios::binary};
     require(bool(in), "Cannot open file for hashing: " + path);
@@ -126,10 +133,12 @@ array<uint8_t, 32> sha_file(const string& path) {
     return sha.finish();
 }
 
+// Returns the number of (term, range) blocks.
 size_t RangeIndex::blocks() const {
     return lookup_range.size();
 }
 
+// Returns the boundaries of equal ranges of range_size documents.
 vector<uint32_t> rbp_uniform_ranges(uint32_t docs, uint32_t range_size) {
     vector<uint32_t> starts{0};
     for (uint64_t first{range_size}; first < docs; first += range_size) {
@@ -141,11 +150,13 @@ vector<uint32_t> rbp_uniform_ranges(uint32_t docs, uint32_t range_size) {
     return starts;
 }
 
+// Checks that this machine is little endian.
 bool rbp_little_endian() {
     const uint16_t probe{1};
     return *reinterpret_cast<const uint8_t*>(&probe) == 1;
 }
 
+// Loads the index file, checks its hash and every structure the kernel relies on.
 RangeIndex rbp_load(const string& path) {
     require(rbp_little_endian(), "RBP files require a little-endian host");
     ifstream in{path, ios::binary | ios::ate};
@@ -241,6 +252,7 @@ RangeIndex rbp_load(const string& path) {
     return r;
 }
 
+// Returns the largest number of postings one term has in one document.
 uint32_t rbp_max_multiplicity(const RangeIndex& r) {
     uint32_t longest{r.impacts.empty() ? 0u : 1u};
     for (size_t b{0}; b < r.blocks(); ++b) {

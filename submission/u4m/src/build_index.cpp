@@ -1,3 +1,4 @@
+// Builds the range index from the forward index, checks it and writes it.
 #include "common.h"
 #include "range_index.h"
 #include <algorithm>
@@ -16,6 +17,7 @@
 #include <vector>
 using namespace std;
 
+// Packs the postings into term-major blocks of in-range positions.
 static RangeIndex rbp_build(const Index& x, uint32_t range_size) {
     require(range_size >= 1 && range_size <= RBP_MAX_RANGE, "Range size must be 1..32768");
     require(x.ids.size() <= UINT32_MAX && x.terms.size() <= UINT32_MAX, "Index too large for 32-bit posting positions");
@@ -58,7 +60,6 @@ static RangeIndex rbp_build(const Index& x, uint32_t range_size) {
         r.lookup_first[t] = uint32_t(r.blocks());
         for (uint64_t i{start[t]}; i < start[t + 1];) {
             const uint32_t range{doc_range[term_docs[i]]};
-
             uint64_t end{i};
             uint32_t previous{r.range_start[range]};
             uint32_t max_gap{0};
@@ -100,6 +101,7 @@ static RangeIndex rbp_build(const Index& x, uint32_t range_size) {
     return r;
 }
 
+// Writes the index file with a SHA-256 of its contents at the end.
 static void rbp_save(RangeIndex& r, const string& path) {
     require(rbp_little_endian(), "RBP files require a little-endian host");
     ofstream out{path, ios::binary};
@@ -137,6 +139,7 @@ static void rbp_save(RangeIndex& r, const string& path) {
     require(bool(out), "Range index write failed");
 }
 
+// Decodes every posting back and checks it against the forward index.
 static void rbp_verify_roundtrip(const Index& x, const RangeIndex& r) {
     require(r.docs == x.ids.size() && r.vocab == x.vocab.size() && r.ids == x.ids, "Document/vocabulary/ID mismatch");
     require(r.impacts.size() == x.terms.size(), "Posting count mismatch");
@@ -192,6 +195,7 @@ static void rbp_verify_roundtrip(const Index& x, const RangeIndex& r) {
     }
 }
 
+// Builds, checks and saves the index for the given range size.
 int main(int argc, char** argv) {
     try {
         require(argc == 4, "Usage: build_index GSP OUTPUT.rbp W");

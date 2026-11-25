@@ -1,3 +1,4 @@
+// Prepares the inputs: converts the CIFF collection and writes the calibration queries.
 #include "common.h"
 #include <algorithm>
 #include <cmath>
@@ -15,12 +16,15 @@
 #include <vector>
 using namespace std;
 
+// Mixes the bits of a 64-bit value for hashing.
 uint64_t mix(uint64_t x) {
     x += 0x9e3779b97f4a7c15ULL;
     x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9ULL;
     x = (x ^ (x >> 27)) * 0x94d049bb133111ebULL;
     return x ^ (x >> 31);
 }
+
+// Hashes a string ID to a 64-bit value.
 uint64_t hash_id(const string& s) {
     uint64_t x{14695981039346656037ULL};
     for (unsigned char c : s) {
@@ -29,6 +33,8 @@ uint64_t hash_id(const string& s) {
     }
     return mix(x);
 }
+
+// Reads one variable-length integer from the stream.
 uint64_t varint(istream& in) {
     uint64_t v{0};
     for (int s{0}; s < 64; s += 7) {
@@ -44,9 +50,12 @@ uint64_t varint(istream& in) {
     }
     throw runtime_error("Invalid varint");
 }
+
 struct Proto {
     const uint8_t* p;
     const uint8_t* e;
+
+    // Reads one variable-length integer from the message.
     uint64_t var() {
         uint64_t v{0};
         for (int s{0}; s < 64; s += 7) {
@@ -62,6 +71,8 @@ struct Proto {
         }
         throw runtime_error("Invalid protobuf varint");
     }
+
+    // Reads a length-prefixed field as a sub-message.
     Proto bytes() {
         uint64_t n{var()};
         require(n <= uint64_t(e - p), "Invalid protobuf length");
@@ -69,6 +80,8 @@ struct Proto {
         p += n;
         return r;
     }
+
+    // Skips one field of the given wire type.
     void skip(unsigned wire) {
         if (wire == 0) {
             var();
@@ -84,10 +97,14 @@ struct Proto {
             throw runtime_error("Unsupported protobuf wire type");
         }
     }
+
+    // Returns the bytes as a string.
     string str() const {
         return string(reinterpret_cast<const char*>(p), e - p);
     }
 };
+
+// Reads one length-prefixed message from the stream.
 vector<uint8_t> message(istream& in) {
     uint64_t n{varint(in)};
     require(n < (1ULL << 32), "Unreasonable message length");
@@ -96,9 +113,13 @@ vector<uint8_t> message(istream& in) {
     require(bool(in), "Truncated message");
     return b;
 }
+
+// Wraps a byte buffer for reading.
 Proto proto(const vector<uint8_t>& b) {
     return {b.data(), b.data() + b.size()};
 }
+
+// Converts a numeric passage ID string to a number.
 uint64_t number(const string& s) {
     require(
         !s.empty() && all_of(
@@ -114,15 +135,20 @@ uint64_t number(const string& s) {
     require(used == s.size(), "Bad ID");
     return x;
 }
+
 struct Pair {
     uint32_t term;
     uint8_t impact;
 };
+
+// Writes one value in binary.
 template <class T> void put(ostream& o, T x) {
     for (size_t i{0}; i < sizeof(T); ++i) {
         o.put(char((uint64_t(x) >> (8 * i)) & 255));
     }
 }
+
+// Writes a vector in binary.
 template <class T> void put_vec(ostream& o, const vector<T>& v) {
     if (sizeof(T) == 1) {
         o.write(reinterpret_cast<const char*>(v.data()), v.size());
@@ -132,6 +158,8 @@ template <class T> void put_vec(ostream& o, const vector<T>& v) {
         }
     }
 }
+
+// Writes the forward index file.
 void save(const Index& x, const string& path) {
     ofstream o{path, ios::binary};
     require(bool(o), "Cannot create index");
@@ -149,6 +177,8 @@ void save(const Index& x, const string& path) {
     }
     require(bool(o), "Index write failed");
 }
+
+// Converts the CIFF collection into a forward index of count passages.
 void import_ciff(const string& path, const string& output, uint32_t count) {
     ifstream in{path, ios::binary};
     require(bool(in), "Cannot open CIFF");
@@ -291,6 +321,8 @@ void import_ciff(const string& path, const string& output, uint32_t count) {
     cout << "IMPORTED docs=" << count << " terms=" << v << " selected_nnz=" << x.terms.size() << " source_postings=" << postings
          << " max_impact=" << max_impact << " bytes=" << filesystem::file_size(output) << '\n';
 }
+
+// Selects the calibration queries, rescales their weights and writes them as TSV.
 void prepare_queries(const string& file, const string& index_path, const string& output, uint32_t calibration_count) {
     Index x{load(index_path)};
     unordered_map<string, uint32_t> dictionary;
@@ -374,6 +406,7 @@ void prepare_queries(const string& file, const string& index_path, const string&
          << " max_conservative_score=" << max_score_bound << " arithmetic=uint64 query_policy=BMP-f32-ceil-cap32\n";
 }
 
+// Runs the import or queries mode.
 int main(int argc, char** argv) {
     try {
         require(
