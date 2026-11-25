@@ -1,5 +1,5 @@
 // Kernels of the pruned scorer: bound every range, score 64 seed ranges to get theta, skip ranges with bound < theta, score and merge the rest.
-// Exact: anything skipped scores below theta and ties at theta are kept. Build with -DPRUNE_THETA_FILTER=0 for the frozen-evaluation scorer (pruned_ts).
+// Exact: anything skipped scores below theta and ties at theta are kept. Build with -DPRUNE_THETA_FILTER=0 to leave out the theta filter (pruned_ts).
 #include "prune_kernel.cuh"
 #include <stdexcept>
 

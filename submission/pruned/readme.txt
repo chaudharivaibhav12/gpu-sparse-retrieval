@@ -15,8 +15,7 @@ passage ID first) are exact too.
 
 Two programs are built from the same source:
   bin/pruned      all five steps. HALVES=1 adds the two-half filter.
-  bin/pruned_ts   the same without the theta filter in step 5. This is the scorer of the frozen evaluation on the
-                  6,480 queries that were not used for tuning.
+  bin/pruned_ts   for comparison: the same without the theta filter in step 5, so the final merge reads more candidates.
 
 REQUIREMENTS
 As u4m/readme.txt (CUDA 12.6 nvcc, g++ C++17, GNU make, Python 3 standard library). In addition:
@@ -34,7 +33,7 @@ FROM SCRATCH (full collection, 8,841,823 passages, 500 calibration queries, k = 
     make index          # data/index-8841823-w256.rbp (round trip checked; pinned SHA-256 checked)
     make run            # runs/pruned-8841823-k10-h1.trec and the timing summary (two-half filter on)
     make verify         # exact CPU reference, then "500/500 queries identical"
-Without the filter: make run verify HALVES=0. Frozen scorer: make run verify BIN=pruned_ts.
+Without the two-half filter: make run verify HALVES=0. Without the theta filter: make run verify BIN=pruned_ts.
 Other depths: make run verify K=100 (k up to 1000). Small end-to-end check of all variants: make demo
 (N=100000 passages, 50 queries, k=10; it also needs the inputs of make fetch).
 
@@ -42,7 +41,7 @@ DIRECT USE
     bin/pruned --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] [--seeds 64] [--two-halves 0|1]
                [--warmup N] [--repeat N] [--threads 256] [--gpu 0]
 Defaults: 64 seeds, two-halves 0, 3 warm-up rounds, 20 measured rounds, 256 threads per block, GPU 0.
---seeds 0 scores every range (no pruning). bin/pruned_ts was evaluated without the two-half filter.
+--seeds 0 scores every range (no pruning). bin/pruned_ts was measured without the two-half filter.
 
 SAMPLE OUTPUT
 Full collection, k=10, two-half filter on, RTX 4070 (one round without warm-up, so not a timing from the report):
