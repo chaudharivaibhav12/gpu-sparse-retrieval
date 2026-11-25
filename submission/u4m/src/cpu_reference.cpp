@@ -1,10 +1,3 @@
-// cpu_reference.cpp - exact CPU reference for u4m: scores every passage of the GSP forward index
-// for each query (sum of weight x impact over the query's terms, 64-bit), ranks by score descending
-// then smaller original passage ID, and writes the top k as a TREC run. With a second run file it
-// compares the two query by query.
-//   cpu_reference GSP QUERIES.tsv K OUT.trec [RUN.trec]
-// Scoring and ranking extracted from src/cpu_pilot.cpp (commit d84ca0b; the "score" mode, dot and
-// ranking; repository main at 8fc44cd); the TREC output and the comparison are new.
 #include "common.h"
 #include <map>
 #include <algorithm>
@@ -23,7 +16,6 @@
 #include <vector>
 using namespace std;
 
-// A run: qid -> ranked (docid, score) list.
 using Run = map<string, vector<pair<string, string>>>;
 
 uint64_t dot(const Index& x, uint32_t d, const vector<uint32_t>& weights) {
@@ -33,8 +25,7 @@ uint64_t dot(const Index& x, uint32_t d, const vector<uint32_t>& weights) {
     }
     return sum;
 }
-vector<uint32_t> ranking(const Index& x, const vector<uint64_t>& scores,
-                         const vector<uint8_t>& keep, uint32_t k) {
+vector<uint32_t> ranking(const Index& x, const vector<uint64_t>& scores, const vector<uint8_t>& keep, uint32_t k) {
     vector<uint32_t> docs;
     for (uint32_t d{0}; d < x.ids.size(); d++) {
         if (keep.empty() || keep[d]) {
@@ -50,7 +41,6 @@ vector<uint32_t> ranking(const Index& x, const vector<uint64_t>& scores,
     return docs;
 }
 
-// Run file: qid Q0 docid rank score tag. Returns qid -> ranked (docid, score) list.
 static Run read_run(const string& path) {
     ifstream in{path};
     require(bool(in), "Cannot open run file: " + path);
@@ -71,8 +61,7 @@ static Run read_run(const string& path) {
 
 int main(int argc, char** argv) {
     try {
-        require(argc == 5 || argc == 6,
-                "Usage: cpu_reference GSP QUERIES.tsv K OUT.trec [RUN.trec]");
+        require(argc == 5 || argc == 6, "Usage: cpu_reference GSP QUERIES.tsv K OUT.trec [RUN.trec]");
         Index x{load(argv[1])};
         vector<Query> queries{read_queries(argv[2])};
         const uint32_t k{static_cast<uint32_t>(stoul(argv[3]))};
@@ -90,13 +79,11 @@ int main(int argc, char** argv) {
             }
             vector<uint32_t> top{ranking(x, sc, {}, k)};
             for (size_t r{0}; r < top.size(); r++) {
-                out << queries[qi].id << " Q0 " << x.ids[top[r]] << ' ' << r + 1 << ' '
-                    << sc[top[r]] << " cpu\n";
+                out << queries[qi].id << " Q0 " << x.ids[top[r]] << ' ' << r + 1 << ' ' << sc[top[r]] << " cpu\n";
             }
         }
         out.close();
-        cout << "REFERENCE docs=" << x.ids.size() << " queries=" << queries.size() << " k=" << k
-             << " out=" << argv[4] << '\n';
+        cout << "REFERENCE docs=" << x.ids.size() << " queries=" << queries.size() << " k=" << k << " out=" << argv[4] << '\n';
         if (argc == 6) {
             const Run ref{read_run(argv[4])};
             const Run run{read_run(argv[5])};

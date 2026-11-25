@@ -1,18 +1,3 @@
-// main.cu - the u4m driver: loads a range index (RBP, positions encoding) and prepared queries,
-// uploads the index, runs every query through the range kernel at batch 1, writes a TREC run and
-// prints a timing summary.
-//   u4m --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] [--warmup N] [--repeat N]
-//   [--threads 256] [--gpu 0] [--timings FILE.csv]
-// --timings writes one row per query and round (warm-up rounds included):
-// phase,round,query_id,query_wall_ms,gpu_span_ms.
-// Extracted from the host code of src/cuda_range_v3.cu (commit 5528bb2; repository main at 8fc44cd)
-// at its defaults (radix selection at every k, theta filter, radix merge). Removed: research_gate /
-// research_runtime.h, VERIFY and the GSP cross-check argument, the refuse-to-overwrite check, the
-// CSV/TSV research outputs, the RBP_STAGE_CLOCKS recording and the warp-list (non-radix) path. Kept
-// unchanged: the input checks, the score overflow gate, the device data layout, the launch
-// configuration and the timing boundary. Timing boundary (as in the experiments): per query, from
-// packing the query argument on the host, through the kernel launch, to the copy of the top k back
-// to the host and the end-of-kernel event's completion.
 #include "common.h"
 #include "range_index.h"
 #include "topk.cuh"
@@ -34,8 +19,6 @@
 #include <vector>
 using namespace std;
 
-// Canonical order of returned candidates: score descending, then smaller original ID (from
-// src/cuda_topk.cuh).
 static bool candidate_better(GpuCandidate a, GpuCandidate b) {
     if (a.valid != b.valid) {
         return a.valid > b.valid;
@@ -62,8 +45,7 @@ struct GpuEvent {
     }
 };
 
-static double quantile(vector<double> v,
-                       double q) { // linear interpolation between order statistics
+static double quantile(vector<double> v, double q) {
     if (v.empty()) {
         return 0;
     }
@@ -118,16 +100,19 @@ int main(int argc, char** argv) {
                 throw runtime_error(
                     "Unknown option " + a +
                     "\nUsage: u4m --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] "
-                    "[--warmup N] [--repeat N] [--threads 256] [--gpu 0] [--timings FILE.csv]");
+                    "[--warmup N] [--repeat N] [--threads 256] [--gpu 0] [--timings FILE.csv]"
+                );
             }
         }
-        require(!index_path.empty() && !queries_path.empty() && k > 0,
-                "Usage: u4m --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] [--warmup "
-                "N] [--repeat N] [--threads 256] [--gpu 0] [--timings FILE.csv]");
         require(
-            k <= RBP_MAX_K && rounds > 0 && threads >= 32 && threads <= 32 * RBP_MAX_WARPS &&
-                threads % 32 == 0,
-            "Unsupported setting (k <= 1000, repeat >= 1, threads a multiple of 32 up to 1024)");
+            !index_path.empty() && !queries_path.empty() && k > 0,
+            "Usage: u4m --index FILE.rbp --queries FILE.tsv --k K [--out run.trec] [--warmup "
+            "N] [--repeat N] [--threads 256] [--gpu 0] [--timings FILE.csv]"
+        );
+        require(
+            k <= RBP_MAX_K && rounds > 0 && threads >= 32 && threads <= 32 * RBP_MAX_WARPS && threads % 32 == 0,
+            "Unsupported setting (k <= 1000, repeat >= 1, threads a multiple of 32 up to 1024)"
+        );
 
         const chrono::steady_clock::time_point load_begin{chrono::steady_clock::now()};
         const RangeIndex index{rbp_load(index_path)};
@@ -137,8 +122,7 @@ int main(int argc, char** argv) {
         const uint32_t W{index.range_size};
         const uint32_t count{uint32_t(queries.size())};
         const uint32_t wanted{min(k, N)};
-        require(unordered_set<uint64_t>(index.ids.begin(), index.ids.end()).size() == N,
-                "Duplicate passage ID");
+        require(unordered_set<uint64_t>(index.ids.begin(), index.ids.end()).size() == N, "Duplicate passage ID");
         require(uint64_t(R) * k <= UINT32_MAX, "Too many range candidates for 32-bit counts");
         const uint32_t multiplicity{rbp_max_multiplicity(index)};
         unordered_set<string> qids;
@@ -147,18 +131,14 @@ int main(int argc, char** argv) {
             unordered_set<uint32_t> terms;
             uint64_t weight_sum{0};
             for (auto p : queries[qi].terms) {
-                require(p.first < index.vocab && p.second <= 32 && terms.insert(p.first).second,
-                        "Bad cap32 query");
+                require(p.first < index.vocab && p.second <= 32 && terms.insert(p.first).second, "Bad cap32 query");
                 weight_sum += p.second;
             }
-            require(queries[qi].terms.size() <= RBP_MAX_TERMS,
-                    "Query has more terms than RBP_MAX_TERMS");
-            // Overflow gate: uint32 shared scores must hold every possible sum.
-            // A term repeated within a document contributes once per posting.
-            require(weight_sum * 255 * multiplicity < uint64_t(UINT32_MAX),
-                    "Query score bound does not fit uint32 shared scores");
+            require(queries[qi].terms.size() <= RBP_MAX_TERMS, "Query has more terms than RBP_MAX_TERMS");
+            require(
+                weight_sum * 255 * multiplicity < uint64_t(UINT32_MAX), "Query score bound does not fit uint32 shared scores"
+            );
         }
-        // Original-ID order inside each range, so ties need no 64-bit compares.
         vector<uint16_t> tie_rank_host(N);
         vector<uint16_t> rank_slot_host(N);
         {
@@ -185,7 +165,6 @@ int main(int argc, char** argv) {
             winner_cap <<= 1;
         }
         size_t shared_bytes{size_t(winner_cap) * 8 + size_t(RBP_RADIX_BUCKETS) * 4 + size_t(W) * 4};
-        // The merging block needs P = winner_cap winner slots in dynamic shared memory.
         shared_bytes = max(shared_bytes, size_t(winner_cap) * 8);
         range_scores_configure(shared_bytes);
         GpuArray<uint32_t> lookup_first(index.lookup_first.size());
@@ -205,11 +184,9 @@ int main(int argc, char** argv) {
         GpuArray<uint8_t> impacts(index.impacts.size());
         GpuArray<GpuCandidate> candidates(size_t(R) * k);
         GpuArray<GpuCandidate> merged(k);
-        // theta must be 0 before every launch; the merging block re-arms it.
         GpuArray<uint32_t> theta(1);
         GpuArray<uint32_t> lengths(R);
         cuda_checked(cudaMemset(theta.ptr, 0, 4));
-        // Global original-ID ranks, their inverse, and the merge's key scratch (R x k).
         vector<uint32_t> global_rank_host(N);
         vector<uint32_t> rank_doc_host(N);
         {
@@ -237,24 +214,25 @@ int main(int argc, char** argv) {
         impacts.upload(index.impacts);
         tie_rank.upload(tie_rank_host);
         rank_slot.upload(rank_slot_host);
-        const RbpView view{lookup_first.ptr,
-                           lookup_range.ptr,
-                           bit_start.ptr,
-                           value_start.ptr,
-                           block_count.ptr,
-                           block_width.ptr,
-                           encoded.ptr,
-                           impacts.ptr,
-                           ids.ptr,
-                           tie_rank.ptr,
-                           rank_slot.ptr,
-                           range_start.ptr,
-                           W,
-                           global_rank.ptr,
-                           rank_doc.ptr};
+        const RbpView view{
+            lookup_first.ptr,
+            lookup_range.ptr,
+            bit_start.ptr,
+            value_start.ptr,
+            block_count.ptr,
+            block_width.ptr,
+            encoded.ptr,
+            impacts.ptr,
+            ids.ptr,
+            tie_rank.ptr,
+            rank_slot.ptr,
+            range_start.ptr,
+            W,
+            global_rank.ptr,
+            rank_doc.ptr
+        };
         cuda_checked(cudaDeviceSynchronize());
-        const double load_seconds{
-            chrono::duration<double>(chrono::steady_clock::now() - load_begin).count()};
+        const double load_seconds{chrono::duration<double>(chrono::steady_clock::now() - load_begin).count()};
 
         QueryArgs args{};
         vector<GpuCandidate> winners(wanted);
@@ -277,28 +255,27 @@ int main(int argc, char** argv) {
                     }
                     cuda_checked(cudaEventRecord(begin.event));
                     if (wanted) {
-                        range_scores_launch(R, threads, shared_bytes, view, args, k, winner_cap,
-                                            candidates.ptr, finished.ptr, merged.ptr, theta.ptr,
-                                            lengths.ptr, merge_keys.ptr);
+                        range_scores_launch(
+                            R, threads, shared_bytes, view, args, k, winner_cap, candidates.ptr, finished.ptr, merged.ptr,
+                            theta.ptr, lengths.ptr, merge_keys.ptr
+                        );
                     }
                     cuda_checked(cudaEventRecord(end.event));
                     if (wanted) {
-                        cuda_checked(cudaMemcpy(winners.data(), merged.ptr,
-                                                size_t(wanted) * sizeof(GpuCandidate),
-                                                cudaMemcpyDeviceToHost));
+                        cuda_checked(
+                            cudaMemcpy(winners.data(), merged.ptr, size_t(wanted) * sizeof(GpuCandidate), cudaMemcpyDeviceToHost)
+                        );
                     }
                     cuda_checked(cudaEventSynchronize(end.event));
-                    const double wall_ms{
-                        chrono::duration<double, milli>(chrono::steady_clock::now() - wall_begin)
-                            .count()};
+                    const double wall_ms{chrono::duration<double, milli>(chrono::steady_clock::now() - wall_begin).count()};
                     float gpu_ms{0};
                     cuda_checked(cudaEventElapsedTime(&gpu_ms, begin.event, end.event));
                     for (uint32_t rank{0}; rank < wanted; ++rank) {
                         const GpuCandidate c{winners[rank]};
-                        require(c.valid && c.doc < N && c.id == index.ids[c.doc],
-                                "Invalid returned candidate");
-                        require(!rank || candidate_better(winners[rank - 1], c),
-                                "Returned candidates are not in canonical order");
+                        require(c.valid && c.doc < N && c.id == index.ids[c.doc], "Invalid returned candidate");
+                        require(
+                            !rank || candidate_better(winners[rank - 1], c), "Returned candidates are not in canonical order"
+                        );
                     }
                     if (phase) {
                         wall[qi].push_back(wall_ms);
@@ -306,8 +283,8 @@ int main(int argc, char** argv) {
                         results[qi] = winners;
                     }
                     if (!timings_path.empty()) {
-                        timings << (phase ? "measured" : "warmup") << ',' << round << ',' << q.id
-                                << ',' << wall_ms << ',' << gpu_ms << '\n';
+                        timings << (phase ? "measured" : "warmup") << ',' << round << ',' << q.id << ',' << wall_ms << ','
+                                << gpu_ms << '\n';
                     }
                 }
             }
@@ -323,13 +300,12 @@ int main(int argc, char** argv) {
             require(bool(out), "Cannot create run file " + out_path);
             for (uint32_t qi{0}; qi < count; ++qi) {
                 for (uint32_t rank{0}; rank < results[qi].size(); ++rank) {
-                    out << queries[qi].id << " Q0 " << results[qi][rank].id << ' ' << rank + 1
-                        << ' ' << results[qi][rank].score << " u4m\n";
+                    out << queries[qi].id << " Q0 " << results[qi][rank].id << ' ' << rank + 1 << ' ' << results[qi][rank].score
+                        << " u4m\n";
                 }
             }
             require(bool(out), "Run file write failed");
         }
-        // Per query: median over the measured rounds; then the distribution over queries.
         vector<double> per_query;
         vector<double> per_query_span;
         double total_ms{0};
@@ -340,18 +316,15 @@ int main(int argc, char** argv) {
                 total_ms += w;
             }
         }
-        cout << "u4m: documents=" << N << " queries=" << count << " k=" << k << " W=" << W
-             << " ranges=" << R << " threads=" << threads << '\n';
-        cout << "GPU: " << properties.name << " (CC " << properties.major << '.' << properties.minor
-             << ")\n";
+        cout << "u4m: documents=" << N << " queries=" << count << " k=" << k << " W=" << W << " ranges=" << R
+             << " threads=" << threads << '\n';
+        cout << "GPU: " << properties.name << " (CC " << properties.major << '.' << properties.minor << ")\n";
         cout << "index load: " << load_seconds << " s (read, checks, host preparation, upload)\n";
         cout << "rounds: " << warmups << " warm-up + " << rounds << " measured\n";
-        cout << "per-query latency (ms, median over rounds): median " << quantile(per_query, 0.5)
-             << "  p95 " << quantile(per_query, 0.95) << "  p99 " << quantile(per_query, 0.99)
-             << '\n';
+        cout << "per-query latency (ms, median over rounds): median " << quantile(per_query, 0.5) << "  p95 "
+             << quantile(per_query, 0.95) << "  p99 " << quantile(per_query, 0.99) << '\n';
         cout << "kernel span (ms, CUDA events, median): " << quantile(per_query_span, 0.5) << '\n';
-        cout << "QPS: " << (total_ms > 0 ? double(count) * rounds / (total_ms / 1000.0) : 0.0)
-             << " (batch 1, measured rounds)\n";
+        cout << "QPS: " << (total_ms > 0 ? double(count) * rounds / (total_ms / 1000.0) : 0.0) << " (batch 1, measured rounds)\n";
         if (!out_path.empty()) {
             cout << "run file: " << out_path << '\n';
         }

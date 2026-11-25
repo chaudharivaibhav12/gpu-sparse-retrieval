@@ -1,7 +1,3 @@
-// range_index.cpp - definitions for range_index.h: SHA-256, the RBP loader with its structural
-// checks, uniform range boundaries and the multiplicity scan. Extracted from src/range_bitpack.h
-// (commit 223cf4b; repository main at 8fc44cd), restricted to the format u4m uses (positions
-// encoding, uniform ranges).
 #include "range_index.h"
 #include "common.h"
 #include <algorithm>
@@ -15,20 +11,17 @@ uint32_t Sha256::rotr(uint32_t x, int n) {
 
 void Sha256::block(const uint8_t* p) {
     static const uint32_t K[64] = {
-        0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4,
-        0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe,
-        0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f,
-        0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7,
-        0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc,
-        0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b,
-        0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116,
-        0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
-        0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7,
-        0xc67178f2};
+        0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01,
+        0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc,
+        0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147,
+        0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+        0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08,
+        0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
+        0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+    };
     uint32_t w[64];
     for (int i{0}; i < 16; ++i) {
-        w[i] = uint32_t(p[4 * i]) << 24 | uint32_t(p[4 * i + 1]) << 16 |
-               uint32_t(p[4 * i + 2]) << 8 | p[4 * i + 3];
+        w[i] = uint32_t(p[4 * i]) << 24 | uint32_t(p[4 * i + 1]) << 16 | uint32_t(p[4 * i + 2]) << 8 | p[4 * i + 3];
     }
     for (int i{16}; i < 64; ++i) {
         const uint32_t s0{rotr(w[i - 15], 7) ^ rotr(w[i - 15], 18) ^ (w[i - 15] >> 3)};
@@ -44,8 +37,7 @@ void Sha256::block(const uint8_t* p) {
     uint32_t g{h[6]};
     uint32_t hh{h[7]};
     for (int i{0}; i < 64; ++i) {
-        const uint32_t t1{hh + (rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25)) + ((e & f) ^ (~e & g)) +
-                          K[i] + w[i]};
+        const uint32_t t1{hh + (rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]};
         const uint32_t t2{(rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))};
         hh = g;
         g = f;
@@ -154,8 +146,6 @@ bool rbp_little_endian() {
     return *reinterpret_cast<const uint8_t*>(&probe) == 1;
 }
 
-// Loads, checks the trailing SHA-256 of all preceding bytes, then checks every
-// structural invariant the kernel relies on for in-bounds access.
 RangeIndex rbp_load(const string& path) {
     require(rbp_little_endian(), "RBP files require a little-endian host");
     ifstream in{path, ios::binary | ios::ate};
@@ -187,8 +177,7 @@ RangeIndex rbp_load(const string& path) {
     };
     char magic[8];
     take(magic, 8);
-    require(memcmp(magic, "GSPRBP02", 8) == 0,
-            "Bad range index magic (u4m needs a positions-encoded GSPRBP02 index)");
+    require(memcmp(magic, "GSPRBP02", 8) == 0, "Bad range index magic (u4m needs a positions-encoded GSPRBP02 index)");
     uint32_t head32[4];
     uint64_t head64[4];
     take(head32, sizeof head32);
@@ -201,8 +190,7 @@ RangeIndex rbp_load(const string& path) {
     take(r.source_sha.data(), 32);
     uint32_t extra[2];
     take(extra, sizeof extra);
-    require(extra[0] == 1 && extra[1] == 0,
-            "Unsupported range index encoding or flags (u4m needs positions, uniform ranges)");
+    require(extra[0] == 1 && extra[1] == 0, "Unsupported range index encoding or flags (u4m needs positions, uniform ranges)");
     const uint64_t blocks{head64[0]};
     const uint64_t nnz{head64[1]};
     const uint64_t words{head64[2]};
@@ -219,31 +207,32 @@ RangeIndex rbp_load(const string& path) {
     require(r.range_size >= 1 && r.range_size <= RBP_MAX_RANGE, "Bad range size");
     r.range_start = rbp_uniform_ranges(r.docs, r.range_size);
     require(r.ranges == r.range_start.size() - 1, "Bad range count");
-    require(r.range_start.size() == size_t(r.ranges) + 1 && r.range_start.front() == 0 &&
-                r.range_start.back() == r.docs,
-            "Bad range boundaries");
+    require(
+        r.range_start.size() == size_t(r.ranges) + 1 && r.range_start.front() == 0 && r.range_start.back() == r.docs,
+        "Bad range boundaries"
+    );
     for (uint32_t range{0}; range < r.ranges; ++range) {
-        require(r.range_start[range + 1] > r.range_start[range] &&
-                    r.range_start[range + 1] - r.range_start[range] <= r.range_size,
-                "Bad range width");
+        require(
+            r.range_start[range + 1] > r.range_start[range] && r.range_start[range + 1] - r.range_start[range] <= r.range_size,
+            "Bad range width"
+        );
     }
-    require(blocks < RBP_NONE && nnz <= UINT32_MAX && words == (r.total_bits + 31) / 32 + 1,
-            "Bad range index sizes");
-    require(r.lookup_first.front() == 0 && r.lookup_first.back() == blocks &&
-                is_sorted(r.lookup_first.begin(), r.lookup_first.end()),
-            "Bad term lookup");
+    require(blocks < RBP_NONE && nnz <= UINT32_MAX && words == (r.total_bits + 31) / 32 + 1, "Bad range index sizes");
+    require(
+        r.lookup_first.front() == 0 && r.lookup_first.back() == blocks && is_sorted(r.lookup_first.begin(), r.lookup_first.end()),
+        "Bad term lookup"
+    );
     require(r.encoded.back() == 0, "Padding word is not zero");
     uint64_t values{0};
     uint64_t bits{0};
     for (uint32_t t{0}; t < r.vocab; ++t) {
         for (uint32_t b{r.lookup_first[t]}; b < r.lookup_first[t + 1]; ++b) {
-            require(r.lookup_range[b] < r.ranges &&
-                        (b == r.lookup_first[t] || r.lookup_range[b] > r.lookup_range[b - 1]),
-                    "Block ranges not ascending within a term");
-            require(r.block_count[b] >= 1 && r.block_width[b] >= 1 && r.block_width[b] <= 16,
-                    "Bad block count or width");
-            require(r.block_value_start[b] == values && r.block_bit_start[b] == bits,
-                    "Blocks are not contiguous");
+            require(
+                r.lookup_range[b] < r.ranges && (b == r.lookup_first[t] || r.lookup_range[b] > r.lookup_range[b - 1]),
+                "Block ranges not ascending within a term"
+            );
+            require(r.block_count[b] >= 1 && r.block_width[b] >= 1 && r.block_width[b] <= 16, "Bad block count or width");
+            require(r.block_value_start[b] == values && r.block_bit_start[b] == bits, "Blocks are not contiguous");
             values += r.block_count[b];
             bits += uint64_t(r.block_count[b]) * r.block_width[b];
         }
@@ -252,8 +241,6 @@ RangeIndex rbp_load(const string& path) {
     return r;
 }
 
-// Largest number of postings one term has for a single document. The source
-// data has 1; a repeated (term, document) pair multiplies the score bound.
 uint32_t rbp_max_multiplicity(const RangeIndex& r) {
     uint32_t longest{r.impacts.empty() ? 0u : 1u};
     for (size_t b{0}; b < r.blocks(); ++b) {
@@ -261,8 +248,7 @@ uint32_t rbp_max_multiplicity(const RangeIndex& r) {
         for (uint32_t j{1}; j < r.block_count[b]; ++j) {
             const uint64_t bit{r.block_bit_start[b] + uint64_t(j) * r.block_width[b]};
             const uint32_t value{rbp_extract(r.encoded.data(), bit, r.block_width[b])};
-            const bool repeat{
-                value == rbp_extract(r.encoded.data(), bit - r.block_width[b], r.block_width[b])};
+            const bool repeat{value == rbp_extract(r.encoded.data(), bit - r.block_width[b], r.block_width[b])};
             run = repeat ? run + 1 : 1;
             longest = max(longest, run);
         }

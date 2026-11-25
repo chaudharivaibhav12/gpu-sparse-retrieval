@@ -1,11 +1,3 @@
-// build_index.cpp - builds the u4m range index (RBP, positions encoding, uniform ranges of W
-// documents) from a GSP forward index, checks it by decoding every posting back against the GSP,
-// and writes it.
-//   build_index GSP OUTPUT.rbp W
-// Extracted from src/range_bitpack_tool.cpp (commit 223cf4b; the "build ... positions" mode) and
-// the builder, writer and round-trip check of src/range_bitpack.h (commit 223cf4b; repository main
-// at 8fc44cd), restricted to the positions encoding without a postings cap. For the same GSP and W
-// the output file is byte-identical to range_bitpack_tool's "build GSP OUTPUT W positions".
 #include "common.h"
 #include "range_index.h"
 #include <algorithm>
@@ -24,11 +16,9 @@
 #include <vector>
 using namespace std;
 
-// Term-major blocks of in-range positions, packed at each block's width.
 static RangeIndex rbp_build(const Index& x, uint32_t range_size) {
     require(range_size >= 1 && range_size <= RBP_MAX_RANGE, "Range size must be 1..32768");
-    require(x.ids.size() <= UINT32_MAX && x.terms.size() <= UINT32_MAX,
-            "Index too large for 32-bit posting positions");
+    require(x.ids.size() <= UINT32_MAX && x.terms.size() <= UINT32_MAX, "Index too large for 32-bit posting positions");
     RangeIndex r;
     r.docs = uint32_t(x.ids.size());
     r.vocab = uint32_t(x.vocab.size());
@@ -43,7 +33,6 @@ static RangeIndex rbp_build(const Index& x, uint32_t range_size) {
     }
     r.ids = x.ids;
     const uint64_t nnz{x.terms.size()};
-    // Counting sort to term-major order; documents stay ascending within a term.
     vector<uint64_t> start(size_t(r.vocab) + 1, 0);
     for (uint32_t t : x.terms) {
         ++start[size_t(t) + 1];
@@ -69,7 +58,7 @@ static RangeIndex rbp_build(const Index& x, uint32_t range_size) {
         r.lookup_first[t] = uint32_t(r.blocks());
         for (uint64_t i{start[t]}; i < start[t + 1];) {
             const uint32_t range{doc_range[term_docs[i]]};
-            // max_gap is the largest packed value: a position within the range.
+
             uint64_t end{i};
             uint32_t previous{r.range_start[range]};
             uint32_t max_gap{0};
@@ -98,8 +87,7 @@ static RangeIndex rbp_build(const Index& x, uint32_t range_size) {
         const uint32_t previous{r.range_start[r.lookup_range[b]]};
         const uint32_t width{r.block_width[b]};
         for (uint32_t j{0}; j < r.block_count[b]; ++j) {
-            const uint32_t doc = term_docs[size_t(r.block_value_start[b]) + j],
-                           gap = doc - previous;
+            const uint32_t doc = term_docs[size_t(r.block_value_start[b]) + j], gap = doc - previous;
             const uint64_t word{bit >> 5};
             const uint32_t shift{uint32_t(bit & 31)};
             r.encoded[word] |= gap << shift;
@@ -132,7 +120,7 @@ static void rbp_save(RangeIndex& r, const string& path) {
     emit(head32, sizeof head32);
     emit(head64, sizeof head64);
     emit(r.source_sha.data(), 32);
-    const uint32_t extra[2]{1u, 0u}; // encoding 1 (positions), no postings cap
+    const uint32_t extra[2]{1u, 0u};
     emit(extra, sizeof extra);
     emit_vec(r.ids);
     emit_vec(r.lookup_first);
@@ -149,11 +137,8 @@ static void rbp_save(RangeIndex& r, const string& path) {
     require(bool(out), "Range index write failed");
 }
 
-// Inverts the index back to forward (document-major) postings and compares
-// them with the GSP source, so every position, width, offset and impact is checked.
 static void rbp_verify_roundtrip(const Index& x, const RangeIndex& r) {
-    require(r.docs == x.ids.size() && r.vocab == x.vocab.size() && r.ids == x.ids,
-            "Document/vocabulary/ID mismatch");
+    require(r.docs == x.ids.size() && r.vocab == x.vocab.size() && r.ids == x.ids, "Document/vocabulary/ID mismatch");
     require(r.impacts.size() == x.terms.size(), "Posting count mismatch");
     vector<uint64_t> offsets(size_t(r.docs) + 1, 0);
     vector<uint32_t> docs(r.impacts.size());
@@ -162,13 +147,12 @@ static void rbp_verify_roundtrip(const Index& x, const RangeIndex& r) {
         const uint64_t last{r.range_start[r.lookup_range[b] + 1]};
         uint64_t doc{first};
         for (uint32_t j{0}; j < r.block_count[b]; ++j) {
-            const uint32_t value{rbp_extract(r.encoded.data(),
-                                             r.block_bit_start[b] + uint64_t(j) * r.block_width[b],
-                                             r.block_width[b])};
+            const uint32_t value{
+                rbp_extract(r.encoded.data(), r.block_bit_start[b] + uint64_t(j) * r.block_width[b], r.block_width[b])
+            };
             const uint64_t before{doc};
             doc = first + value;
-            require(doc < last && (j == 0 || doc >= before),
-                    "Decoded document leaves its range or goes backwards");
+            require(doc < last && (j == 0 || doc >= before), "Decoded document leaves its range or goes backwards");
             docs[size_t(r.block_value_start[b]) + j] = uint32_t(doc);
             ++offsets[doc + 1];
         }
@@ -190,7 +174,6 @@ static void rbp_verify_roundtrip(const Index& x, const RangeIndex& r) {
             }
         }
     }
-    // The rebuilt lists are term-ascending; sort the source lists the same way.
     vector<pair<uint32_t, uint8_t>> expected;
     for (uint32_t d{0}; d < r.docs; ++d) {
         expected.clear();
@@ -201,9 +184,10 @@ static void rbp_verify_roundtrip(const Index& x, const RangeIndex& r) {
             return a.first < b.first;
         });
         for (uint64_t j{x.offsets[d]}; j < x.offsets[d + 1]; ++j) {
-            require(expected[j - x.offsets[d]].first == terms[j] &&
-                        expected[j - x.offsets[d]].second == impacts[j],
-                    "Round-trip posting mismatch at document " + to_string(d));
+            require(
+                expected[j - x.offsets[d]].first == terms[j] && expected[j - x.offsets[d]].second == impacts[j],
+                "Round-trip posting mismatch at document " + to_string(d)
+            );
         }
     }
 }
@@ -214,20 +198,18 @@ int main(int argc, char** argv) {
         const string text{argv[3]};
         size_t used{0};
         const unsigned long long range{stoull(text, &used)};
-        require(!text.empty() && text[0] != '-' && used == text.size() && range >= 1 &&
-                    range <= RBP_MAX_RANGE,
-                "Invalid range size W");
+        require(
+            !text.empty() && text[0] != '-' && used == text.size() && range >= 1 && range <= RBP_MAX_RANGE, "Invalid range size W"
+        );
         const Index x{load(argv[1])};
         RangeIndex r{rbp_build(x, uint32_t(range))};
         r.source_sha = sha_file(argv[1]);
         rbp_verify_roundtrip(x, r);
         rbp_save(r, argv[2]);
-        cout << "INDEX docs=" << r.docs << " vocab=" << r.vocab << " W=" << r.range_size
-             << " ranges=" << r.ranges << " blocks=" << r.blocks()
-             << " postings=" << r.impacts.size() << " bytes=" << filesystem::file_size(argv[2])
+        cout << "INDEX docs=" << r.docs << " vocab=" << r.vocab << " W=" << r.range_size << " ranges=" << r.ranges
+             << " blocks=" << r.blocks() << " postings=" << r.impacts.size() << " bytes=" << filesystem::file_size(argv[2])
              << " roundtrip=verified\n";
-        cout << "INDEX_SHA256 file=" << sha_hex(r.file_sha)
-             << " source_gsp=" << sha_hex(r.source_sha) << '\n';
+        cout << "INDEX_SHA256 file=" << sha_hex(r.file_sha) << " source_gsp=" << sha_hex(r.source_sha) << '\n';
         return 0;
     } catch (const exception& e) {
         cerr << "ERROR: " << e.what() << '\n';

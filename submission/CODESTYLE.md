@@ -58,7 +58,20 @@ int lo{0}, hi{n};
 int lo{0}; int hi{n};
 ```
 
-This includes struct fields: one field per line.
+This includes struct fields and arrays: one field or array per line.
+
+```cpp
+// Good
+uint32_t lo[RBP_V3_UNROLL];
+uint32_t hi[RBP_V3_UNROLL];
+```
+
+Exception: a short group of related values derived from built-ins, such as thread indices, may share
+one `const` declaration with `=` initialisers, as long as the whole statement fits on one line:
+
+```cpp
+const uint32_t thread = threadIdx.x, threads = blockDim.x, lane = thread & 31, warp = thread >> 5, warps = threads >> 5;
+```
 
 ## 5. No one-line bodies
 
@@ -98,12 +111,25 @@ while (lo < hi) lo++;
 
 ## 8. Formatter
 
-Rules 5–7 are enforced by `clang-format` with this `.clang-format` (keep it at the code root):
+Rules 5–7 are enforced by `clang-format` with this `.clang-format` (keep it at the code root). Lines are
+at most 130 characters. A parameter list that doesn't fit on one line puts each parameter on its own
+line, indented one level, with the closing parenthesis on its own line:
+
+```cpp
+void range_scores_launch(
+    uint32_t ranges,
+    uint32_t threads,
+    // ...
+    uint64_t* merge_keys
+);
+```
+
+The configuration:
 
 ```yaml
 BasedOnStyle: LLVM
 IndentWidth: 4
-ColumnLimit: 100
+ColumnLimit: 130
 AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
@@ -114,6 +140,9 @@ SortIncludes: Never
 InsertBraces: true
 SpaceBeforeParens: ControlStatements
 PointerAlignment: Left
+AlignAfterOpenBracket: BlockIndent
+BinPackParameters: OnePerLine
+AllowAllParametersOfDeclarationOnNextLine: false
 ```
 
 Run `clang-format -i` on every changed `.h/.cuh/.cpp/.cu` file before committing. Rules 1–4 are not

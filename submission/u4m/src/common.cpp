@@ -1,6 +1,3 @@
-// common.cpp - definitions for common.h: error reporting, the GSP loader and the prepared-query
-// reader. Extracted from src/cpu_pilot.cpp (commit d84ca0b; repository main at 8fc44cd): require,
-// get, get_vec, load and read_queries, unchanged. All binary integers are little endian.
 #include "common.h"
 #include <algorithm>
 #include <cstring>
@@ -58,9 +55,9 @@ Index load(const string& path) {
         require(bool(in), "Truncated dictionary");
         x.vocab.push_back(s);
     }
-    require(x.offsets.front() == 0 && x.offsets.back() == nnz &&
-                is_sorted(x.offsets.begin(), x.offsets.end()),
-            "Bad document offsets");
+    require(
+        x.offsets.front() == 0 && x.offsets.back() == nnz && is_sorted(x.offsets.begin(), x.offsets.end()), "Bad document offsets"
+    );
     for (auto t : x.terms) {
         require(t < v, "Bad term ID");
     }

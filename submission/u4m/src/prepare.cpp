@@ -1,19 +1,3 @@
-// prepare.cpp - prepares u4m's inputs from the pinned public SPLADE files:
-//   prepare import CIFF OUTPUT.gsp COUNT         CIFF -> GSP forward index of COUNT passages (COUNT
-//   = 8841823:
-//                                                 the full collection; smaller: a deterministic
-//                                                 hash-chosen subset)
-//   prepare queries DEV.pisa INDEX.gsp OUTPUT.tsv CAL_COUNT
-//                                                 the first CAL_COUNT queries of the fixed hash
-//                                                 order (the calibration split), as
-//                                                 "qid<TAB>term:weight ..." with weights rescaled
-//                                                 to at most 32; OUTPUT.tsv.split.tsv lists the
-//                                                 split
-// Extracted from src/cpu_pilot.cpp (commit d84ca0b; repository main at 8fc44cd): the import and
-// queries modes and their helpers, unchanged except that existing outputs are overwritten (no
-// refuse-to-overwrite check). With COUNT = 8841823 and CAL_COUNT = 500 it writes the same GSP and
-// calibration file as experiments/2026-11-15-full-collection-baselines/code/prepare_inputs.py and
-// the team's query preparation.
 #include "common.h"
 #include <algorithm>
 #include <cmath>
@@ -116,11 +100,15 @@ Proto proto(const vector<uint8_t>& b) {
     return {b.data(), b.data() + b.size()};
 }
 uint64_t number(const string& s) {
-    require(!s.empty() && all_of(s.begin(), s.end(),
-                                 [](char c) {
-                                     return c >= '0' && c <= '9';
-                                 }),
-            "Expected numeric MS MARCO passage ID");
+    require(
+        !s.empty() && all_of(
+                          s.begin(), s.end(),
+                          [](char c) {
+                              return c >= '0' && c <= '9';
+                          }
+                      ),
+        "Expected numeric MS MARCO passage ID"
+    );
     size_t used{0};
     unsigned long long x{stoull(s, &used)};
     require(used == s.size(), "Bad ID");
@@ -181,8 +169,7 @@ void import_ciff(const string& path, const string& output, uint32_t count) {
             h.skip(k & 7);
         }
     }
-    require(version == 1 && n > 0 && v > 0 && count > 0 && count <= n,
-            "Unsupported CIFF header or subset size");
+    require(version == 1 && n > 0 && v > 0 && count > 0 && count <= n, "Unsupported CIFF header or subset size");
     streampos start{in.tellg()};
     for (uint32_t t{0}; t < v; t++) {
         uint64_t len{varint(in)};
@@ -271,11 +258,9 @@ void import_ciff(const string& path, const string& output, uint32_t count) {
                         q.skip(z & 7);
                     }
                 }
-                require(delta <= UINT32_MAX && impact <= 255,
-                        "CIFF impact or delta outside supported range");
+                require(delta <= UINT32_MAX && impact <= 255, "CIFF impact or delta outside supported range");
                 did += delta;
-                require(did < n && (seen == 0 || did > previous),
-                        "Invalid/duplicate posting document ID");
+                require(did < n && (seen == 0 || did > previous), "Invalid/duplicate posting document ID");
                 previous = did;
                 seen++;
                 max_impact = max(max_impact, uint32_t(impact));
@@ -286,8 +271,7 @@ void import_ciff(const string& path, const string& output, uint32_t count) {
                 p.skip(k & 7);
             }
         }
-        require(!term.empty() && unique_terms.insert(term).second && df == seen,
-                "Invalid term or df mismatch");
+        require(!term.empty() && unique_terms.insert(term).second && df == seen, "Invalid term or df mismatch");
         x.vocab.push_back(term);
         postings += seen;
         if (t % 5000 == 0) {
@@ -304,12 +288,10 @@ void import_ciff(const string& path, const string& output, uint32_t count) {
         vector<Pair>().swap(doc);
     }
     save(x, output);
-    cout << "IMPORTED docs=" << count << " terms=" << v << " selected_nnz=" << x.terms.size()
-         << " source_postings=" << postings << " max_impact=" << max_impact
-         << " bytes=" << filesystem::file_size(output) << '\n';
+    cout << "IMPORTED docs=" << count << " terms=" << v << " selected_nnz=" << x.terms.size() << " source_postings=" << postings
+         << " max_impact=" << max_impact << " bytes=" << filesystem::file_size(output) << '\n';
 }
-void prepare_queries(const string& file, const string& index_path, const string& output,
-                     uint32_t calibration_count) {
+void prepare_queries(const string& file, const string& index_path, const string& output, uint32_t calibration_count) {
     Index x{load(index_path)};
     unordered_map<string, uint32_t> dictionary;
     for (uint32_t t{0}; t < x.vocab.size(); t++) {
@@ -351,8 +333,7 @@ void prepare_queries(const string& file, const string& index_path, const string&
     uint32_t rescaled{0};
     for (size_t i{0}; i < entries.size(); i++) {
         Entry& e{entries[i]};
-        split << e.id << '\t' << (i < calibration_count ? "calibration" : "heldout") << '\t'
-              << e.hash << '\n';
+        split << e.id << '\t' << (i < calibration_count ? "calibration" : "heldout") << '\t' << e.hash << '\n';
         if (i >= calibration_count) {
             continue;
         }
@@ -374,8 +355,7 @@ void prepare_queries(const string& file, const string& index_path, const string&
         q.id = e.id;
         uint64_t sum{0};
         for (auto& item : counts) {
-            uint32_t weight{max_count > 32 ? uint32_t(ceil(float(item.second) * scale))
-                                           : item.second};
+            uint32_t weight{max_count > 32 ? uint32_t(ceil(float(item.second) * scale)) : item.second};
             unordered_map<string, uint32_t>::iterator found{dictionary.find(item.first)};
             if (found != dictionary.end()) {
                 q.terms.emplace_back(found->second, weight);
@@ -390,15 +370,16 @@ void prepare_queries(const string& file, const string& index_path, const string&
         o << '\n';
         max_score_bound = max(max_score_bound, sum * 255);
     }
-    cout << "PREPARED total_queries=" << entries.size() << " calibration=" << calibration_count
-         << " rescaled=" << rescaled << " max_conservative_score=" << max_score_bound
-         << " arithmetic=uint64 query_policy=BMP-f32-ceil-cap32\n";
+    cout << "PREPARED total_queries=" << entries.size() << " calibration=" << calibration_count << " rescaled=" << rescaled
+         << " max_conservative_score=" << max_score_bound << " arithmetic=uint64 query_policy=BMP-f32-ceil-cap32\n";
 }
 
 int main(int argc, char** argv) {
     try {
-        require(argc >= 2, "Usage: prepare import CIFF OUTPUT.gsp COUNT | queries DEV.pisa "
-                           "INDEX.gsp OUTPUT.tsv CAL_COUNT");
+        require(
+            argc >= 2, "Usage: prepare import CIFF OUTPUT.gsp COUNT | queries DEV.pisa "
+                       "INDEX.gsp OUTPUT.tsv CAL_COUNT"
+        );
         string mode{argv[1]};
         if (mode == "import") {
             require(argc == 5, "import needs 3 arguments");
