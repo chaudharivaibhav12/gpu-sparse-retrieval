@@ -1,22 +1,5 @@
-// Exact exhaustive CPU scorer: the sequential (THREADS=1) and multicore (OpenMP, THREADS>1) baselines.
-//
-// cpu_exhaustive INDEX.gsp QUERIES.tsv OUT.csv OUT_TOP.tsv LIMIT K THREADS ROUNDS WARMUPS
-//
-// Same index (GSP), queries, scoring contract and ties as the GPU range scorer: uint8 document
-// impacts times prepared integer query weights, accumulated in uint32 under the same guard as the
-// GPU (a query whose conservative bound sum(weight x max term impact) is >= 2^32-1 is rejected before
-// any scoring), reported as uint64; ties by original numeric passage ID ascending; every passage is
-// eligible, including score 0. Repeated query terms keep the last weight, as cpu_pilot does.
-//
-// Untimed setup: load the GSP, build a term-major inverted index (postings ascending by document),
-// split the documents into THREADS contiguous parts of about equal posting count, and record where
-// each part starts in every term's list. Each thread first-touches its own accumulator.
-//
-// Timed, per query: build the query's weight list from its parsed (term, weight) pairs; every thread
-// zeroes its accumulator, adds weight x impact for each query posting in its part (term at a time) and
-// keeps its part's canonical top-k; the main thread merges the parts' lists into the final ordered
-// (original ID, score) top-k. File writes are outside the timed region. With THREADS=1 the worker runs
-// on the calling thread, without an OpenMP region.
+// Exact exhaustive CPU scorer (1 thread or OpenMP): same index, scores and tie order as the GPU scorers.
+// Usage: cpu_exhaustive INDEX.gsp QUERIES.tsv OUT.csv OUT_TOP.tsv LIMIT K THREADS ROUNDS WARMUPS
 #define GSP_NO_MAIN
 #include "cpu_pilot.cpp"
 #include <chrono>
@@ -27,13 +10,13 @@ namespace {
 struct Inverted {
     uint32_t docs = 0, vocab = 0;
     uint64_t nnz = 0;
-    vector<uint64_t> ids;          // original passage IDs, by internal document number
-    vector<uint64_t> start;        // vocab + 1
-    vector<uint32_t> post_doc;     // ascending within each term
+    vector<uint64_t> ids;          
+    vector<uint64_t> start;        
+    vector<uint32_t> post_doc;     
     vector<uint8_t> post_impact;
-    vector<uint8_t> max_impact;    // per term
-    vector<uint32_t> part_begin;   // parts + 1 document boundaries
-    vector<uint64_t> cut;          // (parts + 1) x vocab: first posting of part p in term t
+    vector<uint8_t> max_impact;    
+    vector<uint32_t> part_begin;   
+    vector<uint64_t> cut;          
 };
 
 Inverted build(Index&& x, uint32_t parts) {
@@ -51,7 +34,6 @@ Inverted build(Index&& x, uint32_t parts) {
             v.post_doc[fill[t]] = d; v.post_impact[fill[t]] = x.impacts[j]; fill[t]++;
             v.max_impact[t] = max(v.max_impact[t], x.impacts[j]);
         }
-    // Parts of about equal posting count; boundaries are document numbers.
     v.part_begin.assign(parts + 1, v.docs);
     v.part_begin[0] = 0;
     for (uint32_t p = 1; p < parts; p++) {
@@ -67,14 +49,13 @@ Inverted build(Index&& x, uint32_t parts) {
                 : uint64_t(lower_bound(first, last, v.part_begin[p]) - v.post_doc.begin());
     }
     v.ids = move(x.ids);
-    x = Index();  // release the forward arrays
+    x = Index();  
     return v;
 }
 
 struct Hit { uint32_t score; uint64_t id; };
 inline bool better(const Hit& a, const Hit& b) { return a.score != b.score ? a.score > b.score : a.id < b.id; }
 
-// Canonical top-k of documents [begin, end) given their scores acc[0 .. end-begin).
 void local_topk(const Inverted& v, const uint32_t* acc, uint32_t begin, uint32_t end, uint32_t k, vector<Hit>& out) {
     out.clear();
     uint32_t n = end - begin, take = min(k, n);
@@ -111,7 +92,7 @@ void score_part(const Inverted& v, uint32_t p, const vector<pair<uint32_t, uint3
     local_topk(v, acc, begin, end, k, w.hits);
 }
 
-}  // namespace
+}  
 
 int main(int argc, char** argv) {
     try {
@@ -125,7 +106,6 @@ int main(int argc, char** argv) {
         auto all = read_queries(query_path);
         size_t count = min(size_t(limit), all.size());
         Inverted v = build(move(loaded), threads);
-        // Validate every query and the uint32 guard before anything is timed.
         for (size_t i = 0; i < count; i++) {
             uint64_t bound = 0;
             for (auto [t, weight] : all[i].terms) {
@@ -135,7 +115,6 @@ int main(int argc, char** argv) {
             require(bound < 4294967295ULL, "Query exceeds the guarded uint32 domain: " + all[i].id);
         }
         vector<Worker> workers(threads);
-        // Every part must be scored by exactly one thread: a team smaller than THREADS would skip parts.
         omp_set_dynamic(0);
         int team = 0;
         if (threads > 1) {
@@ -143,7 +122,7 @@ int main(int argc, char** argv) {
             {
                 uint32_t p = omp_get_thread_num();
                 if (p == 0) team = omp_get_num_threads();
-                workers[p].acc.assign(v.part_begin[p + 1] - v.part_begin[p], 0);  // first touch by its thread
+                workers[p].acc.assign(v.part_begin[p + 1] - v.part_begin[p], 0);  
             }
             require(team == int(threads), "OpenMP gave " + to_string(team) + " threads, need " + to_string(threads));
         } else {

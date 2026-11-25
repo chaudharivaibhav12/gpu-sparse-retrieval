@@ -1,0 +1,581 @@
+--- a/bin/search.rs
++++ b/bin/search.rs
+@@ -1,7 +1,7 @@
+ use anyhow::Result;
+ 
+ use bmp::query::cursors_from_queries;
+-use bmp::search::b_search;
++use bmp::search::b_search_canonical;
+ use bmp::util::to_trec;
+ use std::path::PathBuf;
+ use structopt::StructOpt;
+@@ -40,7 +40,7 @@
+     let (q_ids, cursors) = cursors_from_queries(args.queries, &index);
+ 
+     eprintln!("Performing query processing");
+-    let results = b_search(cursors, &bfwd, args.k, args.alpha, args.beta);
++    let results = b_search_canonical(cursors, &bfwd, index.documents(), args.k, args.alpha, args.beta);
+ 
+     eprintln!("Exporting TREC run");
+     // 4. Log results into TREC format
+--- a/src/index/forward_index.rs
++++ b/src/index/forward_index.rs
+@@ -14,7 +14,7 @@
+ 
+ #[derive(Default, Serialize, Deserialize, Clone)]
+ pub struct BlockDocument {
+-    pub terms: Vec<u16>,
++    pub terms: Vec<u64>,
+     pub docs_impacts: Vec<Vec<(u8, u8)>>,
+ }
+ 
+@@ -122,8 +122,8 @@
+     query: &Vec<(u16, u8)>,
+     document: &[(u16, Vec<(u8, u8)>)],
+     bsize: usize,
+-) -> Vec<u16> {
+-    let mut doc_score = vec![0; bsize];
++) -> Vec<u64> {
++    let mut doc_score = vec![0u64; bsize];
+ 
+     unsafe {
+         let mut term_ptr = document.as_ptr();
+@@ -139,7 +139,7 @@
+                 let mut inner_ptr = (*term_ptr).1.as_ptr();
+                 let end_inner_ptr = inner_ptr.wrapping_offset((*term_ptr).1.len() as isize);
+                 while inner_ptr != end_inner_ptr {
+-                    doc_score[(*inner_ptr).0 as usize] += (value as u16) * ((*inner_ptr).1 as u16);
++                    doc_score[(*inner_ptr).0 as usize] += (value as u64) * ((*inner_ptr).1 as u64);
+                     inner_ptr = inner_ptr.add(1);
+                 }
+             }
+@@ -148,3 +148,15 @@
+ 
+     doc_score
+ }
++
++#[cfg(test)]
++mod correctness_tests {
++    use super::*;
++
++    #[test]
++    fn scoring_accumulates_above_u16() {
++        let query: Vec<_> = (0..10).map(|t| (t as u16, 32u8)).collect();
++        let document: Vec<_> = (0..10).map(|t| (t as u16, vec![(0u8, 255u8)])).collect();
++        assert_eq!(block_score(&query, &document, 8)[0], 81_600u64);
++    }
++}
+--- a/src/query/live_block.rs
++++ b/src/query/live_block.rs
+@@ -3,14 +3,14 @@
+     query_ranges: &[&[u8]],
+     query_weights: &[u8],
+     vector_len: usize,
+-) -> Vec<u16> {
++) -> Vec<u64> {
+     // let vector_len: usize = query_ranges[0].len();
+-    let mut upper_bounds: Vec<u16> = vec![0; vector_len];
++    let mut upper_bounds: Vec<u64> = vec![0; vector_len];
+ 
+     // Iterate over each vector in scores and add its elements to the result
+     for (&vec, &weight) in query_ranges.iter().zip(query_weights.iter()) {
+         for (i, &score) in vec.iter().enumerate() {
+-            let multiplied = score as u16 * weight as u16;
++            let multiplied = score as u64 * weight as u64;
+             upper_bounds[i] = upper_bounds[i].saturating_add(multiplied);
+         }
+     }
+@@ -22,15 +22,15 @@
+     query_ranges: &[&[crate::index::posting_list::CompressedBlock]],
+     query_weights: &[u8],
+     vector_len: usize,
+-) -> Vec<u16> {
++) -> Vec<u64> {
+     // let vector_len: usize = query_ranges[0].len();
+-    let mut upper_bounds: Vec<u16> = vec![0; vector_len];
++    let mut upper_bounds: Vec<u64> = vec![0; vector_len];
+ 
+     // Iterate over each vector in scores and add its elements to the result
+     for (&vec, &weight) in query_ranges.iter().zip(query_weights.iter()) {
+         for (bid, block) in vec.iter().enumerate() {
+             for &(offset, score) in &block.max_scores {
+-                let multiplied = score as u16 * weight as u16;
++                let multiplied = score as u64 * weight as u64;
+                 upper_bounds[bid * 256 + offset] =
+                     upper_bounds[bid * 256 + offset].saturating_add(multiplied);
+             }
+@@ -38,3 +38,22 @@
+     }
+     upper_bounds
+ }
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn raw_and_compressed_bounds_exceed_u16_without_saturation() {
++        let rows = vec![vec![255u8]; 10];
++        let raw: Vec<&[u8]> = rows.iter().map(|v| v.as_slice()).collect();
++        let weights = vec![32u8; 10];
++        assert_eq!(compute_upper_bounds_raw(&raw, &weights, 1), vec![81_600u64]);
++        let packed: Vec<_> = (0..10).map(|_| vec![crate::index::posting_list::CompressedBlock {
++            max_scores: vec![(0, 255)],
++        }]).collect();
++        let compressed: Vec<&[crate::index::posting_list::CompressedBlock]> =
++            packed.iter().map(|v| v.as_slice()).collect();
++        assert_eq!(compute_upper_bounds(&compressed, &weights, 1), vec![81_600u64]);
++    }
++}
+--- a/src/query/mod.rs
++++ b/src/query/mod.rs
+@@ -47,7 +47,7 @@
+     for t in values {
+         *token_freqs.entry(t.to_string()).or_insert(0) += 1;
+     }
+-    let max_tok_weight = token_freqs.iter().map(|p| *p.1).max().unwrap();
++    let max_tok_weight = token_freqs.iter().map(|p| *p.1).max().unwrap_or(0);
+     if max_tok_weight > MAX_TERM_WEIGHT as u32 {
+         let scale: f32 = MAX_TERM_WEIGHT as f32 / max_tok_weight as f32;
+         for value in token_freqs.values_mut() {
+--- a/src/query/topk_heap.rs
++++ b/src/query/topk_heap.rs
+@@ -5,108 +5,100 @@
+ pub struct Entry<S> {
+     pub doc_id: DocId,
+     pub score: S,
++    pub tie_id: u64,
+ }
+ 
+ impl<S: Copy + PartialOrd> Ord for Entry<S> {
+     fn cmp(&self, other: &Self) -> Ordering {
+-        other
+-            .score
+-            .partial_cmp(&self.score)
+-            .unwrap_or_else(|| other.doc_id.cmp(&self.doc_id))
++        other.score.partial_cmp(&self.score).unwrap_or(Ordering::Equal)
++            .then_with(|| self.tie_id.cmp(&other.tie_id))
+     }
+ }
+ 
+ impl<S: Copy + PartialOrd> PartialOrd for Entry<S> {
+-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+-        Some(self.cmp(other))
+-    }
++    fn partial_cmp(&self, other: &Self) -> Option<Ordering> { Some(self.cmp(other)) }
+ }
+ 
+ impl<S: Copy + PartialOrd> PartialEq for Entry<S> {
+-    fn eq(&self, other: &Self) -> bool {
+-        self.score
+-            .partial_cmp(&other.score)
+-            .unwrap_or_else(|| other.doc_id.cmp(&self.doc_id))
+-            == Ordering::Equal
+-    }
++    fn eq(&self, other: &Self) -> bool { self.cmp(other) == Ordering::Equal }
+ }
+-
+ impl<S: Copy + PartialOrd> Eq for Entry<S> {}
+ 
+ #[derive(Clone)]
+ pub struct TopKHeap<S> {
+-    // BinaryHeap to efficiently manage the K largest elements.
+     heap: std::collections::BinaryHeap<Entry<S>>,
+-    // The current threshold value used to determine if a new score would qualify for entry.
+     threshold: S,
+-    // The maximum number of elements to be maintained in the heap.
+     k: usize,
+ }
+ 
+ impl<S: Default + Copy + PartialOrd> TopKHeap<S> {
+-    /// Creates a new `TopKHeap` with the specified K value.
+-    pub fn new(k: usize) -> Self {
+-        // Initialize the heap with a default threshold of 0.0.
+-        Self::with_threshold(k, S::default())
++    pub fn new(k: usize) -> Self { Self::with_threshold(k, S::default()) }
++
++    pub fn with_threshold(k: usize, threshold: S) -> Self {
++        Self { heap: std::collections::BinaryHeap::with_capacity(k), threshold, k }
+     }
+ 
+-    /// Creates a new `TopKHeap` with the specified K value and initial threshold.
+-    pub fn with_threshold(k: usize, threshold: S) -> Self {
+-        Self {
+-            heap: std::collections::BinaryHeap::with_capacity(k),
+-            threshold,
+-            k,
++    pub fn threshold(&self) -> S { self.threshold }
++    pub fn len(&self) -> usize { self.heap.len() }
++
++    pub fn would_enter(&self, score: S) -> bool {
++        self.k > 0 && (self.heap.len() < self.k || score >= self.threshold)
++    }
++
++    pub fn insert(&mut self, doc_id: DocId, score: S) -> Option<S> {
++        self.insert_with_tie(doc_id, score, doc_id.0 as u64)
++    }
++
++    pub fn insert_with_tie(&mut self, doc_id: DocId, score: S, tie_id: u64) -> Option<S> {
++        if self.k == 0 { return None; }
++        let entry = Entry { doc_id, score, tie_id };
++        if self.heap.len() < self.k {
++            self.heap.push(entry);
++        } else if entry < *self.heap.peek().unwrap() {
++            *self.heap.peek_mut().unwrap() = entry;
++        }
++        if self.heap.len() == self.k {
++            self.threshold = self.heap.peek().unwrap().score;
++            Some(self.threshold)
++        } else {
++            None
+         }
+     }
+ 
+-    /// Gets the current threshold value.
+-    pub fn threshold(&self) -> S {
+-        self.threshold
++    pub fn to_sorted_vec(&mut self) -> Vec<Entry<S>> {
++        let mut sorted = Vec::with_capacity(self.heap.len());
++        while let Some(entry) = self.heap.pop() { sorted.push(entry); }
++        sorted.reverse();
++        self.threshold = S::default();
++        sorted
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn numeric_ties_replace_worse_ids() {
++        let mut heap = TopKHeap::new(2);
++        heap.insert_with_tie(DocId(0), 7u64, 100);
++        heap.insert_with_tie(DocId(1), 7u64, 20);
++        heap.insert_with_tie(DocId(2), 7u64, 3);
++        let ids: Vec<_> = heap.to_sorted_vec().iter().map(|e| e.tie_id).collect();
++        assert_eq!(ids, vec![3, 20]);
+     }
+ 
+-    /// Determines if a given score would qualify for entry into the top-k heap.
+-    pub fn would_enter(&self, score: S) -> bool {
+-        score > self.threshold
+-    }
+-
+-    /// Inserts a document with its score into the top-k heap.
+-    ///
+-    /// If the score does not qualify for entry, returns `None`.
+-    /// Otherwise, inserts the entry into the heap and updates the threshold.
+-    /// Returns the new threshold if the heap size reaches or exceeds k, otherwise returns `None`.
+-    pub fn insert(&mut self, doc_id: DocId, score: S) -> Option<S> {
+-        // Check if the score qualifies for entry into the top-k heap.
+-        if !self.would_enter(score) {
+-            return None;
+-        }
+-        // Push the new entry into the heap.
+-        self.heap.push(Entry { doc_id, score });
+-        // Check if the heap size is within the top-k limit.
+-        if self.heap.len() <= self.k {
+-            // If the heap size equals k, update the threshold and return it.
+-            if self.heap.len() == self.k {
+-                self.threshold = self.heap.peek().unwrap().score;
+-                Some(self.threshold)
+-            } else {
+-                None
+-            }
+-        } else {
+-            self.heap.pop();
+-            self.threshold = self.heap.peek().unwrap().score;
+-            Some(self.threshold)
+-        }
+-    }
+-
+-    /// Converts the TopKHeap into a sorted vector of entries.
+-    ///
+-    /// This method efficiently pops elements from the heap until it is empty,
+-    /// then reverses the vector to obtain the elements in descending order.
+-    pub fn to_sorted_vec(&mut self) -> Vec<Entry<S>> {
+-        let mut sorted_vec = Vec::with_capacity(self.heap.len());
+-        while let Some(elem) = self.heap.pop() {
+-            sorted_vec.push(elem);
+-        }
+-        sorted_vec.reverse();
+-        sorted_vec
++    #[test]
++    fn zero_scores_wide_scores_and_zero_depth() {
++        let mut heap = TopKHeap::new(3);
++        heap.insert_with_tie(DocId(0), 0u64, 10);
++        heap.insert_with_tie(DocId(1), 100_000u64, 20);
++        assert_eq!(heap.len(), 2);
++        let rows = heap.to_sorted_vec();
++        assert_eq!(rows[0].score, 100_000);
++        assert_eq!(rows[1].score, 0);
++        let mut empty = TopKHeap::new(0);
++        assert_eq!(empty.insert(DocId(0), 1u64), None);
++        assert_eq!(empty.len(), 0);
+     }
+ }
+--- a/src/search.rs
++++ b/src/search.rs
+@@ -1,172 +1,100 @@
+-use crate::index::forward_index::block_score;
+-use crate::index::forward_index::BlockForwardIndex;
++use crate::index::forward_index::{block_score, BlockForwardIndex};
+ use crate::index::posting_list::PostingListIterator;
+-use crate::query::cursor::DocId;
+-use crate::query::cursor::{RangeMaxScore, RangeMaxScoreCursor};
++use crate::query::cursor::{DocId, RangeMaxScore, RangeMaxScoreCursor};
+ use crate::query::live_block;
+ use crate::query::topk_heap::TopKHeap;
+ use crate::util::progress_bar;
++use std::collections::HashSet;
+ use std::time::Instant;
+ 
+-#[cfg(target_arch = "aarch64")]
+-use std::arch::aarch64::{_prefetch, _PREFETCH_LOCALITY0, _PREFETCH_READ};
+-
+-#[cfg(target_arch = "x86_64")]
+-use std::arch::x86_64::{_mm_prefetch, _MM_HINT_T0};
+-
+-
+-#[cfg(target_arch = "x86_64")]
+-fn prefetch_block(forward_index: &BlockForwardIndex, block: u32) {
+-    unsafe {
+-        _mm_prefetch(
+-            forward_index.data.as_ptr().add(block as usize) as *const i8,
+-            _MM_HINT_T0,
+-        );
+-    }
+-}
+-
+-#[cfg(target_arch = "aarch64")]
+-fn prefetch_block(forward_index: &BlockForwardIndex, block: u32) {
+-    unsafe {
+-        _prefetch(
+-            forward_index.data.as_ptr().add(block as usize) as *const i8,
+-            _PREFETCH_READ,
+-            _PREFETCH_LOCALITY0,
+-        );
+-    }
+-}
+-
+-
+ pub fn b_search(
+-    queries: Vec<Vec<PostingListIterator>>,
+-    forward_index: &BlockForwardIndex,
+-    k: usize,
+-    alpha: f32,
+-    terms_r: f32,
+-) -> Vec<TopKHeap<u16>> {
++    queries: Vec<Vec<PostingListIterator>>, forward_index: &BlockForwardIndex,
++    k: usize, alpha: f32, terms_r: f32,
++) -> Vec<TopKHeap<u64>> {
+     b_search_verbose(queries, forward_index, k, alpha, terms_r, true)
+ }
+ 
+ pub fn b_search_verbose(
+-    mut queries: Vec<Vec<PostingListIterator>>,
+-    forward_index: &BlockForwardIndex,
+-    k: usize,
+-    alpha: f32,
+-    terms_r: f32,
+-    verbose: bool,
+-) -> Vec<TopKHeap<u16>> {
+-    let mut results: Vec<TopKHeap<u16>> = Vec::new();
++    queries: Vec<Vec<PostingListIterator>>, forward_index: &BlockForwardIndex,
++    k: usize, alpha: f32, terms_r: f32, verbose: bool,
++) -> Vec<TopKHeap<u64>> {
++    search_with_ids(queries, forward_index, k, alpha, terms_r, verbose, None)
++}
+ 
+-    let progress = if verbose {
+-        Some(progress_bar("Forward index-based search", queries.len()))
+-    } else {
+-        None
+-    };
++/// Project-contract CLI entry point. Native API entry points remain callable.
++pub fn b_search_canonical(
++    queries: Vec<Vec<PostingListIterator>>, forward_index: &BlockForwardIndex,
++    document_names: &[String], k: usize, alpha: f32, terms_r: f32,
++) -> Vec<TopKHeap<u64>> {
++    assert!(alpha == 1.0 && terms_r == 1.0, "Canonical exact mode requires alpha=beta=1");
++    let ids: Vec<u64> = document_names.iter().map(|s|
++        s.parse::<u64>().expect("Canonical exact mode requires numeric passage IDs")).collect();
++    assert_eq!(ids.iter().collect::<HashSet<_>>().len(), ids.len(), "Duplicate passage ID");
++    search_with_ids(queries, forward_index, k, alpha, terms_r, true, Some(&ids))
++}
+ 
++fn search_with_ids(
++    mut queries: Vec<Vec<PostingListIterator>>, forward_index: &BlockForwardIndex,
++    k: usize, alpha: f32, terms_r: f32, verbose: bool, numeric_ids: Option<&[u64]>,
++) -> Vec<TopKHeap<u64>> {
++    let mut results = Vec::new();
++    let progress = if verbose { Some(progress_bar("Forward index-based search", queries.len())) } else { None };
++    let limit = numeric_ids.map_or(k, |ids| k.min(ids.len()));
++    let mut zero_order: Vec<usize> = numeric_ids.map_or_else(Vec::new, |ids| (0..ids.len()).collect());
++    if let Some(ids) = numeric_ids { zero_order.sort_unstable_by_key(|&d| ids[d]); }
+     let mut search_elapsed = 0;
+-    let mut buckets: Vec<Vec<u32>> = (0..=2usize.pow(16)).map(|_| Vec::new()).collect();
+-
+     for query in queries.iter_mut() {
+-        let total_terms = query.len();
+-        let terms_to_keep = (total_terms as f32 * terms_r).ceil() as usize;
+-        query.sort_by(|a, b| b.term_weight().partial_cmp(&a.term_weight()).unwrap());
+-        // Keep only the top N terms
+-        query.truncate(terms_to_keep);
+-
+-        let query_weights: Vec<_> = query.iter().map(|post| post.term_weight()).collect();
+-
+-        let query_ranges: Vec<_> = query.iter().map(|post| post.range_max_scores()).collect();
+-        let mut query_ranges_raw = Vec::new();
+-        let mut query_ranges_compressed = Vec::new();
+-        for qr in query_ranges {
+-            match qr {
+-                RangeMaxScore::Compressed(compressed) => query_ranges_compressed.push(compressed),
+-                RangeMaxScore::Raw(raw) => query_ranges_raw.push(raw),
+-            };
++        query.sort_by(|a, b| b.term_weight().cmp(&a.term_weight()));
++        query.truncate((query.len() as f32 * terms_r).ceil() as usize);
++        let mut query_vec: Vec<_> = query.iter().map(|p| (p.term_id() as u16, p.term_weight())).collect();
++        query_vec.sort_by_key(|p| p.0);
++        let seed_threshold = query.iter().map(|p| p.kth(limit) as u64 * p.term_weight() as u64).max().unwrap_or(0);
++        let mut raw = Vec::new(); let mut raw_weights = Vec::new();
++        let mut compressed = Vec::new(); let mut compressed_weights = Vec::new();
++        for posting in query.iter() {
++            match posting.range_max_scores() {
++                RangeMaxScore::Raw(ranges) => { raw.push(ranges); raw_weights.push(posting.term_weight()); }
++                RangeMaxScore::Compressed(ranges) => { compressed.push(ranges); compressed_weights.push(posting.term_weight()); }
++            }
+         }
+-
+-        let mut query_vec = query
+-            .iter()
+-            .map(|&pl| (pl.term_id() as u16, pl.term_weight() as u8))
+-            .collect::<Vec<_>>();
+-        query_vec.sort_by_key(|e| e.0);
+-        let threshold = query
+-            .iter()
+-            .map(|&pl| pl.kth(k) as u16 * pl.term_weight() as u16)
+-            .max()
+-            .unwrap_or(0);
+-
+-        let start_search: Instant = Instant::now();
+-        let run_compressed = query_ranges_compressed.len() > 0;
+-        let upper_bounds = match run_compressed {
+-            true => live_block::compute_upper_bounds(
+-                &query_ranges_compressed,
+-                &query_weights,
+-                forward_index.data.len(),
+-            ),
+-            false => live_block::compute_upper_bounds_raw(
+-                &query_ranges_raw,
+-                &query_weights,
+-                forward_index.data.len(),
+-            ),
+-        };
+-
+-        let mut topk = TopKHeap::with_threshold(k, threshold as u16);
+-        buckets.iter_mut().for_each(std::vec::Vec::clear);
+-        upper_bounds.iter().enumerate().for_each(|(range_id, &ub)| {
+-            if ub > threshold {
+-                buckets[ub as usize].push(range_id as u32);
++        let start = Instant::now();
++        let mut bounds = live_block::compute_upper_bounds_raw(&raw, &raw_weights, forward_index.data.len());
++        if !compressed.is_empty() {
++            let extra = live_block::compute_upper_bounds(&compressed, &compressed_weights, forward_index.data.len());
++            for (bound, addition) in bounds.iter_mut().zip(extra) { *bound += addition; }
++        }
++        let mut candidates: Vec<_> = bounds.into_iter().enumerate()
++            .filter(|&(_, bound)| bound > 0 && bound >= seed_threshold).collect();
++        candidates.sort_unstable_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
++        let mut topk = TopKHeap::new(limit);
++        if limit > 0 {
++            for (block, bound) in candidates {
++                let can_stop = if alpha == 1.0 { topk.threshold() > bound }
++                    else { topk.threshold() as f64 > bound as f64 * alpha as f64 };
++                if topk.len() == limit && can_stop { break; }
++                let scores = block_score(&query_vec, &forward_index.data[block], forward_index.block_size);
++                for (offset, score) in scores.into_iter().enumerate() {
++                    let doc = block * forward_index.block_size + offset;
++                    if score == 0 { continue; }
++                    let tie_id = numeric_ids.map_or(doc as u64, |ids| ids[doc]);
++                    topk.insert_with_tie(DocId(doc as u32), score, tie_id);
++                }
+             }
+-        });
+-
+-        let mut ub_iter =
+-            buckets
+-                .iter_mut()
+-                .enumerate()
+-                .rev()
+-                .flat_map(|(outer_idx, inner_vec)| {
+-                    inner_vec.iter_mut().map(move |val| (outer_idx, val))
+-                });
+-
+-        let (mut current_ub, mut current_block) = ub_iter.next().unwrap();
+-        prefetch_block(forward_index, *current_block);
+-
+-        for (next_ub, next_block) in ub_iter {
+-            prefetch_block(forward_index, *next_block);
+-            let offset = *current_block as usize * forward_index.block_size;
+-
+-            let res = block_score(
+-                &query_vec,
+-                &forward_index.data[*current_block as usize],
+-                forward_index.block_size,
+-            );
+-
+-            for (doc_id, &score) in res.iter().enumerate() {
+-                topk.insert(DocId(doc_id as u32 + offset as u32), score);
++            if let Some(ids) = numeric_ids {
++                if topk.len() < limit {
++                    let present: HashSet<_> = topk.clone().to_sorted_vec().iter().map(|e| e.doc_id.0 as usize).collect();
++                    for &doc in &zero_order {
++                        if !present.contains(&doc) { topk.insert_with_tie(DocId(doc as u32), 0, ids[doc]); }
++                        if topk.len() == limit { break; }
++                    }
++                }
+             }
+-
+-            if topk.threshold() as f32 > current_ub as f32 * alpha {
+-                break;
+-            }
+-            current_block = next_block;
+-            current_ub = next_ub;
+         }
+-        search_elapsed += start_search.elapsed().as_micros();
+-        results.push(topk.clone());
+-        if let Some(progress_bar) = &progress {
+-            progress_bar.inc(1);
+-        }
++        search_elapsed += start.elapsed().as_micros();
++        results.push(topk);
++        if let Some(ref progress) = progress { progress.inc(1); }
+     }
+-    if let Some(progress_bar) = &progress {
+-        progress_bar.finish();
+-    }
+-
+-    if verbose {
+-        eprintln!(
+-            "search_elapsed = {}",
+-            search_elapsed / results.len() as u128
+-        );
+-    }
+-
++    if let Some(progress) = progress { progress.finish(); }
++    if verbose && !results.is_empty() { eprintln!("search_elapsed = {}", search_elapsed / results.len() as u128); }
+     results
+ }
+--- a/src/util.rs
++++ b/src/util.rs
+@@ -12,7 +12,7 @@
+ // Function to convert query results to TREC format and print to stdout
+ pub fn to_trec(
+     query_ids: &[String],
+-    mut results: Vec<TopKHeap<u16>>,
++    mut results: Vec<TopKHeap<u64>>,
+     doc_lexicon: &[String],
+ ) -> String {
+     let mut output = String::new();
