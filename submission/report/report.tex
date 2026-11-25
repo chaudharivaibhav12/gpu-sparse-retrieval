@@ -9,6 +9,13 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{caption}
 \usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\definecolor{cA}{HTML}{2A78D6}
+\definecolor{cB}{HTML}{C8641B}
+\definecolor{cG}{HTML}{4A3AA7}
 
 \newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
 \setlist{itemsep=2pt,topsep=3pt}
@@ -146,7 +153,8 @@ are stored term-major. The index consists of:
 \end{itemize}
 The index is built offline and loaded onto the GPU once.
 
-\paragraph{Execution model.} One kernel launch processes one query, and thread block $r$ scores range $r$:
+\paragraph{Execution model.} One kernel launch processes one query, and thread block $r$ scores range $r$
+(Figure~\ref{fig:model}):
 \begin{enumerate}
 \item for each query term, binary-search the term's range list for $r$ and copy that block's metadata
   into shared memory;
@@ -158,6 +166,16 @@ The index is built offline and loaded onto the GPU once.
 \item the last block to finish, detected with a global atomic counter after a memory fence, merges all
   candidates and writes the final top $k$.
 \end{enumerate}
+\begin{figure}[H]\centering
+\begin{tikzpicture}[font=\small,>=Stealth,b/.style={draw=black!60,minimum height=8mm,minimum width=24mm,align=center}]
+\node[b] (r0) {range 0};\node[b,right=4mm of r0] (r1) {range 1};\node[b,right=4mm of r1] (r2) {range 2};\node[right=2mm of r2] (dd) {$\cdots$};\node[b,right=2mm of dd] (rn) {range $R-1$};
+\foreach \n in {r0,r1,r2,rn}{\node[b,below=6mm of \n,fill=cA!8] (s\n) {scores in\\shared memory};\node[b,below=6mm of s\n,fill=cA!16] (t\n) {local top-$k$};\draw[->] (\n)--(s\n);\draw[->] (s\n)--(t\n);}
+\node[b,below=9mm of tr1,xshift=16mm,fill=cA!28,minimum width=44mm] (m) {last block: merge, final top-$k$};
+\foreach \n in {r0,r1,r2,rn} \draw[->] (t\n.south)--(m);
+\end{tikzpicture}
+\caption{Execution model: one thread block scores one range of documents in shared memory, and the last block to finish merges the candidates. Strategy B takes only the ranges it could not skip.}
+\label{fig:model}
+\end{figure}
 Each block's accumulator covers only $W$ documents, so it fits in shared memory and no
 collection-sized array is needed.
 
@@ -336,12 +354,23 @@ Strategy B & 1.320 & 2.777 & 22.921\\
   because each thread block scores its range in shared memory.
 \end{itemize}
 
+\begin{figure}[H]\centering
+\begin{tikzpicture}\begin{axis}[width=.78\linewidth,height=6.8cm,xmode=log,ymode=log,xtick={10,100,1000},xticklabels={10,100,1000},ytick={0.2,0.5,1,2,5,10},yticklabels={0.2,0.5,1,2,5,10},minor tick style={draw=none},xlabel={$k$},ylabel={median latency (ms, log scale)},xmin=7,xmax=1600,ymin=.15,ymax=11,grid=major,grid style={black!10},axis line style={black!40},legend columns=3,legend style={draw=none,font=\small,at={(.5,1.04)},anchor=south,/tikz/every even column/.append style={column sep=8pt}},legend cell align=left,every axis plot/.append style={line width=1.1pt,mark size=2.6pt}]
+\addplot[cG,mark=diamond*,dashed,mark options={solid}] coordinates{(10,5.884)(100,5.950)(1000,6.414)};\addlegendentry{GPUSparse (FP32/uint8)}
+\addplot[cB,mark=square*,nodes near coords,point meta=explicit symbolic,every node near coord/.append style={font=\scriptsize,text=black,anchor=south,yshift=1pt}] coordinates{(10,.205)[0.205](100,.576)[0.576](1000,3.080)[3.080]};\addlegendentry{Strategy B}
+\addplot[cA,mark=*,nodes near coords,point meta=explicit symbolic,every node near coord/.append style={font=\scriptsize,text=black,anchor=north,yshift=-2pt}] coordinates{(10,.403)[](100,.455)[0.455](1000,.834)[0.834]};\addlegendentry{Strategy A}
+\node[font=\scriptsize,anchor=south,yshift=2pt] at (axis cs:10,.403) {0.403};
+\end{axis}\end{tikzpicture}
+\caption{Median latency against $k$ (log scales), full collection, 500 queries. The values are those of Table~\ref{tab:main}; the systems come from several sessions.}
+\label{fig:depth}
+\end{figure}
+
 \paragraph{Strategy A against Strategy B.}
 \begin{itemize}
 \item At $k=10$, Strategy B is about 2$\times$ faster (ratio of medians from different sessions; without the
   two-half filter it is 1.55$\times$ faster, paired in one session): with a high threshold it scores only a
   small fraction of the ranges, while Strategy A scores all of them.
-\item At $k=100$ and $k=1000$, Strategy A is 1.29$\times$ and 4.32$\times$ faster (paired, same
+\item At $k=100$ and $k=1000$ (Figure~\ref{fig:depth}), Strategy A is 1.29$\times$ and 4.32$\times$ faster (paired, same
   session). As $k$ grows, $\theta$ falls, Strategy B keeps more ranges, and its selection and merge
   grow with $k$. Strategy A's grow very little: from $k=10$ to $k=1000$ its latency only doubles, while
   Strategy B's grows 15$\times$.
