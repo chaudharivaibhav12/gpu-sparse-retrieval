@@ -9,5 +9,4 @@ cpu/  Exact exhaustive CPU scorer, single- or multi-threaded. Runs on CIMS with 
     are in OUT.csv and the answers in OUT_TOP.tsv.
 
 GPUSparse and BMP are other authors' systems, so their code is not part of this submission. The report compares with
-our adapted versions of them, which are in the project repository: https://github.com/chaudharivaibhav12/gpu-sparse-retrieval/
-The other methods, all tests and all raw results are in the same repository.
+our adapted versions of them.
