@@ -1,0 +1,141 @@
+{
+ "schema_version": 1,
+ "experiment_id": "2026-11-24-two-half-depth",
+ "title": "Two-half filter at k=100/1000 against its control and range scorer v3",
+ "owner": "parva",
+ "branch": "exp/parva/2026-11-24-two-half-depth",
+ "status": "run completed",
+ "parent_experiment": "2026-11-21-w256-two-half-filter",
+ "code_paths": [
+  "experiments/2026-11-24-two-half-depth/code/run.py",
+  "experiments/2026-11-24-two-half-depth/code/gate.py",
+  "experiments/2026-11-24-two-half-depth/analysis/analyze.py"
+ ],
+ "configuration_files": [
+  "experiments/2026-11-24-two-half-depth/configs/protocol.json"
+ ],
+ "declared_changes": {
+  "shared_files": "none modified"
+ },
+ "query_split": "calibration-500 only",
+ "runs": [
+  {
+   "run_id": "20261124-cuda5-th-01",
+   "kind": "recorded",
+   "host": "cuda5",
+   "source_commit": "dcb4abf",
+   "status": "completed",
+   "ineligible_processes": 17,
+   "results": "results/2026-11-24-two-half-depth/20261124-cuda5-th-01",
+   "readme": "experiments/2026-11-24-two-half-depth/runs/20261124-cuda5-th-01/README.md",
+   "statistics": {
+    "configurations": {
+     "half-k100": {
+      "median_ms": 0.57621325,
+      "mean_ms": 0.7052773569999999,
+      "p95_ms": 1.5602245,
+      "p99_ms": 2.776886149999999,
+      "per_process_median_ms": [
+       0.5745717499999999,
+       0.57621325,
+       0.5778840000000001
+      ],
+      "total_scored_ranges": 2925388,
+      "total_scored_postings": 3353557296
+     },
+     "tm-k100": {
+      "median_ms": 0.6919912500000001,
+      "mean_ms": 0.8289112956666667,
+      "p95_ms": 1.8308534999999992,
+      "p99_ms": 2.935610349999999,
+      "per_process_median_ms": [
+       0.6925025,
+       0.695337,
+       0.690097
+      ],
+      "total_scored_ranges": 4214262,
+      "total_scored_postings": 4186621453
+     },
+     "v3-k100": {
+      "median_ms": 0.45391675,
+      "mean_ms": 0.472398776,
+      "p95_ms": 0.6670299749999999,
+      "p99_ms": 0.7177314899999999,
+      "per_process_median_ms": [
+       0.45371649999999997,
+       0.45373275,
+       0.454109
+      ]
+     },
+     "half-k1000": {
+      "median_ms": 3.0801524999999996,
+      "mean_ms": 4.803486943333334,
+      "p95_ms": 14.371074999999987,
+      "p99_ms": 22.920862999999994,
+      "per_process_median_ms": [
+       3.080125,
+       3.07617,
+       3.0858825000000003
+      ],
+      "total_scored_ranges": 7455427,
+      "total_scored_postings": 5909793742
+     },
+     "tm-k1000": {
+      "median_ms": 3.2270700000000003,
+      "mean_ms": 4.931712643333333,
+      "p95_ms": 14.414849999999989,
+      "p99_ms": 22.96204599999999,
+      "per_process_median_ms": [
+       3.24006,
+       3.2105125,
+       3.2155125
+      ],
+      "total_scored_ranges": 8959930,
+      "total_scored_postings": 6415302495
+     },
+     "v3-k1000": {
+      "median_ms": 0.8319715000000001,
+      "mean_ms": 0.870452821,
+      "p95_ms": 1.2238965000000002,
+      "p99_ms": 1.41827625,
+      "per_process_median_ms": [
+       0.8318682500000001,
+       0.832404,
+       0.8313247500000001
+      ]
+     }
+    },
+    "contrasts": {
+     "two-half time / v3 time, k100": {
+      "ratio": 1.2932599976605148,
+      "interval_95": [
+       1.2454984160642242,
+       1.343633718663166
+      ]
+     },
+     "two-half time / control time, k100": {
+      "ratio": 0.8524556369895815,
+      "interval_95": [
+       0.8466631711427722,
+       0.8582445925351321
+      ]
+     },
+     "two-half time / v3 time, k1000": {
+      "ratio": 4.318411678995104,
+      "interval_95": [
+       4.125554610688603,
+       4.532079040084561
+      ]
+     },
+     "two-half time / control time, k1000": {
+      "ratio": 0.9594812936107342,
+      "interval_95": [
+       0.9548063272338909,
+       0.9637721264286971
+      ]
+     }
+    }
+   }
+  }
+ ]
+}
