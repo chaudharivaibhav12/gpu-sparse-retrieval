@@ -1,0 +1,10 @@
+mkdir -p obj
+nvcc -O3 -arch=sm_89 -std=c++17 -Xcompiler -Wall,-Wextra,-Wnarrowing -I../u4m/src -c src/main.cu -o obj/main.o
+nvcc -O3 -arch=sm_89 -std=c++17 -Xcompiler -Wall,-Wextra,-Wnarrowing -I../u4m/src -c src/prune_kernel.cu -o obj/prune_kernel.o
+g++ -O3 -std=c++17 -Wall -Wextra -Wnarrowing -c ../u4m/src/range_index.cpp -o obj/range_index.o
+g++ -O3 -std=c++17 -Wall -Wextra -Wnarrowing -c ../u4m/src/common.cpp -o obj/common.o
+mkdir -p bin
+nvcc -arch=sm_89 obj/main.o obj/prune_kernel.o obj/range_index.o obj/common.o -o bin/pruned
+nvcc -O3 -arch=sm_89 -std=c++17 -Xcompiler -Wall,-Wextra,-Wnarrowing -I../u4m/src -DPRUNE_THETA_FILTER=0 -c src/main.cu -o obj/main_ts.o
+nvcc -O3 -arch=sm_89 -std=c++17 -Xcompiler -Wall,-Wextra,-Wnarrowing -I../u4m/src -DPRUNE_THETA_FILTER=0 -c src/prune_kernel.cu -o obj/prune_kernel_ts.o
+nvcc -arch=sm_89 obj/main_ts.o obj/prune_kernel_ts.o obj/range_index.o obj/common.o -o bin/pruned_ts
