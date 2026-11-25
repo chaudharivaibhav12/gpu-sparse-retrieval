@@ -1,0 +1,48 @@
+{
+ "run_id": "20261125-cuda5-cpudepth-01",
+ "experiment_id": "2026-11-25-cpu-depth",
+ "status": "ABANDONED: stopped by Claude after the first process (overlap sampler counted its own /proc walk as other users; attempt 0 showed an unexplained 4.7-core mean; no per-second samples). No result.",
+ "host": "cuda5 (2 x Xeon E5-2650 v2, 16 cores, 2 NUMA nodes); CPU only, no GPU use",
+ "source_commits": {
+  "main": "60d421c23367e2e285f7f89202171c425f32f2b9 (src/cpu_exhaustive.cpp, BMP guarded-u32 build code, matched-final-evaluation BMP sources)"
+ },
+ "controller": {
+  "file": "experiments/2026-11-25-cpu-depth/code/run_cpu.py",
+  "as_run_sha256": "920b78565ffc7c3582574bfe4303e4fb5b8bde5b148ef7500dedbebd8a9c428b",
+  "note": "committed copy differs only by redaction of another user's scratch path (<teammate>); -01 used the earlier sampler (process-tree walk)"
+ },
+ "analysis": {
+  "file": "experiments/2026-11-25-cpu-depth/analysis/analyze.py",
+  "sha256": "bb955cfdaa641191c99197405940b039cc60921e1c4df7c071fc48fc7e20e0a0"
+ },
+ "binaries": {
+  "cpu_exhaustive": "88d791628ebe25da32839650b84a96d30d1f0ae3422fea8cc48f49eaa2c7ab45 (g++ -O3 -march=native -fopenmp -std=c++17 src/cpu_exhaustive.cpp)",
+  "project_benchmark_u64": "0700f03e8dd78d402d7918a71992382001099407824fec22ed2f02b37a4a1cce",
+  "project_benchmark_u32": "5a0b20e0acbe6562c24a303d358b1b4dfc687a2f00fbe8eacc5756a9f291526d",
+  "bmp_build": "experiments/2026-11-20-bmp-guarded-u32/code/build.py run with /usr/bin/python3.12 (attempt 1 with Python 3.9 failed: write_text(newline=) needs 3.10); crates via cargo fetch --locked; 22 Rust unit tests passed; status BUILD_AND_UNIT_TESTS_PASS_NO_MEASUREMENTS; parent = 16 files from a teammate's BMP checkout + 2 from experiments/2026-11-18-matched-final-evaluation/code, all 18 equal to configs/parent-built-source.json"
+ },
+ "inputs": {
+  "gsp": "e838dfbf78855ea48242f89ee9a8e3596830926e31f0864377c279f77fd754ac",
+  "queries": "150917d784f009fddb453a1635bc62d3ec238c4a101347d46914adaad371d091 (500 calibration)",
+  "oracle_top1000": "302b63d4fc0c55cb41eeb9f63ad9b108706ead26edb36304e7c57fbd9c9dc086",
+  "bmp_index": "eaf549b82636dba01287ebd7e9128244f1cbc8d85af233c9587a4a7c205df94d (block 32, raw bounds)",
+  "pisa_queries": "0ac4ad355c198fffa65a94ec4ae23da19a0fbea5978a690f343e850fdb7a00d9"
+ },
+ "bulk": {
+  "location": "outside Git: run-bulk/2026-11-25-cpu-depth/answers-cpudepth.tar.zst (answer listings of both runs, results.tsv/top.tsv)",
+  "sha256": "c8d142fb9d1bf640d7f2dc5c45e4565fc3530129866fed3846e04082ce2aca0a"
+ },
+ "files_sha256": {
+  "logs/commands.txt": "2853e3f6152a9b91b2ebe4dca454fe2f481f18cfcf9e8f8e88928520361daab1",
+  "logs/controller.out": "b877f97937f0ecbd952cd774115175cd1c41075e2b8bbf3be6e59fddad9818f1",
+  "logs/idle-checks.txt": "1d139b31a9274d0f50e0bea2ebcb813ed892b1351a097215fadfacd1622936cc",
+  "logs/stages.txt": "68cf641fee7e2039616ab55023634afb4cb20eaeea899687bf7bb803eb5a448d",
+  "oracle/top100.tsv.gz": "00cd2a69f6c00f0b5a7d0fe5c6e01aa4019244754a4aa65de3ee7c9f5ad03c14",
+  "oracle/top1000.tsv.gz": "09a2d5753a8b9cc1220ebabf45223eecb44839e2d2947dfcf48a7caac943bdae",
+  "raw/cpu16-k100.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "raw/cpu16-k100.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "raw/overlapped/cpu16-k100-a0/cpu16-k100.csv": "f9c0ddfbc45a9fa4c480fe6963cd71df2a5b3dba15503632db6d51a553465cd0",
+  "raw/overlapped/cpu16-k100-a0/cpu16-k100.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "raw/overlapped/cpu16-k100-a0/cpu16-k100.stdout": "c51eadea3981c947349226c493a0430a4929a1c4785fd92542888dc6bcd80b6c"
+ }
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "experiment_id": "2026-11-25-cpu-depth",
+  "title": "CPU baselines (exhaustive 16 threads, BMP 1 thread U64/U32) at k=100 and k=1000, full collection",
+  "owner": "Arnav",
+  "branch": "exp/arnav/2026-11-25-cpu-depth",
+  "status": "complete: run 20261125-cuda5-cpudepth-02; all outputs exact",
+  "parent_experiment": null,
+  "parent_source_commit": "60d421c23367e2e285f7f89202171c425f32f2b9",
+  "question": "CPU baseline latency at k=100 and k=1000 on the full collection",
+  "hypothesis": "exhaustive nearly flat in k; BMP slows with k",
+  "motivation": "the report has CPU numbers at k=10 only",
+  "code_paths": [
+    "src/cpu_exhaustive.cpp",
+    "experiments/2026-11-20-bmp-guarded-u32/code",
+    "experiments/2026-11-25-cpu-depth/code/run_cpu.py",
+    "experiments/2026-11-25-cpu-depth/analysis/analyze.py"
+  ],
+  "configuration_files": [],
+  "declared_changes": {},
+  "scoring_contract": "GSP-CAP32 integer scores, ties by original numeric ID (as in the parent experiments)",
+  "input_manifest": "results/2026-11-25-cpu-depth/20261125-cuda5-cpudepth-02/manifest.json",
+  "query_split": "500 calibration queries only",
+  "timing_boundary": "each scorer's own per-query timer, unchanged (cpu_exhaustive latency_ms; BMP elapsed_ns from parsed query to host top-k)",
+  "correctness_rule": "every round of every process equal to the pinned top-1000 oracle (first k ranks)",
+  "measurement_and_analysis_plan": "see README.md",
+  "success_rule": "descriptive",
+  "failure_rule": "any oracle mismatch stops the run",
+  "next_if_negative": "n/a",
+  "recording_ids": [
+    "not recorded by the team runtime"
+  ],
+  "runs": [
+    "20261125-cuda5-cpudepth-01 (abandoned)",
+    "20261125-cuda5-cpudepth-02"
+  ]
+}

@@ -1,0 +1,13 @@
+mkdir -p obj
+nvcc -O3 -arch=sm_89 -std=c++17 -Xcompiler -Wall,-Wextra,-Wnarrowing -c src/main.cu -o obj/main.o
+nvcc -O3 -arch=sm_89 -std=c++17 -Xcompiler -Wall,-Wextra,-Wnarrowing -c src/range_kernel.cu -o obj/range_kernel.o
+g++ -O3 -std=c++17 -Wall -Wextra -Wnarrowing -c src/range_index.cpp -o obj/range_index.o
+g++ -O3 -std=c++17 -Wall -Wextra -Wnarrowing -c src/common.cpp -o obj/common.o
+mkdir -p bin
+nvcc -arch=sm_89 obj/main.o obj/range_kernel.o obj/range_index.o obj/common.o -o bin/u4m
+g++ -O3 -std=c++17 -Wall -Wextra -Wnarrowing -c src/prepare.cpp -o obj/prepare.o
+g++ obj/prepare.o obj/common.o -o bin/prepare
+g++ -O3 -std=c++17 -Wall -Wextra -Wnarrowing -c src/build_index.cpp -o obj/build_index.o
+g++ obj/build_index.o obj/range_index.o obj/common.o -o bin/build_index
+g++ -O3 -std=c++17 -Wall -Wextra -Wnarrowing -c src/cpu_reference.cpp -o obj/cpu_reference.o
+g++ obj/cpu_reference.o obj/common.o -o bin/cpu_reference
