@@ -23,21 +23,13 @@ Two Strategies over a Range-Partitioned Bit-Packed Index}
 
 % =====================================================================
 \begin{abstract}
-Learned sparse retrieval models such as SPLADE represent queries and documents as sparse vectors over
-a vocabulary, and retrieval returns the $k$ documents with the highest dot product with the query.
-Doing this \emph{exactly} over millions of documents is the first stage of modern search and
-question-answering pipelines, and its latency bounds the whole system. Posting lists are irregular,
-the number of candidate documents is huge, and the final top-$k$ selection is itself expensive, which
-makes the problem a poor fit for a naive GPU implementation. We introduce a range-partitioned,
-bit-packed inverted index in which every GPU thread block scores one contiguous range of documents
-entirely in shared memory. On it we build two complementary strategies:
+Learned sparse retrieval models such as SPLADE represent queries and documents as sparse vectors over a vocabulary, and a top-k retrieval returns $k$ documents with the highest dot product with the query. Doing this \emph{exactly} over millions of documents is the first stage of modern search and question-answering pipelines, and its latency bounds the whole system. The problem is usully considered a poor fit for a naive GPU implementation with posting lists being irregular, the number of candidate documents being huge, and the final top-$k$ selection itself being expensive. We introduce a range-partitioned, bit-packed inverted index in which every GPU thread block scores one contiguous range of documents entirely in shared memory. On this base, we build two complementary strategies:
 \begin{itemize}
 \item \textbf{Strategy A} scores every range and selects the top $k$ with radix-based algorithms, so
   its cost barely grows with $k$;
 \item \textbf{Strategy B} uses upper bounds to skip whole ranges that cannot reach the top $k$.
 \end{itemize}
-On the full 8.8M-passage MS~MARCO collection on an RTX~4070, both return exactly the results of a CPU
-reference. Strategy B is fastest at $k=10$ (0.205\,ms per query), and Strategy A at $k=100$ and
+On the full 8.8M-passage MS~MARCO collection on an RTX~4070, both return exact results. Strategy B is fastest at $k=10$ (0.205\,ms per query), and Strategy A is fastest at $k=100$ and
 $k=1000$ (0.455 and 0.834\,ms). Against a same-hardware adaptation of the recent GPUSparse system,
 the best strategy at each depth is 8.7--34$\times$ faster.
 \end{abstract}
@@ -45,11 +37,11 @@ the best strategy at each depth is 8.7--34$\times$ faster.
 % =====================================================================
 \section{Introduction}
 
-In learned sparse retrieval (LSR), a neural encoder maps each document and each query to a sparse vector of non-negative term weights over a vocabulary of about 30{,}000 terms \cite{splade,spladepp}. The score of a document is the dot product
+In learned sparse retrieval (LSR), a neural encoder maps each document and each query to a sparse vector of term weights over a vocabulary of about 30{,}000 terms \cite{splade,spladepp}. The score of a document is the dot product
 \[
   s(q,d) \;=\; \sum_{t \in q \cap d} w_q(t)\, w_d(t),
 \]
-and retrieval returns the $k$ highest-scoring documents. Document vectors are encoded once, offline, and stored as an inverted index: for every term, the list of documents containing it together with their weights (\emph{impacts}). At query time only the query's terms (typically 20--60) are read.
+and retrieval returns the top $k$ highest-scoring documents. Document vectors are encoded once, offline, and stored as an inverted index: for every term, the list of documents containing it together with their weights (\emph{impacts}). At query time only the query's terms (typically 20--60) are read.
 
 First-stage retrieval feeds every later stage, such as re-rankers and retrieval-augmented generation, so its latency is paid on every request. \emph{Exact} retrieval matters because approximate methods trade recall for speed in ways that are hard to bound. The depth $k$ also varies by use: $k=10$ for direct answers, $k=1000$ when a re-ranker follows. A good system
 has to be fast across that whole range.
@@ -96,7 +88,7 @@ thousands of GPU threads.
 \begin{itemize}
 \item Gaioso et al.\ \cite{gaiosowand} parallelise WAND on GPUs by partitioning the index by document
   ranges and sharing the threshold $\theta$ between thread blocks.
-\item \todo{Huang et al.\ GPU block-max paper: authors, venue} run Block-Max WAND per thread over
+\item Huang et al.\ \cite{huangbmw} run Block-Max WAND per thread over
   compressed lists.
 \item GPUSparse \cite{gpusparse} keeps a SPLADE inverted index resident on one GPU, scores exhaustively
   with a scatter-add over posting lists, then selects the top $k$. It reports 1.27\,ms per query at
@@ -112,8 +104,8 @@ traversals suffer from load imbalance.
   \cite{mergespmv} balances work by splitting rows and non-zeros evenly; bucket-based approaches group
   outputs by row range, which is analogous to our ranges.
 \item \emph{GPU integer compression} with tile-based bit packing \cite{gpufor} decodes in parallel
-  without sequential dependencies, which informed our encoding. \todo{Zahran GPU-VByte decoding paper:
-  authors, venue}
+  without sequential dependencies, which informed our encoding; GPU-VByte decoding is another
+  GPU-oriented approach \cite{zahrangpuvbyte}.
 \item \emph{GPU top-$k$ selection:} bitonic top-$k$ \cite{bitonictopk}, warp-level selection in Faiss
   \cite{faiss}, radix-based selection (AIR Top-K \cite{airtopk}, RadiK \cite{radik}) and
   delegate-based filtering (Dr.~Top-k \cite{drtopk}).
@@ -142,7 +134,7 @@ are stored term-major. The index consists of:
 \begin{itemize}
 \item \texttt{encoded}: each block's in-range document positions, bit-packed at the block's own width
   (at most $\lceil\log_2 W\rceil$ bits). Storing positions rather than gaps lets every posting be
-  decoded independently: the $j$-th value of a block starts at bit $\mathit{start} + j \cdot
+  decoded independently, rather than requiring a prefix sum: the $j$-th value of a block starts at bit $\mathit{start} + j \cdot
   \mathit{width}$;
 \item \texttt{impacts}: one byte per posting, in the same order;
 \item per-block metadata: start bit, impact offset, count, width, and the block's range;
@@ -291,8 +283,6 @@ Strategy B & \textbf{0.205} & 0.576 & 3.080 & 5.1\,GB\\
 \item \textbf{Why.} GPUSparse's latency barely depends on $k$ (+7.6\% from $k=10$ to 1000) because it
   always scores the whole collection into one array before selecting. Both strategies avoid that array,
   because each thread block scores its range in shared memory.
-\item \textbf{Caveat.} Batch size 1 is not GPUSparse's design point (its paper reports 1.27\,ms per query
-  at batch 500 on an H100), and its timed path includes Python host code.
 \end{itemize}
 
 \paragraph{Strategy A against Strategy B.}
@@ -385,12 +375,17 @@ evaluation using a two-level retrieval process,'' in \emph{Proc.\ CIKM}, 2003.
 pruning,'' in \emph{Proc.\ SIGIR}, 2024.
 \bibitem{gaiosowand} R.~Gaioso, V.~Gil-Costa, H.~Guardia and H.~Senger, ``A parallel implementation of
 WAND on GPUs,'' in \emph{Proc.\ Euromicro PDP}, 2018. \todo{verify}
+\bibitem{huangbmw} H.~Huang, M.~Ren, Y.~Zhao, R.~J.~Stones, R.~Zhang, G.~Wang and X.~Liu,
+``GPU-Accelerated Block-Max Query Processing,'' in \emph{Proc.\ ICA3PP}, LNCS, vol.~10393,
+pp.~225--238, Springer, 2017.
 \bibitem{gpusparse} \todo{authors}, ``GPUSparse: Fast and exact learned sparse retrieval on a GPU-resident
 inverted index,'' arXiv:2606.26441, 2026.
 \bibitem{mergespmv} D.~Merrill and M.~Garland, ``Merge-based parallel sparse matrix-vector
 multiplication,'' in \emph{Proc.\ SC}, 2016.
 \bibitem{gpufor} A.~Shanbhag, B.~Yogatama, X.~Yu and S.~Madden, ``Tile-based lightweight integer
 compression in GPU,'' in \emph{Proc.\ SIGMOD}, 2022.
+\bibitem{zahrangpuvbyte} A.~Mallia, M.~Siedlaczek, T.~Suel and M.~Zahran, ``GPU-Accelerated Decoding
+of Integer Lists,'' in \emph{Proc.\ CIKM}, 2019.
 \bibitem{bitonictopk} A.~Shanbhag, H.~Pirk and S.~Madden, ``Efficient top-k query processing on massively
 parallel hardware,'' in \emph{Proc.\ SIGMOD}, 2018.
 \bibitem{faiss} J.~Johnson, M.~Douze and H.~J\'egou, ``Billion-scale similarity search with GPUs,''
