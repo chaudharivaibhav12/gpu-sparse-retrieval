@@ -182,21 +182,45 @@ Strategy A scores every range and makes selection and merging cheap at any depth
 \end{enumerate}
 
 \subsection{Strategy B: bound-based range pruning with a two-half filter}
-\todo{Parva/Vaibhav: expand with the exact kernel pipeline and design choices.}
-Strategy B scores only the ranges that can contain a top-$k$ document. Per query it runs:
+Strategy B scores only the ranges that can contain a top-$k$ document. It needs one extra table, built when the
+index is loaded: the largest impact of every (term, range) block, and, for the two-half filter, the largest
+impact in each half of the block. A query runs as a fixed sequence of kernels on one stream, with no round trip
+to the host in between:
 \begin{enumerate}
-\item \textbf{Range bounds:} for every range, $\sum_t w_q(t)\cdot\max_{d\in\text{range}} w_d(t)$, an upper
-  bound on any document's score in it, computed term-major from per-block maxima;
-\item \textbf{Seed selection:} the 64 ranges with the largest bounds;
-\item \textbf{Seed scoring:} these are scored exactly; their $k$-th best score is a safe initial
-  threshold $\theta$;
-\item \textbf{Two-half filter:} each range whose bound is $\geq\theta$ is checked again with separate
-  bounds for its two halves, and is dropped when both half bounds fall below $\theta$;
-\item \textbf{Scoring and merge:} the remaining ranges are scored with the common range kernel, and
-  candidates below $\theta$ are filtered out before the merge.
+\item \textbf{Range bounds.} The bound of a range is $\sum_t w_q(t)\cdot\max_{d\in\text{range}} w_d(t)$, so no
+  document in it can score more. The kernel goes term by term: the blocks of one term are contiguous in memory,
+  and each thread adds (query weight $\times$ block maximum) to its range's bound with \texttt{atomicAdd}. Our
+  first version used one thread per range with a binary search per term. Changing only this step made the whole
+  query 1.36$\times$ faster ($W=256$, $k=10$).
+\item \textbf{Seed selection.} One block picks the 64 ranges with the largest bounds, by radix select with 12-bit
+  digits; ties go to the lower range number.
+\item \textbf{Seed scoring.} The seeds are scored exactly. $\theta$ is the $k$-th best score among their
+  documents, or 0 if they hold fewer than $k$ documents.
+\item \textbf{Pruning and the two-half filter.} A range whose bound is below $\theta$ is dropped. For each
+  remaining range, one warp computes a bound for each half (128 documents) and drops the range if both are below
+  $\theta$. This costs a lookup per query term, but only for ranges that the first bound could not remove.
+\item \textbf{Scoring.} The surviving ranges go on a work list. Thread blocks stay resident and take ranges from
+  it with an atomic counter, so a skipped range costs no block launch. The scoring of a range follows the
+  common execution model.
+\item \textbf{Merge.} A range whose best document is below $\theta$ writes no list, and single candidates below
+  $\theta$ are invalidated. The last block merges the remaining lists, picking the top $k$ one document at a
+  time. This last part is simple, and it is what limits Strategy B at large $k$.
 \end{enumerate}
-Strategy B uses $W=256$, so bounds are tight. At $k=10$, only about 3\% of ranges and 13\% of
-query postings are scored.
+
+\paragraph{Why the result is exact.} When $\theta>0$, at least $k$ seeded documents score $\theta$ or more. A
+document in a dropped range scores strictly less than $\theta$, so it cannot be in the top $k$. Ranges and
+candidates that only equal $\theta$ are kept, because they can still win a tie on passage ID.
+
+\paragraph{Design choices.}
+\begin{itemize}
+\item \textbf{Range size.} Smaller ranges give tighter bounds. With 64 seeds and $k=10$ the median query scores
+  34.5\% of the ranges at $W=1024$, 16.2\% at $W=512$ and 6.3\% at $W=256$. We use $W=256$, although queries
+  that prune badly then pay for many small ranges (Section~\ref{sec:heldout}).
+\item \textbf{Number of seeds.} With 64 seeds the median query scores at most 3 percentage points more of its
+  postings than with the ideal threshold (the true $k$-th score), so we did not tune it further.
+\item \textbf{Pruning or smaller ranges?} Small ranges alone do not help. Without pruning, $W=256$ is slower
+  than $W=1024$ (0.33$\times$ the speed); pruning then makes it 5.1$\times$ faster.
+\end{itemize}
 
 \paragraph{Complementary strengths.} The strategies reduce different costs. Strategy B reduces the
 amount of scoring, which dominates when $k$ is small and $\theta$ is high. Strategy A reduces the cost of
@@ -322,7 +346,6 @@ Passages & $k=10$ & $k=100$ & $k=1000$\\
 \end{table}
 From 100K to 8.84M passages ($\times88$), latency grows only about 7$\times$. At small collections the
 GPU is not filled (only 25 ranges at 100K), and fixed per-query costs dominate.
-\todo{Strategy B scaling, if available.}
 
 \subsection{Retrieval quality}
 Both strategies return the exact top-$k$ under the contract, so their quality is identical: MRR@10 0.368,
@@ -330,15 +353,105 @@ nDCG@10 0.444 and Recall@1000 0.984 on the 500 queries. The GPUSparse paper repo
 0.983 over 6,980 queries with single-precision scoring. The difference reflects the query subset and the
 uint8 quantisation, which our data cannot separate.
 
-\subsection{Comparison with the CPU}
-\todo{CPU exhaustive (single- and multi-threaded) and BMP latencies on the full collection, with the
-speedups of Strategies A and B.}
+\subsection{How much Strategy B skips}
+\begin{table}[h]
+\centering
+\caption{Work left after pruning, Strategy B ($W=256$, 64 seeds, 500 queries), as a share of all ranges and of all
+query postings. Percentages are means over queries for ranges and totals over queries for postings.}
+\label{tab:work}
+\begin{tabular}{lrrrrrr}
+\toprule
+ & \multicolumn{2}{c}{$k=10$} & \multicolumn{2}{c}{$k=100$} & \multicolumn{2}{c}{$k=1000$}\\
+ & ranges & postings & ranges & postings & ranges & postings\\
+\midrule
+Range bound only & 9.8\% & 27.6\% & 24.4\% & 53.2\% & 51.9\% & 81.5\%\\
+With two-half filter & 5.6\% & 18.5\% & 16.9\% & 42.6\% & 43.2\% & 75.0\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+The kept ranges hold more postings than average, which is why the share of postings is higher than the share of
+ranges. As $k$ grows, $\theta$ drops and the bounds remove less: at $k=1000$ three quarters of the postings are
+still read. The two-half filter reduces query time by 12.8\% at $k=10$, 14.8\% at $k=100$ and 4.1\% at $k=1000$
+(paired against the same scorer without it).
 
-\subsection{Pending results}
-\begin{itemize}
-\item \todo{Batched throughput, for comparison with GPUSparse at its batch size.}
-\item \todo{Any further results.}
-\end{itemize}
+\subsection{Unseen queries}\label{sec:heldout}
+The 500 queries used so far also guided our design. To check that the results hold on other queries, we fixed the
+code and the settings of an earlier Strategy B (no two-half filter, and no $\theta$ filter before the merge) and
+ran it once on the other 6,480 dev queries.
+\begin{table}[h]
+\centering
+\caption{6,480 queries not used for design or tuning, $k=10$, full collection, RTX~4070, batch 1. GPUSparse is the
+variant with uint8 document weights; BMP uses one CPU thread.}
+\label{tab:heldout}
+\begin{tabular}{lrrr}
+\toprule
+System & median (ms) & p95 & p99\\
+\midrule
+Strategy B (earlier version), $W=256$ & \textbf{0.271} & 0.967 & 1.628\\
+Strategy B (earlier version), $W=1024$ & 0.378 & 0.797 & \textbf{0.992}\\
+Exhaustive range scorer (version before Strategy A) & 0.700 & 0.972 & 1.093\\
+GPUSparse & 5.894 & 8.105 & 8.615\\
+BMP on the CPU (64-bit scores) & 13.171 & 35.897 & 63.482\\
+\bottomrule
+\end{tabular}
+\end{table}
+Paired per query, Strategy B at $W=256$ is 19.5$\times$ faster than GPUSparse [19.2, 19.8], 45.4$\times$ faster
+than BMP [43.9, 46.7] and 2.38$\times$ faster than the exhaustive range scorer [2.35, 2.42]. Its median is the
+best, but its p99 is worse than exhaustive scoring. Queries whose bounds are loose prune little and still pay for
+many small ranges; $W=1024$ avoids this at the cost of the median. The current Strategy A and the two-half filter
+came after this test, so they were measured on the 500 queries only.
+
+\subsection{Comparison with the CPU}
+\begin{table}[h]
+\centering
+\caption{CPU systems, full collection, $k=10$, 500 queries, same machine. The 16-thread run uses both sockets.}
+\label{tab:cpu}
+\begin{tabular}{lr}
+\toprule
+System & median (ms)\\
+\midrule
+Exhaustive, 1 thread & 46.90\\
+Exhaustive, 8 threads & 22.86\\
+Exhaustive, 16 threads & 7.63\\
+BMP, 1 thread, 64-bit scores & 13.89\\
+BMP, 1 thread, 32-bit scores & 9.15\\
+\bottomrule
+\end{tabular}
+\end{table}
+The exhaustive range scorer that came before Strategy A (0.690\,ms) is 66.0$\times$ faster than one CPU thread and
+10.6$\times$ faster than 16 (paired). The earlier Strategy B (0.272\,ms) is 47.5$\times$ faster than BMP with
+64-bit scores and 32.4$\times$ faster than BMP with 32-bit scores (paired). Strategy A and the current Strategy B
+are faster still at $k=10$ (0.403 and 0.205\,ms), but we did not time them in the same session as a CPU system, so
+we give no paired ratio. Within one socket the CPU scorer stops scaling after about four threads, which suggests
+that it is limited by memory; with both sockets it jumps to 16 threads' 7.63\,ms. The CPU is a 2013 server part
+and the GPU a 2023 consumer card, so these ratios describe this machine only. BMP is our corrected version of
+the released code, and it includes our fixes for exact ties.
+
+\subsection{Several queries at once}
+Batch 1 is not the case GPUSparse is designed for: its paper reports batch 500. Table~\ref{tab:batch} compares
+throughput, with each system in its own multi-query mode. Our mode keeps several queries in flight on separate
+CUDA streams.
+\begin{table}[h]
+\centering
+\caption{Throughput on the full collection, RTX~4070, 500 queries.}
+\label{tab:batch}
+\begin{tabular}{llrr}
+\toprule
+System & $k$ & in flight / batch & queries/s\\
+\midrule
+Strategy A & 1000 & 32 & \textbf{1,606}\\
+GPUSparse, released batch code & 1000 & 500 & 550\\
+GPUSparse, with our tie order & 1000 & 500 & 492\\
+\midrule
+Strategy B without the two-half filter & 10 & 32 & 4,389\\
+Strategy B without the two-half filter & 10 & 1 & 3,110\\
+\bottomrule
+\end{tabular}
+\end{table}
+At $k=1000$ Strategy A serves 2.92$\times$ the queries per second of GPUSparse's batch mode (3.27$\times$ with the
+same tie order). GPUSparse gains more from batching than we do, so the gap is smaller than the 7.5$\times$ at batch 1.
+Strategy B gains 1.41$\times$ from 32 queries in flight, and the median query then completes in 3.7\,ms instead of
+0.24\,ms: throughput costs latency. The GPUSparse runs use its default settings on our GPU.
 
 % =====================================================================
 \section{Conclusions}
